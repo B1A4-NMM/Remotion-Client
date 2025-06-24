@@ -1,7 +1,6 @@
 # 📌 감정 기반 관계도 앱 (Emotion Graph App)
 
-사용자의 감정을 시각적으로 표현하고 관리할 수 있는 감정 기반 관계도 앱입니다.  
-React 기반으로 구축되었으며, React Query와 Zustand를 통해 상태 및 서버 상태를 효율적으로 관리합니다.
+사용자의 감정을 시각적으로 표현하고 관리할 수 있는 감정 기반 관계도 앱
 
 ## 🛠 사용 기술 스택
 
@@ -42,4 +41,19 @@ npm install
 
 # 개발 서버 실행
 npm run dev
+```
+
+## 🧩 VSCode 추천 설정
+
+`.vscode/settings.json`에 아래 내용을 추가해주세요.  
+자동 저장 시 Prettier와 ESLint가 함께 동작합니다.
+
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
+}
 ```

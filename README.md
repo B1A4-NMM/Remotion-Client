@@ -1,54 +1,45 @@
-# React + TypeScript + Vite
+# 📌 감정 기반 관계도 앱 (Emotion Graph App)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+사용자의 감정을 시각적으로 표현하고 관리할 수 있는 감정 기반 관계도 앱입니다.  
+React 기반으로 구축되었으며, React Query와 Zustand를 통해 상태 및 서버 상태를 효율적으로 관리합니다.
 
-Currently, two official plugins are available:
+## 🛠 사용 기술 스택
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Node.js**: v20.14.0
+- **TypeScript**: 5.8.3
+- **React**: 19.1.0
+- **React DOM**: 19.1.0
+- **React Router DOM**: 7.6.2
+- **React Hook Form**: 7.58.1 – 폼 상태 관리
+- **Zustand**: 5.0.5 – 클라이언트 상태 관리
+- **TanStack React Query (@tanstack/react-query)**: 5.81.2 – 서버 상태 관리
+- **Vite**: 6.3.5 – 번들링 및 개발 서버
 
-## Expanding the ESLint configuration
+### 🔍 Lint & Formatter
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **ESLint**: 9.29.0 (Flat Config 기반 - `eslint.config.js`)
+  - `@eslint/js`: 9.25.0
+  - `@typescript-eslint/eslint-plugin`: 8.34.1
+  - `@typescript-eslint/parser`: 8.34.1
+  - `typescript-eslint`: 8.30.1
+  - `eslint-plugin-react`: 7.37.5
+  - `eslint-plugin-react-hooks`: 5.2.0
+  - `eslint-plugin-react-refresh`: 0.4.19
+  - `eslint-plugin-prettier`: 5.5.0
+- **Prettier**: 3.6.0
+  - `eslint-config-prettier`: 10.1.5
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### ✨ 타입 자동 완성
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- `@types/react`: 19.1.2
+- `@types/react-dom`: 19.1.2
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## ⚙️ 프로젝트 실행 방법
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+# 의존성 설치
+npm install
+
+# 개발 서버 실행
+npm run dev
 ```

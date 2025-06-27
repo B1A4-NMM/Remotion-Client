@@ -1,21 +1,18 @@
 // App.tsx에 추가
-import { Link } from "react-router-dom";
-import { routes } from "./routes";
 import { Routes, Route } from "react-router-dom";
+import { routes } from "./routes";
 
 export default function App() {
   return (
-    <>
-      <nav style={{ display: "flex", gap: "1rem" }}>
-        <Link to="/">Home</Link>
-        <Link to="/about">About</Link>
-      </nav>
-
-      <Routes>
-        {routes.map(({ path, element }) => (
-          <Route key={path} path={path} element={element} />
-        ))}
-      </Routes>
-    </>
+    <div className="w-full flex justify-center items-start bg-white min-h-screen">
+      <div className="w-full max-w-[414px] bg-black text-white min-h-screen border border-gray-300">
+        {/* ✅ 라우팅되는 컴포넌트들이 여기에 그려짐 */}
+        <Routes>
+          {routes.map(({ path, element }) => (
+            <Route key={path} path={path} element={element} />
+          ))}
+        </Routes>
+      </div>
+    </div>
   );
 }

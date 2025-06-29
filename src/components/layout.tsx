@@ -1,5 +1,5 @@
 import { useLocation, Outlet } from "react-router-dom";
-import BottomNavigation from "./BottomNavgation";
+import BottomNavigation from "./BottomNavigation";
 
 // 하단 네비게이션을 숨길 경로 목록
 const HIDE_NAV_PATHS = ["/signup", "/login"];

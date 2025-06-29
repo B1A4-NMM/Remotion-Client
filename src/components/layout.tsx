@@ -1,0 +1,30 @@
+import { useLocation, Outlet } from "react-router-dom";
+import BottomNavigation from "./bottomNavgation";
+
+// 하단 네비게이션을 숨길 경로 목록
+const HIDE_NAV_PATHS = ["/", "/signup", "/login"];
+
+export default function Layout() {
+  const location = useLocation();
+
+  // 현재 경로가 네비게이션을 숨겨야 하는 경로에 포함되지 않는 경우만 보여줌
+  const shouldShowNav = !HIDE_NAV_PATHS.includes(location.pathname);
+
+  return (
+    <div className="w-full flex justify-center items-start bg-white min-h-screen">
+      <div className="w-full max-w-[414px] bg-black text-white min-h-screen relative">
+        <main className="pb-14">
+          {/* 라우팅된 페이지 컴포넌트가 렌더링 되는 곳 */}
+          <Outlet />
+        </main>
+
+        {/* 하단 네비게이션*/}
+        {shouldShowNav && (
+          <div className="fixed bottom-0 left-0 right-0 w-full max-w-[414px] mx-auto z-50">
+            <BottomNavigation />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

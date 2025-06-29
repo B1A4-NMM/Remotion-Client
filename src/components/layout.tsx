@@ -12,7 +12,7 @@ export default function Layout() {
 
   return (
     <div className="w-full flex justify-center items-start bg-white min-h-screen">
-      <div className="w-full max-w-[414px] bg-black text-white min-h-screen relative">
+      <div className="w-full max-w-[414px] text-white min-h-screen relative">
         <main className="pb-14">
           {/* 라우팅된 페이지 컴포넌트가 렌더링 되는 곳 */}
           <Outlet />

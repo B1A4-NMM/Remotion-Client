@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { pastelColors } from "../constants/pastelColors";
 
 // Circle 컴포넌트: 하나의 원(사용자)을 렌더링
-import { Circle } from "../components/circle";
+import { Circle } from "../components/Circle";
 
 // names: 각 원에 표시될 이름 배열
 const names = [

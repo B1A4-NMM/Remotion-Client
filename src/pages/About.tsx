@@ -1,5 +1,5 @@
 import React from "react";
-import BottomNavigation from "../components/bottomNavgation";
+import BottomNavigation from "../components/BottomNavgation";
 const About = () => {
   return (
     <div>

@@ -1,8 +1,8 @@
 import { useLocation, Outlet } from "react-router-dom";
-import BottomNavigation from "./bottomNavgation";
+import BottomNavigation from "./BottomNavgation";
 
 // 하단 네비게이션을 숨길 경로 목록
-const HIDE_NAV_PATHS = ["/", "/signup", "/login"];
+const HIDE_NAV_PATHS = ["/signup", "/login"];
 
 export default function Layout() {
   const location = useLocation();
@@ -12,7 +12,7 @@ export default function Layout() {
 
   return (
     <div className="w-full flex justify-center items-start bg-white min-h-screen">
-      <div className="w-full max-w-[414px] text-white min-h-screen relative">
+      <div className="w-full max-w-[414px] min-h-screen relative">
         <main className="pb-14">
           {/* 라우팅된 페이지 컴포넌트가 렌더링 되는 곳 */}
           <Outlet />

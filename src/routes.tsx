@@ -1,11 +1,11 @@
-import Home from "./pages/home";
-import About from "./pages/about";
-import Calendar from "./pages/calendar";
-import Diary from "./pages/diary";
-import Relation from "./pages/relation";
+import Home from "./pages/Home";
+
+import Calendar from "./pages/Calendar";
+import Diary from "./pages/Diary";
+import Relation from "./pages/Relation";
 export const routes = [
-  { path: "/home", element: <Home /> },
-  { path: "/", element: <About /> },
+  { path: "/", element: <Home /> },
+
   { path: "/diary", element: <Diary /> },
   { path: "/calendar", element: <Calendar /> },
   { path: "/relation", element: <Relation /> },

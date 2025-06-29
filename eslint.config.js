@@ -9,11 +9,19 @@ import prettier from "eslint-config-prettier";
 
 export default tseslint.config(
   { ignores: ["dist"] },
+
+  //  TypeScript 공식 recommended 추가
+  ...tseslint.configs.recommended,
+
   {
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
       ecmaVersion: 2020,
       sourceType: "module",
+      parser: tseslint.parser, //  타입스크립트 파서 지정
+      parserOptions: {
+        project: "./tsconfig.json", // tsconfig.json 위치
+      },
       globals: globals.browser,
     },
     plugins: {
@@ -24,14 +32,12 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       ...react.configs.recommended.rules,
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
-      ],
+      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
     },
   },
+
   {
-    // ✅ prettier 연동: eslint-config-prettier를 마지막에 적용
+    // prettier 연동
     rules: prettier.rules,
   }
 );

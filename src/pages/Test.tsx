@@ -27,22 +27,20 @@ const testDataMap: Record<
 
 const Test = () => {
   const navigate = useNavigate();
-
-  // 테스트 종류를 쿼리 파라미터나 state로 전달받음
   const [searchParams] = useSearchParams();
   const typeParam = searchParams.get("type");
-  // 유효성 검사
+
   const isValidTestType = (value: string | null): value is TestType =>
     value === "phq9" || value === "gad7" || value === "stress";
 
   if (!isValidTestType(typeParam)) {
-    return <div>잘못된 테스트 유형입니다.</div>;
+    return <div className="text-white">잘못된 테스트 유형입니다.</div>;
   }
 
   const { title, questions, options } = testDataMap[typeParam];
-
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<number[]>(Array(questions.length).fill(null));
+  const progress = ((step + 1) / questions.length) * 100;
 
   const handleSelect = (value: number) => {
     const updated = [...answers];
@@ -63,17 +61,15 @@ const Test = () => {
     if (step > 0) setStep(prev => prev - 1);
   };
 
-  const progress = ((step + 1) / questions.length) * 100;
-
   return (
-    <div className="flex flex-col px-4 pt-6 pb-[80px] max-w-md mx-auto">
+    <div className="flex flex-col px-4 pt-6 pb-[80px] max-w-md mx-auto bg-[#1E1E1E] text-white min-h-screen">
       <div className="space-y-4">
-        <h2 className="text-xl font-bold text-center">{title}</h2>
+        <h2 className="text-xl font-bold text-center text-white">{title}</h2>
 
-        <Progress value={progress} className="mb-4" />
+        <Progress value={progress} className="mb-4 bg-gray-600 [&>div]:bg-gray-200" />
 
-        <Card className="p-4">
-          <p className="font-semibold mb-2">{`${step + 1}. ${questions[step]}`}</p>
+        <Card className="p-4 bg-[#2C2C2C] border border-gray-600">
+          <p className="font-semibold mb-2 text-white">{`${step + 1}. ${questions[step]}`}</p>
           <RadioGroup
             value={String(answers[step])}
             onValueChange={val => handleSelect(Number(val))}
@@ -82,25 +78,46 @@ const Test = () => {
             {options.map(opt => (
               <Label
                 key={opt.value}
-                className={`border rounded-md px-3 py-2 flex items-center justify-between cursor-pointer transition-all ${
+                className={`border rounded-md px-3 py-2 flex items-center justify-between cursor-pointer transition-all text-white ${
                   String(opt.value) === String(answers[step])
-                    ? "border-primary ring-2 ring-primary"
-                    : "border-muted"
+                    ? "border-white ring-2 ring-white"
+                    : "border-gray-500"
                 }`}
               >
                 <span>{opt.label}</span>
-                <RadioGroupItem value={String(opt.value)} className="ml-2" />
+                <RadioGroupItem
+                  value={String(opt.value)}
+                  className="ml-2 bg-transparent border-white data-[state=checked]:bg-white data-[state=checked]:border-white"
+                />
               </Label>
             ))}
           </RadioGroup>
         </Card>
       </div>
 
-      <div className="flex justify-between mt-6">
-        <Button variant="outline" onClick={handlePrev} disabled={step === 0}>
+      <div className="flex justify-between mt-6 gap-2">
+        <Button
+          onClick={handlePrev}
+          disabled={step === 0}
+          className={`w-full border ${
+            step === 0
+              ? "border-white text-white"
+              : "border-white text-white hover:bg-white hover:text-black"
+          }`}
+          variant="ghost"
+        >
           이전
         </Button>
-        <Button onClick={handleNext} disabled={answers[step] === null}>
+
+        <Button
+          onClick={handleNext}
+          disabled={answers[step] === null}
+          className={`w-full ${
+            answers[step] === null
+              ? "bg-gray-400 text-black cursor-not-allowed"
+              : "bg-white text-black hover:bg-gray-200"
+          }`}
+        >
           {step === questions.length - 1 ? "결과 확인" : "다음"}
         </Button>
       </div>

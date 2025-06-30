@@ -17,7 +17,7 @@ export default function Login() {
       </h1>
 
       {/* 로고 */}
-      <div className="w-40 h-40 mb-10">
+      <div className="w-40 h-40 mb-20">
         <img
           src={homeLogo}
           alt="Wellbeing Logo"
@@ -29,7 +29,7 @@ export default function Login() {
       <div className="flex flex-col gap-3 w-full max-w-xs">
         <Button
           onClick={() => (window.location.href = SOCIAL_AUTH_URL.kakao)}
-          className="bg-white text-black hover:bg-[#ffe812] rounded-full justify-start gap-3 px-4 py-2"
+          className="h-[48px] bg-white text-black hover:bg-[#ffe812] rounded-full justify-center items-center gap-3 px-4 py-2"
         >
           <img src={kakao} alt="Kakao Icon" className="w-5 h-5" />
           <span>카카오로 계속하기</span>
@@ -37,7 +37,7 @@ export default function Login() {
 
         <Button
           onClick={() => (window.location.href = SOCIAL_AUTH_URL.google)}
-          className="bg-white text-black hover:bg-gray-200 rounded-full justify-start gap-3 px-4 py-2"
+          className="h-[48px] bg-white text-black hover:bg-gray-200 rounded-full justify-center items-center gap-3 px-4 py-2"
         >
           <img src={google} alt="Google Icon" className="w-5 h-5" />
           <span>구글로 계속하기</span>

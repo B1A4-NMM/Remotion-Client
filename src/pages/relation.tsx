@@ -63,6 +63,7 @@ const generateCircles = (count: number) => {
           pastelColors[Math.floor(Math.random() * pastelColors.length)],
           pastelColors[Math.floor(Math.random() * pastelColors.length)],
         ],
+        textColor: "black",
 
         baseSize: 80,
         isCenter: false,

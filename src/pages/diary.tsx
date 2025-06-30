@@ -44,7 +44,7 @@ const Diary = () => {
           <Textarea
             {...register("content", { required: "내용을 작성해주세요" })}
             placeholder="오늘은 무슨 일이 있으셨나요?"
-            className="resize-none flex-1 min-h-0 text-black"
+            className="resize-none flex-1 min-h-0 "
           />
           {errors.content && (
             <p className="text-red-500 text-sm mt-1">{errors.content.message as string}</p>
@@ -53,18 +53,16 @@ const Diary = () => {
 
         {/* 이미지 업로드 */}
         <label htmlFor="image-upload">
-          <Card className="w-full h-48 mt-[1vh] border-dashed border-2 border-gray-400 flex items-center justify-center cursor-pointer overflow-hidden">
+          <Card className="w-full h-48 mt-[1vh] border-dashed border-2 border-gray-400 flex items-center justify-center cursor-pointer overflow-hidden bg-transparent">
             {preview ? (
               <img src={preview} alt="미리보기" className="object-cover w-full h-full" />
             ) : (
-              <div className="flex flex-col items-center text-gray-400">
-                <LucideImage className="w-8 h-8 mb-2" />
-                <span className="text-sm">사진 추가</span>
+              <div className="flex flex-col items-center text-white">
+                <LucideImage className="w-8 h-8 mb-2 text-white" /> {/* 아이콘 색상 변경 */}
               </div>
             )}
           </Card>
         </label>
-
         <input
           type="file"
           accept="image/*"
@@ -77,7 +75,7 @@ const Diary = () => {
 
       {/* 저장하기 버튼! */}
       <div className="pt-4">
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full bg-white text-black hover:bg-gray-200">
           저장하기
         </Button>
       </div>

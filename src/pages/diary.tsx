@@ -19,17 +19,26 @@ const Diary = () => {
   const [preview, setPreview] = useState<string | null>(null);
 
   const onSubmit = (data: any) => {
-    const formData = new FormData();
-    formData.append("content", data.content);
-    if (data.image?.[0]) {
-      formData.append("image", data.image[0]);
-    }
-    mutate(formData);
+    const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
+    const token = localStorage.getItem("accessToken") ?? "";
+
+    mutate({
+      content: data.content,
+      writtenDate: today,
+      weather: "SUNNY",
+      token,
+    });
+
     console.log("폼 제출", data);
+    console.log({
+      content: data.content,
+      writtenDate: today,
+      weather: "SUNNY", // 또는 선택된 값
+      token,
+    });
     reset();
     setPreview(null);
   };
-
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {

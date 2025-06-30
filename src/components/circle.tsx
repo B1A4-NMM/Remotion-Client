@@ -12,6 +12,7 @@ type CircleProps = {
   colors: string[]; // 최소 2개
   isHovered: boolean;
   isCenter: boolean;
+  textColor: string;
 };
 
 export const Circle: React.FC<CircleProps> = ({
@@ -23,6 +24,7 @@ export const Circle: React.FC<CircleProps> = ({
   colors,
   isHovered,
   isCenter,
+  textColor,
 }) => {
   // gradient 배경
   const gradient = `radial-gradient(circle, ${colors[0]} 0%, ${colors[1]} 80%)`;
@@ -54,7 +56,7 @@ export const Circle: React.FC<CircleProps> = ({
     >
       <span
         style={{
-          color: "black",
+          color: textColor,
           textShadow: "0 1px 4px rgba(0,0,0,0.1)",
           zIndex: 11,
         }}

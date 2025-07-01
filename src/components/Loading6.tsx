@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 
 const phrases = [
-  "감정을 곱씹는 중이에요...",
+  "감정을 곱씹는 중이에요",
   "일기를 읽고 마음을 살펴보는 중입니다",
   "당신의 하루를 들여다보는 중이에요",
   "느낌의 파장을 분석하는 중입니다",
@@ -49,7 +49,7 @@ const Loading6 = () => {
 
     const upwardGroup = phrasesRef.current;
     let currentY = 0;
-    const verticalSpacing = 50;
+    const verticalSpacing = 70;
     const startTime = new Date().getTime();
 
     const animate = () => {
@@ -59,7 +59,7 @@ const Loading6 = () => {
       currentY -= 1.35 * easeInOut(now);
 
       checksRef.current.forEach((check, i) => {
-        const boundary = -i * verticalSpacing + verticalSpacing + 15;
+        const boundary = -i * verticalSpacing + verticalSpacing + 50;
         if (currentY < boundary) {
           const alpha = Math.max(Math.min(1 - (currentY - boundary + 15) / 30, 1), 0);
           if (check.circle) check.circle.setAttribute("fill", `rgba(255,255,255,${alpha})`);
@@ -86,14 +86,14 @@ const Loading6 = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: `linear-gradient(to top right, #1E1E1E 10%, #1C2A2F 65%, #1E1E1E 125%)`,
+        background: `linear-gradient(to top right, #1E1E1E 10%, #1E1E1E 65%, #1E1E1E 125%)`,
       }}
     >
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          height: 300,
+          height: 290,
           width: 400,
           overflow: "hidden",
         }}
@@ -114,11 +114,11 @@ const Loading6 = () => {
           <g style={{ mask: "url(#mask)" }}>
             <g ref={phrasesRef}>
               {shuffledPhrases.current.map((phrase, i) => {
-                const y = 30 + i * 50;
+                const y = 40 + i * 70;
                 return (
                   <React.Fragment key={i}>
                     <text x="50" y={y} fontSize="17" fontFamily="Arial" fill="white">
-                      {phrase}...
+                      {phrase}
                     </text>
                     <g transform={`translate(10 ${y - 20}) scale(.9)`}>
                       <circle

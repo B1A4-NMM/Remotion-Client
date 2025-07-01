@@ -1,3 +1,4 @@
+import { Checkbox } from "@/components/ui/checkbox";
 import { useTodoStore } from "@/store/todoStore";
 
 export default function TodoItem({ todo }) {
@@ -5,15 +6,21 @@ export default function TodoItem({ todo }) {
 
   return (
     <li className="flex items-center gap-3">
-      <button
-        onClick={() => toggleTodo(todo.id)}
-        className={`w-5 h-5 rounded-full border flex-shrink-0 ${
-          todo.done ? "bg-gray-500" : ""
-        }`}
-      />
-      <span className={todo.done ? "line-through text-gray-400" : ""}>
-        {todo.text}
-      </span>
+        {/* ✅ shadcn Checkbox 사용 & done 상태 연동 */}
+        <Checkbox
+            checked={todo.done}
+            onCheckedChange={() => toggleTodo(todo.id)}
+            className={`flex-shrink-0 border
+                ${todo.done 
+                ? "border-gray-400 bg-white text-black"
+                : "border-white text-white hover:border-blue-400 focus:ring-blue-400"
+            }`}
+        />
+
+        {/* ✅ 완료 시 텍스트 회색 처리 */}
+        <span className={todo.done ? "text-gray-400" : ""}>
+            {todo.text}
+        </span>
     </li>
   );
 }

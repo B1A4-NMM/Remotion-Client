@@ -17,8 +17,8 @@ type TodoStore = {
 
 export const useTodoStore = create<TodoStore>((set) => ({
     todos: [
-        { id: 1, text: "캘린더 테스트", done: false },
-        { id: 2, text: "할 일 입력", done: false },
+        // { id: 1, text: "캘린더 테스트", done: false },
+        // { id: 2, text: "할 일 입력", done: false },
     ],
 
     addTodo: (text) =>

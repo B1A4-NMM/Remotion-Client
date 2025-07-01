@@ -7,8 +7,8 @@ export default function TodoList() {
     const showDone = useTodoStore((state) => state.showDone);
     const toggleShowDone = useTodoStore((state) => state.toggleShowDone);
 
-    const activeTodos = todos.filter((todo) => !todo.done);
-    const doneTodos = todos.filter((todo) => todo.done);
+    const activeTodos = todos.filter((todo) => !todo.isCompleted);
+    const doneTodos = todos.filter((todo) => todo.isCompleted);
 
     return (
         <div className="overflow-y-auto flex-grow">

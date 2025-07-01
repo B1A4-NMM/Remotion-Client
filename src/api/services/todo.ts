@@ -2,6 +2,7 @@
 // Todo 목록 조회, 생성, 수정, 삭제 기능을 제공하는 서비스 모듈
 
 import axios from "axios";
+import type { Todo } from "@/store/todoStore";
 
 export interface Todo {
   id: string;
@@ -15,27 +16,37 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
 
+// ✅ 목록: from/to 유지
 export const getTodos = async (from: string, to: string) => {
-  const response = await api.get<Todo[]>("/todo", {
-    params: { from, to },
-  });
-  return response.data;
+    const response = await api.get<Todo[]>("/api/todos", {
+        params: { from, to },
+    });
+    return response.data;
 };
 
+// ✅ 생성
 export const createTodo = async ({ title }: { title: string }) => {
-  const response = await api.post<Todo>("/todo", { title });
-  return response.data;
+    const response = await api.post<Todo>("/api/todos", { title });
+    return response.data;
 };
 
+// ✅ 상태 toggle (권장!)
+export const toggleTodo = async (id: string) => {
+    const response = await api.patch<Todo>(`/api/todos/${id}/toggle`);
+    return response.data;
+};
+
+// ✅ 수정 (필드 업데이트)
 export const updateTodo = async (
-  id: string,
-  data: Partial<Omit<Todo, "id">>
+    id: string,
+    data: Partial<Omit<Todo, "id">>
 ) => {
-  const response = await api.patch<Todo>(`/todo/${id}`, data);
-  return response.data;
+    const response = await api.patch<Todo>(`api/todos/${id}`, data);
+    return response.data;
 };
 
+// ✅ 삭제
 export const deleteTodo = async (id: string) => {
-  const response = await api.delete(`/todo/${id}`);
-  return response.data;
+    const response = await api.delete(`api/todos/${id}`);
+    return response.data;
 };

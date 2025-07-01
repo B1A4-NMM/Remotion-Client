@@ -1,5 +1,6 @@
 import {useState} from "react";
-import { useTodoStore } from "@/store/todoStore";
+// import { useTodoStore } from "@/store/todoStore";
+import { useCreateTodo } from "@/api/queries/todo/useCreateTodo";
 import { Checkbox } from "@/components/ui/checkbox";
 
 /**
@@ -10,7 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox";
  */
 
 export default function TodoInputRow() {
-    const addTodo = useTodoStore((state) => state.addTodo);
+    // const addTodo = useTodoStore((state) => state.addTodo);
+    const { mutate } = useCreateTodo();
     const [value, setValue] = useState("");
     const [isComposing, setIsComposing] = useState(false);  // ✅ IME 조합 중 상태 관리
 
@@ -18,7 +20,7 @@ export default function TodoInputRow() {
         // ✅ 조합 중에는 Enter 키를 무시해야 한글 입력이 정상 처리됨
         if (e.key === "Enter" && !isComposing && value.trim()) {
             e.preventDefault();     // ✅ preventDefault()는 <form> 구조에서 Enter 시 submit 방지 역할
-            addTodo(value.trim());
+            mutate(value.trim());
             setValue("");           // 인풋 초기화
         }
     };

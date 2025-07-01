@@ -5,7 +5,7 @@ export default function BottomNavigation() {
   const path = location.pathname;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 w-full max-w-[414px] mx-auto flex justify-around items-center h-14 z-50 bg-white">
+    <div className="fixed bottom-0 left-0 right-0 w-full max-w-[414px] mx-auto flex justify-around items-center h-14 z-50 bg-[#1E1E1E]">
       {/* Diary */}
       <Link to="/diary">
         <div className="flex flex-col items-center">
@@ -18,13 +18,13 @@ export default function BottomNavigation() {
           >
             <path
               d="M14.5 3V25"
-              stroke={path === "/diary" ? "#111111" : "#9C9C9C"}
+              stroke={path === "/diary" ? "#ffffff" : "#9C9C9C"}
               strokeWidth="1.5"
               strokeLinecap="square"
             />
             <path
               d="M25.5 14L3.5 14"
-              stroke={path === "/diary" ? "#111111" : "#9C9C9C"}
+              stroke={path === "/diary" ? "#ffffff" : "#9C9C9C"}
               strokeWidth="1.5"
               strokeLinecap="square"
             />
@@ -42,7 +42,7 @@ export default function BottomNavigation() {
             />
           </svg>
           <span
-            className={`text-xs ${path === "/diary" ? "text-[#111111] font-medium" : "text-[#9C9C9C] font-normal"}`}
+            className={`text-xs ${path === "/diary" ? "text-white font-medium" : "text-[#9C9C9C] font-normal"}`}
           >
             Diary
           </span>
@@ -61,7 +61,7 @@ export default function BottomNavigation() {
           >
             <path
               d="M8.91 18.17L12.19 12.92L15.85 17.1L19.29 11.71"
-              stroke={path === "/relation" ? "#111111" : "#9C9C9C"}
+              stroke={path === "/relation" ? "#ffffff" : "#9C9C9C"}
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -70,14 +70,14 @@ export default function BottomNavigation() {
               cx="22.87"
               cy="5.60"
               r="2.10"
-              stroke={path === "/relation" ? "#111111" : "#9C9C9C"}
+              stroke={path === "/relation" ? "#ffffff" : "#9C9C9C"}
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
           </svg>
           <span
-            className={`text-xs ${path === "/relation" ? "text-[#111111] font-medium" : "text-[#9C9C9C] font-normal"}`}
+            className={`text-xs ${path === "/relation" ? "text-white font-medium" : "text-[#9C9C9C] font-normal"}`}
           >
             Relation
           </span>
@@ -96,7 +96,7 @@ export default function BottomNavigation() {
           >
             <path
               d="M8.919 17.173L12.193 12.919L15.926 15.852L19.129 11.718"
-              stroke={path === "/calendar" ? "#111111" : "#9C9C9C"}
+              stroke={path === "/calendar" ? "#ffffff" : "#9C9C9C"}
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -105,7 +105,7 @@ export default function BottomNavigation() {
               cx="22.863"
               cy="5.602"
               r="2.102"
-              stroke={path === "/calendar" ? "#111111" : "#9C9C9C"}
+              stroke={path === "/calendar" ? "#ffffff" : "#9C9C9C"}
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -119,7 +119,7 @@ export default function BottomNavigation() {
             />
           </svg>
           <span
-            className={`text-xs ${path === "/calendar" ? "text-[#111111] font-medium" : "text-[#9C9C9C] font-normal"}`}
+            className={`text-xs ${path === "/calendar" ? "text-white font-medium" : "text-[#9C9C9C] font-normal"}`}
           >
             Calendar
           </span>

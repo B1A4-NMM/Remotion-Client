@@ -11,14 +11,13 @@ export default function Layout() {
   const shouldShowNav = !HIDE_NAV_PATHS.includes(location.pathname);
 
   return (
-    <div className="w-full flex justify-center items-start bg-white min-h-screen">
-      <div className="w-full max-w-[414px] min-h-screen relative">
-        <main className="">
-          {/* 라우팅된 페이지 컴포넌트가 렌더링 되는 곳 */}
+
+    <div className="w-full flex justify-center items-start min-h-screen">
+      <div className="w-full max-w-[414px] min-h-screen relative bg-[#1E1E1E] text-white">
+        <main>
           <Outlet />
         </main>
 
-        {/* 하단 네비게이션*/}
         {shouldShowNav && (
           <div className="fixed bottom-0 left-0 right-0 w-full max-w-[414px] mx-auto z-50">
             <BottomNavigation />

@@ -45,6 +45,7 @@ const generateCircles = (count: number) => {
     baseSize: 110, // 다른 원보다 크게
     isCenter: true,
     position: { x: 0, y: 0 },
+    textColor: "#ffffff",
   });
 
   // 주변 원들 계층적으로 배치 (원형 레이어)
@@ -62,6 +63,7 @@ const generateCircles = (count: number) => {
           pastelColors[Math.floor(Math.random() * pastelColors.length)],
           pastelColors[Math.floor(Math.random() * pastelColors.length)],
         ],
+        textColor: "black",
 
         baseSize: 80,
         isCenter: false,
@@ -195,6 +197,7 @@ export default function Relation() {
           colors={circle.colors}
           isHovered={isHovered}
           isCenter={circle.isCenter}
+          textColor={circle.textColor}
         />
       );
     });

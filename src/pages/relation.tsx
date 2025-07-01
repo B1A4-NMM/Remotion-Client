@@ -201,7 +201,7 @@ export default function Relation() {
   };
 
   return (
-    <div className="relative w-full h-screen bg-white overflow-hidden">
+    <div className="base relative w-full h-screen overflow-hidden">
       <div className="relative w-full h-full" ref={phoneRef}>
         {/* 중심 위치를 표시하는 시각적 가이드 */}
         <div className="absolute top-1/2 left-1/2 w-10 h-10 border-2 border-dashed border-gray-400 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10" />

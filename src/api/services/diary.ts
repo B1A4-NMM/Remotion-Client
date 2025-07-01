@@ -12,8 +12,8 @@ export const postDiary = async ({ content, writtenDate, weather, token }: DiaryP
 
   const requestBody = { content, writtenDate, weather };
 
-  console.log(" 데이터:", requestBody);
-  console.log("헤더:", `Bearer ${token}`);
+  console.log("📦 요청 데이터:", requestBody);
+  console.log("🔐 Authorization 헤더:", `Bearer ${token}`);
 
   const response = await axios.post(`${BASE_URL}/diary`, requestBody, {
     headers: {
@@ -22,5 +22,5 @@ export const postDiary = async ({ content, writtenDate, weather, token }: DiaryP
     },
   });
 
-  return response.data;
+  return response.data; // 꼭 있어야 useMutation의 data에 전달됨
 };

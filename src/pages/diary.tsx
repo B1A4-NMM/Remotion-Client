@@ -9,11 +9,14 @@ import Loading from "../components/Loading";
 import Loading2 from "../components/Loading2";
 import Loading3 from "../components/Loading3";
 import Loading4 from "../components/Loading4";
+import Loading6 from "../components/Loading6";
+
 const Diary = () => {
   const { mutate, isLoading } = usePostDiary({
     onSuccess: () => {
       reset();
       setPreview(null);
+
       setIsSubmitting(false);
     },
   });
@@ -48,7 +51,7 @@ const Diary = () => {
     });
   };
   if (isSubmitting) {
-    return <Loading4 />; // ← 응답 올 때까지 로딩 표시
+    return <Loading6 />; // ← 응답 올 때까지 로딩 표시
   }
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

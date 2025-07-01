@@ -1,12 +1,26 @@
-// src/api/diary.ts
 import axios from "axios";
 
-// 다이어리 포스트 함수(아직 api안나옴)
-export const postDiary = async (formData: FormData) => {
-  const response = await axios.post("/api/diary", formData, {
+interface DiaryPayload {
+  content: string;
+  writtenDate: string;
+  weather: string;
+  token: string;
+}
+
+export const postDiary = async ({ content, writtenDate, weather, token }: DiaryPayload) => {
+  const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
+
+  const requestBody = { content, writtenDate, weather };
+
+  console.log(" 데이터:", requestBody);
+  console.log("헤더:", `Bearer ${token}`);
+
+  const response = await axios.post(`${BASE_URL}/diary`, requestBody, {
     headers: {
-      "Content-Type": "multipart/form-data",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
   });
+
   return response.data;
 };

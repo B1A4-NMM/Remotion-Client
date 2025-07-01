@@ -13,10 +13,6 @@ import '../styles/moodCircle.css';
 import '../styles/resultCard.css';
 import '../styles/App.css';
  
-interface Emotion {
-  color: string;
-  intensity: number;
-}
 
 const baseColors = {
   green: '#82e79f',
@@ -24,6 +20,13 @@ const baseColors = {
   yellow: '#f8e76c',
   blue: '#70cfe4'
 } as const;
+
+type ColorKey = keyof typeof baseColors;
+
+interface Emotion {
+  color: ColorKey; // 이제 'red', 'green' 등의 키만 허용
+  intensity: number;
+}
 
 // 스트레스 데이터 (날짜 포함)
 const stressData = [
@@ -140,49 +143,55 @@ const Todos = () => {
 }
 
 
-type ColorKey = keyof typeof baseColors;
-
 const R: React.FC = () => {
   const [emotions, setEmotions] = useState<Emotion[]>([]);
   const [scrollY, setScrollY] = useState(0);
 
   const contentRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
 
-
-  // 랜덤한 색들을 선택하는 함수
-  const generateRandomEmotions = (): Emotion[] => {
-    const colorKeys = Object.keys(baseColors) as ColorKey[];
-    const numberOfColors = Math.floor(Math.random() * 3) + 2; // 2-4개의 색상 선택
+  const processEmotions = (colors: string[], intensities: number[]): Emotion[] => {
+    const colorMap = new Map<string, number>();
     
-    // 랜덤하게 색상들을 선택 (중복 없이)
-    const selectedColors = colorKeys
-      .sort(() => Math.random() - 0.5)
-      .slice(0, numberOfColors);
+    // colors 배열을 기준으로 반복
+    colors.forEach((color, index) => {
+      const intensity = intensities[index];
+      colorMap.set(color, (colorMap.get(color) || 0) + intensity);
+    });
     
-    // 각 색상에 대해 랜덤한 intensity 값 설정
-    return selectedColors.map(colorKey => ({
-      color: baseColors[colorKey],
-      intensity: Math.random() * 0.4 + 0.5 // 0.5 ~ 0.9 사이의 값
+    return Array.from(colorMap.entries()).map(([color, totalIntensity]) => ({
+      color: color as ColorKey,
+      intensity: totalIntensity / 10 // 0-1 범위로 정규화
     }));
   };
 
-  // 컴포넌트 마운트 시 랜덤한 색상들 설정
   useEffect(() => {
-    setEmotions(generateRandomEmotions());
-  }, []);
+    const exEmotionColors = ['blue', 'blue', 'blue', 'yellow', 'red', 'green'];
+    const exIntensities = [7, 3, 4, 6, 9, 1];
+    const processedEmotions = processEmotions(exEmotionColors, exIntensities);
+    setEmotions(processedEmotions);
+  }, []); // 빈 의존성 배열로 한 번만 실행
 
+  // emotions 상태를 사용하여 그라데이션 생성
   const generateGradient = (): string => {
     if (emotions.length === 0) return '#333';
-    if (emotions.length === 1) return emotions[0].color;
+    if (emotions.length === 1) return baseColors[emotions[0].color];
+    
+    const intensities = emotions.map(e => e.intensity);
+    const maxIntensity = Math.max(...intensities);
+    const normalizedIntensities = intensities.map(i => i / maxIntensity);
+    
+    const totalWeight = normalizedIntensities.reduce((sum, weight) => sum + weight, 0);
+    let cumulative = 0;
     
     const colors = emotions.map((emotion, index) => {
-      const position = (index / (emotions.length - 1)) * 100;
-      return `${emotion.color} ${position}%`;
-    }).join(', ');
+      cumulative += normalizedIntensities[index];
+      const position = (cumulative / totalWeight) * 100;
+      return `${baseColors[emotion.color]} ${position.toFixed(1)}%`;
+    });
     
-    // 더 부드러운 원형 그라데이션
-    return `radial-gradient(ellipse at center, ${colors})`;
+    return `radial-gradient(ellipse at center, ${colors.join(', ')})`;
+
+
   };
 
   const [emotionCards, setEmotionsCards]=useState([

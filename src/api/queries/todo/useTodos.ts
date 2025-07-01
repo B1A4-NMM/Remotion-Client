@@ -1,0 +1,12 @@
+// Todo 목록을 가져오는 getTodos 함수를 React Query의 useQuery로 감싼 훅
+// from과 to 파라미터를 받아 [\"todos\", from, to] 키로 캐싱
+
+import { useQuery } from "@tanstack/react-query";
+import { getTodos } from "@/api/services/todo";
+
+export const useTodos = (from: string, to: string) => {
+  return useQuery({
+    queryKey: ["todos", from, to],
+    queryFn: () => getTodos(from, to),
+  });
+};

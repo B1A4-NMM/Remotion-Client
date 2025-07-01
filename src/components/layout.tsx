@@ -11,6 +11,7 @@ export default function Layout() {
   const shouldShowNav = !HIDE_NAV_PATHS.includes(location.pathname);
 
   return (
+
     <div className="w-full flex justify-center items-start min-h-screen">
       <div className="w-full max-w-[414px] min-h-screen relative bg-[#1E1E1E] text-white">
         <main>

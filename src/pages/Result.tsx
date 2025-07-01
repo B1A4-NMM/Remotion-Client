@@ -1,9 +1,14 @@
 import React, { useState, useEffect, useRef} from 'react';
-import { Card, CardDescription, CardTitle, CardHeader} from '../components/ui/card';
+import { Card, CardDescription, CardTitle, CardHeader, CardContent} from '../components/ui/card';
+import { ArrowLeft, Clock, CirclePlus, Plus, PlusCircle } from "lucide-react"
+import { ChartContainer } from "../components/ui/chart"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, LabelList, ResponsiveContainer } from "recharts"
+import { toast } from 'sonner'
+import { Link } from 'react-router-dom' // 또는 'next/link'
 import { Badge } from '../components/ui/badge';
-import { ArrowLeft, Clock, CirclePlus, Plus } from "lucide-react"
 import { Button } from '../components/ui/button';
 import { motion } from 'framer-motion';
+
 import '../styles/moodCircle.css';
 import '../styles/resultCard.css';
 import '../styles/App.css';
@@ -20,21 +25,129 @@ const baseColors = {
   blue: '#70cfe4'
 } as const;
 
+// 스트레스 데이터 (날짜 포함)
+const stressData = [
+  { date: "2025-06-31", stress: 237 },
+  { date: "2025-06-31", stress: 73 },
+  { date: "2025-07-01", stress: 209 },
+  { date: "2025-07-02", stress: 214}
+];
+
+// 차트 설정
+const chartConfig = {
+  stress: {
+    label: "스트레스 수치",
+    color: "#ff6b6b", // 빨간색
+  },
+} satisfies ChartConfig
+
+const formatDateToMD = (dateStr: string) => {
+  // YYYY-MM-DD에서 MM/DD 추출
+  const match = dateStr.match(/\d{4}-(\d{2})-(\d{2})/);
+  return match ? `${match[1]}/${match[2]}` : dateStr;
+};
+
+// 커스텀 라벨 컴포넌트
+const CustomLabel = (props: any) => {
+  const { x, y, value } = props;
+  return (
+    <text 
+      x={x} 
+      y={y - 10} 
+      fill="#ffffff" 
+      textAnchor="middle" 
+      fontSize="12"
+      fontWeight="500"
+    >
+      {value}
+    </text>
+  );
+};
+
+const StressChart = () => {
+  return (
+    <div className="w-full h-64 rounded-lg p-4">
+      <ChartContainer config={chartConfig} className="h-full w-full">
+        <LineChart data={stressData} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+          {/* 1. 연한 배경 라인 */}
+          <CartesianGrid 
+            strokeDasharray="none" 
+            stroke="#525a6a" 
+            strokeWidth={1}
+            horizontal={true}
+            vertical={false}
+          />
+          
+          {/* 2. X축에 날짜 표시 */}
+          <XAxis 
+            dataKey="date"
+            tickFormatter={formatDateToMD}
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: '#ffffff', fontSize: 12 }}
+            interval={0}
+          />
+          
+          <YAxis hide />
+          
+          {/* 3. 라인과 점 위에 수치 표시 */}
+          <Line 
+            type="monotone" 
+            dataKey="stress" 
+            stroke="var(--color-stress)" 
+            strokeWidth={2}
+            dot={{ fill: "var(--color-stress)", strokeWidth: 0, r: 4 }}
+            activeDot={{ r: 6, fill: "var(--color-stress)" }}
+          >
+            {/* 각 점 위에 수치 표시 */}
+            <LabelList content={CustomLabel} />
+          </Line>
+        </LineChart>
+      </ChartContainer>
+    </div>
+  );
+};
+
+const Todos = () => {
+  const TodoCards = ["투두리스트", "캘린더 기능 구현", "팀원들과 소통 개선", "의견 차이 관리 방법 연구"];
+
+  const handleTodoAdd = (todoItem: string) => {
+    toast.success(`"${todoItem}" 추가 완료!`, {
+      description: '할일 목록에 성공적으로 추가되었습니다.',
+      duration: 3000,
+    })
+  }
+
+  return (
+    <div className="wrapper space-y-2">
+      {TodoCards.map((card, index) => (
+        <Card key={index} className="bg-gray-100 border-gray-300 p-4">
+          <div className="flex items-center justify-between">
+            <span>{card}</span>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className='rounded-full w-8 h-8 p-0' 
+              onClick={() => handleTodoAdd(card)}
+            >
+              <CirclePlus className='h-4 w-4'/>
+            </Button>
+          </div>
+        </Card>
+      ))}
+    </div>
+  )
+}
+
 
 type ColorKey = keyof typeof baseColors;
 
 const R: React.FC = () => {
   const [emotions, setEmotions] = useState<Emotion[]>([]);
-  const [dragY, setDragY] = useState(0);
-  const [dragConstraints, setDragConstraints] = useState({top:0, bottom:0});
-  const [isFullScreen, setIsFullscreen] =useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [scrollY, setScrollY] = useState(0);
+
   const contentRef = useRef<HTMLDivElement>(null);
-
-  // 전환 임계값
-  const FULLSCREEN_THRESHOLD = -150; // 위로 150px 드래그하면 전체화면
-  const NORMAL_THRESHOLD = 100;      // 아래로 100px 드래그하면 일반모드
-
+  const headerRef = useRef<HTMLDivElement>(null);
 
 
   // 랜덤한 색들을 선택하는 함수
@@ -128,7 +241,6 @@ const R: React.FC = () => {
     }
   ];
 
-  const TodoCards=["투두리스트","캘린더 기능 구현", "팀원들과 소통 개선", "의견 차이 관리 방법 연구"];
 
   const personalButton=[
     {
@@ -149,47 +261,7 @@ const R: React.FC = () => {
     e.currentTarget.classList.toggle('hover');
   };
 
-  const calculateConstraints = () => {
-    if (containerRef.current && contentRef.current) {
-      // DOM 업데이트 완료를 위한 지연
-      requestAnimationFrame(() => {
-        const containerHeight = containerRef.current!.clientHeight;
-        const contentHeight = contentRef.current!.scrollHeight;
-        
-        console.log('=== Drag Constraints Calculation ===');
-        console.log('Container height:', containerHeight);
-        console.log('Content height:', contentHeight);
-        console.log('Content overflow:', contentHeight - containerHeight);
-        
-        if (contentHeight > containerHeight) {
-          // 더 넉넉한 스크롤 범위 제공
-          const availableScroll = contentHeight - containerHeight;
-          const topConstraint = -availableScroll - 200; // 추가 여유 공간
-                    
-          setDragConstraints({ 
-            top: topConstraint,
-            bottom: 50
-          });
-        } else {
-          console.log('Content fits in container - no scroll needed');
-          setDragConstraints({ top: 0, bottom: 0 });
-        }
-      });
-    }
-  };
-
-  // 감정 분석 카드 변경 시에만 재계산
-  useEffect(() => {
-    const timer = setTimeout(calculateConstraints, 200); // 더 긴 지연
-    return () => clearTimeout(timer);
-  }, [emotionCards]); // emotionCards 변경 시에만
-
-  // 초기 계산 (컴포넌트 마운트 시)
-  useEffect(() => {
-    const timer = setTimeout(calculateConstraints, 500); // 초기 로딩 후 계산
-    return () => clearTimeout(timer);
-  }, []);
-
+  
 
   // 드래그 위치에 따른 mood-circle 크기 계산
   const getMoodCircleScale = () => {
@@ -197,20 +269,37 @@ const R: React.FC = () => {
       const minScale = 0.8;
       const maxScale = 1; // 아래로 드래그할 때 최대 크기
       
-      if (dragY <= 0) {
+      if (scrollY <= 0) {
         // 위로 드래그: 크기 감소 (1 → 0.5)
-        return Math.max(minScale, 1 + dragY / maxDrag);
+        return Math.max(minScale, 1 + scrollY / maxDrag);
       } else {
         // 아래로 드래그: 크기 증가 (1 → 1.2)
-        return Math.min(maxScale, 1 + (dragY / maxDrag));
+        return Math.min(maxScale, 1 + (scrollY / maxDrag));
       }
     };
     
+    const handleDrag = (event: any, info: any) => {
+      setScrollY(info.offset.y);
+    };
+  
+    const calculateConstraints = () => {
+      if (!contentRef.current) return { top: 0, bottom: 0 };
+      
+      const contentHeight = contentRef.current.scrollHeight;
+      const viewHeight = window.innerHeight;
+      const headerHeight = 400; // 헤더 + 무드 서클 영역
+      
+      return {
+        top: -(contentHeight - viewHeight + headerHeight),
+        bottom: 0
+      };
+    };
+
 
   return (
     <div className='base px-4 overflow-hidden'>
       {/* 상단 뒤로가기 버튼 */}
-      <div className="flex justify-start pt-6 pb-6">
+      <div className="relative z-50 flex justify-start pt-6 pb-6">
         <Button variant="ghost" size="icon" className="text-white">
           <ArrowLeft className="h-6 w-6" />
         </Button>
@@ -254,162 +343,181 @@ const R: React.FC = () => {
           </div> */}
 
         {/* 드래그 가능한 카드 컨테이너 */}
-        <div ref={containerRef} className="h-[calc(100vh-200px)] overflow-hidden">
-          <motion.div
-            ref={contentRef}
-            drag="y"
-            dragConstraints={dragConstraints}
-            dragElastic={0.1}
-            onDrag={(event, info) => {
-              setDragY(info.offset.y);
-            }}
-            className="cursor-grab active:cursor-grabbing"
-            whileDrag={{ scale: 1.02 }}
+        <motion.div
+          ref={contentRef}
+          drag="y"
+          dragConstraints={calculateConstraints()}
+          dragElastic={0.1}
+          onDrag={handleDrag}
+          className="cursor-grab active:cursor-grabbing"
+          style={{
+            y: scrollY,
+            backgroundColor: scrollY < -100 ? '#1E1E1E' : '#1E1E1E',
+            borderRadius: scrollY < -100 ? '0px' : '24px 24px 0 0',
+            minHeight: '100vh'
+          }}
           >
-          {/* 상단 카드들 */}
-          <div className="card-container flex gap-4 mb-8">
-            <Card className="flex-1 bg-gray-600 border-gray-600">
-              <CardHeader className="text-gray-300">
-                  <h2 className="text-xl font-semibold">일기 제목 예시</h2>
-              </CardHeader>
-            </Card>
-
-          </div>
-
-          {/* 대상별 감정 분석 섹션 */}
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-4 text-white">대상별 감정 분석</h2>
-            
-            {/* 감정 분석 카드들 */}
-            <div className="space-y-4 mb-10">
-              {emotionCards.map((card, index) => (
-                <Card key={index} className="bg-gray-100 border-gray-300 p-4">
-                  <div className="mb-3">
-                    <Badge variant="secondary" className="bg-gray-600 text-white">
-                      {card.title}
-                    </Badge>
-                  </div>
-                  <div className='flex flex-wrap gap-2'>
-                    {card.emotions.map((emotion, index)=>(
-                      <Button key={index} variant="outline" size="sm" className='rounded-full'>
-                        {emotion}
-                      </Button>
-                    ))}
-                    <Button variant="outline" size="sm" className='rounded-full w-8 h-8 p-0' onClick={()=>{/*감정 추가 로직*/}}>
-                      <CirclePlus className='h-4 w-4'/>
-                    </Button>
-                  </div>
-                </Card>
-              ))}
-
-              {/* 새 카드 추가 버튼*/}
-              <Card className="bg-gray-100 border-gray-300 p-4">
-                <div className="mb-3">
-                  <Badge variant="secondary" className="bg-gray-600 text-white" onClick={addEmotionCard}>
-                    <CirclePlus className="h-4 w-4" />
-                  </Badge>
-                </div>
+            {/* 상단 카드들 */}
+            <div className="card-container flex gap-4 mb-8">
+              <Card className="flex-1 bg-gray-600 border-gray-600">
+                <CardHeader className="text-gray-300">
+                    <h2 className="text-xl font-semibold">일기 제목 예시</h2>
+                </CardHeader>
               </Card>
 
-
-              </div>
             </div>
-            <hr />
-            <br/>
 
-            {/* 분석 세션 */}
-            <h2 className="text-xl font-semibold mb-4 text-white">일기에서 나타난 당신의 강점 </h2>
-
-            {/* 강점 분석 카드들 */}
-            <div className="wrapper">
-              <div className="cols">
-                {StrCards.map((card, index) => (
-                  <div 
-                    key={index}
-                    className="col" 
-                    onTouchStart={handleCardClick}
-                    onClick={handleCardClick}
-                  >
-                    <div className="container">
-                      <div className="front" style={{ backgroundImage: `url(${card.image})` }}>
-                        <div className="inner">
-                          <p>{card.title}</p>
-                          <span>{card.count}</span>
-                        </div>
-                      </div>
-                      <div className="back">
-                        <div className="inner">
-                          <p>{card.description}</p>
-                        </div>
-                      </div>
+            {/* 대상별 감정 분석 섹션 */}
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold mb-4 text-white">대상별 감정 분석</h2>
+              
+              {/* 감정 분석 카드들 */}
+              <div className="space-y-4 mb-10">
+                {emotionCards.map((card, index) => (
+                  <Card key={index} className="bg-gray-100 border-gray-300 p-4">
+                    <div className="mb-3">
+                      <Badge variant="secondary" className="bg-gray-600 text-white">
+                        {card.title}
+                      </Badge>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <br/>
-            <hr/>
-            <br/>
-            <h2 className="text-xl font-semibold mb-4 text-white">일기에서 나타난 당신의 약점 </h2>
-
-            {/* 약점 분석 카드들 */}
-            <div className="wrapper">
-              <div className="cols">
-                {WeakCards.map((card, index) => (
-                  <div 
-                    key={index}
-                    className="col" 
-                    onTouchStart={handleCardClick}
-                    onClick={handleCardClick}
-                  >
-                    <div className="container">
-                      <div className="front" style={{ backgroundImage: `url(${card.image})` }}>
-                        <div className="inner">
-                          <p>{card.title}</p>
-                          <span>{card.count}</span>
-                        </div>
-                      </div>
-                      <div className="back">
-                        <div className="inner">
-                          <p>{card.description}</p>
-                        </div>
-                      </div>
+                    <div className='flex flex-wrap gap-2'>
+                      {card.emotions.map((emotion, index)=>(
+                        <Button key={index} variant="outline" size="sm" className='rounded-full'>
+                          {emotion}
+                        </Button>
+                      ))}
+                      <Button variant="outline" size="sm" className='rounded-full w-8 h-8 p-0' onClick={()=>{/*감정 추가 로직*/}}>
+                        <CirclePlus className='h-4 w-4'/>
+                      </Button>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <br/>
-            <hr/>
-            <br/>
-            <h2 className="text-xl font-semibold mb-4 text-white">당신의 최근 스트레스 추이</h2>
-            { /*스트레스 수치*/}
-
-
-
-            <br/>
-            <hr/>
-            <br/>
-            <h2 className="text-xl font-semibold mb-4 text-white">당신의 todoList </h2>
-
-            {/* 투두 리스트 카드들 */}
-            <div className="wrapper space-y-2">
-              {TodoCards.map((card, index) => (
-                <Card key={index} className="bg-gray-100 border-gray-300 p-4">
-                    <span>{card}</span>
                   </Card>
-              ))}
-            </div>
+                ))}
 
-            {/* 하단 버튼 */}
-            <div className="card-container flex flex-wrap gap-4 justify-center mb-8">
+                {/* 새 카드 추가 버튼*/}
+                <Card className="bg-gray-100 border-gray-300 p-4">
+                  <div className="mb-3">
+                    <Badge variant="secondary" className="bg-gray-600 text-white" onClick={addEmotionCard}>
+                      <CirclePlus className="h-4 w-4" />
+                    </Badge>
+                  </div>
+                </Card>
+
+
+                </div>
+              </div>
+              <hr />
+              <br/>
+
+              {/* 분석 세션 */}
+              <h2 className="text-xl font-semibold mb-4 text-white">일기에서 나타난 당신의 강점 </h2>
+
+              {/* 강점 분석 카드들 */}
+              <div className="wrapper">
+                <div className="cols">
+                  {StrCards.map((card, index) => (
+                    <div 
+                      key={index}
+                      className="col" 
+                      onTouchStart={handleCardClick}
+                      onClick={handleCardClick}
+                    >
+                      <div className="container">
+                        <div className="front" style={{ backgroundImage: `url(${card.image})` }}>
+                          <div className="inner">
+                            <p>{card.title}</p>
+                            <span>{card.count}</span>
+                          </div>
+                        </div>
+                        <div className="back">
+                          <div className="inner">
+                            <p>{card.description}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <br/>
+              <hr/>
+              <br/>
+              <h2 className="text-xl font-semibold mb-4 text-white">일기에서 나타난 당신의 약점 </h2>
+
+              {/* 약점 분석 카드들 */}
+              <div className="wrapper">
+                <div className="cols">
+                  {WeakCards.map((card, index) => (
+                    <div 
+                      key={index}
+                      className="col" 
+                      onTouchStart={handleCardClick}
+                      onClick={handleCardClick}
+                    >
+                      <div className="container">
+                        <div className="front" style={{ backgroundImage: `url(${card.image})` }}>
+                          <div className="inner">
+                            <p>{card.title}</p>
+                            <span>{card.count}</span>
+                          </div>
+                        </div>
+                        <div className="back">
+                          <div className="inner">
+                            <p>{card.description}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <br/>
+              <hr/>
+              <br/>
+              { /*스트레스 수치*/}
+              <h2 className="text-xl font-semibold mb-4 text-white">당신의 최근 스트레스 추이</h2>
+               
+                <p className="text-sm text-gray-400">수치가 낮을수록 좋습니다</p>
                 
-            </div>
+                <StressChart />
+                
+                <div className="mt-4 flex justify-between text-sm text-gray-400">
+                  <span>최저: 73</span>
+                  <span>최고: 305</span>
+                  <span>평균: {Math.round(stressData.reduce((acc, cur) => acc + cur.stress, 0) / stressData.length)}</span>
+                </div>
+      
+                <Card className='mt-5'>
+                  <CardHeader>
+                    <p>근 3일간의 스트레스 수치가 높습니다.</p>
+                    <p>스트레스 검사로 더 자세한 결과를 받아보실 수 있습니다.</p>
+                  </CardHeader>
+                  <Link to="/test">
+                    <Button 
+                      className="w-full"
+                      style={{ 
+                        backgroundColor: '#303030', 
+                        color: '#ffffff',
+                        border: 'none'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#494949'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#303030'}
+                    >
+                      테스트 보러 가기
+                    </Button>
+                  </Link>
+                </Card>
 
-        </motion.div>
-      </div>
+              <br/>
+              <hr/>
+              <br/>
+              <h2 className="text-xl font-semibold m-4 text-white">당신의 todoList </h2>
+
+              {/* 투두 리스트 카드들 */}
+              <Todos/>
+
+      </motion.div>
     </div>
   );
 };

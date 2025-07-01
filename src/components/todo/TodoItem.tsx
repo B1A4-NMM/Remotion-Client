@@ -24,7 +24,7 @@ export default function TodoItem({ todo }) {
 
         {/* ✅ 완료 시 텍스트 회색 처리 */}
         <span className={todo.isCompleted ? "text-gray-400" : ""}>
-            {todo.text}
+            {todo.title}
         </span>
     </li>
   );

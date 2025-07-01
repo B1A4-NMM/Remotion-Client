@@ -13,6 +13,7 @@ export type Todo = {
 type TodoStore = {
     todos: Todo[];
     setTodos: (updater: Todo[] | ((prev: Todo[]) => Todo[])) => void;
+    deleteTodo: (id: number) => void;
     showDone: boolean;
     toggleShowDone: () => void;
 };
@@ -23,6 +24,10 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
     setTodos: (updater) => {
         const next = typeof updater === "function" ? (updater as (prev: Todo[]) => Todo[])(get().todos) : updater;
         set({ todos: next });
+    },
+
+    deleteTodo: (id) => {
+        set((state) => ({ todos: state.todos.filter((todo) => todo.id !== id) }));
     },
 
     showDone: false,

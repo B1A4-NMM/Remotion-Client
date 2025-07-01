@@ -2,14 +2,14 @@
 // id와 변경할 필드를 받아 updateTodo 서비스를 호출
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateTodo, type Todo } from "@/api/services/todo";
+import { updateTodo, type ApiTodo } from "@/api/services/todo";
 
 export const useUpdateTodo = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Omit<Todo, "id">> }) =>
-      updateTodo(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<Omit<ApiTodo, "id">> }) =>
+        updateTodo(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["todos"] });
     },

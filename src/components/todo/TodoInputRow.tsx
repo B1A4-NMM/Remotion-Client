@@ -20,7 +20,7 @@ export default function TodoInputRow() {
         // ✅ 조합 중에는 Enter 키를 무시해야 한글 입력이 정상 처리됨
         if (e.key === "Enter" && !isComposing && value.trim()) {
             e.preventDefault();     // ✅ preventDefault()는 <form> 구조에서 Enter 시 submit 방지 역할
-            mutate(value.trim());
+            mutate({ title: value.trim() });
             setValue("");           // 인풋 초기화
         }
     };

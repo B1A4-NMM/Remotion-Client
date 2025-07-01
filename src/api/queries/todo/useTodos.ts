@@ -4,9 +4,19 @@
 import { useQuery } from "@tanstack/react-query";
 import { getTodos } from "@/api/services/todo";
 
-export const useTodos = (from: string, to: string) => {
+export const useTodos = (from?: string, to?: string) => {
+    const now = new Date();
+    const defaultFrom =
+      from ?? new Date(now.getFullYear(), now.getMonth(), 1)
+        .toISOString()
+        .slice(0, 10);
+    const defaultTo =
+      to ?? new Date(now.getFullYear(), now.getMonth() + 1, 0)
+        .toISOString()
+        .slice(0, 10);
+  
   return useQuery({
-    queryKey: ["todos", from, to],
-    queryFn: () => getTodos(from, to),
+    queryKey: ["todos", defaultFrom, defaultTo],
+    queryFn: () => getTodos(defaultFrom, defaultTo),
   });
 };

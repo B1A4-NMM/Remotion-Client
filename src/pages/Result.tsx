@@ -16,7 +16,7 @@ import { Link } from "react-router-dom"; // 또는 'next/link'
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { motion } from "framer-motion";
-
+import TestModal from "../components/TestModal";
 import "../styles/moodCircle.css";
 import "../styles/resultCard.css";
 import "../styles/App.css";
@@ -148,6 +148,8 @@ const Todos = () => {
 type ColorKey = keyof typeof baseColors;
 
 const R: React.FC = () => {
+  const [showTestModal, setShowTestModal] = useState(false);
+
   const [emotions, setEmotions] = useState<Emotion[]>([]);
   const [scrollY, setScrollY] = useState(0);
 
@@ -505,20 +507,20 @@ const R: React.FC = () => {
             <p>근 3일간의 스트레스 수치가 높습니다.</p>
             <p>스트레스 검사로 더 자세한 결과를 받아보실 수 있습니다.</p>
           </CardHeader>
-          <Link to="/test">
-            <Button
-              className="w-full"
-              style={{
-                backgroundColor: "#303030",
-                color: "#ffffff",
-                border: "none",
-              }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#494949")}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#303030")}
-            >
-              테스트 보러 가기
-            </Button>
-          </Link>
+
+          <Button
+            className="w-full"
+            style={{
+              backgroundColor: "#303030",
+              color: "#ffffff",
+              border: "none",
+            }}
+            onClick={() => setShowTestModal(true)}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#494949")}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#303030")}
+          >
+            테스트 보러 가기
+          </Button>
         </Card>
 
         <br />
@@ -529,6 +531,15 @@ const R: React.FC = () => {
         {/* 투두 리스트 카드들 */}
         <Todos />
       </motion.div>
+      {showTestModal && (
+        <TestModal
+          type="stress"
+          onClose={() => setShowTestModal(false)}
+          onFinish={score => {
+            console.log("최종 점수:", score);
+          }}
+        />
+      )}
     </div>
   );
 };

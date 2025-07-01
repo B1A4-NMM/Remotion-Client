@@ -20,7 +20,7 @@ const Diary = () => {
       setPreview(null);
 
       setIsSubmitting(false);
-      navigate("/");
+      navigate("/result");
     },
   });
 
@@ -48,7 +48,7 @@ const Diary = () => {
     console.log({
       content: data.content,
       writtenDate: today,
-      weather: "SUNNY", // 또는 선택된 값
+      weather: "SUNNY",
       token,
     });
   };

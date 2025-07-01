@@ -20,11 +20,12 @@ const LEVEL_MAP: Record<
   stress: STRESS_LEVELS,
 };
 
-const SurveyResultPage = () => {
-  const { state } = useLocation();
-  const score = state?.total ?? 0;
-  const type: TestType = state?.type ?? "phq9";
+interface TestResultProps {
+  type: TestType;
+  score: number;
+}
 
+const TestResult = ({ type, score }: TestResultProps) => {
   const levels = LEVEL_MAP[type];
   const matched = levels.find(level => score <= level.max) ?? levels[levels.length - 1];
 
@@ -43,4 +44,4 @@ const SurveyResultPage = () => {
   );
 };
 
-export default SurveyResultPage;
+export default TestResult;

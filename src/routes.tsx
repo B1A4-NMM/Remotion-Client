@@ -6,7 +6,7 @@ import Relation from "./pages/Relation";
 
 import Result from "./pages/Result";
 import Test from "./pages/Test";
-import TestResult from "./pages/TestResult";
+import TestResult from "./components/TestResult";
 import Login from "./pages/Login";
 import GetAccess from "./pages/GetAccess";
 import Loading6 from "./components/Loading6";

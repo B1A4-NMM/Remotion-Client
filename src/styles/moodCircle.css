@@ -1,4 +1,4 @@
-.mood-container{
+.mood-container {
   display: flex;
   /* flex-direction: column; */
   justify-content: center;
@@ -7,106 +7,106 @@
 }
 
 .mood-circle {
-    position: relative;
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    margin-bottom: 20px;
-    /* 부드러운 형태 변화 */
-    animation: gentle-ripple 12s ease-in-out infinite;
+  position: relative;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  margin-bottom: 20px;
+  /* 부드러운 형태 변화 */
+  animation: gentle-ripple 12s ease-in-out infinite;
+}
+
+/* 메인 그라데이션 레이어 */
+.mood-circle::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  background: inherit;
+  border-radius: 50%;
+  filter: blur(15px);
+  opacity: 0.7;
+  animation: gradient-flow 10s linear infinite;
+  background-size: 300% 300%;
+}
+
+/* 추가 글로우 레이어 */
+.mood-circle::after {
+  content: "";
+  position: absolute;
+  top: -40px;
+  left: -40px;
+  right: -40px;
+  bottom: -40px;
+  background: inherit;
+  border-radius: 50%;
+  filter: blur(510px);
+  opacity: 0.4;
+  animation: gradient-flow 15s linear infinite reverse;
+  background-size: 400% 400%;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+button:hover {
+  background-color: #555;
+}
+
+/* 매우 부드러운 형태 변화 */
+@keyframes gentle-ripple {
+  0%,
+  100% {
+    border-radius: 50% 50.5% 49.5% 50%;
+    transform: rotate(0deg) scale(1);
   }
-  
-  /* 메인 그라데이션 레이어 */
-  .mood-circle::before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: -10px;
-    right: -10px;
-    bottom: -10px;
-    background: inherit;
-    border-radius: 50%;
-    filter: blur(15px);
-    opacity: 0.7;
-    animation: gradient-flow 10s linear infinite;
-    background-size: 300% 300%;
+  25% {
+    border-radius: 49.5% 50% 50.5% 50%;
+    transform: rotate(90deg) scale(1.02);
   }
-  
-  /* 추가 글로우 레이어 */
-  .mood-circle::after {
-    content: '';
-    position: absolute;
-    top: -40px;
-    left: -40px;
-    right: -40px;
-    bottom: -40px;
-    background: inherit;
-    border-radius: 50%;
-    filter: blur(510px);
-    opacity: 0.4;
-    animation: gradient-flow 15s linear infinite reverse;
-    background-size: 400% 400%;
+  50% {
+    border-radius: 50.5% 49.5% 50% 50%;
+    transform: rotate(180deg) scale(1);
   }
-  
-  .controls {
-    display: flex;
-    gap: 10px;
+  75% {
+    border-radius: 50% 50% 50% 49.5%;
+    transform: rotate(270deg) scale(1.02);
   }
-  
-  button {
-    background-color: #333;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 4px;
+}
+
+/* 부드러운 그라데이션 흐름 */
+@keyframes gradient-flow {
+  0% {
+    background-position: 0% 0%;
+    transform: rotate(0deg) scale(1);
   }
-  
-  button:hover {
-    background-color: #555;
+  25% {
+    background-position: 100% 0%;
+    transform: rotate(90deg) scale(1.05);
   }
-  
-  /* 매우 부드러운 형태 변화 */
-  @keyframes gentle-ripple {
-    0%, 100% {
-      border-radius: 50% 50.5% 49.5% 50%;
-      transform: rotate(0deg) scale(1);
-    }
-    25% {
-      border-radius: 49.5% 50% 50.5% 50%;
-      transform: rotate(90deg) scale(1.02);
-    }
-    50% {
-      border-radius: 50.5% 49.5% 50% 50%;
-      transform: rotate(180deg) scale(1);
-    }
-    75% {
-      border-radius: 50% 50% 50% 49.5%;
-      transform: rotate(270deg) scale(1.02);
-    }
+  50% {
+    background-position: 100% 100%;
+    transform: rotate(180deg) scale(1);
   }
-  
-  /* 부드러운 그라데이션 흐름 */
-  @keyframes gradient-flow {
-    0% {
-      background-position: 0% 0%;
-      transform: rotate(0deg) scale(1);
-    }
-    25% {
-      background-position: 100% 0%;
-      transform: rotate(90deg) scale(1.05);
-    }
-    50% {
-      background-position: 100% 100%;
-      transform: rotate(180deg) scale(1);
-    }
-    75% {
-      background-position: 0% 100%;
-      transform: rotate(270deg) scale(1.05);
-    }
-    100% {
-      background-position: 0% 0%;
-      transform: rotate(360deg) scale(1);
-    }
+  75% {
+    background-position: 0% 100%;
+    transform: rotate(270deg) scale(1.05);
   }
-  
+  100% {
+    background-position: 0% 0%;
+    transform: rotate(360deg) scale(1);
+  }
+}

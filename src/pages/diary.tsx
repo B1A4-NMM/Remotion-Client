@@ -4,10 +4,25 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Image as LucideImage } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { usePostDiary } from "@/api/queries/diary/usePostDiary.ts";
+import Loading from "../components/Loading";
+import Loading2 from "../components/Loading2";
+import Loading3 from "../components/Loading3";
+import Loading4 from "../components/Loading4";
+import Loading6 from "../components/Loading6";
 
 const Diary = () => {
-  const { mutate } = usePostDiary();
+  const navigate = useNavigate();
+  const { mutate, isLoading } = usePostDiary({
+    onSuccess: () => {
+      reset();
+      setPreview(null);
+
+      setIsSubmitting(false);
+      navigate("/result");
+    },
+  });
 
   const {
     register,
@@ -17,11 +32,12 @@ const Diary = () => {
   } = useForm();
 
   const [preview, setPreview] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false); // ← 로딩 상태 직접 관리
 
   const onSubmit = (data: any) => {
     const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
     const token = localStorage.getItem("accessToken") ?? "";
-
+    setIsSubmitting(true); // ← 먼저 로딩 true로 설정
     mutate({
       content: data.content,
       writtenDate: today,
@@ -29,16 +45,16 @@ const Diary = () => {
       token,
     });
 
-    console.log("폼 제출", data);
     console.log({
       content: data.content,
       writtenDate: today,
-      weather: "SUNNY", // 또는 선택된 값
+      weather: "SUNNY",
       token,
     });
-    reset();
-    setPreview(null);
   };
+  if (isSubmitting) {
+    return <Loading6 key={Date.now()} />; // ← 응답 올 때까지 로딩 표시
+  }
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {

@@ -66,6 +66,10 @@
     background-color: #555;
   }
   
+  .home-circle:hover{
+    transform: scale(0.6); /* Increase size by 20% */
+  }
+
   /* 매우 부드러운 형태 변화 */
   @keyframes gentle-ripple {
     0%, 100% {

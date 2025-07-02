@@ -19,7 +19,26 @@ type TodoStore = {
 };
 
 export const useTodoStore = create<TodoStore>((set, get) => ({
-    todos: [],
+    todos: [
+        {
+            id: 1,
+            title: "Amie 벤치마킹",
+            isCompleted: false,
+            date: "",
+            isRepeat: false,
+            repeatRule: null,
+            repeatEndDate: null,
+        },
+        {
+            id: 2,
+            title: "투두리스트, 캘린더 기능 구현",
+            isCompleted: false,
+            date: "",
+            isRepeat: false,
+            repeatRule: null,
+            repeatEndDate: null,
+        },
+    ],
 
     setTodos: (updater) => {
         const next = typeof updater === "function" ? (updater as (prev: Todo[]) => Todo[])(get().todos) : updater;

@@ -22,7 +22,7 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
     todos: [
         {
             id: 1,
-            title: "Amie 벤치마킹",
+            title: "캘린더 기능 구현",
             isCompleted: false,
             date: "",
             isRepeat: false,
@@ -31,7 +31,16 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
         },
         {
             id: 2,
-            title: "투두리스트, 캘린더 기능 구현",
+            title: "팀원들과 소통 개선",
+            isCompleted: false,
+            date: "",
+            isRepeat: false,
+            repeatRule: null,
+            repeatEndDate: null,
+        },
+        {
+            id: 3,
+            title: "의견 차이 관리 방법 연구",
             isCompleted: false,
             date: "",
             isRepeat: false,

@@ -13,10 +13,10 @@ export default function TodoItem({ todo }) {
             checked={todo.isCompleted}
             onCheckedChange={() => mutate(todo.id)}
 
-            className={`flex-shrink-0 border
+            className={`flex-shrink-0 border border-white
                 ${todo.isCompleted
-                ? "border-gray-400 bg-white text-black"
-                : "border-white text-white hover:border-blue-400 focus:ring-blue-400"
+                ? "bg-white text-black"
+                : "bg-transparent text-white hover:border-blue-400 focus:ring-blue-400"
             }`}
         />
 

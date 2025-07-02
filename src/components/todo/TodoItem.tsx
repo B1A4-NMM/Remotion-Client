@@ -1,0 +1,29 @@
+import { Checkbox } from "@/components/ui/checkbox";
+// import { useTodoStore } from "@/store/todoStore";
+import { useToggleTodo } from "@/api/queries/todo/useToggleTodo";
+
+export default function TodoItem({ todo }) {
+  // const toggleTodo = useTodoStore((state) => state.toggleTodo);
+  const { mutate } = useToggleTodo();
+
+  return (
+    <li className="flex items-center gap-3">
+        {/* ✅ shadcn Checkbox 사용 & isCompleted 상태 연동 */}
+        <Checkbox
+            checked={todo.isCompleted}
+            onCheckedChange={() => mutate(todo.id)}
+
+            className={`flex-shrink-0 border border-white
+                ${todo.isCompleted
+                ? "bg-white text-black"
+                : "bg-transparent text-white hover:border-blue-400 focus:ring-blue-400"
+            }`}
+        />
+
+        {/* ✅ 완료 시 텍스트 회색 처리 */}
+        <span className={todo.isCompleted ? "text-gray-400" : ""}>
+            {todo.title}
+        </span>
+    </li>
+  );
+}

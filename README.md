@@ -59,6 +59,9 @@
 # 의존성 설치
 npm install
 
+# 환경 변수 파일 설정
+cp .env.example .env  # 필요한 경우 VITE_API_URL 값을 수정하세요
+
 # 개발 서버 실행
 npm run dev
 

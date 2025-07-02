@@ -33,6 +33,8 @@ const names = [
 
 // generateCircles: 중심 원 + 주변 원 위치와 속성 초기 생성
 const generateCircles = (count: number) => {
+  const color = pastelColors[Math.floor(Math.random() * pastelColors.length)];
+
   const circles = []; // 최종 원 리스트
   const layers = Math.ceil(Math.sqrt(count)); // 필요 레이어 수 계산
   let id = 0; // 원마다 고유 ID 부여
@@ -42,7 +44,7 @@ const generateCircles = (count: number) => {
     id: id++,
     colors: ["#ffffff"], // 중심은 흰색
     name: names[0] || "중심",
-    baseSize: 110, // 다른 원보다 크게
+    baseSize: 160, // 다른 원보다 크게
     isCenter: true,
     position: { x: 0, y: 0 },
     textColor: "#ffffff",
@@ -53,7 +55,7 @@ const generateCircles = (count: number) => {
     const perLayer = layer * 6; // 각 레이어에 위치할 원 수
     for (let i = 0; i < perLayer && id < names.length; i++) {
       const angle = (i / perLayer) * 2 * Math.PI;
-      const radius = layer * 80;
+      const radius = layer * 140;
       const x = radius * Math.cos(angle);
       const y = radius * Math.sin(angle);
       circles.push({
@@ -65,7 +67,7 @@ const generateCircles = (count: number) => {
         ],
         textColor: "black",
 
-        baseSize: 80,
+        baseSize: 140,
         isCenter: false,
         position: { x, y },
       });
@@ -89,6 +91,11 @@ export default function Relation() {
 
   // 중심에서 가장 가까운 원 탐색 (100ms마다)
   useEffect(() => {
+    const lastClosest = { current: null as number | null };
+    const lastChangedAt = { current: Date.now() };
+    const STABILITY_TIME_MS = 300;
+    const THRESHOLD = 120; // 중심으로부터 거리 제한
+
     const timeout = setTimeout(() => {
       const interval = setInterval(() => {
         if (!innerRef.current || !phoneRef.current) return;
@@ -107,17 +114,27 @@ export default function Relation() {
           const cx = rect.left + rect.width / 2;
           const cy = rect.top + rect.height / 2;
           const dist = Math.hypot(cx - centerX, cy - centerY);
-          if (dist < 60 && dist < minDistance) {
+
+          if (dist < THRESHOLD && dist < minDistance) {
             closestId = index;
             minDistance = dist;
           }
         });
 
-        setHoveredIndex(closestId);
+        // 안정적으로 일정 시간 유지된 경우에만 hoveredIndex 갱신
+        if (closestId !== lastClosest.current) {
+          lastClosest.current = closestId;
+          lastChangedAt.current = Date.now();
+        } else {
+          const now = Date.now();
+          if (now - lastChangedAt.current >= STABILITY_TIME_MS) {
+            setHoveredIndex(closestId);
+          }
+        }
       }, 100);
 
       return () => clearInterval(interval);
-    }, 1000); // 1초 후부터 감지 시작
+    }, 1000);
 
     return () => clearTimeout(timeout);
   }, []);

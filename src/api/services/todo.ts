@@ -7,7 +7,7 @@ import axios from "axios";
 export interface ApiTodo {
     id: string;
     title: string;
-    done: boolean;
+    isCompleted: boolean;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -15,6 +15,18 @@ export interface ApiTodo {
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
+
+// 모든 요청에 Authorization 헤더 자동 추가
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem("accessToken") ?? "";
+    if (token) {
+      config.headers = {
+        ...config.headers,
+        Authorization: `Bearer ${token}`,
+      };
+    }
+    return config;
+  });
 
 // ✅ 목록: from/to 유지
 export const getTodos = async (from: string, to: string) => {

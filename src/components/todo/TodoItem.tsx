@@ -8,15 +8,13 @@ export default function TodoItem({ todo }) {
 
   return (
     <li className="flex items-center gap-3">
-        {/* ✅ shadcn Checkbox 사용 & done 상태 연동 */}
+        {/* ✅ shadcn Checkbox 사용 & isCompleted 상태 연동 */}
         <Checkbox
-            // checked={todo.done}
-            // onCheckedChange={() => toggleTodo(todo.id)}
             checked={todo.isCompleted}
             onCheckedChange={() => mutate(todo.id)}
 
             className={`flex-shrink-0 border
-                ${todo.isCompleted    // As-is: ${todo.done
+                ${todo.isCompleted
                 ? "border-gray-400 bg-white text-black"
                 : "border-white text-white hover:border-blue-400 focus:ring-blue-400"
             }`}

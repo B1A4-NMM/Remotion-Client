@@ -14,7 +14,9 @@ export const useToggleTodo = () => {
         // Optimistic Update: 스토어 먼저 갱신
         onMutate: async (id: string) => {
             setTodos((prev) =>
-                prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t))
+                prev.map((t) =>
+                    t.id === id ? { ...t, isCompleted: !t.isCompleted } : t
+                )            
             );
         },
 

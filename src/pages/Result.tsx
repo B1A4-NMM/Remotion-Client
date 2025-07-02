@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom' // 또는 'next/link'
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { motion } from 'framer-motion';
-
+import TestModal from '../components/TestModal';
 import '../styles/moodCircle.css';
 import '../styles/resultCard.css';
 import '../styles/App.css';

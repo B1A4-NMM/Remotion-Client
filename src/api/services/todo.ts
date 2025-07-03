@@ -30,7 +30,7 @@ api.interceptors.request.use((config) => {
 
 // ✅ 목록: from/to 유지
 export const getTodos = async (from: string, to: string) => {
-    const response = await api.get<ApiTodo[]>("/api/todos", {
+    const response = await api.get<ApiTodo[]>("/api/todo", {
         params: { from, to },
     });
     return response.data;
@@ -38,13 +38,13 @@ export const getTodos = async (from: string, to: string) => {
 
 // ✅ 생성
 export const createTodo = async ({ title }: { title: string }) => {
-    const response = await api.post<ApiTodo>("/api/todos", { title });
+    const response = await api.post<ApiTodo>("/api/todo", { title });
     return response.data;
 };
 
 // ✅ 상태 toggle (권장!)
 export const toggleTodo = async (id: string) => {
-    const response = await api.patch<ApiTodo>(`/api/todos/${id}/toggle`);
+    const response = await api.patch<ApiTodo>(`/api/todo/${id}/toggle`);
     return response.data;
 };
 
@@ -53,12 +53,12 @@ export const updateTodo = async (
     id: string,
     data: Partial<Omit<ApiTodo, "id">>
 ) => {
-    const response = await api.patch<ApiTodo>(`/api/todos/${id}`, data);
+    const response = await api.patch<ApiTodo>(`/api/todo/${id}`, data);
     return response.data;
 };
 
 // ✅ 삭제
 export const deleteTodo = async (id: string) => {
-    const response = await api.delete(`/api/todos/${id}`);
+    const response = await api.delete(`/api/todo/${id}`);
     return response.data;
 };

@@ -9,15 +9,23 @@ export interface DiaryPayload {
 export interface DiaryResponse {
   id: number;
   title: string;
+  photo_path?: string;
   content: string;
   people: Person[];
+  selfEmotion: Emotion[];
+  stateEmotion: Emotion[];
   activity: Activity[];
   todos: TodoItem[];
+  createdAt?: string;
 }
 
-export interface Person {
+interface Person {
   name: string;
-  feel: Emotion[];
+  feel: {
+    emotionType: string;
+    intensity: number;
+  }[];
+  count: number;
 }
 
 export interface Emotion {
@@ -25,8 +33,9 @@ export interface Emotion {
   intensity: number;
 }
 
-export interface Activity {
+interface Activity {
   activityContent: string;
+  strength: string;
 }
 
 export interface TodoItem {

@@ -3,15 +3,12 @@ import { useGetTodayDiary } from '../api/queries/home/useGetHome';
 import { motion } from 'framer-motion';
 import React, { useState, useEffect, useRef} from 'react';
 import { Link, useLocation } from "react-router-dom";
-
-
+import { toast } from 'sonner';
 import { Card, CardDescription, CardTitle, CardHeader, CardContent} from '../components/ui/card';
-import { ArrowLeft, Clock, CirclePlus, Plus, PlusCircle } from "lucide-react"
-import { Button } from '../components/ui/button';
+import clsx from 'clsx'; 
 
 
 import '../styles/moodCircle.css';
-
 
 const WeeklyCalender = () => {
   const [currentWeekOffset, setCurrentWeekOffset] = useState(0);
@@ -149,8 +146,35 @@ const baseColors = {
 
 type ColorKey = keyof typeof baseColors;
 
+
+type ChangesProps = {
+  hasTodayDiary?: boolean;
+  onAlreadyWrote: () => void;
+  children: React.ReactNode;
+};
+
+
+const Changes = ({ hasTodayDiary, onAlreadyWrote, children }: ChangesProps) =>
+  hasTodayDiary ? (
+    <div onClick={onAlreadyWrote}>
+      {children}
+    </div>
+  ) : (
+    <Link to="/diary" >{children}</Link>    
+  );
+
 const MoodCircle = ({ diaries }: {diaries?: any[] }) => {
   const [emotions, setEmotions] = useState<Emotion[]>([]);
+  const hasTodayDiary = diaries && diaries.length > 0;
+  
+  /* 이미 작성했을 때 토스트만 표시 */
+  const handleAlreadyWrote = () => {
+    toast.error('오늘은 이미 일기를 작성했습니다', {
+      description: '하루에 하나의 일기만 작성할 수 있습니다.',
+      duration: 3000,
+    });
+  };
+
 
   // 감정을 색상으로 매핑하는 함수
   const mapEmotionToColor = (emotion: string): string => {
@@ -242,61 +266,45 @@ const MoodCircle = ({ diaries }: {diaries?: any[] }) => {
     
   };
 
-
   return (
-    <div >
-      <Link to="/diary" className='home-circle'>
-        <motion.div 
-          className="mood-container flex justify-center mb-6"
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          whileHover={{ scale: 0.95 }}    // 마우스 올릴 때 약간 작아짐
-          whileTap={{ scale: 0.9 }}       // 클릭할 때 약간 작아짐
-        >
-          <div 
-            className="mood-circle w-48 h-48 rounded-full"
-            style={{ 
-              background: generateGradient(),
-              boxShadow: `0 0 40px ${emotions[0]?.color || '#4ecdc4'}40`
-            }}
-          />
-        </motion.div>
-      </Link>
-    </div>
+    <div>
+    <Changes hasTodayDiary={hasTodayDiary} onAlreadyWrote={handleAlreadyWrote}>
+      <motion.div 
+        className="mood-container flex justify-center mb-6"
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        whileHover={{ scale: 0.95 }}    // 마우스 올릴 때 약간 작아짐
+        whileTap={{ scale: 0.9 }}       // 클릭할 때 약간 작아짐
+      >
+        <div 
+          className="mood-circle w-36 h-36 rounded-full"
+          style={{ 
+            background: generateGradient(),
+            boxShadow: `0 0 40px ${emotions[0]?.color || '#4ecdc4'}40`
+          }}
+        />
+      </motion.div>
+    </Changes>
+  </div>
   );
 };
 
 const DiaryCards = ({ diaries }: { diaries?: any[] }) => {
+
+  const makePreview = (raw?: string, limit = 150) =>
+    !raw ? '' : raw.replace(/\s+/g, ' ').slice(0, limit) + (raw.length > limit ? '…' : '');
+  
   const sampleDiaries = [
     {
       id: 1,
-      title: "오늘 하루는 어땠나요? 일기를 작성해보세요.",
-      emotions: ["기대"],
-      time: "지금",
-      writtenDate: new Date().toISOString().split('T')[0]
+      title: "오늘 하루는 어땠나요? 일기를 작성해 주세요.",
+      peoples:["인물"],
+      content_preview: "일기를 작성해주세요. 여기에는 일기 내용이 3줄까지 미리보기로 나타납니다."
     }
   ];
 
   const displayDiaries = diaries && diaries.length > 0 ? diaries : sampleDiaries;
-
-  const [scrollY, setScrollY] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const handleDrag = (event: any, info: any) => {
-    setScrollY(info.point.y);
-  };
-
-  const calculateConstraints = () => {
-    if (!contentRef.current || !containerRef.current) return { top: 0, bottom: 0 };
-    const contentHeight = contentRef.current.scrollHeight;
-    const containerHeight = containerRef.current.clientHeight;
-    // 컨텐츠가 컨테이너보다 작으면 드래그 불가
-    if (contentHeight <= containerHeight) return { top: 0, bottom: 0 };
-    return {
-      top: -(contentHeight - containerHeight + 500),
-      bottom: 0
-    };
-  };
 
   return (
     <div 
@@ -304,45 +312,42 @@ const DiaryCards = ({ diaries }: { diaries?: any[] }) => {
       className="card-container overflow-hidden"
       style={{ minHeight: '100vh', position: 'relative' }}
     >
-      <motion.div
-        ref={contentRef}
-        drag="y"
-        dragConstraints={calculateConstraints()}
-        dragElastic={0.1}
-        onDrag={handleDrag}
-        className="cursor-grab active:cursor-grabbing"
-        style={{
-          y: scrollY,
-          position: 'absolute',
-          width: '100%',
-        }}
-      >
-        <div className="space-y-4 px-4 py-8">
-          {displayDiaries.map((diary, index) => (
-            <Card key={diary.id || index} className="bg-gray-600 border-gray-600 border-gray-700 p-6">
-              <div className="mb-4">
-                <p className="text-white text-base leading-relaxed">
-                  "{diary.title}"
-                </p>
-              </div>
+      <div className="space-y-4 px-4 py-8">
+          {displayDiaries.map((diary, idx) => (
+            <Card
+              key={diary.id ?? idx}
+              className="bg-gray-600 border-gray-600 text-2xl border-gray-700 p-6"
+            >
+              {/* 제목 */}
+              <h1 className="text-white mb-4 leading-relaxed">"{diary.title}"</h1>
+
+              {/* 등장 인물 */}
               <div className="flex flex-wrap gap-2 mb-4">
-                {diary.emotions.map((emotion: string, emotionIndex: number) => (
-                  <span 
-                    key={emotionIndex}
+                {diary.peoples?.map((p: string, i: number) => (
+                  <span
+                    key={i}
                     className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full text-sm border border-gray-600"
                   >
-                    {emotion}
+                    {p}
                   </span>
                 ))}
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-400 text-sm">{diary.time}</span>
-                <div className="w-8 h-8 bg-gray-600 rounded-full" />
+
+              {/* ──▶ 3줄 미리보기 영역 ◀── */}
+              <div className='bg-gray-800/70 backdrop-blur-sm px-6 py-6 rounded-2xl'>
+                <p
+                  className={clsx(
+                    'text-gray-200 text-sm mb-4',
+                    diary.content_preview ? 'line-clamp-3' : 'hidden'
+                  )}
+                >
+                  {makePreview(diary.content_preview)}
+                </p>
               </div>
+
             </Card>
           ))}
         </div>
-      </motion.div>
     </div>
   );
 };

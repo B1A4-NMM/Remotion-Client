@@ -7,7 +7,7 @@ export default function BottomNavigation() {
   return (
     <div className="fixed bottom-0 left-0 right-0 w-full max-w-[414px] mx-auto flex justify-around items-center h-14 z-50 bg-[#1E1E1E]">
       {/* Diary */}
-      <Link to="/diary">
+      <Link to="/">
         <div className="flex flex-col items-center">
           <svg
             width="29"
@@ -18,13 +18,13 @@ export default function BottomNavigation() {
           >
             <path
               d="M14.5 3V25"
-              stroke={path === "/diary" ? "#ffffff" : "#9C9C9C"}
+              stroke={path === "/" ? "#ffffff" : "#9C9C9C"}
               strokeWidth="1.5"
               strokeLinecap="square"
             />
             <path
               d="M25.5 14L3.5 14"
-              stroke={path === "/diary" ? "#ffffff" : "#9C9C9C"}
+              stroke={path === "/" ? "#ffffff" : "#9C9C9C"}
               strokeWidth="1.5"
               strokeLinecap="square"
             />
@@ -42,7 +42,7 @@ export default function BottomNavigation() {
             />
           </svg>
           <span
-            className={`text-xs ${path === "/diary" ? "text-white font-medium" : "text-[#9C9C9C] font-normal"}`}
+            className={`text-xs ${path === "/" ? "text-white font-medium" : "text-[#9C9C9C] font-normal"}`}
           >
             Diary
           </span>

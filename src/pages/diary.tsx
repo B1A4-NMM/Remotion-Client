@@ -50,8 +50,6 @@ const Diary = () => {
     if (file) {
       console.log("✅ 선택된 이미지 파일:", file);
       formData.append("photo", file);
-    } else {
-      console.warn("❌ 이미지가 선택되지 않았습니다.");
     }
 
     for (const [key, value] of formData.entries()) {

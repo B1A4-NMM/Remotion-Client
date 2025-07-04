@@ -1,38 +1,43 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toggleTodo } from "@/api/services/todo";
+import { updateTodo } from "@/api/services/todo"; // ✅ toggleTodo 대신 updateTodo 사용
 import { useTodoStore } from "@/store/todoStore";
 
 import type { Todo } from "@/store/todoStore";
 
 export const useToggleTodo = () => {
-    const queryClient = useQueryClient();
-    const setTodos = useTodoStore((state) => state.setTodos);
+  const queryClient = useQueryClient();
+  const { setTodos } = useTodoStore.getState();
 
-    return useMutation({
-        mutationFn: toggleTodo,
+  return useMutation({
+    // ✅ mutationFn은 toggleTodo 대신 updateTodo
+    mutationFn: async (id: string) => {
+      // 현재 todos에서 해당 todo 찾아서 isCompleted 반전
+      const todo = useTodoStore.getState().todos.find((t) => t.id === id);
+      if (!todo) throw new Error("Todo not found");
 
-        // Optimistic Update: 스토어 먼저 갱신
-        onMutate: async (id: string) => {
-            setTodos((prev) =>
-                prev.map((t) =>
-                    t.id === id ? { ...t, isCompleted: !t.isCompleted } : t
-                )            
-            );
-        },
+      return updateTodo(id, { isCompleted: !todo.isCompleted });
+    },
 
-        // 서버 성공: 스토어 & React Query 쿼리 invalidate
-        onSuccess: (updated: Todo) => {
-            setTodos((prev) => 
-                    prev.map((t) => (t.id === updated.id ? updated : t))
-            );
+    // Optimistic Update: 스토어 먼저 갱신
+    onMutate: async (id: string) => {
+      setTodos((prev) =>
+        prev.map((t) =>
+          t.id === id ? { ...t, isCompleted: !t.isCompleted } : t
+        )
+      );
+    },
 
-            // ✅ ["todos"] 쿼리 invalidate → 같은 쿼리 쓰는 모든 곳 최신화!
-            queryClient.invalidateQueries({ queryKey: ["todos"] });
-        },
+    onSuccess: (updated: Todo) => {
+      setTodos((prev) =>
+        prev.map((t) => (t.id === updated.id ? updated : t))
+      );
 
-        onError: (error) => {
-            console.error("Todo toggle 실패:", error);
-            // 필요하다면 롤백 로직 추가
-        },
-    });
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+    },
+
+    onError: (error) => {
+      console.error("Todo toggle 실패:", error);
+      // rollback 필요하면 여기서 처리
+    },
+  });
 };

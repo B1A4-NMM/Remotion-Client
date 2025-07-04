@@ -5,13 +5,17 @@ import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
 
-interface ApiTodo {
-  id: string;
-  title: string;
-  isCompleted: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
+export interface ApiTodo {
+    id: string;
+    title: string;
+    isCompleted: boolean;
+    date: string | null;
+    isRepeat: boolean;
+    repeatRule: string | null;
+    repeatEndDate: string | null;
+    createdAt: string;
+    updatedAt: string;
+  }
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -43,16 +47,14 @@ export const createTodo = async ({ title }: { title: string }) => {
   return response.data;
 };
 
-// ✅ 상태 toggle (권장!)
-export const toggleTodo = async (id: string) => {
-  const response = await api.patch<ApiTodo>(`/todos/${id}/toggle`);
-  return response.data;
-};
 
 // ✅ 수정 (필드 업데이트)
-export const updateTodo = async (id: string, data: Partial<Omit<ApiTodo, "id">>) => {
-  const response = await api.patch<ApiTodo>(`/todos/${id}`, data);
-  return response.data;
+export const updateTodo = async (
+    id: string, 
+    data: Partial<Omit<ApiTodo, "id">>
+) => {
+    const response = await api.patch<ApiTodo>(`/todos/${id}`, data);
+    return response.data;
 };
 
 // ✅ 삭제

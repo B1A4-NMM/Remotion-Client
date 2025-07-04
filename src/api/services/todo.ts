@@ -2,9 +2,10 @@
 // Todo 목록 조회, 생성, 수정, 삭제 기능을 제공하는 서비스 모듈
 
 import axios from "axios";
-// import type { Todo } from "@/store/todoStore";
 
-export interface ApiTodo {
+const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
+
+interface ApiTodo {
   id: string;
   title: string;
   isCompleted: boolean;
@@ -13,7 +14,7 @@ export interface ApiTodo {
 }
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: BASE_URL,
 });
 
 // 모든 요청에 Authorization 헤더 자동 추가

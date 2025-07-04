@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,30 +28,40 @@ const Diary = () => {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm();
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const [preview, setPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false); // ← 로딩 상태 직접 관리
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const onSubmit = (data: any) => {
-    const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
+    const today = new Date().toISOString().split("T")[0];
     const token = localStorage.getItem("accessToken") ?? "";
-    setIsSubmitting(true); // ← 먼저 로딩 true로 설정
-    mutate({
-      content: data.content,
-      writtenDate: today,
-      weather: "SUNNY",
-      token,
-    });
+    const file = fileInputRef.current?.files?.[0]; // ✅ 리액트 방식으로 파일 참조
 
-    console.log({
-      content: data.content,
-      writtenDate: today,
-      weather: "SUNNY",
-      token,
-    });
+    const formData = new FormData();
+    formData.append("content", data.content);
+    formData.append("writtenDate", today);
+    formData.append("weather", "SUNNY");
+
+    if (file) {
+      console.log("✅ 선택된 이미지 파일:", file);
+      formData.append("photo", file);
+    } else {
+      console.warn("❌ 이미지가 선택되지 않았습니다.");
+    }
+
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
+
+    setIsSubmitting(true);
+    mutate(formData);
   };
+
   if (isSubmitting) {
     return <Loading6 key={Date.now()} />; // ← 응답 올 때까지 로딩 표시
   }
@@ -59,6 +69,7 @@ const Diary = () => {
     const file = e.target.files?.[0];
     if (file) {
       setPreview(URL.createObjectURL(file));
+      setImageFile(file); // ✅ 여기에 저장
     }
   };
 
@@ -92,9 +103,10 @@ const Diary = () => {
           type="file"
           accept="image/*"
           id="image-upload"
-          {...register("image")}
+          {...register("image")} // 있어도 괜찮음
           onChange={handleImageChange}
           className="hidden"
+          ref={fileInputRef} // ✅ 여기
         />
       </div>
 

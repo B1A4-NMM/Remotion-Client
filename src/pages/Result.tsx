@@ -1,21 +1,29 @@
-import React, { useState, useEffect, useRef} from 'react';
-import { useMutationState } from '@tanstack/react-query';
+import React, { useState, useEffect, useRef } from "react";
+import { useMutationState } from "@tanstack/react-query";
 
-import { Card, CardDescription, CardTitle, CardHeader, CardContent} from '../components/ui/card';
-import { ArrowLeft, Clock, CirclePlus, Plus, PlusCircle } from "lucide-react"
-import { ChartContainer } from "../components/ui/chart"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, LabelList, ResponsiveContainer } from "recharts"
-import { toast } from 'sonner'
-import { Link } from 'react-router-dom' // 또는 'next/link'
-import { Badge } from '../components/ui/badge';
-import { Button } from '../components/ui/button';
-import { motion } from 'framer-motion';
+import { Card, CardDescription, CardTitle, CardHeader, CardContent } from "../components/ui/card";
+import { ArrowLeft, Clock, CirclePlus, Plus, PlusCircle } from "lucide-react";
+import { ChartContainer } from "../components/ui/chart";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  LabelList,
+  ResponsiveContainer,
+} from "recharts";
+import { toast } from "sonner";
+import { Link } from "react-router-dom"; // 또는 'next/link'
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
+import { motion } from "framer-motion";
 
-import TestModal from '../components/TestModal';
-import '../styles/moodCircle.css';
-import '../styles/resultCard.css';
-import '../styles/App.css';
- 
+import TestModal from "../components/TestModal";
+import "../styles/moodCircle.css";
+import "../styles/resultCard.css";
+import "../styles/App.css";
+
 interface DiaryCardsProps {
   hasTodayDiary: boolean;
   todayDiary: any | null;
@@ -24,15 +32,14 @@ interface DiaryCardsProps {
   isContentError: boolean;
 }
 
-
 const baseColors = {
-  green: '#4ecdc4',
-  red: '#ff6b6b',
-  yellow: '#ffe66d',
-  blue: '#45b7d1',
-  gray: '#c4c4c4',
-  gray1: '#c4c4c4',
-  gray2: '#424242'
+  green: "#4ecdc4",
+  red: "#ff6b6b",
+  yellow: "#ffe66d",
+  blue: "#45b7d1",
+  gray: "#c4c4c4",
+  gray1: "#c4c4c4",
+  gray2: "#424242",
 } as const;
 
 type ColorKey = keyof typeof baseColors;
@@ -44,32 +51,58 @@ interface Emotion {
 
 // 감정을 색상으로 매핑하는 함수
 const mapEmotionToColor = (emotion: string): string => {
-  const strongHappiness = new Set(["행복", "기쁨", "신남", "즐거움", "설렘", "유대", "신뢰", "존경"]);
+  const strongHappiness = new Set([
+    "행복",
+    "기쁨",
+    "신남",
+    "즐거움",
+    "설렘",
+    "유대",
+    "신뢰",
+    "존경",
+  ]);
   const weakHappiness = new Set(["친밀", "자신감", "평온", "안정", "편안", "감사", "무난", "차분"]);
-  const strongUnhappiness = new Set(["시기", "서운", "불안", "실망", "속상", "상처", "긴장", "화남", "짜증", "무기력", "지침", "억울", "초조", "부담", "어색", "불편", "불쾌", "소외", "지루"]); // 누락된 감정 추가
-  const weakUnhappiness = new Set(["외로움", "우울", "공허", "기대"]); 
-  
+  const strongUnhappiness = new Set([
+    "시기",
+    "서운",
+    "불안",
+    "실망",
+    "속상",
+    "상처",
+    "긴장",
+    "화남",
+    "짜증",
+    "무기력",
+    "지침",
+    "억울",
+    "초조",
+    "부담",
+    "어색",
+    "불편",
+    "불쾌",
+    "소외",
+    "지루",
+  ]); // 누락된 감정 추가
+  const weakUnhappiness = new Set(["외로움", "우울", "공허", "기대"]);
+
   if (strongHappiness.has(emotion)) return "yellow";
-  if (weakHappiness.has(emotion)) return "green";  
+  if (weakHappiness.has(emotion)) return "green";
   if (strongUnhappiness.has(emotion)) return "red";
   if (weakUnhappiness.has(emotion)) return "blue";
   return "gray"; // 알 수 없는 감정
 };
 
-{/* ==========무드 서클 ============== */}
-const MoodCircle = ({
-  hasTodayDiary, 
-  todayDiary, 
-  diaryContent, }: DiaryCardsProps) => {
-
+{
+  /* ==========무드 서클 ============== */
+}
+const MoodCircle = ({ hasTodayDiary, todayDiary, diaryContent }: DiaryCardsProps) => {
   const [emotions, setEmotions] = useState<Emotion[]>([]);
-
 
   // 일기 내용에서 감정 데이터를 처리하는 함수
   const processDiaryContentEmotions = (content: any): Emotion[] => {
-      if (!content || !hasTodayDiary) {
-        return [{ color: 'gray1' as ColorKey, intensity: 1 }];
-      }
+    if (!content || !hasTodayDiary) {
+      return [{ color: "gray1" as ColorKey, intensity: 1 }];
+    }
 
     // 모든 감정을 하나의 배열로 수집
     const allEmotions: { type: string; intensity: number }[] = [];
@@ -79,7 +112,7 @@ const MoodCircle = ({
       content.selfEmotion.forEach((emotion: any) => {
         allEmotions.push({
           type: emotion.emotionType,
-          intensity: emotion.intensity || 5
+          intensity: emotion.intensity || 5,
         });
       });
     }
@@ -89,7 +122,7 @@ const MoodCircle = ({
       content.stateEmotion.forEach((emotion: any) => {
         allEmotions.push({
           type: emotion.emotionType,
-          intensity: emotion.intensity || 5
+          intensity: emotion.intensity || 5,
         });
       });
     }
@@ -101,14 +134,14 @@ const MoodCircle = ({
           person.feel.forEach((emotion: any) => {
             allEmotions.push({
               type: emotion.emotionType,
-              intensity: (emotion.intensity || 5) * 0.5 // 다른 사람 감정은 가중치 낮게
+              intensity: (emotion.intensity || 5) * 0.5, // 다른 사람 감정은 가중치 낮게
             });
           });
         }
       });
     }
     if (allEmotions.length === 0) {
-      return [{ color: 'gray1' as ColorKey, intensity: 1 }];
+      return [{ color: "gray1" as ColorKey, intensity: 1 }];
     }
 
     // 색상별로 그룹화하고 강도 계산
@@ -120,8 +153,8 @@ const MoodCircle = ({
 
     /* ① 다른 색이 있으면 gray* 제거  */
     if (colorMap.size > 1) {
-      colorMap.delete('gray1');
-      colorMap.delete('gray2');
+      colorMap.delete("gray1");
+      colorMap.delete("gray2");
     }
 
     // 정규화 및 결과 생성
@@ -131,69 +164,64 @@ const MoodCircle = ({
       .sort((a, b) => b[1] - a[1])
       .map(([color, total]) => ({
         color,
-        intensity: +(total / maxIntensity).toFixed(3) // 0~1
-    }));
+        intensity: +(total / maxIntensity).toFixed(3), // 0~1
+      }));
   };
 
-  
   // diaryContent가 변경될 때마다 감정 분석 실행
   useEffect(() => {
     const processedEmotions = processDiaryContentEmotions(diaryContent);
     setEmotions(processedEmotions);
   }, [diaryContent, hasTodayDiary]);
-  
+
   // emotions 상태를 사용하여 그라데이션 생성
   const generateGradient = (): string => {
     // 1. emotions가 없거나, 모두 gray만 있을 때
-    if (
-      emotions.length === 0 ||
-      emotions.every(e => e.color === 'gray1' || e.color === 'gray2')
-    ) {
+    if (emotions.length === 0 || emotions.every(e => e.color === "gray1" || e.color === "gray2")) {
       return `radial-gradient(ellipse at center, ${baseColors.gray1}, ${baseColors.gray2})`;
-    }    
-    
+    }
+
     // 2. 감정이 1개만 있을 때
     if (emotions.length === 1) {
       return baseColors[emotions[0].color];
-    } 
-    
+    }
+
     // 3. 여러 감정이 있을 때
     const intensities = emotions.map(e => e.intensity);
     const maxIntensity = Math.max(...intensities);
     const normalizedIntensities = intensities.map(i => i / maxIntensity);
-    
+
     const totalWeight = normalizedIntensities.reduce((sum, weight) => sum + weight, 0);
     let cumulative = 0;
-    
+
     const colors = emotions.map(({ color, intensity }, idx) => {
       cumulative += intensity;
       const pos = (cumulative / totalWeight) * 100;
       return `${baseColors[color]} ${pos.toFixed(1)}%`;
     });
-    
-    return `radial-gradient(ellipse at center, ${colors.join(', ')})`;
 
-  }
+    return `radial-gradient(ellipse at center, ${colors.join(", ")})`;
+  };
 
-  return(
+  return (
     <motion.div
-    className="mood-container flex justify-center mb-6"
-    animate={{
-      scale: getMoodCircleScale(),
-      opacity: Math.max(0.5, getMoodCircleScale()),
-    }}
-    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-  >
-    <div
-      className="mood-circle w-36 h-36 rounded-full"
-      style={{
-        background: generateGradient(),
-        boxShadow: `0 0 40px ${baseColors[emotions[0]?.color ?? 'gray1']}40`,
+      className="mood-container flex justify-center mb-6"
+      animate={{
+        scale: getMoodCircleScale(),
+        opacity: Math.max(0.5, getMoodCircleScale()),
       }}
-    />
-  </motion.div>
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+    >
+      <div
+        className="mood-circle w-36 h-36 rounded-full"
+        style={{
+          background: generateGradient(),
+          boxShadow: `0 0 40px ${baseColors[emotions[0]?.color ?? "gray1"]}40`,
+        }}
+      />
+    </motion.div>
   );
-}
+};
 
 const Todos = () => {
   const TodoCards = [
@@ -228,15 +256,13 @@ const Todos = () => {
         </Card>
       ))}
     </div>
-  )
-}
-
+  );
+};
 
 const Result: React.FC = () => {
-  
   const postDiaryData = useMutationState({
-    filters: { mutationKey: ['postDiary'] },
-    select: (mutation) => {
+    filters: { mutationKey: ["postDiary"] },
+    select: mutation => {
       console.log("🔍 Mutation 상태:", mutation.state.status); // pending, success, error 등
       console.log("🔍 Mutation 데이터:", mutation.state.data);
       console.log("🔍 전체 mutation:", mutation);
@@ -245,7 +271,7 @@ const Result: React.FC = () => {
   });
 
   console.log("📊 전체 postDiaryData:", postDiaryData);
-  
+
   const latestDiaryData = postDiaryData[postDiaryData.length - 1];
   console.log("📌 latestDiaryData:", latestDiaryData);
   if (!latestDiaryData) {
@@ -258,7 +284,7 @@ const Result: React.FC = () => {
   const [scrollY, setScrollY] = useState(0);
 
   const contentRef = useRef<HTMLDivElement>(null);
-  
+
   const handleCardClick = (e: React.ChangeEvent<any>) => {
     e.currentTarget.classList.toggle("hover");
   };
@@ -340,7 +366,6 @@ const Result: React.FC = () => {
           minHeight: "100vh",
         }}
       >
-
         {/*스트레스 수치*/}
         <h2 className="text-xl font-semibold mb-4 text-white">당신의 최근 스트레스 추이</h2>
 

@@ -68,10 +68,10 @@ const MentalChart = ({ type }: MentalChartProps) => {
   const data = mentalData[type];
 
   return (
-    <div className="w-full h-[180px] sm:h-[200px] rounded-lg p-1">
+    <div className="w-full h-[20vh]  rounded-lg p-1">
       <h1 className="text-white text-xl text-left tracking-tight drop-shadow-md mb-2">Date</h1>
       <ChartContainer config={chartConfig} className="h-full w-full">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%">
           <LineChart data={data} margin={{ top: 15, right: 10, left: 10, bottom: 10 }}>
             <CartesianGrid
               strokeDasharray="none"

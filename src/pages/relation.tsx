@@ -1,242 +1,177 @@
-// React 훅 및 motion import
-import React, { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+"use client";
 
-// pastelColors: 원 색상 배열 (랜덤 배정용)
-import { pastelColors } from "../constants/pastelColors";
+import React, { useRef, useEffect, useState } from "react";
+import { motion, useMotionValue } from "framer-motion";
+import type { Node, AnimatedBranch, Edge } from "@/types/emotionalGraph";
+import { updatePhysics } from "@/utils/physics";
+import {
+  createRootNode,
+  createAnimatedBranches,
+  updateNodeOpacity,
+  updateEdgeOpacity,
+  createNodeFromBranch,
+} from "@/utils/animation";
+import { drawEdges, drawAnimatedBranch, drawNodes } from "@/utils/drawing";
+import { EMOTION_COLORS } from "@/constants/emotionalGraph.ts";
 
-// Circle 컴포넌트: 하나의 원(사용자)을 렌더링
-import { Circle } from "../components/Circle";
+const EmotionalGraph = () => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const animationRef = useRef<number>();
+  const nodesRef = useRef<Node[]>([]);
+  const edgesRef = useRef<Edge[]>([]);
+  const animatedBranchesRef = useRef<AnimatedBranch[]>([]);
+  const startTimeRef = useRef<number>(0);
+  const previousTimestampRef = useRef<number>(0);
 
-// names: 각 원에 표시될 이름 배열
-const names = [
-  "나",
-  "채민",
-  "수빈",
-  "하린",
-  "진영",
-  "구철",
-  "도영",
-  "도연",
-  "은범",
-  "운석",
-  "효식",
-  "우현",
-  "민하",
-  "유진",
-  "재웅1",
-  "재웅2",
-  "경호",
-  "준석",
-  "세현",
-];
+  const dpr = window.devicePixelRatio || 1;
+  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
 
-// generateCircles: 중심 원 + 주변 원 위치와 속성 초기 생성
-const generateCircles = (count: number) => {
-  const color = pastelColors[Math.floor(Math.random() * pastelColors.length)];
+  // 드래그 위치 상태
+  const offsetX = useMotionValue(0);
+  const offsetY = useMotionValue(0);
 
-  const circles = []; // 최종 원 리스트
-  const layers = Math.ceil(Math.sqrt(count)); // 필요 레이어 수 계산
-  let id = 0; // 원마다 고유 ID 부여
-
-  // 중심 원 추가
-  circles.push({
-    id: id++,
-    colors: ["#ffffff"], // 중심은 흰색
-    name: names[0] || "중심",
-    baseSize: 160, // 다른 원보다 크게
-    isCenter: true,
-    position: { x: 0, y: 0 },
-    textColor: "#ffffff",
-  });
-
-  // 주변 원들 계층적으로 배치 (원형 레이어)
-  for (let layer = 1; id < names.length; layer++) {
-    const perLayer = layer * 6; // 각 레이어에 위치할 원 수
-    for (let i = 0; i < perLayer && id < names.length; i++) {
-      const angle = (i / perLayer) * 2 * Math.PI;
-      const radius = layer * 140;
-      const x = radius * Math.cos(angle);
-      const y = radius * Math.sin(angle);
-      circles.push({
-        id: id,
-        name: names[id] || `이름${id}`,
-        colors: [
-          pastelColors[Math.floor(Math.random() * pastelColors.length)],
-          pastelColors[Math.floor(Math.random() * pastelColors.length)],
-        ],
-        textColor: "black",
-
-        baseSize: 140,
-        isCenter: false,
-        position: { x, y },
-      });
-      id++;
-    }
-  }
-  return circles;
-};
-
-export default function Relation() {
-  // 상태: 모든 원 정보 저장
-  const [gridCircles, setGridCircles] = useState(() => generateCircles(names.length));
-
-  // phoneRef: 전체 wrapper (중심 기준 계산용)
-  const phoneRef = useRef<HTMLDivElement>(null);
-  // innerRef: 모든 원들을 담는 내부 드래그 요소
-  const innerRef = useRef<HTMLDivElement>(null);
-
-  // hoveredIndex: 중심에 가장 가까운 원 index (확대용)
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-
-  // 중심에서 가장 가까운 원 탐색 (100ms마다)
   useEffect(() => {
-    const lastClosest = { current: null as number | null };
-    const lastChangedAt = { current: Date.now() };
-    const STABILITY_TIME_MS = 300;
-    const THRESHOLD = 120; // 중심으로부터 거리 제한
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    const timeout = setTimeout(() => {
-      const interval = setInterval(() => {
-        if (!innerRef.current || !phoneRef.current) return;
+    const resizeCanvas = () => {
+      const parent = canvas.parentElement;
+      if (!parent) return;
+      const { width, height } = parent.getBoundingClientRect();
 
-        const rect = phoneRef.current.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
 
-        const circles = innerRef.current.querySelectorAll(".circle");
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+      setCanvasSize({ width, height });
+    };
 
-        let closestId: number | null = null;
-        let minDistance = Infinity;
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
 
-        circles.forEach((circle: any, index) => {
-          const rect = circle.getBoundingClientRect();
-          const cx = rect.left + rect.width / 2;
-          const cy = rect.top + rect.height / 2;
-          const dist = Math.hypot(cx - centerX, cy - centerY);
+    const parent = canvas.parentElement;
+    if (!parent) return;
+    const { width, height } = parent.getBoundingClientRect();
+    const centerX = width / 2;
+    const centerY = height / 2;
 
-          if (dist < THRESHOLD && dist < minDistance) {
-            closestId = index;
-            minDistance = dist;
+    nodesRef.current = [];
+    edgesRef.current = [];
+    animatedBranchesRef.current = [];
+
+    const rootNode = createRootNode(centerX, centerY);
+    nodesRef.current.push(rootNode);
+    animatedBranchesRef.current = createAnimatedBranches(rootNode, centerX, centerY);
+
+    const draw = (timestamp: number) => {
+      if (!startTimeRef.current) {
+        startTimeRef.current = timestamp;
+        previousTimestampRef.current = timestamp;
+      }
+
+      const dt = (timestamp - previousTimestampRef.current) / 16;
+      const elapsed = timestamp - startTimeRef.current;
+      previousTimestampRef.current = timestamp;
+
+      const { width, height } = canvasSize;
+      ctx.clearRect(0, 0, width, height);
+
+      if (elapsed < 6000) {
+        updatePhysics(nodesRef.current, edgesRef.current, dt);
+      }
+
+      const centerX = width / 2 - offsetX.get();
+      const centerY = height / 2 - offsetY.get();
+
+      const rootNode = nodesRef.current[0];
+      if (rootNode) updateNodeOpacity(rootNode, elapsed);
+
+      drawEdges(ctx, edgesRef.current);
+
+      for (let i = animatedBranchesRef.current.length - 1; i >= 0; i--) {
+        const branch = animatedBranchesRef.current[i];
+        if (!branch.finished && elapsed >= branch.startTime) {
+          const branchElapsed = elapsed - branch.startTime;
+          branch.progress = Math.min(branchElapsed / branch.duration, 1);
+          branch.opacity = Math.min(branchElapsed / (branch.duration * 0.3), 1);
+          drawAnimatedBranch(ctx, branch);
+          if (branch.progress === 1) {
+            const newNode = createNodeFromBranch(branch, elapsed);
+            nodesRef.current.push(newNode);
+            edgesRef.current.push({
+              from: branch.from,
+              to: newNode,
+              restLength: Math.hypot(newNode.x - branch.from.x, newNode.y - branch.from.y),
+              opacity: branch.opacity,
+            });
+            branch.finished = true;
+            animatedBranchesRef.current.splice(i, 1);
           }
-        });
+        }
+      }
 
-        // 안정적으로 일정 시간 유지된 경우에만 hoveredIndex 갱신
-        if (closestId !== lastClosest.current) {
-          lastClosest.current = closestId;
-          lastChangedAt.current = Date.now();
+      nodesRef.current.forEach(node => {
+        if (node.label === "나") return;
+
+        // 중심점과 가까우면 커지기
+        const dx = node.x - centerX;
+        const dy = node.y - centerY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const activeRadius = 100; // 중심 인식 범위
+        const maxRadius = 50;
+        const minRadius = 30;
+
+        if (dist < activeRadius) {
+          node.radius = Math.min(node.radius + 0.5, maxRadius);
         } else {
-          const now = Date.now();
-          if (now - lastChangedAt.current >= STABILITY_TIME_MS) {
-            setHoveredIndex(closestId);
-          }
+          node.radius = Math.max(node.radius - 0.5, minRadius);
         }
-      }, 100);
 
-      return () => clearInterval(interval);
-    }, 1000);
+        updateNodeOpacity(node, elapsed);
+        updateEdgeOpacity(edgesRef.current, node);
+      });
 
-    return () => clearTimeout(timeout);
-  }, []);
+      drawNodes(ctx, nodesRef.current);
+      ctx.globalAlpha = 1;
 
-  // 원끼리 겹침 방지 알고리즘 (간단한 충돌 해소)
-  const resolveOverlaps = (positions: any[], sizes: number[]) => {
-    const maxIterations = 3;
-    for (let iter = 0; iter < maxIterations; iter++) {
-      for (let i = 0; i < positions.length; i++) {
-        for (let j = 0; j < positions.length; j++) {
-          if (i === j) continue;
-          const dx = positions[i].x - positions[j].x;
-          const dy = positions[i].y - positions[j].y;
-          const dist = Math.hypot(dx, dy);
-          const minDist = (sizes[i] + sizes[j]) / 2;
-          if (dist < minDist && dist > 0) {
-            const overlap = minDist - dist;
-            const nx = dx / dist;
-            const ny = dy / dist;
-            positions[i].x += nx * (overlap / 2);
-            positions[i].y += ny * (overlap / 2);
-            positions[j].x -= nx * (overlap / 2);
-            positions[j].y -= ny * (overlap / 2);
-          }
-        }
-      }
-    }
-    return positions;
-  };
+      animationRef.current = requestAnimationFrame(draw);
+    };
 
-  // 원들 렌더링 (hover된 원은 확대, 주변은 밀려남)
-  const renderCircles = (circles: any[], hoveredIndex: number | null) => {
-    const expandedSize = 1.3; // 확대 비율
-    const pushRadius = 100; // hover 시 밀어내는 반경
+    animationRef.current = requestAnimationFrame(draw);
 
-    const hoveredCircle = hoveredIndex != null ? circles[hoveredIndex] : null;
-
-    const tempPositions = circles.map(c => ({ ...c.position }));
-    const tempSizes = circles.map((c, i) =>
-      i === hoveredIndex ? c.baseSize * expandedSize : c.baseSize
-    );
-
-    // 중심 근처 원을 hover했을 때 주변 원들 밀어냄
-    if (hoveredCircle) {
-      for (let i = 0; i < circles.length; i++) {
-        if (i === hoveredIndex) continue;
-        const dx = tempPositions[i].x - hoveredCircle.position.x;
-        const dy = tempPositions[i].y - hoveredCircle.position.y;
-        const dist = Math.hypot(dx, dy);
-        if (dist < pushRadius && dist > 0) {
-          const pushAmount = (pushRadius - dist) * 0.5;
-          const normX = dx / dist;
-          const normY = dy / dist;
-          tempPositions[i].x += normX * pushAmount;
-          tempPositions[i].y += normY * pushAmount;
-        }
-      }
-      resolveOverlaps(tempPositions, tempSizes);
-    }
-
-    // 각 원 컴포넌트 렌더링
-    return circles.map((circle, i) => {
-      const isHovered = i === hoveredIndex;
-      const scale = isHovered ? expandedSize : 1;
-      const size = circle.baseSize * scale;
-      const x = tempPositions[i].x;
-      const y = tempPositions[i].y;
-
-      return (
-        <Circle
-          key={circle.id}
-          id={circle.id}
-          name={circle.name}
-          x={x}
-          y={y}
-          size={size}
-          colors={circle.colors}
-          isHovered={isHovered}
-          isCenter={circle.isCenter}
-          textColor={circle.textColor}
-        />
-      );
-    });
-  };
+    return () => {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      window.removeEventListener("resize", resizeCanvas);
+    };
+  }, [canvasSize.width, canvasSize.height]);
 
   return (
-    <div className="relative w-full h-screen  overflow-hidden">
-      <div className="relative w-full h-full" ref={phoneRef}>
-        {/* 중심 위치를 표시하는 시각적 가이드 */}
-        <div className="absolute top-1/2 left-1/2 w-10 h-10 border-2 border-dashed border-gray-400 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10" />
-
-        {/* 원들 담는 드래그 가능한 레이어 */}
-        <motion.div
-          drag
-          dragConstraints={{ left: -400, right: 400, top: -400, bottom: 400 }}
-          className="w-full h-full cursor-grab"
-          ref={innerRef}
-          whileDrag={{ scale: 1.05 }}
-        >
-          {renderCircles(gridCircles, hoveredIndex)}
-        </motion.div>
-      </div>
+    <div className="w-full h-screen overflow-hidden bg-black relative">
+      <motion.div
+        drag
+        dragMomentum={false}
+        dragElastic={0.1}
+        style={{ x: offsetX, y: offsetY }}
+        className="absolute top-0 left-0 w-full h-full cursor-grab active:cursor-grabbing"
+      >
+        <canvas
+          ref={canvasRef}
+          style={{
+            width: "00%",
+            height: "100%",
+            borderRadius: 20,
+            boxShadow: "0 0 30px rgba(255, 255, 255, 0.1)",
+            display: "block",
+          }}
+        />
+      </motion.div>
     </div>
   );
-}
+};
+
+export default EmotionalGraph;

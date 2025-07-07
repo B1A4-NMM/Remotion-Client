@@ -3,31 +3,40 @@ import type { UseMutationOptions } from "@tanstack/react-query";
 import { postDiary } from "./../../services/diary";
 import { useNavigate } from "react-router-dom";
 
-export const usePostDiary = (
-  options?: UseMutationOptions<any, unknown, FormData> // ✅ FormData로 변경
-) => {
+export const usePostDiary = (options?: UseMutationOptions<any, unknown, FormData>) => {
   const navigate = useNavigate();
 
   return useMutation<any, unknown, FormData>({
-    // ✅ 여기도 FormData
+    ...options, // ✅ 외부 옵션 먼저 병합
+
     mutationFn: async variables => {
-      console.log("📤 postDiary 호출됨 with payload:", variables);
-      const response = await postDiary(variables); // 이건 FormData 받음
-      console.log("📥 postDiary 응답 받음:", response);
+      console.log("postDiary 호출됨", variables);
+      const response = await postDiary(variables);
+
       return response;
     },
+
     onSuccess: (data, variables, context) => {
-      console.log("✅ 일기 업로드 성공:", data);
-      console.log("📦 요청 데이터:", variables);
-      console.log("🧠 context 정보:", context);
-      options?.onSuccess?.(data, variables, context);
+      const diaryId = data?.id;
+
+      if (!diaryId) {
+        console.error(" diaryId 없음:", data);
+        return;
+      }
+
+      navigate(`/result/${diaryId}`);
+
+      try {
+        options?.onSuccess?.(data, variables, context);
+      } catch (err) {
+        console.error(" 외부 onSuccess 에러:", err);
+      }
     },
+
     onError: (error, variables, context) => {
-      console.error("❌ 일기 업로드 실패:", error);
-      console.log("📦 실패한 요청 데이터:", variables);
-      console.log("🧠 context 정보:", context);
+      console.error(" 일기 업로드 실패:", error);
+
       options?.onError?.(error, variables, context);
     },
-    ...options,
   });
 };

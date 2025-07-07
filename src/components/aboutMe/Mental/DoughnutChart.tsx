@@ -2,30 +2,26 @@ import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
 interface DoughnutChartProps {
-  data: {
-    title: string;
-    value: number;
-    color: string;
-  }[];
-  size?: number; // optional fallback
+  data: { title: string; value: number; color: string }[];
   innerCutoutPercentage?: number;
   summaryTitle?: string;
 }
 
 const DoughnutChart = ({
   data,
-  size = 180,
   innerCutoutPercentage = 40,
   summaryTitle = "TOTAL:",
 }: DoughnutChartProps) => {
   const ref = useRef<SVGSVGElement | null>(null);
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
+  const size = 200; // 고정된 viewBox 사이즈 기준
   const radius = size / 2;
   const innerRadius = radius * (innerCutoutPercentage / 100);
 
   useEffect(() => {
     if (!ref.current) return;
+
     const svg = d3.select(ref.current);
     svg.selectAll("*").remove();
 
@@ -68,10 +64,10 @@ const DoughnutChart = ({
       .duration(500)
       .attr("opacity", 1)
       .text(d => d.data.title);
-  }, [data, size, innerCutoutPercentage]);
+  }, [data, innerCutoutPercentage]);
 
   return (
-    <div className="relative w-full" style={{ aspectRatio: "1 / 1", maxWidth: size }}>
+    <div className="relative w-full h-[18vh]" style={{ aspectRatio: "1 / 1" }}>
       <svg
         ref={ref}
         viewBox={`0 0 ${size} ${size}`}
@@ -83,11 +79,11 @@ const DoughnutChart = ({
         className="absolute top-1/2 left-1/2 text-center text-white pointer-events-none"
         style={{
           transform: "translate(-50%, -50%)",
-          width: `${innerRadius * 2}px`,
+          width: `${(innerCutoutPercentage / 100) * 100}%`,
         }}
       >
         <p className="text-xs opacity-70 tracking-wide">{summaryTitle}</p>
-        <p className="text-3xl font-bold">{total}</p>
+        <p className="text-2xl font-bold">{total}</p>
       </div>
     </div>
   );

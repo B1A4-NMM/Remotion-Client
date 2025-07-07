@@ -163,7 +163,7 @@ const CardSlider = () => {
                 bgColor
               )}
               style={{
-                width: "90%",
+                width: "95%",
                 maxWidth: "26rem",
                 height: "86vh",
                 zIndex,

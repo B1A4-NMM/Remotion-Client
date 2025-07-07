@@ -16,11 +16,17 @@ export const useCreateTodo = () => {
 
     // Optimistic update: 로컬 스토어에 먼저 추가 → 사용자 UX 좋음
     onMutate: async newTodo => {
-      setTodos(prev => [...prev, newTodo]);
+      const tempId = Date.now().toString();
+      const optimisticTodo = { ...newTodo, id: tempId, isCompleted: false };
+      setTodos(prev => [...prev, optimisticTodo]);
+      return { tempId };
     },
 
     // 서버 성공 시: 쿼리 무효화로 서버 데이터 싱크 맞춤
-    onSuccess: () => {
+    onSuccess: (created, _newTodo, context) => {
+      if (context?.tempId) {
+        setTodos(prev => prev.map(t => (t.id === context.tempId ? created : t)));
+      }
       queryClient.invalidateQueries({ queryKey: ["todos"] });
     },
 

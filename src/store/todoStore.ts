@@ -1,61 +1,40 @@
 import { create } from "zustand";
 
 export type Todo = {
-    id: number;
+    id: string;
     title: string;
     isCompleted: boolean;
-    date: string;
+    date: string | null;
     isRepeat: boolean;
     repeatRule: string | null;
     repeatEndDate: string | null;
+    createdAt: string;
+    updatedAt: string;
 };
 
 type TodoStore = {
     todos: Todo[];
     setTodos: (updater: Todo[] | ((prev: Todo[]) => Todo[])) => void;
-    deleteTodo: (id: number) => void;
+    deleteTodo: (id: string) => void;
     showDone: boolean;
     toggleShowDone: () => void;
 };
 
 export const useTodoStore = create<TodoStore>((set, get) => ({
-    todos: [
-        {
-            id: 1,
-            title: "캘린더 기능 구현",
-            isCompleted: false,
-            date: "",
-            isRepeat: false,
-            repeatRule: null,
-            repeatEndDate: null,
-        },
-        {
-            id: 2,
-            title: "팀원들과 소통 개선",
-            isCompleted: false,
-            date: "",
-            isRepeat: false,
-            repeatRule: null,
-            repeatEndDate: null,
-        },
-        {
-            id: 3,
-            title: "의견 차이 관리 방법 연구",
-            isCompleted: false,
-            date: "",
-            isRepeat: false,
-            repeatRule: null,
-            repeatEndDate: null,
-        },
-    ],
+    todos: [],
 
     setTodos: (updater) => {
-        const next = typeof updater === "function" ? (updater as (prev: Todo[]) => Todo[])(get().todos) : updater;
+        const next = 
+        typeof updater === "function" 
+            ? (updater as (prev: Todo[]) => Todo[])(get().todos) 
+            : updater;
         set({ todos: next });
     },
 
-    deleteTodo: (id) => {
-        set((state) => ({ todos: state.todos.filter((todo) => todo.id !== id) }));
+    deleteTodo: (id: string) => {
+        set((state) => ({ 
+            todos: state.todos.filter((todo) => todo.id !== id),
+        }));
     },
 
     showDone: false,

@@ -21,7 +21,6 @@ interface DiaryCardsProps {
   isContentError: boolean;
 }
 
-
 /* ─ 1. 샘플 일기 (작성 유도) ─ */
 const sampleDiary = {
     "activity_analysis": [

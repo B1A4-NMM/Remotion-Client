@@ -6,7 +6,7 @@ export const useGetDiaryContent = (token: string, id: string) => {
   return useQuery({
     queryKey: ["diaryContent", id, token],
     queryFn: () => getDiaryContent(token, id),
-    enabled: !!token && !!id && id !== 'sample', // sample id일 때는 호출하지 않음
+    enabled: !!token && !!id && id !== "sample", // sample id일 때는 호출하지 않음
     staleTime: 1000 * 60 * 5,
   });
 };

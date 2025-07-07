@@ -6,21 +6,20 @@ import { Card } from "@/components/ui/card";
 import { Image as LucideImage } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { usePostDiary } from "@/api/queries/diary/usePostDiary.ts";
-import Loading from "../components/Loading";
-import Loading2 from "../components/Loading2";
-import Loading3 from "../components/Loading3";
-import Loading4 from "../components/Loading4";
-import Loading6 from "../components/Loading6";
+import Loading from "../components/Loading/Loading";
+import Loading2 from "../components/Loading/Loading2";
+import Loading3 from "../components/Loading/Loading3";
+import Loading4 from "../components/Loading/Loading4";
+import Loading6 from "../components/Loading/Loading6";
 
 const Diary = () => {
   const navigate = useNavigate();
-  const { mutate, isLoading } = usePostDiary({
+  const { mutate } = usePostDiary({
     onSuccess: () => {
       reset();
       setPreview(null);
 
       setIsSubmitting(false);
-      navigate("/result");
     },
   });
 

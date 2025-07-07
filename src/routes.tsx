@@ -9,9 +9,9 @@ import Test from "./pages/Test";
 import TestResult from "./components/TestResult";
 import Login from "./pages/Login";
 import GetAccess from "./pages/GetAccess";
-import Loading6 from "./components/Loading/Loading6";
+import Loading6 from "./components/loading/Loading6";
 import Analysis from "./pages/Analysis";
-import AboutMe from "./components/AboutMe";
+import AboutMe from "./pages/AboutMe";
 export const routes = [
   { path: "/", element: <Home /> },
   { path: "/diary", element: <Diary /> },

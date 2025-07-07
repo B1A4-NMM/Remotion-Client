@@ -11,7 +11,7 @@ export const useDeleteTodo = () => {
   return useMutation({
     mutationFn: deleteTodo,
     
-    onMutate: async (id: number) => {
+    onMutate: async (id: string) => {
         // Optimistic Update
         deleteTodoInStore(id);
     },

@@ -35,7 +35,7 @@ api.interceptors.request.use(config => {
 
 // ✅ 목록: from/to 유지
 export const getTodos = async (from: string, to: string) => {
-  const response = await api.get<ApiTodo[]>("/todos", {
+  const response = await api.get<ApiTodo[]>(`${BASE_URL}/todos`, {
     params: { from, to },
   });
   return response.data;
@@ -43,7 +43,7 @@ export const getTodos = async (from: string, to: string) => {
 
 // ✅ 생성
 export const createTodo = async ({ title }: { title: string }) => {
-  const response = await api.post<ApiTodo>("/todos", { title });
+  const response = await api.post<ApiTodo>(`${BASE_URL}/todos`, { title });
   return response.data;
 };
 
@@ -53,12 +53,12 @@ export const updateTodo = async (
     id: string, 
     data: Partial<Omit<ApiTodo, "id">>
 ) => {
-    const response = await api.patch<ApiTodo>(`/todos/${id}`, data);
+    const response = await api.patch<ApiTodo>(`${BASE_URL}/todos/${id}`, data);
     return response.data;
 };
 
 // ✅ 삭제
 export const deleteTodo = async (id: string) => {
-  const response = await api.delete(`/todos/${id}`);
+  const response = await api.delete(`${BASE_URL}/todos/${id}`);
   return response.data;
 };

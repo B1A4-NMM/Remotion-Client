@@ -14,8 +14,8 @@ interface DoughnutChartProps {
 
 const DoughnutChart = ({
   data,
-  size = 240,
-  innerCutoutPercentage = 70,
+  size = 180,
+  innerCutoutPercentage = 40,
   summaryTitle = "TOTAL:",
 }: DoughnutChartProps) => {
   const ref = useRef<SVGSVGElement | null>(null);

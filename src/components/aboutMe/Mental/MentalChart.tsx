@@ -9,9 +9,9 @@ interface MentalChartProps {
 
 const mentalData: Record<MentalType, { date: string; value: number }[]> = {
   stress: [
-    { date: "2025-06-30", value: 237 },
-    { date: "2025-07-01", value: 209 },
-    { date: "2025-07-02", value: 214 },
+    { date: "2025-06-30", value: 10 },
+    { date: "2025-07-01", value: 150 },
+    { date: "2025-07-02", value: 150 },
   ],
   anxiety: [
     { date: "2025-06-30", value: 120 },
@@ -56,19 +56,13 @@ const CustomLabel = (props: any) => {
 
 const MentalChart = ({ type }: MentalChartProps) => {
   const config = chartConfig[type];
-  const data = mentalData[type]; // ✅ 올바르게 데이터 불러오기
-  useEffect(() => {
-    console.log("✅ 현재 타입:", type);
-    console.log("📊 현재 데이터:", data);
-  }, [type]);
+  const data = mentalData[type];
 
   return (
-    <div className="w-full h-64 rounded-lg p-4">
-      <h1 className="text-white text-xl pb-1 px-3 pt-6 text-left tracking-tight drop-shadow-md">
-        Date{" "}
-      </h1>
+    <div className="w-full h-50 rounded-lg p-1">
+      <h1 className="text-white text-xl  text-left tracking-tight drop-shadow-md">Date </h1>
       <ChartContainer config={chartConfig} className="h-full w-full">
-        <LineChart data={data} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+        <LineChart data={data} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
           <CartesianGrid
             strokeDasharray="none"
             stroke="#525a6a"
@@ -87,7 +81,7 @@ const MentalChart = ({ type }: MentalChartProps) => {
           <YAxis hide />
           <Line
             type="monotone"
-            dataKey="value" // ✅ 여기도 고정된 key로
+            dataKey="value"
             stroke={config.color}
             strokeWidth={2}
             dot={{ fill: config.color, strokeWidth: 0, r: 4 }}

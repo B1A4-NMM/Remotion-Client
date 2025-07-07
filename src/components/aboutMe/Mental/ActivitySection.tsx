@@ -16,9 +16,7 @@ const activityData = [
 const ActivitySection = () => {
   return (
     <>
-      <h1 className="text-white text-xl pb-1 px-6 pt-6 text-left tracking-tight drop-shadow-md">
-        Activity
-      </h1>
+      <h1 className="text-white text-xl text-left tracking-tight drop-shadow-md">Activity</h1>
       <div className="flex justify-center items-center w-full h-full">
         <DoughnutChart data={activityData} />
       </div>

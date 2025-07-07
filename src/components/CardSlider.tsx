@@ -12,7 +12,7 @@ const components: {
   bgColor: string;
 }[] = [
   { Component: MentalHealthCard, bgColor: "bg-gray-700" },
-  { Component: StrengthCard, bgColor: "bg-gray-300" },
+  { Component: StrengthCard, bgColor: "bg-gray-700" },
   { Component: EmotionCard, bgColor: "bg-yellow-100" },
   { Component: AchievementCard, bgColor: "bg-blue-100" },
 ];

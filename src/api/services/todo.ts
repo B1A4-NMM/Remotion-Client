@@ -6,16 +6,16 @@ import axios from "axios";
 const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
 
 export interface ApiTodo {
-    id: string;
-    title: string;
-    isCompleted: boolean;
-    date: string | null;
-    isRepeat: boolean;
-    repeatRule: string | null;
-    repeatEndDate: string | null;
-    createdAt: string;
-    updatedAt: string;
-  }
+  id: string;
+  title: string;
+  isCompleted: boolean;
+  date: string | null;
+  isRepeat: boolean;
+  repeatRule: string | null;
+  repeatEndDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -35,10 +35,15 @@ api.interceptors.request.use(config => {
 
 // ✅ 목록: from/to 유지
 export const getTodos = async (from: string, to: string) => {
+  console.log("📤 getTodos called with:", { from, to });
+
   const response = await api.get<ApiTodo[]>(`${BASE_URL}/todos`, {
     params: { from, to },
   });
-  return response.data;
+
+  console.log("📥 getTodos response.data:", response.data);
+
+  return response.data.todos;
 };
 
 // ✅ 생성
@@ -47,14 +52,10 @@ export const createTodo = async ({ title }: { title: string }) => {
   return response.data;
 };
 
-
 // ✅ 수정 (필드 업데이트)
-export const updateTodo = async (
-    id: string, 
-    data: Partial<Omit<ApiTodo, "id">>
-) => {
-    const response = await api.patch<ApiTodo>(`${BASE_URL}/todos/${id}`, data);
-    return response.data;
+export const updateTodo = async (id: string, data: Partial<Omit<ApiTodo, "id">>) => {
+  const response = await api.patch<ApiTodo>(`${BASE_URL}/todos/${id}`, data);
+  return response.data;
 };
 
 // ✅ 삭제

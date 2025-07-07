@@ -514,7 +514,7 @@ const generateGradient = (): string => {
     >
       <Changes hasTodayDiary={hasTodayDiary} onAlreadyWrote={handleAlreadyWrote}>
         <motion.div
-          className="mood-container flex justify-center mb-6 mt-8"
+          className="flex justify-center mb-6 mt-8"
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}

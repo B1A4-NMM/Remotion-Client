@@ -6,8 +6,8 @@ type Props = {
   values: number[]; // 0~4 값 6개
 };
 
-const WIDTH = 450;
-const HEIGHT = 300;
+const WIDTH = 100;
+const HEIGHT = 00;
 const RADIUS = 100;
 const CENTER_X = WIDTH / 3;
 const CENTER_Y = HEIGHT / 2;
@@ -55,7 +55,7 @@ const HexRadarChart: React.FC<Props> = ({ values }) => {
   }, [values]);
 
   return (
-    <div className="flex justify-center items-center bg-black p-6 rounded-xl w-full h-[300px]">
+    <div className="flex justify-center items-center p-6 rounded-xl w-full h-[300px]">
       <svg
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         width="100%"

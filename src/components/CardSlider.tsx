@@ -4,10 +4,15 @@ import StrengthCard from "./aboutMe/StrengthCard";
 import EmotionCard from "./aboutMe/EmotionCard";
 import AchievementCard from "./aboutMe/AchievementCard";
 import MentalHealthCard from "./aboutMe/MentalHealthCard";
-
-const components = [
+type CardComponentProps = {
+  isActive: boolean;
+};
+const components: {
+  Component: React.ComponentType<CardComponentProps>;
+  bgColor: string;
+}[] = [
   { Component: MentalHealthCard, bgColor: "bg-gray-700" },
-  { Component: StrengthCard, bgColor: "bg-green-100" },
+  { Component: StrengthCard, bgColor: "bg-gray-300" },
   { Component: EmotionCard, bgColor: "bg-yellow-100" },
   { Component: AchievementCard, bgColor: "bg-blue-100" },
 ];
@@ -171,7 +176,7 @@ const CardSlider = () => {
               }}
             >
               <div className="w-full h-full overflow-y-auto">
-                <Component />
+                <Component isActive={index === curSlide} />
               </div>
             </div>
           );

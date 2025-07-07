@@ -6,6 +6,9 @@ import PeopleSection from "./Mental/PeopleSection";
 
 // 타입 정의
 type MentalType = "stress" | "anxiety" | "depression";
+interface MentalCardProps {
+  isActive: boolean;
+}
 
 // 버튼 색상 맵
 const colorMap: Record<MentalType, string> = {
@@ -14,7 +17,7 @@ const colorMap: Record<MentalType, string> = {
   depression: "#ef6c00", // 주황
 };
 
-const MentalHealthCard = () => {
+const MentalHealthCard = ({ isActive }: MentalCardProps) => {
   const [currentType, setCurrentType] = useState<MentalType>("stress");
 
   const buttons = [

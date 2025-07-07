@@ -542,54 +542,54 @@ const MoodCircle = ({ hasTodayDiary, todayDiary, diaryContent }: DiaryCardsProps
 
   return (
     <AnimatePresence>
-      {!isExpanded && (
+    {!isExpanded && (
+      <motion.div
+      className="z-30 flex items-center justify-center pt-20"
+      variants={{
+        hidden: { 
+          opacity: 0, 
+          scale: 0.8,
+          transition: { 
+            duration: 0.06,    // 빠르게 사라짐
+            ease: "easeIn" 
+          }
+        },
+        visible: { 
+          opacity: 1, 
+          scale: 1,
+          transition: { 
+            duration: 1.2,    // 천천히 나타남
+            delay: 0.5,
+            ease: "easeOut" 
+          }
+        }
+      }}
+      initial="hidden"
+      animate="visible" 
+      exit="hidden"
+    >
+      <Changes hasTodayDiary={hasTodayDiary} onAlreadyWrote={handleAlreadyWrote}>
         <motion.div
-          className="z-30 flex items-center justify-center pt-20"
-          variants={{
-            hidden: {
-              opacity: 0,
-              scale: 0.8,
-              transition: {
-                duration: 0.06, // 빠르게 사라짐
-                ease: "easeIn",
-              },
-            },
-            visible: {
-              opacity: 1,
-              scale: 1,
-              transition: {
-                duration: 1.2, // 천천히 나타남
-                delay: 0.5,
-                ease: "easeOut",
-              },
-            },
-          }}
-          initial="hidden"
-          animate="visible"
-          exit="hidden"
+          className="flex justify-center mb-6 mt-8"
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
         >
-          <Changes hasTodayDiary={hasTodayDiary} onAlreadyWrote={handleAlreadyWrote}>
-            <motion.div
-              className="mood-container flex justify-center mb-6 mt-8"
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <div
-                className="mood-circle w-36 h-36 rounded-full"
-                style={{
-                  background: (() => {
-                    const gradient = generateGradient();
-                    return gradient;
-                  })(),
-                  boxShadow: `0 0 40px ${baseColors[emotions[0]?.color ?? "gray1"]}40`,
-                }}
-              />
-            </motion.div>
-          </Changes>
+          <div
+            className="mood-circle w-36 h-36 rounded-full"
+            style={{
+              background: (() => {
+                const gradient = generateGradient();
+                return gradient;
+              })(),
+              boxShadow: `0 0 40px ${baseColors[emotions[0]?.color ?? 'gray1']}40`,
+            }}
+          />
         </motion.div>
-      )}
-    </AnimatePresence>
+      </Changes>
+    </motion.div>
+    )}
+    </AnimatePresence>  
   );
 };
 

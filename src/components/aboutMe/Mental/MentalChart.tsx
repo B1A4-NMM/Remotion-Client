@@ -1,6 +1,15 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, LabelList } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  LabelList,
+  ResponsiveContainer,
+} from "recharts";
 import { ChartContainer } from "../../ui/chart";
 import { useEffect } from "react";
+
 type MentalType = "stress" | "anxiety" | "depression";
 
 interface MentalChartProps {
@@ -59,37 +68,39 @@ const MentalChart = ({ type }: MentalChartProps) => {
   const data = mentalData[type];
 
   return (
-    <div className="w-full h-50 rounded-lg p-1">
-      <h1 className="text-white text-xl  text-left tracking-tight drop-shadow-md">Date </h1>
+    <div className="w-full h-[180px] sm:h-[100px] rounded-lg p-1">
+      <h1 className="text-white text-xl text-left tracking-tight drop-shadow-md mb-2">Date</h1>
       <ChartContainer config={chartConfig} className="h-full w-full">
-        <LineChart data={data} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-          <CartesianGrid
-            strokeDasharray="none"
-            stroke="#525a6a"
-            strokeWidth={1}
-            horizontal
-            vertical={false}
-          />
-          <XAxis
-            dataKey="date"
-            tickFormatter={formatDateToMD}
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: "#ffffff", fontSize: 12 }}
-            interval={0}
-          />
-          <YAxis hide />
-          <Line
-            type="monotone"
-            dataKey="value"
-            stroke={config.color}
-            strokeWidth={2}
-            dot={{ fill: config.color, strokeWidth: 0, r: 4 }}
-            activeDot={{ r: 6, fill: config.color }}
-          >
-            <LabelList content={CustomLabel} />
-          </Line>
-        </LineChart>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+            <CartesianGrid
+              strokeDasharray="none"
+              stroke="#525a6a"
+              strokeWidth={1}
+              horizontal
+              vertical={false}
+            />
+            <XAxis
+              dataKey="date"
+              tickFormatter={formatDateToMD}
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "#ffffff", fontSize: 12 }}
+              interval={0}
+            />
+            <YAxis hide />
+            <Line
+              type="monotone"
+              dataKey="value"
+              stroke={config.color}
+              strokeWidth={2}
+              dot={{ fill: config.color, strokeWidth: 0, r: 4 }}
+              activeDot={{ r: 6, fill: config.color }}
+            >
+              <LabelList content={CustomLabel} />
+            </Line>
+          </LineChart>
+        </ResponsiveContainer>
       </ChartContainer>
     </div>
   );

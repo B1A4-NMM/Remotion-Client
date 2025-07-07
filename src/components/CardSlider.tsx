@@ -11,6 +11,7 @@ const components = [
   { Component: EmotionCard, bgColor: "bg-yellow-100" },
   { Component: AchievementCard, bgColor: "bg-blue-100" },
 ];
+
 const CardSlider = () => {
   const [curSlide, setCurSlide] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
@@ -34,6 +35,7 @@ const CardSlider = () => {
     startX.current = x;
     setDragOffset(0);
   };
+
   const goToSlide = (index: number) => {
     if (index < 0 || index >= components.length || isTransitioning) return;
     setIsTransitioning(true);
@@ -108,7 +110,7 @@ const CardSlider = () => {
       ref={containerRef}
       className="relative w-full h-screen overflow-hidden cursor-grab active:cursor-grabbing select-none"
     >
-      <div className="absolute inset-0 flex pt-8  justify-center px-4 md:px-8">
+      <div className="absolute inset-0 flex pt-8 justify-center px-4 md:px-8">
         {components.map(({ Component, bgColor }, index) => {
           const offset = index - curSlide;
           const isActive = offset === 0;
@@ -157,8 +159,8 @@ const CardSlider = () => {
             <div
               key={index}
               className={clsx(
-                "absolute transition-all duration-500 ease-out rounded-3xl shadow-xl overflow-hidden",
-                bgColor // ✅ 여기서 배경색 적용
+                "absolute transition-all duration-500 ease-out rounded-3xl shadow-xl",
+                bgColor
               )}
               style={{
                 width: "90%",
@@ -168,7 +170,9 @@ const CardSlider = () => {
                 transform: `translateX(${translateX}px) translateY(${translateY}px) scale(${scale}) rotateY(${rotateY}deg) rotateX(${isActive ? 0 : 3}deg)`,
               }}
             >
-              <Component />
+              <div className="w-full h-full overflow-y-auto">
+                <Component />
+              </div>
             </div>
           );
         })}

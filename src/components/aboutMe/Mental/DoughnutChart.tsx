@@ -7,7 +7,7 @@ interface DoughnutChartProps {
     value: number;
     color: string;
   }[];
-  size?: number;
+  size?: number; // optional fallback
   innerCutoutPercentage?: number;
   summaryTitle?: string;
 }
@@ -20,6 +20,7 @@ const DoughnutChart = ({
 }: DoughnutChartProps) => {
   const ref = useRef<SVGSVGElement | null>(null);
   const total = data.reduce((sum, item) => sum + item.value, 0);
+
   const radius = size / 2;
   const innerRadius = radius * (innerCutoutPercentage / 100);
 
@@ -42,7 +43,6 @@ const DoughnutChart = ({
 
     const arcs = group.selectAll("path").data(pie(data)).enter().append("path");
 
-    // 초기 애니메이션 설정
     arcs
       .attr("fill", d => d.data.color)
       .transition()
@@ -52,7 +52,6 @@ const DoughnutChart = ({
         return t => arc(i(t))!;
       });
 
-    // 활동명 텍스트 표시
     group
       .selectAll("text")
       .data(pie(data))
@@ -72,18 +71,22 @@ const DoughnutChart = ({
   }, [data, size, innerCutoutPercentage]);
 
   return (
-    <div className="relative mx-auto" style={{ width: size, height: size }}>
-      <svg ref={ref} width={size} height={size} className="block" />
+    <div className="relative w-full" style={{ aspectRatio: "1 / 1", maxWidth: size }}>
+      <svg
+        ref={ref}
+        viewBox={`0 0 ${size} ${size}`}
+        preserveAspectRatio="xMidYMid meet"
+        className="w-full h-full block"
+      />
 
-      {/* 중앙 요약 영역 */}
       <div
-        className="absolute top-1/2 left-1/2 text-center text-white"
+        className="absolute top-1/2 left-1/2 text-center text-white pointer-events-none"
         style={{
           transform: "translate(-50%, -50%)",
           width: `${innerRadius * 2}px`,
         }}
       >
-        <p className="text-xs text-white opacity-70 tracking-wide">{summaryTitle}</p>
+        <p className="text-xs opacity-70 tracking-wide">{summaryTitle}</p>
         <p className="text-3xl font-bold">{total}</p>
       </div>
     </div>

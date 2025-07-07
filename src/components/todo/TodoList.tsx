@@ -12,17 +12,22 @@ export default function TodoList() {
   const setTodos = useTodoStore(state => state.setTodos);
 
   useEffect(() => {
-    console.log("📦 fetchedTodos:", fetchedTodos);
+    if (!fetchedTodos) return;
+
+    console.log(" fetchedTodos:", fetchedTodos);
     if (Array.isArray(fetchedTodos)) {
       setTodos(fetchedTodos);
     } else {
-      console.error("❌ fetchedTodos is not an array", fetchedTodos);
+      console.error("fetchedTodos is not an array", fetchedTodos);
     }
   }, [fetchedTodos, setTodos]);
 
-  const activeTodos = Array.isArray(todos) ? todos.filter(todo => !todo.isCompleted) : [];
-
-  const doneTodos = Array.isArray(todos) ? todos.filter(todo => todo.isCompleted) : [];
+  const activeTodos = Array.isArray(todos)
+    ? todos.filter(todo => !todo.isCompleted).sort((a, b) => a.id - b.id)
+    : [];
+  const doneTodos = Array.isArray(todos)
+    ? todos.filter(todo => todo.isCompleted).sort((a, b) => a.id - b.id)
+    : [];
   return (
     <div className="overflow-y-auto flex-grow">
       {/* 미완료 + 인라인 New todo */}

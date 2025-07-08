@@ -1,26 +1,48 @@
 import React from "react";
-import GaugeChart from "./DoughnutChart";
 import DoughnutChart from "./DoughnutChart";
+
+type MentalType = "stress" | "anxiety" | "depression";
+
 type DoughnutData = {
   title: string;
   value: number;
   color: string;
 };
-const activityData = [
-  { title: "일", value: 120, color: "#F87171" }, // 빨강
-  { title: "운동", value: 80, color: "#60A5FA" }, // 파랑
-  { title: "인간관계", value: 50, color: "#34D399" }, // 초록
-  { title: "과제", value: 30, color: "#FBBF24" }, // 노랑
-];
 
-const ActivitySection = () => {
+const activityDataMap: Record<MentalType, DoughnutData[]> = {
+  stress: [
+    { title: "데이트", value: 30, color: "#5b9bd5" },
+    { title: "밀린 과제", value: 20, color: "#70ad47" },
+    { title: "방치우기", value: 50, color: "#ffc000" },
+    { title: "살 빼기", value: 50, color: "#ff610e" },
+  ],
+  anxiety: [
+    { title: "임구철", value: 25, color: "#5b9bd5" },
+    { title: "정진영", value: 25, color: "#70ad47" },
+    { title: "이하린", value: 50, color: "#ffc000" },
+  ],
+  depression: [
+    { title: "산책", value: 40, color: "#5b9bd5" },
+    { title: "일기쓰기", value: 20, color: "#70ad47" },
+    { title: "손채민", value: 40, color: "#ffc000" },
+  ],
+};
+
+interface ActivitySectionProps {
+  type: MentalType;
+}
+
+const ActivitySection = ({ type }: ActivitySectionProps) => {
+  const activityData = activityDataMap[type];
+
   return (
-    <>
-      <h1 className="text-white text-xl text-left tracking-tight drop-shadow-md">Activity</h1>
+    <section className="w-full">
+      <h1 className="text-white text-xl text-left tracking-tight drop-shadow-md mb-2">Activity</h1>
+
       <div className="flex justify-center items-center w-full h-full">
-        <DoughnutChart data={activityData} />
+        <DoughnutChart data={activityData} innerCutoutPercentage={40} summaryTitle="TOTAL:" />
       </div>
-    </>
+    </section>
   );
 };
 

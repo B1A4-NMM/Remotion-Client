@@ -24,10 +24,10 @@ const DropChartArea = () => {
       ref={dropRef}
       onDragOver={e => {
         e.preventDefault();
-        e.stopPropagation(); // ✅ 슬라이더 이벤트 전파 방지
+        e.stopPropagation();
       }}
       onDrop={e => {
-        e.stopPropagation(); // ✅ 슬라이더 이벤트 전파 방지
+        e.stopPropagation();
       }}
       className="w-full h-72 border-2 border-dashed rounded-xl flex items-center justify-center"
     >

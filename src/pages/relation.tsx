@@ -15,12 +15,11 @@ import {
   createNodeFromBranch,
 } from "@/utils/animation";
 import { drawEdges, drawAnimatedBranch, drawNodes } from "@/utils/drawing";
-import { EMOTION_COLORS } from "@/constants/emotionalGraph.ts";
 
 const EmotionalGraph = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null); // ⭐ 부모 컨테이너
-  const hasScrolledToMe = useRef(false); // ⭐ 한 번만 스크롤 처리
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const hasScrolledToMe = useRef(false);
 
   const animationRef = useRef<number>();
   const nodesRef = useRef<Node[]>([]);
@@ -30,16 +29,9 @@ const EmotionalGraph = () => {
   const previousTimestampRef = useRef<number>(0);
   const { data: relationData } = useGetRelation();
 
-  useEffect(() => {
-    if (relationData) {
-      console.log("🎯 감정 및 관계 데이터:", relationData);
-    }
-  }, [relationData]);
-
   const dpr = window.devicePixelRatio || 1;
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
 
-  // 드래그 위치 상태
   const offsetX = useMotionValue(0);
   const offsetY = useMotionValue(0);
 
@@ -77,9 +69,19 @@ const EmotionalGraph = () => {
     edgesRef.current = [];
     animatedBranchesRef.current = [];
 
-    const rootNode = createRootNode(centerX + 100, centerY); // 🎯 중심을 실제 캔버스 중앙에
+    const rootNode = createRootNode(centerX + 100, centerY);
     nodesRef.current.push(rootNode);
-    animatedBranchesRef.current = createAnimatedBranches(rootNode, centerX, centerY);
+
+    // ✅ 수정: relationData를 기반으로 branches 생성
+    const relationArray = relationData?.relations?.relations;
+    if (Array.isArray(relationArray)) {
+      animatedBranchesRef.current = createAnimatedBranches(
+        rootNode,
+        centerX,
+        centerY,
+        relationArray
+      );
+    }
 
     const draw = (timestamp: number) => {
       if (!startTimeRef.current) {
@@ -150,11 +152,8 @@ const EmotionalGraph = () => {
 
       drawNodes(ctx, nodesRef.current);
       ctx.globalAlpha = 1;
-      const smoothScrollTo = (
-        element: HTMLElement,
-        target: number,
-        duration = 1500 // ← 여기를 늘리면 천천히 감
-      ) => {
+
+      const smoothScrollTo = (element: HTMLElement, target: number, duration = 1500) => {
         const start = element.scrollLeft;
         const change = target - start;
         const startTime = performance.now();
@@ -181,7 +180,7 @@ const EmotionalGraph = () => {
         const container = containerRef.current;
         if (meNode && container) {
           const targetX = meNode.x - container.clientWidth / 2;
-          smoothScrollTo(container, targetX, 1000); // ← 천천히 2초 동안 이동
+          smoothScrollTo(container, targetX, 1000);
           hasScrolledToMe.current = true;
         }
       }
@@ -195,7 +194,7 @@ const EmotionalGraph = () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
       window.removeEventListener("resize", resizeCanvas);
     };
-  }, [canvasSize.width, canvasSize.height]);
+  }, [canvasSize.width, canvasSize.height, relationData]);
 
   return (
     <div

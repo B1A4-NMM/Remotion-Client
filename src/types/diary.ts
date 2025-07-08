@@ -5,39 +5,91 @@ export interface DiaryPayload {
   weather: string;
   token: string;
 }
+
 // 내가 받는 데이터
 export interface DiaryResponse {
-  id: number;
-  title: string;
-  photo_path?: string;
-  content: string;
-  people: Person[];
-  selfEmotion: Emotion[];
-  stateEmotion: Emotion[];
-  activity: Activity[];
-  todos: TodoItem[];
-  createdAt?: string;
+  activity_analysis: ActivityAnalysis[];
+  reflection: Reflection;
 }
 
-interface Person {
-  name: string;
-  feel: {
-    emotionType: string;
-    intensity: number;
-  }[];
-  count: number;
-}
-
-export interface Emotion {
-  emotionType: string;
-  intensity: number;
-}
-
-interface Activity {
-  activityContent: string;
+export interface ActivityAnalysis {
+  activity: string;
+  peoples: Person[];
+  self_emotions: SelfEmotions;
+  state_emotions: StateEmotions;
+  problem: Problem[];
   strength: string;
+}
+
+export interface Person {
+  name: string;
+  interactions: {
+    emotion: string[];
+    emotion_intensity: number[];
+  };
+  name_intimacy: string;
+}
+
+export interface SelfEmotions {
+  emotion: string[];
+  emotion_intensity: number[];
+}
+
+export interface StateEmotions {
+  emotion: string[];
+  emotion_intensity: number[];
+}
+
+export interface Problem {
+  situation: string;
+  cause: string;
+  approach: string;
+  outcome: string;
+}
+
+export interface Reflection {
+  achievements: string[];
+  shortcomings: string[];
+  tomorrow_mindset: string;
+  todo: string[];
 }
 
 export interface TodoItem {
   content: string;
+}
+
+
+export interface EmotionSummary {
+  emotion: string;
+  intensity: number;
+  count: number;
+}
+
+export interface MemberSummaryResponse {
+  Relation: EmotionSummary[];
+  Self: EmotionSummary[];
+  State: EmotionSummary[];
+}
+
+// EmotionChart에서 사용할 수 있도록 변환하는 타입
+export interface EmotionData {
+  name: string;
+  count: number;
+}
+
+export interface ProcessedMemberSummary {
+  relationData: {
+    connected: EmotionData[];
+    distanced: EmotionData[];
+  };
+  stateData: {
+    elevated: EmotionData[];
+    tense: EmotionData[];
+    calm: EmotionData[];
+    lethargic: EmotionData[];
+  };
+  selfData: {
+    positive: EmotionData[];
+    negative: EmotionData[];
+  };
 }

@@ -1,4 +1,3 @@
-// components/MoodCircle.tsx
 import React, { useState, useEffect } from 'react';
 
 // 타입 정의
@@ -77,123 +76,124 @@ diaryContent,
     // 일기 내용에서 감정 데이터를 처리하는 함수
     const processDiaryContentEmotions = (): Emotion[] => {
 
-        console.log(diaryContent);
         if (!diaryContent) {
             return [{ color: "gray1" as ColorKey, intensity: 1 }];
         }
 
         const allEmotions: { type: string; intensity: number }[] = [];
 
-        console.log(allEmotions);
         // activity_analysis 배열 처리
         if (diaryContent.activity_analysis && Array.isArray(diaryContent.activity_analysis)) {
         diaryContent.activity_analysis.forEach((activity: any) => {
             
-            // self_emotions 처리
+            // self_emotions 처리 
             if (activity.self_emotions) {
-            const selfEmotions = activity.self_emotions.self_emotion || [];
-            const selfIntensities = activity.self_emotions.self_emotion_intensity || [];
-            
-            selfEmotions.forEach((emotion: string, index: number) => {
-                allEmotions.push({
-                type: emotion,
-                intensity: selfIntensities[index] || 5
-                });
-            });
-            }
-
-            // state_emotions 처리
-            if (activity.state_emotions) {
-            const stateEmotions = activity.state_emotions.state_emotion || [];
-            const stateIntensities = activity.state_emotions.s_emotion_intensity || [];
-            
-            stateEmotions.forEach((emotion: string, index: number) => {
-                allEmotions.push({
-                type: emotion,
-                intensity: stateIntensities[index] || 5
-                });
-            });
-            }
-
-            // peoples의 relation_emotion 처리 (가중치 낮게)
-            if (activity.peoples && Array.isArray(activity.peoples)) {
-            activity.peoples.forEach((person: any) => {
-                if (person.interactions) {
-                const relationEmotions = person.interactions.relation_emotion || [];
-                const relationIntensities = person.interactions.r_emotion_intensity || [];
+                const selfEmotions = activity.self_emotions.emotion || [];
+                const selfIntensities = activity.self_emotions.emotion_intensity || [];
                 
-                relationEmotions.forEach((emotion: string, index: number) => {
+                selfEmotions.forEach((emotion: string, index: number) => {
                     allEmotions.push({
                     type: emotion,
-                    intensity: (relationIntensities[index] || 5) * 0.5 // 가중치 낮게
+                    intensity: selfIntensities[index] || 5
                     });
                 });
+            }
+
+            // state_emotions 처리 
+            if (activity.state_emotions) {
+                const stateEmotions = activity.state_emotions.emotion || [];
+                const stateIntensities = activity.state_emotions.emotion_intensity || [];
+                
+                stateEmotions.forEach((emotion: string, index: number) => {
+                    allEmotions.push({
+                    type: emotion,
+                    intensity: stateIntensities[index] || 5
+                    });
+                });
+            }
+
+            // peoples의 interactions 처리 
+            if (activity.peoples && Array.isArray(activity.peoples)) {
+                activity.peoples.forEach((person: any) => {
+                    if (person.interactions) {
+                    const relationEmotions = person.interactions.emotion || [];
+                    const relationIntensities = person.interactions.emotion_intensity || [];
+                
+                    relationEmotions.forEach((emotion: string, index: number) => {
+                        allEmotions.push({
+                    type: emotion,
+                        intensity: relationIntensities[index] || 5 
+                        });
+                    });
                 }
             });
             }
         });
         }
 
+        console.log("allEmotions",allEmotions);
         if (allEmotions.length === 0) {
             return [{ color: "gray1" as ColorKey, intensity: 1 }];
-            }
+        }
 
-            // 색상별로 그룹화하고 강도 계산
-            const colorMap = new Map<ColorKey, number>();
-            allEmotions.forEach(({ type, intensity }) => {
+        // 색상별로 그룹화하고 강도 계산
+        const colorMap = new Map<ColorKey, number>();
+        allEmotions.forEach(({ type, intensity }) => {
             const color = mapEmotionToColor(type);
             colorMap.set(color, (colorMap.get(color) || 0) + intensity);
-            });
+        });
 
-            if (colorMap.size > 1) {
+        if (colorMap.size > 1) {
             colorMap.delete("gray1");
             colorMap.delete("gray2");
-            }
+        }
 
-            const maxIntensity = Math.max(...colorMap.values());
+        const totalColorIntensity = [...colorMap.values()].reduce((sum, val) => sum + val, 0);
 
-            return [...colorMap.entries()]
-            .sort((a, b) => b[1] - a[1])
-            .map(([color, total]) => ({
-                color,
-                intensity: +(total / maxIntensity).toFixed(3)
-            }));
-        };
+        return [...colorMap.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .map(([color, total]) => ({
+          color,
+          intensity: +(total / totalColorIntensity).toFixed(3)
+        }));
+    };
 
     // diaryContent가 변경될 때마다 감정 분석 실행
     useEffect(() => {
-        const processedEmotions = processDiaryContentEmotions(diaryContent);
+        const processedEmotions = processDiaryContentEmotions();
+        console.log("processedEmotions",processedEmotions);
         setEmotions(processedEmotions);
     }, [diaryContent]);
+
 
     // emotions 상태를 사용하여 그라데이션 생성
     const generateGradient = (): string => {
         // 1. emotions가 없거나, 모두 gray만 있을 때
         if (emotions.length === 0 || emotions.every(e => e.color === "gray1" || e.color === "gray2")) {
-        return `radial-gradient(ellipse at center, ${baseColors.gray1}, ${baseColors.gray2})`;
+          return `radial-gradient(ellipse at center, ${baseColors.gray1}, ${baseColors.gray2})`;
         }
-
+    
         // 2. 감정이 1개만 있을 때
         if (emotions.length === 1) {
-        return baseColors[emotions[0].color];
+          return baseColors[emotions[0].color as ColorKey];
         }
-
+    
         // 3. 여러 감정이 있을 때
         const intensities = emotions.map(e => e.intensity);
-        const maxIntensity = Math.max(...intensities);
-        const normalizedIntensities = intensities.map(i => i / maxIntensity);
-
+        const totalIntensity = intensities.reduce((sum, intensity) => sum + intensity, 0);
+        const normalizedIntensities = intensities.map(i => i / totalIntensity);
+    
         const totalWeight = normalizedIntensities.reduce((sum, weight) => sum + weight, 0);
         let cumulative = 0;
-
+    
         const colors = emotions.map(({ color, intensity }, idx) => {
-        cumulative += intensity;
-        const pos = (cumulative / totalWeight) * 100;
-        return `${baseColors[color]} ${pos.toFixed(1)}%`;
+          cumulative += intensity / totalIntensity;  // totalIntensity 사용
+          const pos = (cumulative / totalWeight) * 100;
+          return `${baseColors[color as ColorKey]} ${pos.toFixed(1)}%`;
         });
-
+    
         return `radial-gradient(ellipse at center, ${colors.join(", ")})`;
-    };
+      };
         
     return (
         <div className="mood-container flex justify-center mb-6">

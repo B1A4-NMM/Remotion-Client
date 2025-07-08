@@ -4,21 +4,30 @@ import { Card} from '../ui/card';
 import { Button } from '../ui/button';
 import { CirclePlus, Target } from 'lucide-react';
 import { toast } from 'sonner';
+import { useCreateTodo } from '@/api/queries/todo/useCreateTodo';
 
 interface TodosProps {
   todos: string[]; // Result.tsx에서 전달받은 투두 리스트
 }
 
 const Todos: React.FC<TodosProps> = ({ todos }) => {
+  const { mutate } = useCreateTodo();
   // todos가 빈 배열이면 아무것도 렌더링하지 않음
   if (!todos || todos.length === 0) {
     return null;
   }
   const handleTodoAdd = (todoItem: string) => {
-    toast.success(`"${todoItem}" 추가 완료!`, {
-      description: "할일 목록에 성공적으로 추가되었습니다.",
-      duration: 1000,
-    });
+    mutate(
+      { title: todoItem },
+      {
+        onSuccess: () => {
+          toast.success(`"${todoItem}" 추가 완료!`, {
+            description: "할일 목록에 성공적으로 추가되었습니다.",
+            duration: 1000,
+          });
+        },
+      }
+    );
   };
 
   return (

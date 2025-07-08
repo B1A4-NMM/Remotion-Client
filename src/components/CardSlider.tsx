@@ -113,7 +113,7 @@ const CardSlider = () => {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-screen overflow-hidden cursor-grab active:cursor-grabbing select-none"
+      className="relative w-full h-screen overflow-hidden cursor-grab active:cursor-grabbing select-none "
     >
       <div className="absolute inset-0 flex pt-8 justify-center px-4 md:px-8">
         {components.map(({ Component, bgColor }, index) => {

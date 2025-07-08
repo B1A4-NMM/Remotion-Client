@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef} from 'react';
-import { useGetTodayDiary } from '../api/queries/home/useGetHome';
-import { useGetDiaryContent } from '../api/queries/home/useGetDiary';
+import { useGetDiaryContent } from '../api/queries/result/useGetDiaryContent';
+import { useGetMemberSummary } from '../api/queries/result/useGetmemSummary';
 import { ArrowLeft, Clock, CirclePlus, Plus, PlusCircle } from "lucide-react"
 import { Button } from '../components/ui/button';
 import { motion } from 'framer-motion';
@@ -12,13 +12,11 @@ import '../styles/resultCard.css';
 import '../styles/App.css';
 import ActivityCardSlider from '../components/result/ActivityCardSlider';
 import StressTest from '../components/result/StressTest';
+import { useParams } from 'react-router-dom';
  
 interface DiaryCardsProps {
-  hasTodayDiary: boolean;
-  todayDiary: any | null;
   diaryContent: any | null;
-  isContentLoading: boolean;
-  isContentError: boolean;
+  memSummary: any |null;
 }
 
 /* ─ 1. 샘플 일기 (작성 유도) ─ */
@@ -225,13 +223,14 @@ const sampleDiary = {
 
 {/* ==========결과 카드 리스트 ============== */}
 const ResultCards = ({
-  hasTodayDiary, 
-  diaryContent, 
+  diaryContent,
+  memSummary 
 }: DiaryCardsProps)=>{
+
   const [scrollY, setScrollY] = useState(0);
 
   const contentRef = useRef<HTMLDivElement>(null);
-  
+
   const handleDrag = (event: any, info: any) => {
     setScrollY(info.offset.y);
   };
@@ -251,14 +250,14 @@ const ResultCards = ({
 
   // 투두 데이터 추출 함수
   const getTodos = (): string[] => {
-    if (hasTodayDiary && diaryContent?.reflection?.todo) {
+    if (diaryContent?.reflection?.todo) {
       return diaryContent.reflection.todo;
     }
-    return sampleDiary.reflection.todo;
+    return [];
   };
 
+
   const todos = getTodos();
-  const isWarning = true;
 
 
   return(
@@ -280,16 +279,15 @@ const ResultCards = ({
       >
 
         <ActivityCardSlider
-          data={hasTodayDiary? diaryContent : sampleDiary}
+          data={diaryContent}
         />
         {/* 투두 리스트 카드들 */}
         <Todos 
           todos={todos}
-          hasTodayDiary={hasTodayDiary}
         />
 
         <StressTest
-          isWarning={isWarning}/>
+          memSummary={memSummary}/>
 
         
       </motion.div>
@@ -303,75 +301,62 @@ const Result: React.FC = () => {
 
 
   const [showTestModal, setShowTestModal] = useState(false);
-
-  const [emotions, setEmotions] = useState<Emotion[]>([]);
-
-  {/* UI 테스트 용 임시 처리. 나중에 수정할 예정  */}
+  const { id } =useParams<{id:string}>();
   const token = localStorage.getItem('accessToken') || '';
 
   const { 
-      data: todayData, 
+      data: diaryContent, 
       isLoading, 
       isError, 
-      error,
-      isSuccess
-    } = useGetTodayDiary(token);
-  
-    /* ─ 1. 오늘 일기 필터링 ─ */
-    const todayDiaries = todayData?.todayDiaries || [];
-    const hasTodayDiary = todayDiaries.length > 0;
-    const todayDiary = hasTodayDiary ? todayDiaries[0] : sampleDiary;
-  
-    /* ─ 2. 오늘 일기 상세 내용 가져오기 ─ */
-    const {
-      data: apiDiaryContent,
-      isLoading: isContentLoading,
-      isError: isContentError
-    } = useGetDiaryContent(
-      token,
-      todayDiary?.diaryId?.toString() || 'sample' // 기본값으로 'sample' 문자열 사용
-    );
+    } = useGetDiaryContent(token, id||'sample');
 
-     /* ─ 3. 최종 데이터 결정 ─ */
-    const diaryContent = hasTodayDiary ? apiDiaryContent : sampleDiary;
-  
-     // 두 API 호출 모두 로딩 상태 확인
-     if (isLoading || isContentLoading) {
-      return (
-        <div className="base flex items-center justify-center min-h-screen">
-          <div className="text-white">
-            {isLoading ? '일기 목록 로딩 중...' : '일기 내용 로딩 중...'}
-          </div>
+    const { data: memsummary} = useGetMemberSummary(token);
+    
+    if (isLoading ) {
+     return (
+      <div className="base flex items-center justify-center min-h-screen">
+        <div className="text-white">일기 내용 로딩 중...</div>
+      </div>
+     );
+   }
+
+    // 에러 상태 처리
+  if (isError) {
+    return (
+      <div className="base flex items-center justify-center min-h-screen">
+        <div className="text-white text-center">
+          <h2 className="text-xl mb-2">일기를 불러올 수 없습니다</h2>
+          <p className="text-gray-300">
+            {id ? `일기 ID ${id}를 찾을 수 없습니다.` : '일기 ID가 필요합니다.'}
+          </p>
         </div>
-      );
-    }
+      </div>
+    );
+  }
 
-    console.log(diaryContent);
+  const finalDiaryContent = diaryContent? diaryContent :sampleDiary ;
 
   return (
     <div className="base px-4 overflow-hidden">
       {/* 상단 뒤로가기 버튼 */}
       <div className="relative z-50 flex justify-start pt-6 pb-6">
-        <Button variant="ghost" size="icon" className="text-white">
+        <Button variant="ghost" size="icon" className="text-white" onClick={() => {
+      window.location.href = '/';
+    }}>
           <ArrowLeft className="h-6 w-6" />
         </Button>
       </div>
 
       {/* 무드 서클 */}
         <MoodCircle 
-          diaryContent={diaryContent}
+          diaryContent={finalDiaryContent}
         />
 
         <ResultCards
-          hasTodayDiary={hasTodayDiary}
-          todayDiary={todayDiary}
-          diaryContent={diaryContent}
-          isContentLoading={isContentLoading}
-          isContentError={isContentError}
+          diaryContent={finalDiaryContent}
+          memSummary={memsummary}
         />
 
-
-      
       {showTestModal && (
         <TestModal
           type="stress"

@@ -5,6 +5,7 @@ import type { PanInfo } from 'framer-motion';
 import ActivityCard from './ActivityCard'; // 컴포넌트는 일반 import
 import { processActivityData } from '../../utils/activityCardUtils';
 
+
 interface ActivityCardSliderProps {
   data: any;
 }
@@ -20,6 +21,7 @@ const ActivityCardSlider: React.FC<ActivityCardSliderProps> = ({ data }) => {
   const backgroundColor = [
     'linear-gradient(to bottom ,rgb(74, 99, 124),rgb(105, 105, 105))', // 파란색
   ];
+
 
   const handleDrag = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const threshold = 100;

@@ -1,0 +1,43 @@
+
+.donut-ring {
+  stroke: #1e212b;
+}
+
+:root {
+  --bg-light:#d5dfef;
+	--bg-dark:#202631;
+}
+
+.chart-center{
+    display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.donut-wrapper {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: #202631;
+  box-shadow: 
+    8px 8px 20px rgba(0, 0, 0, 0.4),        /* 더 진한 외부 그림자 */
+    -5px -5px 20px rgba(255, 255, 255, 0.221),  /* 더 밝은 하이라이트 */
+    inset -8px -8px 15px rgba(255, 255, 255, 0.08), 
+    inset 5px 5px 10px rgb(0 0 0 / 20%);
+  margin-bottom: 15px;
+}
+
+/* 기존 애니메이션 스타일들도 함께 관리 */
+.svg-item {
+  width: 100%;
+  font-size: 16px;
+  margin: 0 auto;
+  animation: donutfade 1s;
+  padding: 20px;
+}
+
+@keyframes donutfade {
+  0% { opacity: .2; }
+  100% { opacity: 1; }
+}

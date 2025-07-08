@@ -7,10 +7,13 @@ import { toast } from 'sonner';
 
 interface TodosProps {
   todos: string[]; // Result.tsx에서 전달받은 투두 리스트
-  hasTodayDiary: boolean; // 실제 데이터 여부
 }
 
-const Todos: React.FC<TodosProps> = ({ todos, hasTodayDiary }) => {
+const Todos: React.FC<TodosProps> = ({ todos }) => {
+  // todos가 빈 배열이면 아무것도 렌더링하지 않음
+  if (!todos || todos.length === 0) {
+    return null;
+  }
   const handleTodoAdd = (todoItem: string) => {
     toast.success(`"${todoItem}" 추가 완료!`, {
       description: "할일 목록에 성공적으로 추가되었습니다.",
@@ -23,10 +26,10 @@ const Todos: React.FC<TodosProps> = ({ todos, hasTodayDiary }) => {
       <div className="mb-4 flex items-center gap-2">
         <Target className="h-5 w-5 text-white" />
         <h3 className="text-lg font-semibold text-white">
-          {hasTodayDiary ? "내일의 할일" : "추천 할일"}
+          내일의 할일 
         </h3>
         <p className="text-sm text-white/70">
-          {hasTodayDiary ? "일기에서 추출된 할일" : "샘플 할일"}
+          일기에서 추출된 할일
         </p>
       </div>
       

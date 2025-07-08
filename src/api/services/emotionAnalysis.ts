@@ -2,9 +2,7 @@
 import axios from "axios";
 import type { EmotionAnalysisResponse } from "../../types/diary";
 
-export const getEmotionAnalysis = async (
-  token: string, 
-): Promise<EmotionAnalysisResponse> => {
+export const getEmotionAnalysis = async (token: string): Promise<EmotionAnalysisResponse> => {
   const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
 
   const response = await axios.get(`${BASE_URL}/member/emotion/base-analysis`, {
@@ -14,7 +12,7 @@ export const getEmotionAnalysis = async (
     },
   });
 
-  console.log("response.data", response.data);
+  // console.log("response.data", response.data);
 
   return response.data;
 };

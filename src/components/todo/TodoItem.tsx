@@ -18,20 +18,22 @@ export default function TodoItem({ todo }) {
   const commitEdit = () => {
     const trimmed = value.trim();
     setEditing(false);
-    if (!trimmed || trimmed === todo.title) return;
-    setTodos(prev => prev.map(t => (t.id === todo.id ? { ...t, title: trimmed } : t)));
-    updateTodo(todo.id, { isCompleted: 'true' });
+    if (!trimmed) {
+      deleteTodo(todo.id);
+      return;
+    }
+
+    if (trimmed === todo.title) return;
+
+    setTodos(prev =>
+      prev.map(t => (t.id === todo.id ? { ...t, title: trimmed } : t))
+    );
+    updateTodo({ id: todo.id, data: { title: trimmed } });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !isComposing) {
       e.preventDefault();
-      const trimmed = value.trim();
-      if (!trimmed) {
-        deleteTodo(todo.id);
-        setEditing(false);
-        return;
-      }
       commitEdit();
     } else if (e.key === "Escape") {
       e.preventDefault();

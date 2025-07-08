@@ -48,18 +48,43 @@ export const getTodos = async (from: string, to: string) => {
 
 // ✅ 생성
 export const createTodo = async ({ title }: { title: string }) => {
+  try {
+  console.log("✨ createTodo called with:", { title });
+
   const response = await api.post<ApiTodo>(`${BASE_URL}/todos`, { title });
+
+  console.log("✨ createTodo response.data:", response.data);
+
   return response.data;
+}
+  catch (error) {
+    console.error("❌ createTodo error:", error);
+    throw error;
+  }
 };
 
 // ✅ 수정 (필드 업데이트)
 export const updateTodo = async (id: number, data: Partial<Omit<ApiTodo, "id">>) => {
+  try {
+  console.log("🐛 updateTodo called with:", { id, data });
+
   const response = await api.patch<ApiTodo>(`${BASE_URL}/todos/${id}`, data);
+
+  console.log("🐛 updateTodo response.data:", response.data);
+
   return response.data;
+  } catch (error) {
+    console.error("❌ updateTodo error:", error);
+    throw error;
+  }
 };
 
 // ✅ 삭제
 export const deleteTodo = async (id: number) => {
+  console.log("🗑️ deleteTodo called with:", { id });
+
   const response = await api.delete(`${BASE_URL}/todos/${id}`);
+
+  console.log("🗑️ deleteTodo response.data:", response.data);
   return response.data;
 };

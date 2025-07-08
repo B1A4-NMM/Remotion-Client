@@ -22,14 +22,15 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
         <span
           className={cn(
             "h-4 w-4 shrink-0 rounded-sm border border-white shadow flex items-center justify-center",
-            "text-white", // 기본 색상
+            "text-white",
             "peer-focus-visible:outline-none peer-focus-visible:ring-1 peer-focus-visible:ring-ring",
             "peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
-            "peer-checked:bg-white peer-checked:text-black",
+            "peer-checked:bg-white peer-checked:text-black", 
+            "peer-checked:[&>svg]:opacity-100",
             className
           )}
         >
-          <Check className="h-3 w-3 opacity-0 peer-checked:opacity-100" />
+          <Check className="h-3 w-3 opacity-0" />
         </span>
       </label>
     );

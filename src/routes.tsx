@@ -12,6 +12,7 @@ import GetAccess from "./pages/GetAccess";
 import Loading6 from "./components/loading/Loading6";
 import Analysis from "./pages/Analysis";
 import AboutMe from "./pages/AboutMe";
+import Map from "./pages/Map";
 export const routes = [
   { path: "/", element: <Home /> },
   { path: "/diary", element: <Diary /> },
@@ -25,4 +26,5 @@ export const routes = [
   { path: "/loading", element: <Loading6 /> },
   { path: "/analysis", element: <Analysis /> },
   { path: "/aboutme", element: <AboutMe /> },
+  { path: "/map", element: <Map /> },
 ];

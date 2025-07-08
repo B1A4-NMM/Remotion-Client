@@ -9,8 +9,12 @@ import { usePostDiary } from "@/api/queries/diary/usePostDiary.ts";
 import Loading6 from "../components/loading/Loading6";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import LocationPicker from "@/components/LocationPicker"; // 분리된 지도 모달 컴포넌트
+import { useParams } from "react-router-dom";
+import dayjs from "dayjs";
 
 const Diary = () => {
+  const { date } = useParams();
+
   const navigate = useNavigate();
   const [mapOpen, setMapOpen] = useState(false);
   const {
@@ -22,7 +26,10 @@ const Diary = () => {
     formState: { errors },
   } = useForm();
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-
+  const isValidDate = date && dayjs(date, "YYYY-MM-DD", true).isValid();
+  if (!isValidDate) {
+    return <div className="p-4 text-red-500">❌ 유효하지 않은 날짜입니다: {date}</div>;
+  }
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -87,14 +94,12 @@ const Diary = () => {
       setImageFile(file);
     }
   };
-
   const onSubmit = (data: any) => {
-    const today = new Date().toISOString().split("T")[0];
     const file = fileInputRef.current?.files?.[0];
     const formData = new FormData();
 
     formData.append("content", data.content);
-    formData.append("writtenDate", today);
+    formData.append("writtenDate", date!); // ✅ URL에서 받은 날짜로 작성
     formData.append("weather", "SUNNY");
 
     if (location) {
@@ -106,7 +111,7 @@ const Diary = () => {
       formData.append("photo", file);
     }
 
-    // ✅ FormData 내용 로그 찍기
+    // 디버깅 로그
     console.log("📤 전송할 FormData 내용:");
     formData.forEach((value, key) => {
       if (key === "photo" && value instanceof File) {

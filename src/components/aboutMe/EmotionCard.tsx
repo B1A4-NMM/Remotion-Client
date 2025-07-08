@@ -49,7 +49,6 @@ const EmotionCard = () => {
           },
         });
 
-        // console.log("character response:", response.data);
         // 올바른 객체 형태로 저장
         setAnimalType({ character: response.data.character as AnimalKey });
       } catch (error) {

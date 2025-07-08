@@ -13,11 +13,6 @@ import "../styles/homeCard.css";
 import "../styles/moodCircle.css";
 import dayjs from "dayjs";
 
-/* ─ 1. 샘플 일기 (작성 유도) ─ */
-const sampleDiary = {
-  id: "sample",
-};
-
 const Home = () => {
   const token = localStorage.getItem("accessToken") || "";
   const navigate = useNavigate();
@@ -53,6 +48,8 @@ const Home = () => {
   );
 
   const todayDiary = todayData ? todayData : null;
+  console.log(todayDiary);
+  console.log(dayjs(selectedDate).format("YYYY-MM-DD"));
 
   const {
     data: diaryContent,

@@ -24,6 +24,34 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
   const startY = useRef(0);
   const isDragging = useRef(false);
 
+  // 안전한 접근을 위한 방어 코드
+  if (!videos || videos.length === 0) {
+    return (
+      <div className="flex items-center justify-center w-full h-screen bg-black text-white">
+        <div className="text-center">
+          <div className="text-xl mb-2">📹</div>
+          <div>추천 영상이 없습니다</div>
+        </div>
+      </div>
+    );
+  }
+
+  // 현재 인덱스가 유효한지 확인
+  const safeCurrentIndex = Math.max(0, Math.min(currentIndex, videos.length - 1));
+  const currentVideo = videos[safeCurrentIndex];
+
+  // currentVideo가 유효한지 확인
+  if (!currentVideo || !currentVideo.id) {
+    return (
+      <div className="flex items-center justify-center w-full h-screen bg-black text-white">
+        <div className="text-center">
+          <div className="text-xl mb-2">⚠️</div>
+          <div>영상 정보를 불러올 수 없습니다</div>
+        </div>
+      </div>
+    );
+  }
+
   // 위아래 네비게이션
   const goToPrevious = () => {
     if (isTransitioning) return;
@@ -78,8 +106,27 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const currentVideo = videos[currentIndex];
+  
+  // YouTube URL 생성 함수
+  const generateYouTubeUrl = (videoId: string) => {
+    const baseUrl = `https://www.youtube.com/embed/${videoId}`;
+    const params = new URLSearchParams({
+      rel: '0',
+      modestbranding: '1',
+      controls: '0',
+      showinfo: '0',
+      fs: '1', // 전체화면 허용
+      iv_load_policy: '3', // 어노테이션 비활성화
+    });
 
+    // autoPlay가 true일 때만 관련 파라미터 추가
+    if (autoPlay) {
+      params.append('autoplay', '1');
+      params.append('mute', '1');
+    }
+
+    return `${baseUrl}?${params.toString()}`;
+  };
 
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
@@ -92,22 +139,25 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
         onTouchStart={(e) => handleStart(e.touches[0].clientY)}
         onTouchEnd={(e) => handleEnd(e.changedTouches[0].clientY)}
       >
-        {/* YouTube iframe - 전체 화면 */}
-        <iframe
-          className={`w-full h-full object-cover transition-opacity duration-300 ${
-            isTransitioning ? 'opacity-50' : 'opacity-100'
-          }`}
-          src={`https://www.youtube.com/embed/${currentVideo.id}${
-            autoPlay ? '?autoplay=1&mute=1' : ''
-          }&rel=0&modestbranding=1&controls=0`}
-          title={currentVideo.title}
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          style={{
-            objectFit: 'cover'
-          }}
-        />
+        {/* 수정된 YouTube iframe */}
+        <div className="relative w-full h-full">
+          <iframe
+            key={currentVideo.id} // 영상 변경 시 iframe 재생성
+            className={`absolute inset-0 w-full h-full transition-opacity duration-300 ${
+              isTransitioning ? 'opacity-50' : 'opacity-100'
+            }`}
+            src={generateYouTubeUrl(currentVideo.id)}
+            title={currentVideo.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            style={{
+              border: 'none',
+              // 세로 화면에서 영상 중앙 정렬
+              transform: 'scale(1.2)', // 필요에 따라 조정
+              transformOrigin: 'center center'
+            }}
+          />
+        </div>
 
         {/* 세로 네비게이션 버튼 */}
         {showControls && videos.length > 1 && (

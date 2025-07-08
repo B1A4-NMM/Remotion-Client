@@ -10,7 +10,7 @@ export const useToggleTodo = () => {
 
   return useMutation({
     // ✅ mutationFn은 toggleTodo 대신 updateTodo
-    mutationFn: async (id: string) => {
+    mutationFn: async (id: number) => {
       // 현재 todos에서 해당 todo 찾아서 isCompleted 반전
       const todo = useTodoStore.getState().todos.find((t) => t.id === id);
       if (!todo) throw new Error("Todo not found");
@@ -19,7 +19,7 @@ export const useToggleTodo = () => {
     },
 
     // Optimistic Update: 스토어 먼저 갱신
-    onMutate: async (id: string) => {
+    onMutate: async (id: number) => {
       setTodos((prev) =>
         prev.map((t) =>
           t.id === id ? { ...t, isCompleted: !t.isCompleted } : t

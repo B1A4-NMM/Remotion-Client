@@ -1,13 +1,15 @@
 import { Checkbox } from "@/components/ui/checkbox";
-import { useToggleTodo } from "@/api/queries/todo/useToggleTodo";
+// import { useToggleTodo } from "@/api/queries/todo/useToggleTodo";
 import { useUpdateTodo } from "@/api/queries/todo/useUpdateTodo";
+import { useDeleteTodo } from "@/api/queries/todo/useDeleteTodo";
 import { useTodoStore } from "@/store/todoStore";
 import { useState } from "react";
 
 export default function TodoItem({ todo }) {
   // const toggleTodo = useTodoStore((state) => state.toggleTodo);
-  const { mutate } = useToggleTodo();
+  // const { mutate } = useToggleTodo();
   const { mutate: updateTodo } = useUpdateTodo();
+  const { mutate: deleteTodo } = useDeleteTodo();
   const setTodos = useTodoStore(state => state.setTodos);
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(todo.title);
@@ -18,12 +20,18 @@ export default function TodoItem({ todo }) {
     setEditing(false);
     if (!trimmed || trimmed === todo.title) return;
     setTodos(prev => prev.map(t => (t.id === todo.id ? { ...t, title: trimmed } : t)));
-    updateTodo({ id: todo.id, data: { title: trimmed } });
+    updateTodo(todo.id, { isCompleted: 'true' });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !isComposing) {
       e.preventDefault();
+      const trimmed = value.trim();
+      if (!trimmed) {
+        deleteTodo(todo.id);
+        setEditing(false);
+        return;
+      }
       commitEdit();
     } else if (e.key === "Escape") {
       e.preventDefault();
@@ -37,7 +45,13 @@ export default function TodoItem({ todo }) {
         {/* ✅ shadcn Checkbox 사용 & isCompleted 상태 연동 */}
         <Checkbox
             checked={todo.isCompleted}
-            onCheckedChange={() => mutate(todo.id)}
+            onCheckedChange={(checked) => {
+              const complete = Boolean(checked);
+              setTodos(prev => prev.map(t =>
+                t.id === todo.id ? { ...t, isCompleted: complete } : t
+              ));
+              updateTodo({ id: todo.id, data: { isCompleted: complete } });
+            }}
 
             className={`flex-shrink-0 border border-white
                 ${todo.isCompleted

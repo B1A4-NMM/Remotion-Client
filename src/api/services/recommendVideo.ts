@@ -1,22 +1,22 @@
 // api/services/recommendVideo.ts
-import axios from "axios";
-import type { video } from "../../types/video";
+import axios from 'axios';
+import type { VideoApiResponse } from '../../types/video';
 
 export const getVideo = async (
-  token: string, 
-  period: number = 0
-): Promise<video> => {
+  token: string,
+  period = 0
+): Promise<VideoApiResponse> => {
   const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
 
-  const response = await axios.get(`${BASE_URL}/recommend/video`, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    params: {
-      period // 검색 기간 파라미터 추가
+  const { data } = await axios.get<VideoApiResponse>(
+    `${BASE_URL}/recommend/video`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { period },
     }
-  });
+  );
 
-  return response.data;
+  return data;             // ⇐ 그대로 돌려준다
 };

@@ -24,6 +24,34 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
   const startY = useRef(0);
   const isDragging = useRef(false);
 
+  // 안전한 접근을 위한 방어 코드
+  if (!videos || videos.length === 0) {
+    return (
+      <div className="flex items-center justify-center w-full h-screen bg-black text-white">
+        <div className="text-center">
+          <div className="text-xl mb-2">📹</div>
+          <div>추천 영상이 없습니다</div>
+        </div>
+      </div>
+    );
+  }
+
+  // 현재 인덱스가 유효한지 확인
+  const safeCurrentIndex = Math.max(0, Math.min(currentIndex, videos.length - 1));
+  const currentVideo = videos[safeCurrentIndex];
+
+  // currentVideo가 유효한지 확인
+  if (!currentVideo || !currentVideo.id) {
+    return (
+      <div className="flex items-center justify-center w-full h-screen bg-black text-white">
+        <div className="text-center">
+          <div className="text-xl mb-2">⚠️</div>
+          <div>영상 정보를 불러올 수 없습니다</div>
+        </div>
+      </div>
+    );
+  }
+
   // 위아래 네비게이션
   const goToPrevious = () => {
     if (isTransitioning) return;
@@ -77,8 +105,6 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
-
-  const currentVideo = videos[currentIndex];
 
 
   return (

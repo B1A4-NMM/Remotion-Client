@@ -6,6 +6,6 @@ export const useGetCharacter = (token: string) => {
   return useQuery({
     queryKey: ["character", token],
     queryFn: () => getCharacter(token),
-    enabled: !!token ,
+    enabled: !!token,
   });
 };

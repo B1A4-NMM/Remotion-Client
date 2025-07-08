@@ -1,51 +1,61 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
+
 type RadarChartProps = {
-  values: number[];
+  typeCount: Record<string, number>; // 서버에서 받은 원본
   onSelectCategory?: (label: string) => void;
   colors?: string[];
 };
 
-const RadarChart = ({ values, colors, onSelectCategory }: RadarChartProps) => {
-  const svgRef = useRef(null);
-  const [selectedIndex, setSelectedIndex] = useState(null);
-  const pastelColors = colors ?? [
-    // 기본 색상 지정 (옵션이 없을 때 대비)
-    "#a8d5ba",
-    "#ffd3b6",
-    "#ffaaa5",
-    "#d5c6e0",
-    "#f8ecc9",
-    "#c1c8e4",
-  ];
-  const data = values;
-  const labels = ["지혜", "도전", "배려", "협력", "절제", "긍정"];
+const LABELS = ["지혜", "도전", "정의", "배려", "절제", "긍정"];
+const PASTEL_COLORS = ["#a8d5ba", "#ffd3b6", "#ffaaa5", "#d5c6e0", "#f8ecc9", "#c1c8e4"];
+const API_TO_DISPLAY_LABEL_MAP: Record<string, string> = {
+  지혜: "지혜",
+  용기: "도전",
+  인애: "배려",
+  정의: "협력",
+  절제: "절제",
+  초월: "긍정",
+};
 
-  const maxValue = 5;
-  const numAxes = labels.length;
+const RadarChart = ({ typeCount, onSelectCategory, colors }: RadarChartProps) => {
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
+  const pastelColors = colors ?? PASTEL_COLORS;
+  const numAxes = LABELS.length;
+  const maxValue = 15;
+  const width = 300;
+  const height = 300;
+  const radius = 100;
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const angleSlice = (Math.PI * 2) / numAxes;
+
+  // ✅ typeCount에서 values 계산
+  const values = LABELS.map(displayLabel => {
+    const apiLabel = Object.entries(API_TO_DISPLAY_LABEL_MAP).find(
+      ([, mappedLabel]) => mappedLabel === displayLabel
+    )?.[0];
+    return apiLabel && typeCount?.[apiLabel] !== undefined ? typeCount[apiLabel] : 0;
+  });
+
+  const highlightIndex = values.indexOf(Math.max(...values));
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const width = 300;
-    const height = 300;
-    const radius = 100;
-    const centerX = width / 2;
-    const centerY = height / 2;
-
     svg.attr("width", width).attr("height", height);
 
-    const angleSlice = (Math.PI * 2) / numAxes;
-
-    // Background grid lines
+    // 🌀 배경 그리드
     for (let level = 1; level <= maxValue; level++) {
-      const levelFactor = (radius / maxValue) * level;
+      const r = (radius / maxValue) * level;
       const points = d3.range(numAxes).map(i => {
         const angle = angleSlice * i;
         return [
-          centerX + levelFactor * Math.cos(angle - Math.PI / 2),
-          centerY + levelFactor * Math.sin(angle - Math.PI / 2),
+          centerX + r * Math.cos(angle - Math.PI / 2),
+          centerY + r * Math.sin(angle - Math.PI / 2),
         ];
       });
       svg
@@ -57,15 +67,15 @@ const RadarChart = ({ values, colors, onSelectCategory }: RadarChartProps) => {
         .attr("opacity", 0.3);
     }
 
-    // Axis lines and labels (as button UI)
+    // 🧭 축선과 라벨
     const axisGroup = svg.append("g");
-    labels.forEach((label, i) => {
+
+    LABELS.forEach((label, i) => {
       const angle = angleSlice * i;
       const x = centerX + radius * Math.cos(angle - Math.PI / 2);
       const y = centerY + radius * Math.sin(angle - Math.PI / 2);
-      const labelDistance = 32;
-      const labelX = centerX + (radius + labelDistance) * Math.cos(angle - Math.PI / 2);
-      const labelY = centerY + (radius + labelDistance) * Math.sin(angle - Math.PI / 2);
+      const labelX = centerX + (radius + 30) * Math.cos(angle - Math.PI / 2);
+      const labelY = centerY + (radius + 30) * Math.sin(angle - Math.PI / 2);
 
       axisGroup
         .append("line")
@@ -81,18 +91,9 @@ const RadarChart = ({ values, colors, onSelectCategory }: RadarChartProps) => {
         .append("g")
         .attr("transform", `translate(${labelX},${labelY})`)
         .style("cursor", "pointer")
-        .on("click", function () {
+        .on("click", () => {
           setSelectedIndex(i);
-          if (onSelectCategory) onSelectCategory(labels[i]);
-
-          d3.select(this)
-            .select("rect")
-            .transition()
-            .duration(150)
-            .attr("fill", "#e0e0e0")
-            .transition()
-            .duration(150)
-            .attr("fill", pastelColors[i]);
+          onSelectCategory?.(label);
         });
 
       const text = group
@@ -101,10 +102,10 @@ const RadarChart = ({ values, colors, onSelectCategory }: RadarChartProps) => {
         .attr("text-anchor", "middle")
         .attr("dy", "0.35em")
         .style("font-size", "14px")
-
         .attr("fill", "#333");
 
-      const bbox = text.node().getBBox();
+      const bbox = text.node()?.getBBox();
+      if (!bbox) return;
 
       group
         .insert("rect", "text")
@@ -119,37 +120,32 @@ const RadarChart = ({ values, colors, onSelectCategory }: RadarChartProps) => {
         .attr("stroke-width", 1);
     });
 
-    // Data area
-    const dataPoints = data.map((d, i) => {
+    // 📈 데이터 영역 (폴리곤)
+    const dataPoints = values.map((v, i) => {
       const angle = angleSlice * i;
-      const value = (d / maxValue) * radius;
+      const scaled = (v / maxValue) * radius;
       return {
-        x: centerX + value * Math.cos(angle - Math.PI / 2),
-        y: centerY + value * Math.sin(angle - Math.PI / 2),
+        x: centerX + scaled * Math.cos(angle - Math.PI / 2),
+        y: centerY + scaled * Math.sin(angle - Math.PI / 2),
       };
     });
 
     const area = svg
       .append("polygon")
       .attr("points", dataPoints.map(() => `${centerX},${centerY}`).join(" "))
-      .attr("fill", "#66c2a5")
-      .attr("opacity", 0.8);
+      .attr("fill", pastelColors[highlightIndex])
+      .attr("opacity", 0.75);
 
     area
       .transition()
-      .duration(1200)
+      .duration(1000)
       .ease(d3.easeCubicOut)
       .attr("points", dataPoints.map(p => `${p.x},${p.y}`).join(" "));
-  }, [selectedIndex]);
+  }, [typeCount]);
 
   return (
     <div className="w-full flex justify-center">
       <svg ref={svgRef}></svg>
-      {/* {selectedIndex !== null && (
-        <div className="absolute top-5 text-white text-sm">
-          {labels[selectedIndex]} 라벨이 선택됨!
-        </div>
-      )} */}
     </div>
   );
 };

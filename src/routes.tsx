@@ -27,4 +27,5 @@ export const routes = [
   { path: "/loading", element: <Loading6 /> },
   { path: "/analysis", element: <Analysis /> },
   { path: "/aboutme", element: <AboutMe /> },
+  { path: "/video", element: <Video /> },
 ];

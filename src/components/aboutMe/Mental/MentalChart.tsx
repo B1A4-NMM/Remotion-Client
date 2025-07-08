@@ -8,45 +8,23 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { ChartContainer } from "../../ui/chart";
-import { useEffect } from "react";
 
-type MentalType = "stress" | "anxiety" | "depression";
+type MentalType = "스트레스" | "불안" | "우울";
 
 interface MentalChartProps {
   type: MentalType;
+  data: {
+    date: string;
+    emotionGroup: string;
+    intensity: number;
+    count: number;
+  }[];
 }
 
-const mentalData: Record<MentalType, { date: string; value: number }[]> = {
-  stress: [
-    { date: "2025-06-30", value: 10 },
-    { date: "2025-07-01", value: 150 },
-    { date: "2025-07-02", value: 150 },
-  ],
-  anxiety: [
-    { date: "2025-06-30", value: 120 },
-    { date: "2025-07-01", value: 180 },
-    { date: "2025-07-02", value: 160 },
-  ],
-  depression: [
-    { date: "2025-06-30", value: 90 },
-    { date: "2025-07-01", value: 100 },
-    { date: "2025-07-02", value: 110 },
-  ],
-};
-
 const chartConfig: Record<MentalType, { label: string; color: string }> = {
-  stress: {
-    label: "스트레스",
-    color: "#ff6b6b",
-  },
-  anxiety: {
-    label: "불안",
-    color: "#5b9bd5",
-  },
-  depression: {
-    label: "우울",
-    color: "#8e44ad",
-  },
+  스트레스: { label: "스트레스", color: "#ff6b6b" },
+  불안: { label: "불안", color: "#5b9bd5" },
+  우울: { label: "우울", color: "#8e44ad" },
 };
 
 const formatDateToMD = (dateStr: string) => {
@@ -63,16 +41,26 @@ const CustomLabel = (props: any) => {
   );
 };
 
-const MentalChart = ({ type }: MentalChartProps) => {
+const MentalChart = ({ type, data }: MentalChartProps) => {
   const config = chartConfig[type];
-  const data = mentalData[type];
+
+  // API 데이터 매핑: { date, intensity } → { date, value }
+  const chartData = data.map(item => ({
+    date: item.date,
+    value: item.intensity,
+  }));
+
+  // 최대값 계산 (기본값은 최소 100 보장)
+  const maxValue = Math.max(...chartData.map(d => d.value), 100);
 
   return (
-    <div className="w-full h-[20vh]  rounded-lg p-1">
-      <h1 className="text-white text-xl text-left tracking-tight drop-shadow-md mb-2">Date</h1>
+    <div className="w-full h-[20vh] rounded-lg p-1">
+      <h1 className="text-white text-xl text-left tracking-tight drop-shadow-md mb-2">
+        날짜별 {config.label}
+      </h1>
       <ChartContainer config={chartConfig} className="h-full w-full">
         <ResponsiveContainer width="100%">
-          <LineChart data={data} margin={{ top: 15, right: 10, left: 10, bottom: 10 }}>
+          <LineChart data={chartData} margin={{ top: 15, right: 10, left: 10, bottom: 10 }}>
             <CartesianGrid
               strokeDasharray="none"
               stroke="#525a6a"
@@ -88,7 +76,7 @@ const MentalChart = ({ type }: MentalChartProps) => {
               tick={{ fill: "#ffffff", fontSize: 12 }}
               interval={0}
             />
-            <YAxis hide />
+            <YAxis domain={[0, maxValue]} hide />
             <Line
               type="monotone"
               dataKey="value"

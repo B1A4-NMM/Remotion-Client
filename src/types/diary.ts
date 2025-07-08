@@ -93,3 +93,31 @@ export interface ProcessedMemberSummary {
     negative: EmotionData[];
   };
 }
+
+export interface Character{
+  character: string;
+}
+
+
+export type AnimalKey = "호랑이" | "토끼" | "개" | "고양이" | "팬더" | "펭귄" | 
+"나무늘보" | "다람쥐" | "독수리" | "코브라" | "여우" | "박쥐" | 
+"고래" | "거북이" | "개구리" | "문어" | "unknown";
+
+export interface AnimalTypeProps {
+  animalType: {
+    character: AnimalKey;
+  };
+}
+
+
+export interface EmotionAnalysisItem {
+  emotion: string;
+  intensity: number;
+  count: number;
+}
+
+export interface EmotionAnalysisResponse {
+  Relation: EmotionAnalysisItem[];
+  Self: EmotionAnalysisItem[];
+  State: EmotionAnalysisItem[];
+}

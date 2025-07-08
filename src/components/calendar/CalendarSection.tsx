@@ -12,11 +12,6 @@ const CalendarSection = () => {
       <h2>CalendarSection!</h2>
       <h2>CalendarSection!</h2>
       <h2>CalendarSection!</h2>
-      <h2>CalendarSection!</h2>
-      <h2>CalendarSection!</h2>
-      <h2>CalendarSection!</h2>
-      <h2>CalendarSection!</h2>
-      <h2>CalendarSection!</h2>
     </div>
   );
 };

@@ -55,15 +55,13 @@ export default function TodoItem({ todo }) {
               updateTodo({ id: todo.id, data: { isCompleted: complete } });
             }}
 
-            className={`flex-shrink-0
-                ${todo.isCompleted
-                ? "bg-white text-black border-white"
-                : "border border-white bg-transparent text-white hover:border-blue-400 focus:ring-blue-400"
-            }`}
+            // className={`flex-shrink-0
+            //     ${todo.isCompleted
+            //       ? "bg-white text-black border-white peer-checked:bg-white peer-checked:text-black"
+            //       : "border border-white bg-transparent text-white hover:border-blue-400 focus:ring-blue-400"
+            // }`}
         />
 
-        {/* ✅ 완료 시 텍스트 회색 처리 */}
-        {/* <span className={todo.isCompleted ? "text-gray-400" : ""}> */}
         {/* ✅ 완료 시 텍스트 회색 처리 및 클릭 시 인라인 편집 */}
         {editing ? (
           <input

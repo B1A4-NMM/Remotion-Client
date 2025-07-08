@@ -1,4 +1,4 @@
-// api/queries/diary/useGetDiaryContent.ts
+// api/queries/diary/useGetDiary.ts
 import { useQuery } from "@tanstack/react-query";
 import { getDiaryContent } from "../../services/diaryContent";
 

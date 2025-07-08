@@ -1,13 +1,16 @@
 //Home.tsx
-import { useGetTodayDiary } from "../api/queries/home/useGetHome";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useGetDiaryContent } from "../api/queries/home/useGetDiary";
 
 import MonthlyCalendar from '../components/home/Calender';
 import MoodCircle from '../components/home/MoodCircle';
 import DiaryCards from '../components/home/DiaryCards';
 
+import {useGetDiaryDate} from '../api/queries/home/useGetDiaryDate'
+
 import "../styles/homeCard.css";
 import "../styles/moodCircle.css";
+import dayjs from "dayjs";
 
 
 /* ─ 1. 샘플 일기 (작성 유도) ─ */
@@ -19,7 +22,28 @@ const sampleDiary = {
 const Home = () => {
   const token = localStorage.getItem("accessToken") || "";
 
-  const { data: todayData, isLoading} = useGetTodayDiary(token);
+  const [selectedDate, setSelectedDate] = useState<Date>(dayjs().toDate());  
+  const [errorMessage , setErrorMessage] = useState<string>("");
+
+  const handleDateSelect = useCallback((date: Date) => {
+    const selectedDate = dayjs(date);
+    const currentDate = dayjs();
+  
+    if (selectedDate.isAfter(currentDate, 'day')) {
+      setErrorMessage("해당 날짜로는 이동할 수 없습니다.");
+      setTimeout(() => setErrorMessage(""), 3000);
+      return;
+    }
+  
+    setSelectedDate(date);  // Date 객체 그대로 저장
+    setErrorMessage("");
+  }, []);
+  
+  // API 호출 시 string 변환
+  const { data: todayData, isLoading } = useGetDiaryDate(
+    token, 
+    dayjs(selectedDate).format("YYYY-MM-DD")  // 🔥 사용 시점에 변환
+  );
 
   const todayDiary = todayData? todayData : null;
 
@@ -48,8 +72,15 @@ const Home = () => {
 
   return (
     <div className="base">
+
+      {/* 오류 메시지 표시 */}
+      {errorMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 bg-red-500 text-white rounded-lg shadow-lg animate-pulse">
+          {errorMessage}
+        </div>
+      )}
       {/* 상단 주간 캘린더 */}
-      <MonthlyCalendar />
+      <MonthlyCalendar onDateSelect={handleDateSelect} selectedDate={selectedDate}/>
 
       {/* MoodCircle*/}
       <MoodCircle

@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { motion, AnimatePresence, delay } from "framer-motion";
 import dayjs from "dayjs";
 import { create } from "zustand";
 
+import '../../styles/App.css'
 
 interface DiaryStore {
   isExpanded: boolean;
@@ -17,75 +18,121 @@ export const useDiaryStore = create<DiaryStore>(set => ({
 
 interface MonthlyCalendarProps {
     onDateSelect?: (date: Date) => void;
+    selectedDate?: Date;
   }
-  
-  const MonthlyCalendar = ({ onDateSelect }: MonthlyCalendarProps) => {
+  const MonthlyCalendar = ({ onDateSelect, selectedDate }: MonthlyCalendarProps) => {
     const [currentMonth, setCurrentMonth] = useState(dayjs());
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-    const [isTransitioning, setIsTransitioning] = useState(false); // 월 전환 상태
+    const [isTransitioning, setIsTransitioning] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
     const today = dayjs();
-  
+    const [internalSelected, setInternalSelected] = useState<dayjs.Dayjs | null>(
+      selectedDate ? dayjs(selectedDate) : null
+    );
+    useEffect(() => {
+      if (selectedDate) {
+        const newSelected = dayjs(selectedDate);
+        setInternalSelected(newSelected);
+        setCurrentMonth(newSelected.startOf('month')); // 👈 이 줄 추가!
+      }
+    }, [selectedDate]);
+
     // 현재 월의 모든 날짜 가져오기
     const getMonthDates = (month: dayjs.Dayjs) => {
       const dates = [];
       const daysInMonth = month.daysInMonth();
-  
+      
       for (let i = 1; i <= daysInMonth; i++) {
         dates.push(month.date(i));
       }
       return dates;
     };
   
+    const centerDate = (idx: number) => {
+      const cont = scrollRef.current;
+      if (!cont) return;
+      const itemW = 68;
+      const left = idx * itemW - cont.clientWidth / 2 + itemW / 2;
+      cont.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
+    };
+  
+    // 선택된 날짜를 특정 월에서 찾아서 중앙에 위치시키는 함수
+    const centerSelectedDateInMonth = (targetMonth: dayjs.Dayjs, targetDate: dayjs.Dayjs) => {
+      const monthDates = getMonthDates(targetMonth);
+      const selectedIdx = monthDates.findIndex(d => 
+        d.isSame(targetDate, 'day')
+      );
+      
+      if (selectedIdx !== -1) {
+        setTimeout(() => centerDate(selectedIdx), 100);
+      }
+    };
+
+    useLayoutEffect(() => {
+      if (internalSelected && internalSelected.isSame(currentMonth, 'month')) {
+        const idx = getMonthDates(currentMonth).findIndex(d =>
+          d.isSame(internalSelected, 'day')
+        );
+        if (idx !== -1) {
+          centerDate(idx);
+        }
+      }
+    }, [currentMonth, internalSelected]);
+  
     const monthDates = getMonthDates(currentMonth);
     const dayLabels = ["M", "T", "W", "T", "F", "S", "S"];
   
-    // 드래그 제약사항 계산
+    // 수정된 드래그 제약사항 - 양방향 드래그 지원
     const calculateDragConstraints = () => {
-      const itemWidth = 70; // 각 날짜 버튼 너비
-      const containerWidth = typeof window !== "undefined" ? window.innerWidth : 400;
-      const visibleItems = Math.floor(containerWidth / itemWidth);
-      const maxScroll = Math.max(0, (monthDates.length * 1.43 - visibleItems) * itemWidth);
+      if (!scrollRef.current) return { left: 0, right: 0 };
+      
+      const itemWidth = 68;
+      const containerWidth = scrollRef.current.clientWidth;
+      const totalWidth = monthDates.length * itemWidth;
+      const maxScroll = Math.max(0, totalWidth - containerWidth);
   
       return {
-        left: -maxScroll,
-        right: 0,
+        left: -maxScroll,   // 왼쪽으로 드래그 가능
+        right: maxScroll,   // 오른쪽으로도 드래그 가능
       };
     };
   
-    // 드래그 종료 시 월 변경
-    const handleDragEnd = (event: any, info: any) => {
-      const threshold = 700;
   
-      if (info.offset.x > threshold) {
-        // 오른쪽으로 드래그 - 이전 달
-        setIsTransitioning(true);
-        setCurrentMonth(prev => prev.subtract(1, "month"));
-  
-        // 짧은 지연 후 전환 상태 해제
-        setTimeout(() => setIsTransitioning(false), 300);
-      } else if (info.offset.x < -threshold) {
-        // 왼쪽으로 드래그 - 다음 달
-        setIsTransitioning(true);
-        setCurrentMonth(prev => prev.add(1, "month"));
-  
-        setTimeout(() => setIsTransitioning(false), 300);
-      }
-      // setDragX(0) 제거!
-    };
-  
-    // 날짜 클릭 핸들러
-    const handleDateClick = (date: dayjs.Dayjs) => {
-      console.log("Selected date:", date.format("YYYY-MM-DD"));
+    // 수평 스크롤 캘린더 날짜 클릭 핸들러
+    const handleDateClick = (date: dayjs.Dayjs, index: number) => {
+      if (date.isAfter(today, 'day')) return;
+      
+      setInternalSelected(date);  
+      centerDate(index);
       onDateSelect?.(date.toDate());
       setIsCalendarOpen(false);
     };
   
-    // 큰 캘린더용 전체 달력 생성
+    // 수정된 전체 캘린더 클릭 핸들러
+    const handleFullCalendarDateClick = (date: dayjs.Dayjs) => {
+      if (date.isAfter(today, 'day')) return;
+    
+      setInternalSelected(date);          // ① 즉시 표시용
+      onDateSelect?.(date.toDate());      // ② 부모에도 알림
+    
+      if (!date.isSame(currentMonth, 'month')) {
+        const newMonth = date.startOf('month');
+        setCurrentMonth(newMonth);
+        requestAnimationFrame(() => centerSelectedDateInMonth(newMonth, date));
+      } else {
+        const idx = getMonthDates(currentMonth).findIndex(d => d.isSame(date, 'day'));
+        centerDate(idx);
+      }
+    
+      setIsCalendarOpen(false);
+    };
+  
+    // 나머지 함수들은 동일...
     const generateFullCalendar = (month: dayjs.Dayjs) => {
       const firstDay = month.startOf("month");
       const lastDay = month.endOf("month");
-      const startDate = firstDay.startOf("week").add(1, "day"); // 월요일 시작
+      const startDate = firstDay.startOf("week").add(1, "day");
       const endDate = lastDay.endOf("week").add(1, "day");
   
       const weeks = [];
@@ -111,31 +158,20 @@ interface MonthlyCalendarProps {
         <div className="absolute top-3 left-0 right-0 z-10">
           {/* 상단 네비게이션 */}
           <div className="flex justify-between items-center mb-4 px-4">
-            {/* 오늘 날짜 */}
             <div className="text-white font-medium">
               <div className="text-lg">{today.format("MM월 DD일")}</div>
               <div className="text-sm text-gray-400">{today.format("YYYY년")}</div>
             </div>
-  
-            {/* 현재 월 표시 */}
+            
+            {/* 현재 월 표시 - 이제 올바르게 업데이트됨 */}
             <span className="text-white font-medium">{currentMonth.format("YYYY년 MM월")}</span>
-  
-            {/* 캘린더 버튼 */}
+            
             <button
               onClick={() => setIsCalendarOpen(true)}
               className="text-gray-400 hover:text-white p-2"
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <rect
-                  x="3"
-                  y="4"
-                  width="18"
-                  height="18"
-                  rx="2"
-                  ry="2"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="2" />
                 <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2" />
                 <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2" />
                 <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="2" />
@@ -143,56 +179,57 @@ interface MonthlyCalendarProps {
             </button>
           </div>
   
-          {/* 스크롤 가능한 날짜 목록 */}
-          <div className="w-full overflow-hidden">
+          {/* 수정된 스크롤 캘린더 */}
+          <div 
+            ref={scrollRef}
+            className="w-full overflow-x-auto hide-scrollbar"
+            style={{ scrollBehavior: "smooth" }}
+          >
             <motion.div
-              key={currentMonth.format("YYYY-MM")} // 월이 바뀔 때마다 새로운 컴포넌트
               ref={containerRef}
               drag="x"
               dragConstraints={calculateDragConstraints()}
               dragElastic={0.1}
-              onDragEnd={handleDragEnd}
               className="flex gap-2 px-4 pb-2 cursor-grab active:cursor-grabbing"
               style={{
                 width: "max-content",
-                minWidth: "200%",
+                minWidth: "100%",
               }}
-              // 월 전환 시에만 애니메이션 적용
               initial={isTransitioning ? { opacity: 0, x: 0 } : false}
               animate={isTransitioning ? { opacity: 1, x: 0 } : {}}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
               {monthDates.map((date, index) => {
-                const isToday = date.isSame(today, "day");
+                const isFuture = date.isAfter(today, 'day');
+                const isSelected = internalSelected ? date.isSame(internalSelected, 'day') : false;
                 const dayNumber = date.date();
                 const dayOfWeek = date.day();
   
                 return (
                   <motion.button
-                    key={`${currentMonth.format("YYYY-MM")}-${index}`}
-                    onClick={() => handleDateClick(date)}
-                    className="flex flex-col items-center flex-shrink-0 p-2"
+                    key={index}
+                    onClick={() => handleDateClick(date, index)}
+                    disabled={isFuture}
+                    className={`
+                      flex flex-col items-center flex-shrink-0 p-2 transition-all
+                      ${isFuture ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                    `}
                     style={{ minWidth: "60px" }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={!isFuture ? { scale: 1.05 } : {}}
+                    whileTap={!isFuture ? { scale: 0.95 } : {}}
                   >
                     <span className="text-gray-400 text-xs mb-1">
                       {dayLabels[dayOfWeek === 0 ? 6 : dayOfWeek - 1]}
                     </span>
                     <div
                       className={`
-                      w-10 h-10 rounded-xl flex items-center justify-center text-white font-medium transition-colors text-sm
-                      ${isToday ? "bg-blue-600 shadow-lg" : "bg-transparent hover:bg-gray-700"}
-                    `}
+                        w-10 h-10 rounded-xl flex items-center justify-center text-white font-medium transition-colors text-sm
+                        ${isSelected ? "bg-blue-600 shadow-lg" : "bg-transparent hover:bg-gray-700"}
+                        ${isFuture ? "bg-gray-800 text-gray-500" : ""}
+                      `}
                     >
                       {dayNumber}
                     </div>
-                    <div
-                      className={`
-                      w-1.5 h-1.5 rounded-full mt-1
-                      ${index % 3 === 0 ? "bg-green-400" : "transparent"}
-                    `}
-                    />
                   </motion.button>
                 );
               })}
@@ -225,13 +262,7 @@ interface MonthlyCalendarProps {
                     className="text-gray-400 hover:text-white p-2"
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M15 18L9 12L15 6"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
+                      <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </button>
   
@@ -244,13 +275,7 @@ interface MonthlyCalendarProps {
                     className="text-gray-400 hover:text-white p-2"
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M9 18L15 12L9 6"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
+                      <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </button>
                 </div>
@@ -270,19 +295,21 @@ interface MonthlyCalendarProps {
                     <div key={weekIndex} className="grid grid-cols-7 gap-1 mb-2">
                       {week.map((date, dayIndex) => {
                         const isCurrentMonth = date.isSame(currentMonth, "month");
-                        const isToday = date.isSame(today, "day");
+                        const isSelected = internalSelected ? date.isSame(internalSelected, 'day') : false;                        const isFuture = date.isAfter(today, 'day');
   
                         return (
                           <motion.button
                             key={`${weekIndex}-${dayIndex}`}
-                            onClick={() => handleDateClick(date)}
+                            onClick={() => handleFullCalendarDateClick(date)}
+                            disabled={isFuture}
                             className={`
                               h-12 rounded-lg flex items-center justify-center text-sm font-medium transition-colors
                               ${isCurrentMonth ? "text-white" : "text-gray-600"}
-                              ${isToday ? "bg-blue-600 text-white shadow-lg" : "hover:bg-gray-700"}
+                              ${isSelected ? "bg-blue-600 text-white shadow-lg" : "hover:bg-gray-700"}
+                              ${isFuture ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
                             `}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                            whileHover={!isFuture ? { scale: 1.05 } : {}}
+                            whileTap={!isFuture ? { scale: 0.95 } : {}}
                           >
                             {date.date()}
                           </motion.button>

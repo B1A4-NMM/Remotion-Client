@@ -1,4 +1,25 @@
 // 내가 보내는 데이터
+
+
+export interface TodayEmotion {
+  emotionType: string;
+  intensity: number;
+}
+
+export interface TodayDiary {
+  diaryId: number;
+  title: string;
+  writtenDate: string;
+  emotions: string[];
+  targets: string[];
+}
+
+export interface TodayDiaryResponse {
+  todayEmotions: TodayEmotion[];
+  todayDiaries: TodayDiary[];
+}
+
+
 export interface DiaryPayload {
   content: string;
   writtenDate: string;

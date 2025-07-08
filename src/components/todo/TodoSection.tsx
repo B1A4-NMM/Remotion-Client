@@ -5,8 +5,10 @@ import TodoList from "./TodoList";
 export default function TodoSection() {
     return (
         <section className="flex flex-col w-full h-full p-4">
-            <TodoHeader />
-            <TodoList />
+            <TodoHeader className="flex-none" />
+            <div className="flex-grow overflow-y-auto">
+                <TodoList />
+            </div>
         </section>
     );
 }

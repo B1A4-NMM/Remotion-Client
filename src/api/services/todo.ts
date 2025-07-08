@@ -6,7 +6,7 @@ import axios from "axios";
 const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
 
 export interface ApiTodo {
-  id: string;
+  id: number;
   title: string;
   isCompleted: boolean;
   date: string | null;
@@ -37,7 +37,7 @@ api.interceptors.request.use(config => {
 export const getTodos = async (from: string, to: string) => {
   console.log("📤 getTodos called with:", { from, to });
 
-  const response = await api.get<ApiTodo[]>("/todos", {
+  const response = await api.get<ApiTodo[]>(`${BASE_URL}/todos`, {
     params: { from, to },
   });
 
@@ -48,20 +48,43 @@ export const getTodos = async (from: string, to: string) => {
 
 // ✅ 생성
 export const createTodo = async ({ title }: { title: string }) => {
-  const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
+  try {
+  console.log("✨ createTodo called with:", { title });
 
   const response = await api.post<ApiTodo>(`${BASE_URL}/todos`, { title });
+
+  console.log("✨ createTodo response.data:", response.data);
+
   return response.data;
+}
+  catch (error) {
+    console.error("❌ createTodo error:", error);
+    throw error;
+  }
 };
 
 // ✅ 수정 (필드 업데이트)
-export const updateTodo = async (id: string, data: Partial<Omit<ApiTodo, "id">>) => {
-  const response = await api.patch<ApiTodo>(`/todos/${id}`, data);
+export const updateTodo = async (id: number, data: Partial<Omit<ApiTodo, "id">>) => {
+  try {
+  console.log("🐛 updateTodo called with:", { id, data });
+
+  const response = await api.patch<ApiTodo>(`${BASE_URL}/todos/${id}`, data);
+
+  console.log("🐛 updateTodo response.data:", response.data);
+
   return response.data;
+  } catch (error) {
+    console.error("❌ updateTodo error:", error);
+    throw error;
+  }
 };
 
 // ✅ 삭제
-export const deleteTodo = async (id: string) => {
-  const response = await api.delete(`/todos/${id}`);
+export const deleteTodo = async (id: number) => {
+  console.log("🗑️ deleteTodo called with:", { id });
+
+  const response = await api.delete(`${BASE_URL}/todos/${id}`);
+
+  console.log("🗑️ deleteTodo response.data:", response.data);
   return response.data;
 };

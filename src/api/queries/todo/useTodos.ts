@@ -3,6 +3,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getTodos } from "@/api/services/todo";
+import { useTodoStore } from "@/store/todoStore";
 
 export const useTodos = (from?: string, to?: string) => {
   const now = new Date();
@@ -14,5 +15,9 @@ export const useTodos = (from?: string, to?: string) => {
   return useQuery({
     queryKey: ["todos", defaultFrom, defaultTo],
     queryFn: () => getTodos(defaultFrom, defaultTo),
+    onSuccess: (data) => {
+      const { setTodos } = useTodoStore.getState();
+      setTodos(data);
+    },
   });
 };

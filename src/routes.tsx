@@ -1,6 +1,6 @@
 import Home from "./pages/Home";
 
-import Calendar from "./pages/Calendar";
+import Calendar from "./pages/calendar";
 import Diary from "./pages/Diary";
 import Relation from "./pages/Relation";
 
@@ -12,6 +12,7 @@ import GetAccess from "./pages/GetAccess";
 import Loading6 from "./components/loading/Loading6";
 import Analysis from "./pages/Analysis";
 import AboutMe from "./pages/AboutMe";
+import Map from "./pages/Map";
 import Video from "./pages/video";
 export const routes = [
   { path: "/", element: <Home /> },
@@ -26,5 +27,4 @@ export const routes = [
   { path: "/loading", element: <Loading6 /> },
   { path: "/analysis", element: <Analysis /> },
   { path: "/aboutme", element: <AboutMe /> },
-  { path: "/video", element: <Video /> },
 ];

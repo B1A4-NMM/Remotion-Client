@@ -32,7 +32,7 @@ const emotionData = {
 };
 
 const EmotionCard = () => {
-  const [animalType, setAnimalType] = useState<{character: AnimalKey} | null>(null);
+  const [animalType, setAnimalType] = useState<{ character: AnimalKey } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
@@ -49,7 +49,7 @@ const EmotionCard = () => {
           },
         });
 
-        console.log("character response:", response.data);
+        // console.log("character response:", response.data);
         // 올바른 객체 형태로 저장
         setAnimalType({ character: response.data.character as AnimalKey });
       } catch (error) {
@@ -62,13 +62,11 @@ const EmotionCard = () => {
 
     fetchCharacter();
   }, [token, BASE_URL]);
-  
-  const {
-    data: EmotionAnalysis
-  }= useGetEmotionAnalysis(token);
 
-  console.log("EmotionAnalysis", EmotionAnalysis);
-  
+  const { data: EmotionAnalysis } = useGetEmotionAnalysis(token);
+
+  // console.log("EmotionAnalysis", EmotionAnalysis);
+
   if (isLoading) return <div>로딩 중...</div>;
   if (isError) return <div>캐릭터 정보를 불러오는 데 실패했습니다.</div>;
 
@@ -80,12 +78,8 @@ const EmotionCard = () => {
 
       {/* 감정 차트 추가 */}
       <div className="p-6">
-        <h3 className="text-xl font-bold text-center mb-6 text-gray-100">
-          감정 분석 차트
-        </h3>
-        <EmotionChart 
-          emotionAnalysis={EmotionAnalysis}
-          animate={true} />
+        <h3 className="text-xl font-bold text-center mb-6 text-gray-100">감정 분석 차트</h3>
+        <EmotionChart emotionAnalysis={EmotionAnalysis} animate={true} />
       </div>
     </div>
   );

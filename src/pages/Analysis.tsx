@@ -11,17 +11,24 @@ const CardList = () => {
   const cards = [
     {
       image:
-        "https://images.unsplash.com/photo-1557177324-56c542165309?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
+        "https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fCVFQyU5RCVCQyVFQiU5RiVBQyVFQyU4QSVBNCVFRCU4QSVCOHxlbnwwfHwwfHx8MA%3D%3D",
       category: "Feelings",
       heading: "About me",
       link: "/aboutme",
     },
     {
       image:
-        "https://images.unsplash.com/photo-1557187666-4fd70cf76254?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
+        "https://plus.unsplash.com/premium_photo-1682308117151-22e8ef6cf444?q=80&w=1243&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       category: "Memories",
       heading: "Relation",
       link: "/relation",
+    },
+    {
+      image:
+        "https://plus.unsplash.com/premium_photo-1682310071124-33632135b2ee?q=80&w=912&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      category: "Memories",
+      heading: "Map View",
+      link: "/map",
     },
   ];
 

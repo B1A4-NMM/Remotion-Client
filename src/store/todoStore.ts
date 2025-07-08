@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 export type Todo = {
-    id: string;
+    id: number;
     title: string;
     isCompleted: boolean;
     date: string | null;
@@ -15,7 +15,7 @@ export type Todo = {
 type TodoStore = {
     todos: Todo[];
     setTodos: (updater: Todo[] | ((prev: Todo[]) => Todo[])) => void;
-    deleteTodo: (id: string) => void;
+    deleteTodo: (id: number) => void;
     showDone: boolean;
     toggleShowDone: () => void;
 };
@@ -31,7 +31,7 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
         set({ todos: next });
     },
 
-    deleteTodo: (id: string) => {
+    deleteTodo: (id: number) => {
         set((state) => ({ 
             todos: state.todos.filter((todo) => todo.id !== id),
         }));

@@ -1,6 +1,6 @@
 import Home from "./pages/Home";
 
-import Calendar from "./pages/Calendar";
+import Calendar from "./pages/calendar";
 import Diary from "./pages/Diary";
 import Relation from "./pages/Relation";
 

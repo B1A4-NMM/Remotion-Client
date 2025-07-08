@@ -28,7 +28,7 @@ export default function TodoInputRow() {
     return (
         <li className="flex items-center gap-3">
             {/* 비어있는 체크박스 자리 */}
-            <Checkbox disabled className="flex-shrink-0 opacity-50 border-white bg-transparent" />
+            <Checkbox disabled className="flex-shrink-0 opacity-50 border border-white bg-transparent" />
 
             {/* 인라인 input */}
             <input

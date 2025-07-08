@@ -162,7 +162,7 @@ const EmotionalGraph = () => {
         <canvas
           ref={canvasRef}
           style={{
-            width: "00%",
+            width: "100%",
             height: "100%",
             borderRadius: 20,
             boxShadow: "0 0 30px rgba(255, 255, 255, 0.1)",

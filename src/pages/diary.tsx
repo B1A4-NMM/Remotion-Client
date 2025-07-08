@@ -21,6 +21,7 @@ const Diary = () => {
     getValues,
     formState: { errors },
   } = useForm();
+  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -91,12 +92,30 @@ const Diary = () => {
     const today = new Date().toISOString().split("T")[0];
     const file = fileInputRef.current?.files?.[0];
     const formData = new FormData();
+
     formData.append("content", data.content);
     formData.append("writtenDate", today);
     formData.append("weather", "SUNNY");
+
+    if (location) {
+      formData.append("latitude", String(location.latitude));
+      formData.append("longitude", String(location.longitude));
+    }
+
     if (file) {
       formData.append("photo", file);
     }
+
+    // ✅ FormData 내용 로그 찍기
+    console.log("📤 전송할 FormData 내용:");
+    formData.forEach((value, key) => {
+      if (key === "photo" && value instanceof File) {
+        console.log(`📎 ${key}:`, value.name, `(size: ${value.size} bytes)`);
+      } else {
+        console.log(`📝 ${key}:`, value);
+      }
+    });
+
     setIsSubmitting(true);
     mutate(formData);
   };
@@ -127,7 +146,12 @@ const Diary = () => {
               <p className="text-red-500 text-sm mt-1">{errors.content.message as string}</p>
             )}
             <div className="flex justify-end mt-2">
-              <LocationPicker open={mapOpen} onOpenChange={setMapOpen} />
+              <LocationPicker
+                onLocationSelect={loc => {
+                  console.log("📥 부모에서 받은 위치:", loc);
+                  setLocation(loc); // 상태 저장도 가능
+                }}
+              />
 
               <Button
                 type="button"

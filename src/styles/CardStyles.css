@@ -31,7 +31,7 @@ body {
   justify-content: center;
   align-items: flex-start;
   min-height: 100%;
-  padding: var(--spacing-xxl) var(--spacing-l);
+  padding: var(--spacing-l) var(--spacing-l);
   background-image: linear-gradient(15deg, #1e1e1e 0%, #1e1e1e 150%);
 }
 
@@ -46,12 +46,13 @@ body {
 .card {
   position: relative;
   list-style: none;
+  aspect-ratio: 5 / 3.4; /* or 1.25 */
 }
 
 .card:before {
   content: "";
   display: block;
-  padding-bottom: 110%;
+  aspect-ratio: 5 / 4.2; /* or 1.25 */
   width: 100%;
 }
 
@@ -115,4 +116,9 @@ body {
 
 .fade-screen.fade-out {
   opacity: 1;
+}
+@media (max-width: 480px) {
+  .card:before {
+    aspect-ratio: 5 / 3.5;
+  }
 }

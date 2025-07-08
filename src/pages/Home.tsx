@@ -20,26 +20,19 @@ const Home = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(dayjs().toDate());
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  //  날짜 클릭 시 URL로 이동하도록 수정
-  const handleDateSelect = useCallback(
-    (date: Date) => {
-      const selected = dayjs(date);
-      const current = dayjs();
+  const handleDateSelect = useCallback((date: Date) => {
+    const selected = dayjs(date);
+    const current = dayjs();
 
-      if (selected.isAfter(current, "day")) {
-        setErrorMessage("해당 날짜로는 이동할 수 없습니다.");
-        setTimeout(() => setErrorMessage(""), 3000);
-        return;
-      }
+    if (selected.isAfter(current, "day")) {
+      setErrorMessage("해당 날짜로는 이동할 수 없습니다.");
+      setTimeout(() => setErrorMessage(""), 3000);
+      return;
+    }
 
-      const formattedDate = selected.format("YYYY-MM-DD");
-      navigate(`/diary/${formattedDate}`); //  해당 날짜 작성 페이지로 이동
-
-      setSelectedDate(date);
-      setErrorMessage("");
-    },
-    [navigate]
-  );
+    setSelectedDate(date);
+    setErrorMessage("");
+  }, []);
 
   // API 호출 시 string 변환
   const { data: todayData, isLoading } = useGetDiaryDate(
@@ -80,7 +73,14 @@ const Home = () => {
       <MonthlyCalendar onDateSelect={handleDateSelect} selectedDate={selectedDate} />
 
       {/* MoodCircle */}
-      <MoodCircle hasTodayDiary={hasTodayDiary} todayDiary={todayDiary} />
+      <MoodCircle
+        hasTodayDiary={hasTodayDiary}
+        todayDiary={todayDiary}
+        onClickWrite={() => {
+          const formattedDate = dayjs(selectedDate).format("YYYY-MM-DD");
+          navigate(`/diary/${formattedDate}`);
+        }}
+      />
 
       {/* 하단 일기 카드들 */}
       <DiaryCards

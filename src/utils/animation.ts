@@ -32,7 +32,7 @@ export const createAnimatedBranches = (
   centerY: number
 ): AnimatedBranch[] => {
   const emotionDistanceMap: Record<string, number> = {
-    가족: 220,
+    가족: 300,
     친구: 180,
     연인: 200,
     직장: 160,
@@ -92,7 +92,7 @@ export function createNodeFromBranch(branch: AnimatedBranch, now: number): Node 
     opacity: 0,
     targetOpacity: 1,
     startTime: now,
-    fadeInDuration: 400,
+    fadeInDuration: 700,
     isStatic: true,
   };
 }

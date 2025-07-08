@@ -14,7 +14,7 @@ const components: {
   { Component: MentalHealthCard, bgColor: "bg-gray-700" },
   { Component: StrengthCard, bgColor: "bg-gray-700" },
   { Component: EmotionCard, bgColor: "bg-yellow-100" },
-  { Component: AchievementCard, bgColor: "bg-blue-100" },
+  // { Component: AchievementCard, bgColor: "bg-blue-100" },
 ];
 
 const CardSlider = () => {

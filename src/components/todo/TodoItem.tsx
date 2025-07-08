@@ -55,10 +55,10 @@ export default function TodoItem({ todo }) {
               updateTodo({ id: todo.id, data: { isCompleted: complete } });
             }}
 
-            className={`flex-shrink-0 border border-white
+            className={`flex-shrink-0
                 ${todo.isCompleted
-                ? "bg-white text-black"
-                : "bg-transparent text-white hover:border-blue-400 focus:ring-blue-400"
+                ? "bg-white text-black border-white"
+                : "border border-white bg-transparent text-white hover:border-blue-400 focus:ring-blue-400"
             }`}
         />
 

@@ -1,10 +1,36 @@
 import { Checkbox } from "@/components/ui/checkbox";
-// import { useTodoStore } from "@/store/todoStore";
 import { useToggleTodo } from "@/api/queries/todo/useToggleTodo";
+import { useUpdateTodo } from "@/api/queries/todo/useUpdateTodo";
+import { useTodoStore } from "@/store/todoStore";
+import { useState } from "react";
 
 export default function TodoItem({ todo }) {
   // const toggleTodo = useTodoStore((state) => state.toggleTodo);
   const { mutate } = useToggleTodo();
+  const { mutate: updateTodo } = useUpdateTodo();
+  const setTodos = useTodoStore(state => state.setTodos);
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(todo.title);
+  const [isComposing, setIsComposing] = useState(false);
+
+  const commitEdit = () => {
+    const trimmed = value.trim();
+    setEditing(false);
+    if (!trimmed || trimmed === todo.title) return;
+    setTodos(prev => prev.map(t => (t.id === todo.id ? { ...t, title: trimmed } : t)));
+    updateTodo({ id: todo.id, data: { title: trimmed } });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !isComposing) {
+      e.preventDefault();
+      commitEdit();
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      setValue(todo.title);
+      setEditing(false);
+    }
+  };
 
   return (
     <li className="flex items-center gap-3">
@@ -21,9 +47,27 @@ export default function TodoItem({ todo }) {
         />
 
         {/* ✅ 완료 시 텍스트 회색 처리 */}
-        <span className={todo.isCompleted ? "text-gray-400" : ""}>
+        {/* <span className={todo.isCompleted ? "text-gray-400" : ""}> */}
+        {/* ✅ 완료 시 텍스트 회색 처리 및 클릭 시 인라인 편집 */}
+        {editing ? (
+          <input
+            value={value}
+            onChange={e => setValue(e.target.value)}
+            onBlur={commitEdit}
+            onKeyDown={handleKeyDown}
+            onCompositionStart={() => setIsComposing(true)}
+            onCompositionEnd={() => setIsComposing(false)}
+            className="w-full bg-transparent outline-none placeholder:text-gray-400"
+            autoFocus
+          />
+        ) : (
+          <span
+            className={todo.isCompleted ? "text-gray-400" : ""}
+            onClick={() => setEditing(true)}
+          >
             {todo.title}
-        </span>
+          </span>
+        )}
     </li>
   );
 }

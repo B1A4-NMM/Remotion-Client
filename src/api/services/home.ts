@@ -1,23 +1,6 @@
 //home.ts
 import axios from "axios";
-
-interface TodayEmotion {
-  emotionType: string;
-  intensity: number;
-}
-
-interface TodayDiary {
-  diaryId: number;
-  title: string;
-  writtenDate: string;
-  emotions: string[];
-  targets: string[];
-}
-
-interface TodayDiaryResponse {
-  todayEmotions: TodayEmotion[];
-  todayDiaries: TodayDiary[];
-}
+import type {TodayDiaryResponse} from '../../types/diary'
 
 export const getTodayDiary = async (token: string): Promise<TodayDiaryResponse> => {
   const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;

@@ -3,32 +3,22 @@ import MentalChart from "../aboutMe/Mental/MentalChart";
 import { Button } from "../ui/button";
 import ActivitySection from "./Mental/ActivitySection";
 import PeopleSection from "./Mental/PeopleSection";
-export const peopleData = [
-  {
-    title: "스트레스를 유발한 사람들",
-    skills: [
-      {
-        label: "임구철 - 지속적인 야근과 질책으로 스트레스를 유발함",
-        level: 90,
-      },
-      {
-        label: "정진영 - 업무 분담의 불균형으로 갈등이 생김",
-        level: 70,
-      },
-      {
-        label: "이하린 - 사소한 일로 자주 다투며 감정 소모가 큼",
-        level: 60,
-      },
-      {
-        label: "손채민 - 과도한 기대와 간섭으로 부담을 느낌",
-        level: 75,
-      },
-    ],
-  },
-];
 
-const MentalHealthCard = () => {
-  const [currentType, setCurrentType] = useState<"stress" | "anxiety" | "depression">("stress");
+// 타입 정의
+type MentalType = "stress" | "anxiety" | "depression";
+interface MentalCardProps {
+  isActive: boolean;
+}
+
+// 버튼 색상 맵
+const colorMap: Record<MentalType, string> = {
+  stress: "#00bcd4", // 청록
+  anxiety: "#8e24aa", // 보라
+  depression: "#ef6c00", // 주황
+};
+
+const MentalHealthCard = ({ isActive }: MentalCardProps) => {
+  const [currentType, setCurrentType] = useState<MentalType>("stress");
 
   const buttons = [
     { type: "stress", label: "Stress" },
@@ -40,22 +30,33 @@ const MentalHealthCard = () => {
     <div className="flex flex-col items-start gap-6 w-full pt-4 px-6">
       <h1 className="text-white text-2xl font-bold pt-6">Mental Health</h1>
 
+      {/* 타입 전환 버튼 */}
       <div className="flex gap-4">
-        {buttons.map(({ type, label }) => (
-          <Button
-            key={type}
-            onClick={() => setCurrentType(type)}
-            variant={currentType === type ? "default" : "outline"}
-            className="px-4"
-          >
-            {label}
-          </Button>
-        ))}
+        {buttons.map(({ type, label }) => {
+          const isActive = currentType === type;
+          const baseColor = colorMap[type];
+
+          return (
+            <Button
+              key={type}
+              onClick={() => setCurrentType(type)}
+              className="px-4 font-semibold rounded-md transition-all duration-200 hover:opacity-90"
+              style={{
+                backgroundColor: isActive ? baseColor : "transparent",
+                color: isActive ? "white" : baseColor,
+                border: `1.5px solid ${baseColor}`, // ✅ 여기서 border 굵기 + 색상 지정
+              }}
+            >
+              {label}
+            </Button>
+          );
+        })}
       </div>
 
+      {/* 차트 및 상세 섹션 */}
       <MentalChart type={currentType} />
-      <ActivitySection />
-      <PeopleSection />
+      <ActivitySection type={currentType} />
+      <PeopleSection type={currentType} />
     </div>
   );
 };

@@ -1,5 +1,4 @@
 import React from "react";
-import RadarChartBox from "../components/RadarChartBox";
 import CardSlider from "../components/CardSlider";
 
 const AboutMe = () => {

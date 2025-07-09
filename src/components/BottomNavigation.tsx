@@ -138,8 +138,8 @@ export default function BottomNavigation() {
         </div>
       </Link>
 
-      {/* Calendar */}
-      <Link to="/calendar">
+      {/* Action */}
+      <Link to="/Action">
         <div className="flex flex-col items-center">
           <svg
             width="24px"
@@ -215,7 +215,7 @@ export default function BottomNavigation() {
             ></path>
           </svg>
           <span
-            className={`text-xs ${path === "/calendar" ? "text-white font-medium" : "text-[#9C9C9C] font-normal"}`}
+            className={`text-xs ${path === "/action" ? "text-white font-medium" : "text-[#9C9C9C] font-normal"}`}
           >
             Action
           </span>

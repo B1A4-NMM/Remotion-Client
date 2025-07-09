@@ -18,5 +18,5 @@ export const getVideo = async (
     }
   );
 
-  return data;             // ⇐ 그대로 돌려준다
+  return data; 
 };

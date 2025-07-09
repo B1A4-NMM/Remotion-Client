@@ -20,7 +20,7 @@ const colorMap: Record<MentalType, string> = {
 
 const MentalHealthCard = ({ isActive }: MentalCardProps) => {
   const [currentType, setCurrentType] = useState<MentalType>("스트레스"); // ✅ 영어 아님!
-  const { data } = useMentalData(currentType, 3); // 최근 3일치
+  const { data } = useMentalData(currentType, 365); // 최근 3일치
 
   const buttons: { type: MentalType; label: string }[] = [
     { type: "스트레스", label: "스트레스" },

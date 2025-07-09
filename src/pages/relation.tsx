@@ -1,8 +1,11 @@
 "use client";
+import { useQuery } from "@tanstack/react-query";
 
 import React, { useRef, useEffect, useState } from "react";
 import { motion, useMotionValue } from "framer-motion";
 import type { Node, AnimatedBranch, Edge } from "@/types/emotionalGraph";
+import { useGetRelation } from "./../api/queries/relation/useGetRelation";
+
 import { updatePhysics } from "@/utils/physics";
 import {
   createRootNode,
@@ -12,21 +15,23 @@ import {
   createNodeFromBranch,
 } from "@/utils/animation";
 import { drawEdges, drawAnimatedBranch, drawNodes } from "@/utils/drawing";
-import { EMOTION_COLORS } from "@/constants/emotionalGraph.ts";
 
 const EmotionalGraph = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const hasScrolledToMe = useRef(false);
+
   const animationRef = useRef<number>();
   const nodesRef = useRef<Node[]>([]);
   const edgesRef = useRef<Edge[]>([]);
   const animatedBranchesRef = useRef<AnimatedBranch[]>([]);
   const startTimeRef = useRef<number>(0);
   const previousTimestampRef = useRef<number>(0);
+  const { data: relationData } = useGetRelation();
 
   const dpr = window.devicePixelRatio || 1;
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
 
-  // 드래그 위치 상태
   const offsetX = useMotionValue(0);
   const offsetY = useMotionValue(0);
 
@@ -41,9 +46,9 @@ const EmotionalGraph = () => {
       if (!parent) return;
       const { width, height } = parent.getBoundingClientRect();
 
-      canvas.width = width * dpr;
+      canvas.width = width * dpr * 3 + 200;
       canvas.height = height * dpr;
-      canvas.style.width = `${width}px`;
+      canvas.style.width = `${width * 3 + 200}px`;
       canvas.style.height = `${height}px`;
 
       ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -64,9 +69,19 @@ const EmotionalGraph = () => {
     edgesRef.current = [];
     animatedBranchesRef.current = [];
 
-    const rootNode = createRootNode(centerX, centerY);
+    const rootNode = createRootNode(centerX + 100, centerY);
     nodesRef.current.push(rootNode);
-    animatedBranchesRef.current = createAnimatedBranches(rootNode, centerX, centerY);
+
+    // ✅ 수정: relationData를 기반으로 branches 생성
+    const relationArray = relationData?.relations?.relations;
+    if (Array.isArray(relationArray)) {
+      animatedBranchesRef.current = createAnimatedBranches(
+        rootNode,
+        centerX,
+        centerY,
+        relationArray
+      );
+    }
 
     const draw = (timestamp: number) => {
       if (!startTimeRef.current) {
@@ -118,11 +133,10 @@ const EmotionalGraph = () => {
       nodesRef.current.forEach(node => {
         if (node.label === "나") return;
 
-        // 중심점과 가까우면 커지기
         const dx = node.x - centerX;
         const dy = node.y - centerY;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const activeRadius = 100; // 중심 인식 범위
+        const activeRadius = 100;
         const maxRadius = 50;
         const minRadius = 30;
 
@@ -139,6 +153,38 @@ const EmotionalGraph = () => {
       drawNodes(ctx, nodesRef.current);
       ctx.globalAlpha = 1;
 
+      const smoothScrollTo = (element: HTMLElement, target: number, duration = 1500) => {
+        const start = element.scrollLeft;
+        const change = target - start;
+        const startTime = performance.now();
+
+        const easeInOutQuad = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
+
+        const animateScroll = (currentTime: number) => {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = easeInOutQuad(progress);
+
+          element.scrollLeft = start + change * eased;
+
+          if (progress < 1) {
+            requestAnimationFrame(animateScroll);
+          }
+        };
+
+        requestAnimationFrame(animateScroll);
+      };
+
+      if (!hasScrolledToMe.current) {
+        const meNode = nodesRef.current.find(n => n.label === "나");
+        const container = containerRef.current;
+        if (meNode && container) {
+          const targetX = meNode.x - container.clientWidth / 2;
+          smoothScrollTo(container, targetX, 1000);
+          hasScrolledToMe.current = true;
+        }
+      }
+
       animationRef.current = requestAnimationFrame(draw);
     };
 
@@ -148,16 +194,19 @@ const EmotionalGraph = () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
       window.removeEventListener("resize", resizeCanvas);
     };
-  }, [canvasSize.width, canvasSize.height]);
+  }, [canvasSize.width, canvasSize.height, relationData]);
 
   return (
-    <div className="w-full h-screen overflow-hidden bg-black relative">
+    <div
+      ref={containerRef}
+      className="w-full h-screen overflow-x-scroll overflow-y-hidden bg-black relative"
+    >
       <motion.div
         drag
         dragMomentum={false}
         dragElastic={0.1}
         style={{ x: offsetX, y: offsetY }}
-        className="absolute top-0 left-0 w-full h-full cursor-grab active:cursor-grabbing"
+        className="w-[300%] h-full cursor-grab active:cursor-grabbing"
       >
         <canvas
           ref={canvasRef}

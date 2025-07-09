@@ -1,9 +1,9 @@
 import type { NodeData } from "../types/emotionalGraph";
 
 export const NODES_DATA: NodeData[] = [
-  { label: "가족", level: 1, color: "#FF6B6B" },
+  { label: "가족", level: 5, color: "#FF6B6B" },
   { label: "친구", level: 2, color: "#6BCB77" },
-  { label: "연인", level: 1.5, color: "#4D96FF" },
+  { label: "연인", level: 1, color: "#4D96FF" },
   { label: "동료", level: 2.2, color: "#FFD93D" },
   { label: "과거친구", level: 3, color: "#9D4EDD" },
 ];

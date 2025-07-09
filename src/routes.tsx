@@ -16,7 +16,7 @@ import Map from "./pages/Map";
 import Video from "./pages/video";
 export const routes = [
   { path: "/", element: <Home /> },
-  { path: "/diary", element: <Diary /> },
+  { path: "/diary/:date", element: <Diary /> },
   { path: "/calendar", element: <Calendar /> },
   { path: "/relation", element: <Relation /> },
   { path: "/result/:id", element: <Result /> },
@@ -27,5 +27,6 @@ export const routes = [
   { path: "/loading", element: <Loading6 /> },
   { path: "/analysis", element: <Analysis /> },
   { path: "/aboutme", element: <AboutMe /> },
+  { path: "/map", element: <Map /> },
   { path: "/video", element: <Video /> },
 ];

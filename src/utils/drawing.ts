@@ -39,6 +39,10 @@ export const drawAnimatedBranch = (ctx: CanvasRenderingContext2D, branch: Animat
 export const drawNodes = (ctx: CanvasRenderingContext2D, nodes: Node[]) => {
   nodes.forEach(node => {
     ctx.globalAlpha = node.opacity;
+    if (!isFinite(node.x) || !isFinite(node.y) || !isFinite(node.radius)) {
+      console.warn("❌ NaN 노드 발견", node);
+      return;
+    }
 
     if (node.label === "나") {
       // 중심 노드: 단색 흰색

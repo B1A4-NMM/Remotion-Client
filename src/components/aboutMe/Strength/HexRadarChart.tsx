@@ -24,22 +24,47 @@ const RadarChart = ({ typeCount, onSelectCategory, colors }: RadarChartProps) =>
 
   const pastelColors = colors ?? PASTEL_COLORS;
   const numAxes = LABELS.length;
-  const maxValue = 15;
+  const maxValue = 5;
   const width = 300;
   const height = 300;
   const radius = 100;
   const centerX = width / 2;
   const centerY = height / 2;
   const angleSlice = (Math.PI * 2) / numAxes;
+  const cleanedTypeCount = Object.fromEntries(
+    Object.entries(typeCount).filter(
+      ([key, value]) =>
+        key &&
+        typeof key === "string" &&
+        key in API_TO_DISPLAY_LABEL_MAP &&
+        typeof value === "number"
+    )
+  );
+  const rawValues = LABELS.map(displayLabel => {
+    const apiLabel = Object.entries(API_TO_DISPLAY_LABEL_MAP).find(
+      ([, mappedLabel]) => mappedLabel === displayLabel
+    )?.[0];
+
+    if (!apiLabel || typeof cleanedTypeCount[apiLabel] !== "number") {
+      return 0; // ← 이거 추가!!
+    }
+
+    return cleanedTypeCount[apiLabel];
+  });
 
   // ✅ typeCount에서 values 계산
   const values = LABELS.map(displayLabel => {
     const apiLabel = Object.entries(API_TO_DISPLAY_LABEL_MAP).find(
       ([, mappedLabel]) => mappedLabel === displayLabel
     )?.[0];
-    return apiLabel && typeCount?.[apiLabel] !== undefined ? typeCount[apiLabel] : 0;
+    return apiLabel && cleanedTypeCount[apiLabel] !== undefined ? cleanedTypeCount[apiLabel] : 0;
   });
-
+  console.log("✅ cleanedTypeCount:", cleanedTypeCount);
+  console.log("✅ rawValues:", rawValues);
+  console.log(
+    "✅ scaled values:",
+    rawValues.map(v => (v / maxValue) * radius)
+  );
   const highlightIndex = values.indexOf(Math.max(...values));
 
   useEffect(() => {
@@ -123,7 +148,8 @@ const RadarChart = ({ typeCount, onSelectCategory, colors }: RadarChartProps) =>
     // 📈 데이터 영역 (폴리곤)
     const dataPoints = values.map((v, i) => {
       const angle = angleSlice * i;
-      const scaled = (v / maxValue) * radius;
+      const rawScaled = (v / maxValue) * radius;
+      const scaled = Math.min(Math.max(rawScaled, 8), radius); // 최소 8, 최대 radius
       return {
         x: centerX + scaled * Math.cos(angle - Math.PI / 2),
         y: centerY + scaled * Math.sin(angle - Math.PI / 2),

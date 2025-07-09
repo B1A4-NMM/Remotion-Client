@@ -9,30 +9,44 @@ import { Progress } from "../components/ui/progress";
 import { PHQ_QUESTIONS, PHQ_OPTIONS } from "../constants/phq-9";
 import { GAD7_QUESTIONS, GAD7_OPTIONS } from "../constants/gad-7";
 import { STRESS_QUESTIONS, STRESS_OPTIONS } from "../constants/pss";
+import { TEST_INTRO } from "../constants/testIntro";
 import { X } from "lucide-react";
 import TestResult from "./TestResult";
-type TestType = "phq9" | "gad7" | "stress";
+type IncomingType = "phq9" | "gad7" | "stress" | "depression" | "anxiety";
 
+type TestType = "phq9" | "gad7" | "stress";
+const mapType = (rawType: IncomingType): TestType => {
+  switch (rawType) {
+    case "depression":
+      return "phq9";
+    case "anxiety":
+      return "gad7";
+    default:
+      return rawType;
+  }
+};
 const testDataMap = {
   phq9: { title: "PHQ-9 우울 증상 자가검진", questions: PHQ_QUESTIONS, options: PHQ_OPTIONS },
   gad7: { title: "GAD-7 불안 자가검진", questions: GAD7_QUESTIONS, options: GAD7_OPTIONS },
-  stress: { title: "스트레스 자가진단", questions: STRESS_QUESTIONS, options: STRESS_OPTIONS },
+  stress: { title: "PSS 스트레스 자가진단", questions: STRESS_QUESTIONS, options: STRESS_OPTIONS },
 };
 
 interface TestModalProps {
-  type: TestType;
+  type: IncomingType; // 변경
   onClose: () => void;
   onFinish: (score: number) => void;
 }
 
 const TestModal = ({ type, onClose, onFinish }: TestModalProps) => {
-  const { title, questions, options } = testDataMap[type];
+  const convertedType = mapType(type);
+  const { title, questions, options } = testDataMap[convertedType];
+
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<number[]>(Array(questions.length).fill(null));
   const progress = ((step + 1) / questions.length) * 100;
-  const [mode, setMode] = useState<"question" | "result">("question");
+  const [mode, setMode] = useState<"intro" | "question" | "result">("intro");
   const [score, setScore] = useState(0);
-
+  console.log("✅ type 값:", type);
   const handleSelect = (value: number) => {
     const updated = [...answers];
     updated[step] = value;
@@ -45,7 +59,8 @@ const TestModal = ({ type, onClose, onFinish }: TestModalProps) => {
     } else {
       const total = answers.reduce((sum, val) => sum + (val ?? 0), 0);
       setScore(total);
-      setMode("result"); // 🔥 여기서 모달 내부 결과 화면 전환만 함
+      setMode("result");
+      onFinish(total);
     }
   };
 
@@ -63,24 +78,46 @@ const TestModal = ({ type, onClose, onFinish }: TestModalProps) => {
       >
         <motion.div
           className="w-full max-w-md overflow-y-auto bg-[#1E1E1E] text-white rounded-t-xl p-6 pb-16"
-          style={{ maxHeight: "calc(100vh - 3.5rem)" }}
+          style={{ maxHeight: "calc(100vh - 3.5rem)", minHeight: "480px" }} // ✅ 추가
           initial={{ y: "100%" }}
           animate={{ y: 0 }}
           exit={{ y: "100%" }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
         >
-          {/* 닫기 버튼 */}
           <div className="flex justify-end mb-2">
             <button onClick={onClose}>
               <X className="text-white hover:text-red-300" />
             </button>
           </div>
 
-          {/* ✅ 여기서 분기 시작 */}
-          {mode === "question" ? (
+          {/* Intro 설명 */}
+          {mode === "intro" && (
+            <>
+              <div className="w-full">
+                <h2 className="text-xl font-bold text-center mb-4">{title}</h2>
+                <div
+                  className="overflow-y-auto text-base leading-relaxed text-gray-200 bg-[#2c2c2c] rounded-lg p-5 border border-gray-100"
+                  style={{ height: "70%" }}
+                >
+                  {TEST_INTRO[type]}
+                </div>
+                <div className="mt-6">
+                  <Button
+                    onClick={() => setMode("question")}
+                    className="w-full bg-white text-black hover:bg-gray-200"
+                  >
+                    검사 시작하기
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+
+          {mode === "question" && (
             <>
               <h2 className="text-xl font-bold text-center mb-4">{title}</h2>
-              <Progress value={progress} className="mb-4 bg-gray-600 [&>div]:bg-gray-200" />
+              <Progress value={progress} className="mb-4 bg-gray-600 [&>div]:bg-blue-400" />
+
               <Card className="p-4 bg-[#2C2C2C] border border-gray-600">
                 <p className="font-semibold mb-2 text-white">{`${step + 1}. ${questions[step]}`}</p>
                 <RadioGroup
@@ -124,10 +161,12 @@ const TestModal = ({ type, onClose, onFinish }: TestModalProps) => {
                 </Button>
               </div>
             </>
-          ) : (
+          )}
+
+          {mode === "result" && (
             <>
               <h2 className="text-2xl font-bold text-center mb-4 text-white">검사 결과</h2>
-              <TestResult type={type} score={score} />
+              <TestResult type={mapType(type)} score={score} />
               <div className="mt-6">
                 <Button onClick={onClose} className="w-full bg-white text-black hover:bg-gray-200">
                   닫기

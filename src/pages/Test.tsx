@@ -22,7 +22,7 @@ const testDataMap: Record<
 > = {
   phq9: { title: "PHQ-9 우울 증상 자가검진", questions: PHQ_QUESTIONS, options: PHQ_OPTIONS },
   gad7: { title: "GAD-7 불안 자가검진", questions: GAD7_QUESTIONS, options: GAD7_OPTIONS },
-  stress: { title: "스트레스 자가진단", questions: STRESS_QUESTIONS, options: STRESS_OPTIONS },
+  stress: { title: "PSS 스트레스 자가진단", questions: STRESS_QUESTIONS, options: STRESS_OPTIONS },
 };
 
 const Test = () => {

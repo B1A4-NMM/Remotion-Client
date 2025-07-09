@@ -1,29 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useGetDiaryContentResult } from "../api/queries/home/useGetDiary";
 import { useGetMemberSummary } from "../api/queries/result/useGetmemSummary";
-import { ArrowLeft, Clock, CirclePlus, Plus, PlusCircle } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { motion } from "framer-motion";
+import { useParams } from "react-router-dom";
+import { useGetDiaryHealth } from "../api/queries/result/useGetDiaryHealth"; // 경로는 실제 경로에 맞게 수정
 
 import Todos from "../components/result/Todo";
 import MoodCircle from "../components/result/MoodCircle";
 import TestModal from "../components/TestModal";
-import "../styles/resultCard.css";
-import "../styles/App.css";
+import WarningTestBox from "../components/WariningTestBox"; // ✅ 추가
 import ActivityCardSlider from "../components/result/ActivityCardSlider";
 import StressTest from "../components/result/StressTest";
-import { useParams } from "react-router-dom";
+import "../styles/resultCard.css";
+import "../styles/App.css";
 
-interface DiaryCardsProps {
-  diaryContent: any | null;
-  memSummary: any | null;
-}
-
-/* ─ 1. 샘플 일기 (작성 유도) ─ */
+// 샘플 일기 데이터 (없을 경우 대체용)
 const sampleDiary = {
   activity_analysis: [
     {
-      activity: "발표 피드백 도와주기",
+      activity: "피드백 주고받기",
       peoples: [],
       self_emotions: {
         self_emotion: [],
@@ -32,37 +29,6 @@ const sampleDiary = {
       state_emotions: {
         state_emotion: ["무난"],
         s_emotion_intensity: [4],
-      },
-      problem: [
-        {
-          situation: "None",
-          approach: "None",
-          outcome: "None",
-          decision_code: "None",
-          conflict_response_code: "None",
-        },
-      ],
-      strength: "학습애",
-    },
-    {
-      activity: "피드백 주고받기",
-      peoples: [
-        {
-          name: "재웅",
-          interactions: {
-            relation_emotion: ["신뢰"],
-            r_emotion_intensity: [4],
-          },
-          name_intimacy: "0.5",
-        },
-      ],
-      self_emotions: {
-        self_emotion: [],
-        self_emotion_intensity: [],
-      },
-      state_emotions: {
-        state_emotion: [],
-        s_emotion_intensity: [],
       },
       problem: [
         {
@@ -75,105 +41,28 @@ const sampleDiary = {
       ],
       strength: "팀워크",
     },
-    {
-      activity: "최종 기획 발표",
-      peoples: [
-        {
-          name: "팀원들",
-          interactions: {
-            relation_emotion: ["실망"],
-            r_emotion_intensity: [6],
-          },
-          name_intimacy: "0.5",
-        },
-      ],
-      self_emotions: {
-        self_emotion: ["죄책감", "후회"],
-        self_emotion_intensity: [7, 6],
-      },
-      state_emotions: {
-        state_emotion: ["불안"],
-        s_emotion_intensity: [6],
-      },
-      problem: [
-        {
-          situation: "기술 오류",
-          approach: "대책 회의",
-          outcome: "팀 혼란",
-          decision_code: "회피적",
-          conflict_response_code: "회피형",
-        },
-      ],
-      strength: "리더십",
-    },
-    {
-      activity: "대책 회의",
-      peoples: [
-        {
-          name: "팀원들",
-          interactions: {
-            relation_emotion: ["실망"],
-            r_emotion_intensity: [6],
-          },
-          name_intimacy: "0.5",
-        },
-      ],
-      self_emotions: {
-        self_emotion: ["책임감"],
-        self_emotion_intensity: [8],
-      },
-      state_emotions: {
-        state_emotion: ["불안"],
-        s_emotion_intensity: [6],
-      },
-      problem: [
-        {
-          situation: "방향 차이",
-          approach: "교통 정리 실패",
-          outcome: "팀 혼란",
-          decision_code: "의존적",
-          conflict_response_code: "회피형",
-        },
-      ],
-      strength: "판단력",
-    },
-    {
-      activity: "자리 비우기",
-      peoples: [],
-      self_emotions: {
-        self_emotion: ["차분함"],
-        self_emotion_intensity: [7],
-      },
-      state_emotions: {
-        state_emotion: ["무난"],
-        s_emotion_intensity: [4],
-      },
-      problem: [
-        {
-          situation: "None",
-          approach: "None",
-          outcome: "None",
-          decision_code: "None",
-          conflict_response_code: "None",
-        },
-      ],
-      strength: "자기조절",
-    },
   ],
   reflection: {
-    achievements: ["리더십 발휘", "자기조절 성공"],
-    shortcomings: ["기술 미흡", "교통 정리 실패"],
-    todo: ["컨디션 챙기기", "긍정적 태도"],
+    achievements: [],
+    shortcomings: [],
+    todo: ["긍정적 태도 유지", "컨디션 관리"],
   },
 };
 
-{
-  /* ==========결과 카드 리스트 ============== */
+interface DiaryCardsProps {
+  diaryContent: any | null;
+  memSummary: any | null;
 }
-const ResultCards = ({ diaryContent, memSummary }: DiaryCardsProps) => {
-  const [scrollY, setScrollY] = useState(0);
 
+/* ✅ 하위 카드 컴포넌트 */ const ResultCards = ({ diaryContent }: DiaryCardsProps) => {
+  const [scrollY, setScrollY] = useState(0);
+  const [testType, setTestType] = useState<"stress" | "anxiety" | "depression" | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const { id } = useParams<{ id: string }>();
+  const period = 7;
+
+  // ✅ 감정 건강 데이터 가져오기
+  const { data: healthData } = useGetDiaryHealth(id!, period);
 
   const handleDrag = (event: any, info: any) => {
     setScrollY(info.offset.y);
@@ -181,30 +70,35 @@ const ResultCards = ({ diaryContent, memSummary }: DiaryCardsProps) => {
 
   const calculateConstraints = () => {
     if (!contentRef.current) return { top: 0, bottom: 0 };
-
     const contentHeight = contentRef.current.scrollHeight;
     const viewHeight = window.innerHeight;
-    const headerHeight = 400; // 헤더 + 무드 서클 영역
-
+    const headerHeight = 400;
     return {
       top: -(contentHeight - viewHeight + headerHeight),
       bottom: 0,
     };
   };
 
-  // 투두 데이터 추출 함수
-  const getTodos = (): string[] => {
-    if (diaryContent?.reflection?.todo) {
-      return diaryContent.reflection.todo;
+  const todos = diaryContent?.reflection?.todo ?? [];
+
+  // ✅ healthData에서 warning 값들 추출
+  const showWarnings = [
+    healthData?.stressWarning && "stress",
+    healthData?.anxietyWarning && "anxiety",
+    healthData?.depressionWarning && "depression",
+  ].filter(Boolean) as ("stress" | "anxiety" | "depression")[];
+  const convertWarningToTestType = (warning: "stress" | "anxiety" | "depression") => {
+    switch (warning) {
+      case "anxiety":
+        return "gad7";
+      case "depression":
+        return "phq9";
+      default:
+        return "stress";
     }
-    return [];
   };
-
-  const todos = getTodos();
-
   return (
     <>
-      {/* 드래그 가능한 카드 컨테이너 */}
       <motion.div
         ref={contentRef}
         drag="y"
@@ -220,17 +114,28 @@ const ResultCards = ({ diaryContent, memSummary }: DiaryCardsProps) => {
         }}
       >
         <ActivityCardSlider data={diaryContent} />
-        {/* 투두 리스트 카드들 */}
-        <Todos todos={todos} />
 
-        <StressTest memSummary={memSummary} />
+        <Todos todos={todos} />
+        {showWarnings.map(type => (
+          <WarningTestBox key={type} type={type} onClick={setTestType} />
+        ))}
       </motion.div>
+
+      {/* 🧪 심리테스트 모달 */}
+      {testType && (
+        <TestModal
+          type={convertWarningToTestType(testType)} // 💡 변환해서 넘기기
+          onClose={() => setTestType(null)}
+          onFinish={score => {
+            console.log(`${testType} 점수:`, score);
+          }}
+        />
+      )}
     </>
   );
 };
-
+/* ✅ 메인 Result 페이지 */
 const Result: React.FC = () => {
-  const [showTestModal, setShowTestModal] = useState(false);
   const { id } = useParams<{ id: string }>();
   const token = localStorage.getItem("accessToken") || "";
 
@@ -239,7 +144,6 @@ const Result: React.FC = () => {
     isLoading,
     isError,
   } = useGetDiaryContentResult(token, id || "sample");
-
   const { data: memsummary } = useGetMemberSummary(token);
 
   if (isLoading) {
@@ -250,7 +154,6 @@ const Result: React.FC = () => {
     );
   }
 
-  // 에러 상태 처리
   if (isError) {
     return (
       <div className="base flex items-center justify-center min-h-screen">
@@ -264,11 +167,11 @@ const Result: React.FC = () => {
     );
   }
 
-  const finalDiaryContent = diaryContent ? diaryContent : sampleDiary;
+  const finalDiaryContent = diaryContent || sampleDiary;
 
   return (
     <div className="base px-4 overflow-hidden">
-      {/* 상단 뒤로가기 버튼 */}
+      {/* ⬅️ 뒤로가기 */}
       <div className="relative z-50 flex justify-start pt-6 pb-6">
         <Button
           variant="ghost"
@@ -282,20 +185,11 @@ const Result: React.FC = () => {
         </Button>
       </div>
 
-      {/* 무드 서클 */}
+      {/* 🎯 무드 서클 */}
       <MoodCircle diaryContent={finalDiaryContent} />
 
+      {/* 📦 결과 카드들 */}
       <ResultCards diaryContent={finalDiaryContent} memSummary={memsummary} />
-
-      {showTestModal && (
-        <TestModal
-          type="stress"
-          onClose={() => setShowTestModal(false)}
-          onFinish={score => {
-            console.log("최종 점수:", score);
-          }}
-        />
-      )}
     </div>
   );
 };

@@ -1,0 +1,42 @@
+version: 0.2
+
+env:
+  variables:
+    S3_BUCKET: remotion-client-static-907522609509
+    CLOUDFRONT_DISTRIBUTION_ID: EBJY59NQB1ZR6
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - echo Installing dependencies...
+      - npm ci
+  
+  pre_build:
+    commands:
+      - echo Running linter...
+      - npm run lint
+  
+  build:
+    commands:
+      - echo Building the application...
+      - npm run build
+  
+  post_build:
+    commands:
+      - echo Build completed successfully
+      - echo Deploying to S3...
+      - aws s3 sync dist/ s3://$S3_BUCKET --delete
+      - echo Creating CloudFront invalidation...
+      - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: 'dist'
+  name: remotion-client-build
+
+cache:
+  paths:
+    - 'node_modules/**/*'

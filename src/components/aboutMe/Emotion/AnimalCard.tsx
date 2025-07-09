@@ -2,6 +2,7 @@ import { Card } from "../../../components/ui/card";
 
 import type { AnimalKey, AnimalTypeProps } from "../../../types/diary";
 
+
 // 동물 정보 데이터
 const animalData: Record<AnimalKey, { name: string; description: string; imgSrc: string }> = {
   호랑이: {
@@ -10,7 +11,7 @@ const animalData: Record<AnimalKey, { name: string; description: string; imgSrc:
       "항상 팀의 앞에 서서 분위기를 끌어올리는 리더형입니다. 강력한 자신감과 에너지로 주변 사람에게 활력을 전하지만, 가끔은 상대의 페이스를 놓칠 수 있어 세심한 배려가 필요합니다. 새로운 목표가 생기면 누구보다 빨리 달려가며, 함께하는 사람에게도 같은 열정을 기대합니다.",
     imgSrc: "../assets/img/tiger.svg",
   },
-  토끼: {
+  새: {
     name: "밝게 웃지만 속은 불안한 작은 토끼",
     description:
       "처음엔 밝고 사랑스러운 웃음으로 상대를 사로잡지만, 내면엔 '잘하고 있을까?' 하는 걱정이 자리합니다. 사랑과 설렘을 동시에 추구해 감정의 롤러코스터를 자주 타며, 지나간 선택에 대한 후회를 오래 품곤 합니다. 꾸준한 지지와 안전한 공간을 제공해 주면 한층 안정되고 깊은 애정을 보여 줍니다.",
@@ -114,25 +115,27 @@ const AnimalCard = ({ animalType }: AnimalTypeProps) => {
   // console.log('Current animal:', currentAnimal);
 
   const animalColor = {
-    tiger: "#f0963c",
-    rabbit: "#f395c5",
-    dog: "#c56f06",
-    cat: "#f3df48",
-    panda: "#ffffff",
-    penguin: "#525489",
-    sloth: "#e5c4a3",
-    squirrel: "#ab70db",
-    eagle: "#60a6dc",
-    cobra: "#399432",
-    fox: "#fe8a70",
-    bat: "#636363",
-    whale: "#325994",
-    turtle: "#bee358",
-    frog: "#42e5a4",
-    octopus: "#df6161",
+    호랑이: "#f0963c",
+    새: "#f395c5",
+    개: "#c56f06",
+    고양이: "#f3df48",
+    팬더: "#ffffff",
+    펭귄: "#525489",
+    나무늘보: "#e5c4a3",
+    다람쥐: "#ab70db",
+    독수리: "#60a6dc",
+    코브라: "#399432",
+    여우: "#fe8a70",
+    박쥐: "#636363",
+    고래: "#325994",
+    거북이: "#bee358",
+    개구리: "#42e5a4",
+    문어: "#df6161",
+    unknown: "#cccccc"
   };
 
-  const mainColor = animalColor[animalType];
+  const mainColor = animalColor[animalType.character];
+  console.log(mainColor);
 
   // 동물 타입이 잘못된 경우 처리
   if (!currentAnimal) {
@@ -146,7 +149,7 @@ const AnimalCard = ({ animalType }: AnimalTypeProps) => {
   }
 
   return (
-    <div className="flex justify-center p-6">
+    <div className="flex justify-center p-6 ">
       <Card className="max-w-md w-full rounded-3xl overflow-hidden bg-white">
         <img
           src={currentAnimal.imgSrc}
@@ -156,7 +159,7 @@ const AnimalCard = ({ animalType }: AnimalTypeProps) => {
         <div
           className="p-6"
           style={{
-            backgroundColor: mainColor, // ✅ Fixed: colon instead of equals
+            backgroundColor: mainColor
           }}
         >
           <h2 className="text-xl font-bold text-center mb-4 text-gray-800 leading-tight">

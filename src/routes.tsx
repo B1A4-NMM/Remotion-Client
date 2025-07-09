@@ -14,6 +14,8 @@ import Analysis from "./pages/Analysis";
 import AboutMe from "./pages/AboutMe";
 import Map from "./pages/Map";
 import Video from "./pages/video";
+
+import Action from "./pages/Action";
 export const routes = [
   { path: "/", element: <Home /> },
   { path: "/diary/:date", element: <Diary /> },
@@ -29,4 +31,5 @@ export const routes = [
   { path: "/aboutme", element: <AboutMe /> },
   { path: "/map", element: <Map /> },
   { path: "/video", element: <Video /> },
+  { path: "/action", element: <Action /> },
 ];

@@ -8,10 +8,10 @@ env:
 phases:
   install:
     runtime-versions:
-      nodejs: 18
+      nodejs: 16
     commands:
       - echo Installing dependencies...
-      - npm ci
+      - npm install
   
   pre_build:
     commands:

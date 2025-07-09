@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import clsx from "clsx";
 import { useDiaryStore } from "./Calender";
 import { Button } from "../ui/button";
+import { useDeleteDiary } from "../../api/queries/home/useDeleteDiary";
 
 interface DiaryCardsProps {
     hasTodayDiary: boolean;
@@ -32,11 +33,51 @@ const DiaryCards = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   // 카드 확장 상태 관리
+  const token = localStorage.getItem("accessToken") || "";
   const { isExpanded, setIsExpanded } = useDiaryStore();
   const [isImageExpanded, setIsImageExpanded] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  /* ─ 2. 표시할 일기 결정 ─ */
+  //삭제 mutaion 훅
+  const deleteDiaryMutation = useDeleteDiary();
+
+  /* 표시할 일기 결정 ─ */
   const displayDiary = hasTodayDiary ? todayDiary.todayDiaries[0] : sampleDiary;
+
+  //일기 삭제 핸들러
+  const handleDeleteDiary = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  //삭제 확인
+  const handleConfirmDelete = async () => {
+    if (!hasTodayDiary || !displayDiary?.diaryId) {
+      toast.error("삭제할 일기를 찾을 수 없습니다.");
+      return;
+    }
+
+    try {
+      await deleteDiaryMutation.mutateAsync({
+        token,
+        diaryId: displayDiary.diaryId.toString(),
+      });
+      
+      // 삭제 성공 시 모달 닫기
+      setShowDeleteConfirm(false);
+      setIsExpanded(false);
+      
+    } catch (error) {
+      console.error("일기 삭제 중 오류 발생:", error);
+    }
+  };
+
+  // 삭제 취소 핸들러
+  const handleCancelDelete = () => {
+    setShowDeleteConfirm(false);
+  };
+
+  
+
 
   // 감정 매핑 함수
   const mapEmotionToColor = (emotion: string): keyof typeof baseColors => {
@@ -150,19 +191,6 @@ const DiaryCards = ({
     setIsImageExpanded(true);
   };
 
-  const handleDeleteDiary = () => {
-    const isConfirmed = window.confirm(
-      '정말 삭제하시겠습니까?\n삭제 후엔 복구 할 수 없습니다.'
-    );
-    
-    if (isConfirmed) {
-      // 실제 삭제 로직 구현
-      console.log('일기 삭제 실행');
-      // API 호출 또는 삭제 함수 호출
-      // deleteDiary(diaryId);
-    }
-  };
-  
 
   return (
     <>
@@ -365,7 +393,7 @@ const DiaryCards = ({
                 </button>
 
                 {/* 확장된 컨텐츠 */}
-                <div className="relative z-10 p-4">
+                <div className="relative z-10 p-4 mb-16">
                   {/* 날짜 정보 */}
                   {todayDiary?.todayDiaries?.[0] && (
                     <div className="text-white/70 text-sm mb-6">
@@ -523,18 +551,97 @@ const DiaryCards = ({
                     </div>
                   )}
                   <div>
-                  <Button 
-                    className="mt-10"
-                    onClick={handleDeleteDiary}
-                    style={{
-                      backgroundColor:"#e64545",
-                      color:"#110303"
-                    }}
-                  >
-                    일기 삭제하기
-                  </Button>
+                    <Button 
+                      className="mt-10"
+                      onClick={handleDeleteDiary}
+                      disabled={deleteDiaryMutation.isPending}
+                      style={{
+                        backgroundColor: "#e64545",
+                        color: "#110303"
+                      }}
+                    >
+                      {deleteDiaryMutation.isPending ? "삭제 중..." : "일기 삭제하기"}
+                    </Button>
                   </div>
                 </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 삭제 확인 모달 */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <motion.div
+            className="fixed inset-0 z-[70] flex items-center justify-center p-4"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.8)" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={handleCancelDelete}
+          >
+            <motion.div
+              className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* 아이콘 */}
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+                  <svg 
+                    className="w-8 h-8 text-red-600" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" 
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              {/* 메시지 */}
+              <div className="text-center mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  정말 삭제하시겠습니까?
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  삭제 후엔 복구 할 수 없습니다.
+                </p>
+              </div>
+
+              {/* 버튼들 */}
+              <div className="flex gap-3">
+                <Button
+                  className="flex-1"
+                  variant="outline"
+                  onClick={handleCancelDelete}
+                  disabled={deleteDiaryMutation.isPending}
+                  style={{
+                    borderColor: "#d1d5db",
+                    color: "#6b7280"
+                  }}
+                >
+                  취소
+                </Button>
+                <Button
+                  className="flex-1"
+                  onClick={handleConfirmDelete}
+                  disabled={deleteDiaryMutation.isPending}
+                  style={{
+                    backgroundColor: "#e64545",
+                    color: "#ffffff"
+                  }}
+                >
+                  {deleteDiaryMutation.isPending ? "삭제 중..." : "삭제하기"}
+                </Button>
               </div>
             </motion.div>
           </motion.div>

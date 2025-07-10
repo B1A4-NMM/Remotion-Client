@@ -5,13 +5,19 @@ import { useGetDiaryDate } from "../api/queries/home/useGetDiaryDate";
 
 import MonthlyCalendar from "../components/home/Calender";
 import MoodCircle from "../components/home/MoodCircle";
+import MoodBack from "../components/home/MoodBack";
 import DiaryCards from "../components/home/DiaryCards";
 
 import { useNavigate } from "react-router-dom";
 
+import { Canvas } from "@react-three/fiber";
+
 import "../styles/homeCard.css";
 import "../styles/moodCircle.css";
+import "../styles/moodback.css";
 import dayjs from "dayjs";
+import Waveback from "../components/home/WaveBack";
+import Blob from "../components/home/Blob/Blob";
 
 const Home = () => {
   const token = localStorage.getItem("accessToken") || "";
@@ -41,8 +47,6 @@ const Home = () => {
   );
 
   const todayDiary = todayData ? todayData : null;
-  console.log(todayDiary);
-  console.log(dayjs(selectedDate).format("YYYY-MM-DD"));
 
   const {
     data: diaryContent,
@@ -62,6 +66,9 @@ const Home = () => {
 
   return (
     <div className="base">
+      { /* 무드 배경 */}
+      {/* <MoodBack diaryContent={diaryContent} /> */}
+
       {/* 오류 메시지 표시 */}
       {errorMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 bg-red-500 text-white rounded-lg shadow-lg animate-pulse">
@@ -80,16 +87,24 @@ const Home = () => {
           const formattedDate = dayjs(selectedDate).format("YYYY-MM-DD");
           navigate(`/diary/${formattedDate}`);
         }}
-      />
+        />
+
+      <div className="container">
+        <Canvas>
+          <Blob diaryContent={diaryContent}/>
+        </Canvas>
+      </div>
+
 
       {/* 하단 일기 카드들 */}
-      <DiaryCards
+      {/* <DiaryCards
         hasTodayDiary={hasTodayDiary}
         todayDiary={todayDiary}
         diaryContent={diaryContent}
         isContentLoading={isContentLoading}
         isContentError={isContentError}
-      />
+      /> */}
+      {/* <Waveback diaryContent={diaryContent} /> */}
     </div>
   );
 };

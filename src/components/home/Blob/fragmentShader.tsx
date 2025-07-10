@@ -14,7 +14,7 @@ varying vec3 vPosition;
 varying float vDisplacement;
 
 void main() {
-    vec3 lightDirection = normalize(vec3(0.0, 0.0, 1.0));
+    vec3 lightDirection = normalize(vec3(1.0, 1.0, 1.0));
     vec3 normal = normalize(vNormal);
     
     // 기본 디퓨즈 라이팅
@@ -31,11 +31,23 @@ void main() {
     vec3 reflectDir = reflect(-lightDirection, normal);
     float specular = pow(max(dot(viewDirection, reflectDir), 0.0), 32.0);
     
-    // **감정 기반 색상 믹싱 (B코드에서 가져옴)**
+    // 감정 색상 혼합
     float totalIntensity = u_colorIntensity1 + u_colorIntensity2 + u_colorIntensity3 + 1e-6;
-    vec3 emotionColor = (u_color1 * u_colorIntensity1 + 
-                        u_color2 * u_colorIntensity2 + 
-                        u_color3 * u_colorIntensity3) / totalIntensity;
+    vec3 blendedEmotionColor = 
+        (u_color1 * u_colorIntensity1 + 
+        u_color2 * u_colorIntensity2 + 
+        u_color3 * u_colorIntensity3) / totalIntensity;
+
+    // 혼합색에 흰색 섞기 (탁함 보정)
+    blendedEmotionColor = mix(blendedEmotionColor, vec3(1.0), 0.2);
+
+    // 수직 위치 기반 그라데이션 적용 (vPosition.y 기준)
+    float gradientFactor = clamp((vPosition.y + 2.0) / 4.0, 0.0, 1.0); // -2~2 → 0~1
+    vec3 gradientEmotionColor = mix(u_color1, u_color2, gradientFactor);
+    gradientEmotionColor = mix(gradientEmotionColor, u_color3, gradientFactor * (1.0 - gradientFactor));
+
+    // 그라데이션 색상과 평균 색을 블렌딩
+    vec3 emotionColor = mix(blendedEmotionColor, gradientEmotionColor, 0.4);
     
     // 파면에 따른 색상 요동 (B코드 방식)
     float colorNoise = sin(vPosition.x * 3.0 + u_time) * 
@@ -43,8 +55,8 @@ void main() {
     emotionColor = mix(emotionColor * 1.0, emotionColor * 1.1, colorNoise * 0.5 + 0.5);
     
     // **A코드의 물 색상과 감정 색상 블렌딩**
-    vec3 waterColor = vec3(0.1, 0.1, 0.1); // 연한 하늘색
-    vec3 deepColor = vec3(0.2, 0.2, 0.2);  // 깊은 파란색
+    vec3 waterColor = vec3(0.0, 0.05, 0.2); // 연한 하늘색
+    vec3 deepColor = vec3(0.0, 0.0, 0.3);  // 깊은 파란색
     
     // 감정 색상을 물 색상과 자연스럽게 블렌딩
     vec3 lightWaterColor = mix(waterColor, emotionColor, 0.6);

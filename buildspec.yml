@@ -10,6 +10,7 @@ phases:
       - echo Retrieving environment variables from Parameter Store...
       - export VITE_SOCIAL_AUTH_URL=$(aws ssm get-parameter --name "/harudew/VITE_SOCIAL_AUTH_URL" --query "Parameter.Value" --output text)
       - export VITE_GOOGLE_MAPS_API_KEY=$(aws ssm get-parameter --name "/harudew/VITE_GOOGLE_MAPS_API_KEY" --with-decryption --query "Parameter.Value" --output text)
+      - export VITE_REDIRECT_URI=$(aws ssm get-parameter --name "/harudew/VITE_REDIRECT_URI" --query "Parameter.Value" --output text)
       - echo Environment variables loaded successfully
   build:
     commands:

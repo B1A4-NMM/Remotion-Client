@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import React, { useRef, useEffect, useState } from "react";
 import { motion, useMotionValue } from "framer-motion";
 import type { Node, AnimatedBranch, Edge } from "@/types/emotionalGraph";
-import { useGetRelation } from "./../api/queries/relation/useGetRelation";
+import { useGetRelation } from "../api/queries/relation/useGetRelation";
 
 import { updatePhysics } from "@/utils/physics";
 import {

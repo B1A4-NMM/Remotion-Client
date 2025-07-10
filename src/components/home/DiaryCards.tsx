@@ -292,7 +292,7 @@ const DiaryCards = ({
                       >
                         {hasTodayDiary
                           ? makePreview(todayDiary?.todayDiaries?.[0]?.content)  // content 필드 사용
-                          : "일기를 작성해주세요. 여기에는 일기 내용이 3줄까지 미리보기로 나타납니다."}
+                          : "일기를 작성해주세요"}
                       </p>
                     )}
 

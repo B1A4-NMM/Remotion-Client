@@ -1,7 +1,6 @@
 import { useLocation, Outlet } from "react-router-dom";
-import BottomNavigation from "./BottomNavigation";
-import { Toaster } from 'sonner'
-
+import BottomNavigation from "./components/BottomNavigation";
+import { Toaster } from "sonner";
 
 // 하단 네비게이션을 숨길 경로 목록
 const HIDE_NAV_PATHS = ["/signup", "/login"];
@@ -13,7 +12,6 @@ export default function Layout() {
   const shouldShowNav = !HIDE_NAV_PATHS.includes(location.pathname);
 
   return (
-
     <div className="w-full flex justify-center items-start min-h-screen">
       <div className="w-full max-w-[414px] min-h-screen relative bg-[#1E1E1E] text-white">
         <main>
@@ -26,11 +24,11 @@ export default function Layout() {
             toastOptions={{
               duration: 4000,
               style: {
-                background: '#FFFFFF',
-                color: '#000000',
-                border: '1px solid #000000',
+                background: "#FFFFFF",
+                color: "#000000",
+                border: "1px solid #000000",
               },
-              className: 'my-toast',
+              className: "my-toast",
             }}
           />
         </main>

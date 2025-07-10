@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { routes } from "./routes";
-import Layout from "./components/Layout";
-import { ThemeProvider } from "./components/theme-provider"
+import Layout from "./Layout";
+import { ThemeProvider } from "./components/Theme-provider";
 
 export default function App() {
   return (

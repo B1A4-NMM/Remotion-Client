@@ -80,14 +80,14 @@ const Home = () => {
       <MonthlyCalendar onDateSelect={handleDateSelect} selectedDate={selectedDate} />
 
       {/* MoodCircle */}
-      <MoodCircle
+      {/* <MoodCircle
         hasTodayDiary={hasTodayDiary}
         todayDiary={todayDiary}
         onClickWrite={() => {
           const formattedDate = dayjs(selectedDate).format("YYYY-MM-DD");
           navigate(`/diary/${formattedDate}`);
         }}
-        />
+        /> */}
 
       <div className="container">
         <Canvas>

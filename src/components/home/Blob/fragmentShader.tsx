@@ -17,77 +17,64 @@ void main() {
     vec3 lightDirection = normalize(vec3(1.0, 1.0, 1.0));
     vec3 normal = normalize(vNormal);
     
-    // 기본 디퓨즈 라이팅
     float diffuse = max(dot(normal, lightDirection), 0.6);
-    
-    // 뷰 방향 벡터
     vec3 viewDirection = normalize(cameraPosition - vPosition);
-    
-    // 프레넬 효과 (투명 재질의 굴절감)
     float fresnel = 1.0 - max(dot(normal, viewDirection), 0.0);
     fresnel = pow(fresnel, 1.5);
-    
-    // 반사 효과
     vec3 reflectDir = reflect(-lightDirection, normal);
     float specular = pow(max(dot(viewDirection, reflectDir), 0.0), 32.0);
-    
-    // 감정 색상 혼합
+
+    // [1] 감정 색상 혼합
     float totalIntensity = u_colorIntensity1 + u_colorIntensity2 + u_colorIntensity3 + 1e-6;
     vec3 blendedEmotionColor = 
         (u_color1 * u_colorIntensity1 + 
         u_color2 * u_colorIntensity2 + 
         u_color3 * u_colorIntensity3) / totalIntensity;
 
-    // 혼합색에 흰색 섞기 (탁함 보정)
-    blendedEmotionColor = mix(blendedEmotionColor, vec3(1.0), 0.2);
+    // [2] 탁함 보정
+    blendedEmotionColor = mix(blendedEmotionColor, vec3(1.0), 0.35);
+    blendedEmotionColor = pow(blendedEmotionColor, vec3(1.0 / 2.2));  // 감마 보정
 
-    // 수직 위치 기반 그라데이션 적용 (vPosition.y 기준)
+    // [3] 수직 위치 기반 그라데이션
     float gradientFactor = clamp((vPosition.y + 2.0) / 4.0, 0.0, 1.0); // -2~2 → 0~1
     vec3 gradientEmotionColor = mix(u_color1, u_color2, gradientFactor);
     gradientEmotionColor = mix(gradientEmotionColor, u_color3, gradientFactor * (1.0 - gradientFactor));
+    gradientEmotionColor = mix(gradientEmotionColor, vec3(1.0), 0.25);
 
-    // 그라데이션 색상과 평균 색을 블렌딩
-    vec3 emotionColor = mix(blendedEmotionColor, gradientEmotionColor, 0.4);
-    
-    // 파면에 따른 색상 요동 (B코드 방식)
-    float colorNoise = sin(vPosition.x * 3.0 + u_time) * 
-                      cos(vPosition.y * 2.0 + u_time * 0.7);
-    emotionColor = mix(emotionColor * 1.0, emotionColor * 1.1, colorNoise * 0.5 + 0.5);
-    
-    // **A코드의 물 색상과 감정 색상 블렌딩**
-    vec3 waterColor = vec3(0.0, 0.05, 0.2); // 연한 하늘색
-    vec3 deepColor = vec3(0.0, 0.0, 0.3);  // 깊은 파란색
-    
-    // 감정 색상을 물 색상과 자연스럽게 블렌딩
+    // [4] blended + gradient 결합
+    vec3 emotionColor = mix(blendedEmotionColor, gradientEmotionColor, 0.5);
+
+    // [5] 파면 색상 변동
+    float colorNoise = sin(vPosition.x * 3.0 + u_time) * cos(vPosition.y * 2.0 + u_time * 0.7);
+    emotionColor = mix(emotionColor, vec3(1.0), 0.1 + 0.1 * colorNoise);
+
+    // [6] 물 색상과 블렌딩
+    vec3 waterColor = vec3(0.0, 0.05, 0.2);
+    vec3 deepColor = vec3(0.0, 0.0, 0.3);
     vec3 lightWaterColor = mix(waterColor, emotionColor, 0.6);
     vec3 deepWaterColor = mix(deepColor, emotionColor * 0.8, 0.5);
-    
-    // 깊이에 따른 색상 변화
     float depth = abs(vDisplacement) * 2.0;
     vec3 baseColor = mix(lightWaterColor, deepWaterColor, depth);
-    
-    // 조명 계산
+
     vec3 diffuseColor = baseColor * diffuse * 0.8;
     vec3 ambientColor = lightWaterColor * 0.4;
-    vec3 fresnelColor = vec3(1.0, 1.0, 1.0) * fresnel * 0.6;
-    vec3 specularColor = vec3(1.0, 1.0, 1.0) * specular * 0.8;
-    
-    // 파장에 따른 색상 변화 (감정 색상 기반)
+    vec3 fresnelColor = vec3(1.0) * fresnel * 0.6;
+    vec3 specularColor = vec3(1.0) * specular * 0.8;
     vec3 rippleColor = mix(vec3(0.9, 0.95, 1.0), emotionColor, 0.3) * abs(vDisplacement) * 0.3;
-    
-    // 최종 색상 합성
+
+    // [7] 최종 색상 + 밝기 보정
     vec3 finalColor = ambientColor + diffuseColor + fresnelColor + specularColor + rippleColor;
-    
-    // 투명도 계산 (A코드 방식 유지)
+    finalColor = mix(finalColor, vec3(1.0), 0.2);
+
     float alpha = 0.7 + fresnel * 0.2 + abs(vDisplacement) * 0.3;
     alpha = clamp(alpha, 0.4, 0.9);
-    
-    // 시간에 따른 미묘한 변화
+
     float timeVariation = sin(u_time * 0.4) * 0.05 + 0.95;
     finalColor *= timeVariation;
-    
+
     gl_FragColor = vec4(finalColor, alpha);
 }
 `;
+
 
 export default fragmentShader;

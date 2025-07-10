@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Image as LucideImage, Mic, MicOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { usePostDiary } from "@/api/queries/diary/usePostDiary.ts";
-import Loading6 from "../components/loading/Loading6";
+import Loading6 from "../components/Loading/Loading6";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import LocationPicker from "@/components/LocationPicker"; // 분리된 지도 모달 컴포넌트
 import { useParams } from "react-router-dom";

@@ -1,19 +1,19 @@
 import Home from "./pages/Home";
 
-import Calendar from "./pages/calendar";
+import Calendar from "./pages/Calendar";
 import Diary from "./pages/Diary";
-import Relation from "./pages/Relation";
+import Relation from "./pages/T_Relation";
 
 import Result from "./pages/Result";
 import Test from "./pages/Test";
 import TestResult from "./components/TestResult";
 import Login from "./pages/Login";
 import GetAccess from "./pages/GetAccess";
-import Loading6 from "./components/loading/Loading6";
+import Loading6 from "./components/Loading/Loading6";
 import Analysis from "./pages/Analysis";
 import AboutMe from "./pages/AboutMe";
 import Map from "./pages/Map";
-import Video from "./pages/video";
+import Video from "./pages/T_Video";
 
 import Action from "./pages/Action";
 export const routes = [

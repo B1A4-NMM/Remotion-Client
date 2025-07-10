@@ -126,7 +126,7 @@ const StressTest: React.FC<StressProps> = ({ memSummary }) => {
               color: "#ffffff",
               border: "none",
             }}
-            onClick={() => navigate('/aboutme')} 
+            onClick={() => navigate('/video')} 
             onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#18adc7")}
             onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#2eb9c0")}
           >

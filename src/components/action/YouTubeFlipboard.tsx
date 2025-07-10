@@ -16,7 +16,6 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
   showControls = true
 }) => {
 
-
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showDescription, setShowDescription] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -51,6 +50,25 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
       </div>
     );
   }
+
+  const [scale, setScale] = useState(1);
+  const [isVideoLoading, setIsVideoLoading] = useState(true);
+  const [VideoError, setVideoError] = useState(false);
+
+  useEffect(()=>{
+    const updateScale=()=>{
+      const screenRatio = window.innerHeight/window.innerWidth;
+      const videoRatio = 9/16; //16:9 세로 비율
+
+      if(screenRatio>videoRatio){
+        setScale(window.innerWidth/1920); //세로가 더 길면 영상 확대 
+        }
+      };
+
+      updateScale();
+      window.addEventListener('resize', updateScale);
+      return ()=>window.removeEventListener('resize',updateScale);
+  }, []);
 
   // 위아래 네비게이션
   const goToPrevious = () => {
@@ -106,6 +124,27 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  
+  // YouTube URL 생성 함수
+  const generateYouTubeUrl = (videoId: string) => {
+    const baseUrl = `https://www.youtube.com/embed/${videoId}`;
+    const params = new URLSearchParams({
+      rel: '0',
+      modestbranding: '1',
+      controls: '0',
+      showinfo: '0',
+      fs: '1', // 전체화면 허용
+      iv_load_policy: '3', // 어노테이션 비활성화
+    });
+
+    // autoPlay가 true일 때만 관련 파라미터 추가
+    if (autoPlay) {
+      params.append('autoplay', '1');
+      params.append('mute', '1');
+    }
+
+    return `${baseUrl}?${params.toString()}`;
+  };
 
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
@@ -118,22 +157,44 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
         onTouchStart={(e) => handleStart(e.touches[0].clientY)}
         onTouchEnd={(e) => handleEnd(e.changedTouches[0].clientY)}
       >
-        {/* YouTube iframe - 전체 화면 */}
-        <iframe
-          className={`w-full h-full object-cover transition-opacity duration-300 ${
-            isTransitioning ? 'opacity-50' : 'opacity-100'
-          }`}
-          src={`https://www.youtube.com/embed/${currentVideo.id}${
-            autoPlay ? '?autoplay=1&mute=1' : ''
-          }&rel=0&modestbranding=1&controls=0`}
-          title={currentVideo.title}
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          style={{
-            objectFit: 'cover'
-          }}
-        />
+        {/* 수정된 YouTube iframe */}
+        <div className="relative w-full h-full">
+          <iframe
+            key={currentVideo.id} // 영상 변경 시 iframe 재생성
+            className={`absolute inset-0 w-full h-full transition-opacity duration-300 ${
+              isTransitioning ? 'opacity-50' : 'opacity-100'
+            }`}
+            src={generateYouTubeUrl(currentVideo.id)}
+            title={currentVideo.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            onLoad={()=>setIsVideoLoading(false)}
+            onError={()=>setVideoError(true)}
+            allowFullScreen
+            style={{
+              border: 'none',
+              // 세로 화면에서 영상 중앙 정렬
+              transform: 'scale(${scale})', // 필요에 따라 조정
+              transformOrigin: 'center center'
+            }}
+          />
+        </div>
+
+        {/*로딩 오버레이 */}
+        {isVideoLoading &&(
+          <div className="absolute inset-0 bg-black flex items-center justify-center">
+          <div className="text-white">영상 로딩 중...</div>
+        </div>
+        )}
+
+        {/*에러 오버레이 */}
+        {VideoError &&(
+          <div className="absolute inset-0 bg-black flex items-center justify-center">
+          <div className="text-white text-center">
+            <div className="text-xl mb-2">⚠️</div>
+            <div>영상을 불러올 수 없습니다</div>
+          </div>
+        </div>
+        )}
 
         {/* 세로 네비게이션 버튼 */}
         {showControls && videos.length > 1 && (
@@ -162,14 +223,37 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
           </div>
         )}
 
+        {/*세로 액션 버튼 */}
+        <div className="absolute right-4 bottom-32 z-20">
+          <div className="flex flex-col space-y-4">
+            <button className="bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-all w-14 h-14 flex items-center justify-center">
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+              </svg>
+            </button>
+            
+            <button className="bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-all w-14 h-14 flex items-center justify-center">
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
+              </svg>
+            </button>
+            
+            <button className="bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-all w-14 h-14 flex items-center justify-center">
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
         {/* 하단 정보 영역 - 오버레이 스타일 */}
-        <div className="absolute bottom-0 left-0 right-0 z-10">
+        <div className="absolute bottom-0 left-0 right-0 z-10 h-60">
           {/* 그라데이션 배경 */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
           
           <div className="relative p-6 pb-8">
-            <div className="flex items-start justify-between">
-              <div className="flex-1 min-w-0 pr-4">
+            <div className="flex items-start">
+              <div className="flex-1 min-w-0 pr-20"> {/* pr-20으로 오른쪽 여백 추가 */}
                 <h3 className="text-xl font-bold text-white mb-2 leading-tight">
                   {currentVideo.title}
                 </h3>
@@ -179,65 +263,15 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
                   {currentVideo.description}
                 </p>
 
-                <button
-                  onClick={() => setShowDescription(!showDescription)}
-                  className="flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  <Info size={16} />
-                  <span className="text-sm">
-                    {showDescription ? '설명 숨기기' : '더보기'}
-                  </span>
-                </button>
-              </div>
-
-              {/* 세로 액션 버튼들 (릴스 스타일) */}
-              <div className="flex flex-col space-y-4">
-                <button className="bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-all">
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-                  </svg>
-                </button>
-                
-                <button className="bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-all">
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
-                  </svg>
-                </button>
-                
-                <button className="bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-all">
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
-                  </svg>
-                </button>
               </div>
             </div>
           </div>
         </div>
-
-        {/* 전체 설명 모달 */}
-        {showDescription && (
-          <div className="absolute inset-0 bg-black/90 backdrop-blur-sm z-20 flex items-end">
-            <div className="w-full max-h-96 bg-gray-900/95 backdrop-blur-sm rounded-t-xl p-6 overflow-y-auto">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="text-lg font-semibold text-white">설명</h4>
-                <button
-                  onClick={() => setShowDescription(false)}
-                  className="text-gray-400 hover:text-white transition-colors p-2"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-              <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
-                {currentVideo.description || '설명이 없습니다.'}
-              </p>
-            </div>
-          </div>
-        )}
 
         {/* 스와이프 힌트 */}
-        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 text-white/60 text-sm z-10 animate-bounce">
+        {/* <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 text-white/60 text-sm z-10 animate-bounce">
           ↕ 스와이프하여 영상 전환
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -26,25 +26,35 @@ const SAMPLE_DATA: VideoType[] = [
 ];
 const Video: React.FC = () => {
   const token = localStorage.getItem("accessToken") ?? "";
-
   const { data, isLoading, isError } = useGetVideo(token);
 
   /** API 응답 → 화면용 배열 변환 */
   const apiVideo: VideoType[] =
-    data?.videoId && typeof data.videoId === "string"
-      ? [
-          {
-            id: data.videoId,
-            title: "추천 영상",
-            description: data.message ?? "",
-          },
-        ]
+    data?.videoId && Array.isArray(data.videoId)
+      ? data.videoId.map((id, index) => ({
+          id: id,
+          title: `추천 영상 ${index + 1}`,
+          description: data.message ?? "추천된 영상입니다.",
+        }))
       : [];
 
   const videoData = apiVideo.length ? apiVideo : SAMPLE_DATA;
 
-  if (isLoading) return <div>로딩 중…</div>;
-  if (isError) return <div>영상을 가져오지 못했습니다.</div>;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-gray-600">비디오를 불러오는 중...</div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-red-600">비디오를 불러오는데 실패했습니다.</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">

@@ -120,7 +120,7 @@ export interface Character{
 }
 
 
-export type AnimalKey = "호랑이" | "토끼" | "개" | "고양이" | "팬더" | "펭귄" | 
+export type AnimalKey = "호랑이" | "새" | "개" | "고양이" | "팬더" | "펭귄" | 
 "나무늘보" | "다람쥐" | "독수리" | "코브라" | "여우" | "박쥐" | 
 "고래" | "거북이" | "개구리" | "문어" | "unknown";
 

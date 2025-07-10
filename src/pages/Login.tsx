@@ -29,7 +29,7 @@ export default function Login() {
       {/* 소셜 로그인 버튼 */}
       <div className="flex flex-col gap-3 w-full max-w-xs">
         <Button
-          onClick={() => (window.location.href = SOCIAL_AUTH_URL.kakao + `?state = ${REDIRECT_URI}`)}
+          onClick={() => (window.location.href = SOCIAL_AUTH_URL.kakao+`?state=${REDIRECT_URI}`)}
           className="h-[48px] bg-white text-black hover:bg-[#ffe812] rounded-full justify-center items-center gap-3 px-4 py-2"
         >
           <img src={kakao} alt="Kakao Icon" className="w-5 h-5" />
@@ -37,7 +37,7 @@ export default function Login() {
         </Button>
 
         <Button
-          onClick={() => (window.location.href = SOCIAL_AUTH_URL.google + `?state = ${REDIRECT_URI}`)}
+          onClick={() => (window.location.href = SOCIAL_AUTH_URL.google+`?state=${REDIRECT_URI}`)}
           className="h-[48px] bg-white text-black hover:bg-gray-200 rounded-full justify-center items-center gap-3 px-4 py-2"
         >
           <img src={google} alt="Google Icon" className="w-5 h-5" />

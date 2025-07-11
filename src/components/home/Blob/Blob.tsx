@@ -251,7 +251,7 @@ const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
   });
 
   return (
-    <mesh ref={mesh} scale={1.3} position={[0, 0, 0]}>
+    <mesh ref={mesh} scale={1.0} position={[0, 0, 0]}>
       <icosahedronGeometry args={[2, 16]} />
       <shaderMaterial
         vertexShader={vertexShader}

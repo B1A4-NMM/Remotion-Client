@@ -196,7 +196,7 @@ const DiaryCards = ({
     <>
       {/* 기본 카드 */}
       <AnimatePresence>
-        {!isExpanded && (
+        {!isExpanded && hasTodayDiary && (
           <motion.div
             className="z-50 flex items-center justify-center p-4"
             variants={{
@@ -278,28 +278,22 @@ const DiaryCards = ({
                   )}
 
                   {/* 컨텐츠 미리보기 */}
+                  
                   <div className="mt-4">
-                    {isContentLoading && hasTodayDiary ? (
+                    {isContentLoading ? (
                       <div className="flex items-center gap-2 text-black/70 text-sm">
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black/70"></div>
                         일기 내용을 불러오는 중...
                       </div>
                     ) : (
-                      <p
-                        className={clsx(
-                          "text-black/90 text-base leading-relaxed",
-                          diaryContent?.content || !hasTodayDiary ? "line-clamp-3" : "hidden"
-                        )}
-                      >
-                        {hasTodayDiary
-                          ? makePreview(todayDiary?.todayDiaries?.[0]?.content)  // content 필드 사용
-                          : "일기를 작성해주세요. 여기에는 일기 내용이 3줄까지 미리보기로 나타납니다."}
-                      </p>
-                    )}
-
-                    {/* 클릭 유도 텍스트 */}
-                    {hasTodayDiary && diaryContent && (
-                      <div className="text-black/50 text-xs mt-2 italic">탭하여 전체 내용 보기</div>
+                      <div>
+                        <p className="text-black/90 text-base leading-relaxed line-clamp-3">
+                          {makePreview(todayDiary?.todayDiaries?.[0]?.content)}
+                        </p>
+                        <div className="text-black/50 text-xs mt-2 italic">
+                          탭하여 전체 내용 보기
+                        </div>
+                      </div>
                     )}
                   </div>
 
@@ -647,6 +641,13 @@ const DiaryCards = ({
             </motion.div>
           </motion.div>
         )}
+        <div className="z-40 flex justify-center ">
+          <div className="flex flex-col items-center">
+            <h1 className="text-3xl font-bold mb-5"> 하루뒤 시작하기</h1>
+            <p className="text-xm text-stone-500"> 나만의 하루를 기록해 보세요.</p>
+            <p className="text-xm text-stone-500"> 시작하려면 중앙의 '+' 버튼을 탭하세요.</p>
+          </div>
+        </div>
       </AnimatePresence>
     </>
   );

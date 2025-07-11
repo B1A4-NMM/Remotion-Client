@@ -1,0 +1,63 @@
+.waveback-container {
+    position: absolute;
+    bottom: 0; /* 화면 최하단에 고정 */
+    left: 0;
+    right: 0;
+    width: 300%;
+    height: 30vh;
+    z-index: 1; /* 네비게이터(보통 z-index: 10)보다 낮게 설정 */
+    overflow: hidden;
+    pointer-events: none;
+  }
+  
+  .waves {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin-bottom: -7px;
+  }
+  
+  .parallax > use {
+    animation: move-forever 15s linear infinite;
+  }
+  
+  .parallax > use:nth-child(1) {
+    animation-delay: -2s;
+    animation-duration: 7s;
+  }
+  
+  .parallax > use:nth-child(2) {
+    animation-delay: -3s;
+    animation-duration: 10s;
+  }
+  
+  .parallax > use:nth-child(3) {
+    animation-delay: -4s;
+    animation-duration: 13s;
+  }
+  
+  .parallax > use:nth-child(4) {
+    animation-delay: -5s;
+    animation-duration: 20s;
+  }
+  
+  /* 부드러운 애니메이션을 위한 수정된 keyframe */
+  @keyframes move-forever {
+    0% {
+      transform: translate3d(-90px, 0, 0);
+    }
+    100% {
+      transform: translate3d(85px, 0, 0);
+    }
+  }
+  
+  /* 모바일 최적화 */
+  @media (max-width: 768px) {
+    .waveback-container {
+      height: 15vh;
+      min-height: 80px;
+    }
+  }
+  

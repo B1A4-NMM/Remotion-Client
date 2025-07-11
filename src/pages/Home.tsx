@@ -3,15 +3,16 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useGetDiaryContent } from "../api/queries/home/useGetDiary";
 import { useGetDiaryDate } from "../api/queries/home/useGetDiaryDate";
 
-import MonthlyCalendar from "../components/home/Calender";
-import MoodCircle from "../components/home/MoodCircle";
 import DiaryCards from "../components/home/DiaryCards";
+import Title from "../components/home/Title";
 
 import { useNavigate } from "react-router-dom";
 
+import { Canvas } from "@react-three/fiber";
+
 import "../styles/homeCard.css";
-import "../styles/moodCircle.css";
 import dayjs from "dayjs";
+import Blob from "../components/home/Blob/Blob";
 
 const Home = () => {
   const token = localStorage.getItem("accessToken") || "";
@@ -41,8 +42,6 @@ const Home = () => {
   );
 
   const todayDiary = todayData ? todayData : null;
-  console.log(todayDiary);
-  console.log(dayjs(selectedDate).format("YYYY-MM-DD"));
 
   const {
     data: diaryContent,
@@ -62,34 +61,23 @@ const Home = () => {
 
   return (
     <div className="base">
-      {/* 오류 메시지 표시 */}
-      {errorMessage && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 bg-red-500 text-white rounded-lg shadow-lg animate-pulse">
-          {errorMessage}
-        </div>
-      )}
+      {/*상단* 고정*/}
+      <Title />
 
-      {/* 상단 주간 캘린더 */}
-      <MonthlyCalendar onDateSelect={handleDateSelect} selectedDate={selectedDate} />
-
-      {/* MoodCircle */}
-      <MoodCircle
-        hasTodayDiary={hasTodayDiary}
-        todayDiary={todayDiary}
-        onClickWrite={() => {
-          const formattedDate = dayjs(selectedDate).format("YYYY-MM-DD");
-          navigate(`/diary/${formattedDate}`);
-        }}
-      />
+      <div className="container">
+        <Canvas>
+          <Blob diaryContent={diaryContent} />
+        </Canvas>
+      </div>
 
       {/* 하단 일기 카드들 */}
-      <DiaryCards
+      {/* <DiaryCards
         hasTodayDiary={hasTodayDiary}
         todayDiary={todayDiary}
         diaryContent={diaryContent}
         isContentLoading={isContentLoading}
         isContentError={isContentError}
-      />
+      /> */}
     </div>
   );
 };

@@ -196,7 +196,7 @@ const DiaryCards = ({
     <>
       {/* 기본 카드 */}
       <AnimatePresence>
-        {!isExpanded && (
+        {!isExpanded && hasTodayDiary && (
           <motion.div
             className="z-50 flex items-center justify-center p-4"
             variants={{
@@ -224,7 +224,7 @@ const DiaryCards = ({
           >
             <motion.div
               ref={containerRef}
-              className="card-container overflow-hidden cursor-pointer"
+              className="card-container overflow-hidden cursor-pointer rounded-3xl shadow-xl"
               style={{ position: "relative" }}
               onClick={handleCardClick}
               whileHover={{ scale: 1.02 }}
@@ -236,8 +236,9 @@ const DiaryCards = ({
                 className="absolute inset-0 w-full h-full rounded-3xl"
                 style={{
                   backgroundImage: diaryContent?.photo_path 
-                    ? `url(${diaryContent.photo_path})` 
-                    : "none", // 그라데이션 제거
+                      ? `url(${diaryContent.photo_path})` 
+                      : "none",
+                    backgroundColor: diaryContent?.photo_path ? "transparent" : "#ffffff",
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   backgroundRepeat: "no-repeat",
@@ -251,7 +252,7 @@ const DiaryCards = ({
 
 
               {/* 카드 컨텐츠 */}
-              <div className="relative z-10 backdrop-blur-sm rounded-3xl p-4 shadow-white border border-white/20">
+              <div className="relative z-10 backdrop-blur-sm rounded-3xl p-4 shadow-black ">
                 <div className="flex flex-col p-2">
                   
 
@@ -266,7 +267,7 @@ const DiaryCards = ({
                             style={{
                               backgroundColor: `${baseColors[person.emotionColor]}80`,
                               borderColor: baseColors[person.emotionColor],
-                              color: "white",
+                              color: "black",
                             }}
                           >
                             {person.name}
@@ -277,28 +278,22 @@ const DiaryCards = ({
                   )}
 
                   {/* 컨텐츠 미리보기 */}
+                  
                   <div className="mt-4">
-                    {isContentLoading && hasTodayDiary ? (
-                      <div className="flex items-center gap-2 text-white/70 text-sm">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white/70"></div>
+                    {isContentLoading ? (
+                      <div className="flex items-center gap-2 text-black/70 text-sm">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black/70"></div>
                         일기 내용을 불러오는 중...
                       </div>
                     ) : (
-                      <p
-                        className={clsx(
-                          "text-white/90 text-base leading-relaxed",
-                          diaryContent?.content || !hasTodayDiary ? "line-clamp-3" : "hidden"
-                        )}
-                      >
-                        {hasTodayDiary
-                          ? makePreview(todayDiary?.todayDiaries?.[0]?.content)  // content 필드 사용
-                          : "일기를 작성해주세요. 여기에는 일기 내용이 3줄까지 미리보기로 나타납니다."}
-                      </p>
-                    )}
-
-                    {/* 클릭 유도 텍스트 */}
-                    {hasTodayDiary && diaryContent && (
-                      <div className="text-white/50 text-xs mt-2 italic">탭하여 전체 내용 보기</div>
+                      <div>
+                        <p className="text-black/90 text-base leading-relaxed line-clamp-3">
+                          {makePreview(todayDiary?.todayDiaries?.[0]?.content)}
+                        </p>
+                        <div className="text-black/50 text-xs mt-2 italic">
+                          탭하여 전체 내용 보기
+                        </div>
+                      </div>
                     )}
                   </div>
 
@@ -379,7 +374,7 @@ const DiaryCards = ({
 
                 {/* 닫기 버튼 */}
                 <button
-                  className="absolute top-4 right-4 z-20 text-white/80 hover:text-white bg-black/30 rounded-full p-2 backdrop-blur-sm"
+                  className="absolute top-4 right-4 z-20 text-black/80 hover:text-black bg-black/30 rounded-full p-2 backdrop-blur-sm"
                   onClick={() => setIsExpanded(false)}
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -396,7 +391,7 @@ const DiaryCards = ({
                 <div className="relative z-10 p-4 mb-16">
                   {/* 날짜 정보 */}
                   {todayDiary?.todayDiaries?.[0] && (
-                    <div className="text-white/70 text-sm mb-6">
+                    <div className="text-black/70 text-sm mb-6">
                       {dayjs(todayDiary.todayDiaries[0].writtenDate).format(
                         "YYYY년 MM월 DD일"
                       )}
@@ -406,7 +401,7 @@ const DiaryCards = ({
                   {/* 인물 태그 */}
                   {getPeopleWithEmotions().length > 0 && (
                     <div className="mb-8">
-                      <h3 className="text-white/80 text-lg font-semibold mb-4">등장인물</h3>
+                      <h3 className="text-black/80 text-lg font-semibold mb-4">등장인물</h3>
                       <div className="flex flex-wrap gap-3">
                         {getPeopleWithEmotions().map((person, index) => (
                           <div key={index} className="relative group">
@@ -415,7 +410,7 @@ const DiaryCards = ({
                               style={{
                                 backgroundColor: `${baseColors[person.emotionColor]}80`,
                                 borderColor: baseColors[person.emotionColor],
-                                color: "white",
+                                color: "black",
                               }}
                             >
                               {person.name}
@@ -450,7 +445,7 @@ const DiaryCards = ({
                           e.currentTarget.style.display = "none";
                         }}
                       />
-                      <p className="text-white/50 text-xs mt-2 text-center">
+                      <p className="text-black/50 text-xs mt-2 text-center">
                         이미지를 클릭하면 크게 볼 수 있습니다
                       </p>
                     </div>
@@ -469,7 +464,7 @@ const DiaryCards = ({
                       >
                         {/* 닫기 버튼 */}
                         <button
-                          className="absolute top-4 right-4 z-[70] text-white/80 hover:text-white bg-black/50 rounded-full p-3 backdrop-blur-sm"
+                          className="absolute top-4 right-4 z-[70] text-black/80 hover:text-black bg-black/50 rounded-full p-3 backdrop-blur-sm"
                           onClick={() => setIsImageExpanded(false)}
                         >
                           <svg
@@ -504,7 +499,7 @@ const DiaryCards = ({
                         />
 
                         {/* 이미지 정보 */}
-                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white/70 text-sm text-center">
+                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-black/70 text-sm text-center">
                           <p>{displayDiary?.title}</p>
                           <p className="text-xs opacity-60">
                             {displayDiary &&
@@ -530,8 +525,8 @@ const DiaryCards = ({
                   ></div>
 
                   <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-6">
-                    <h3 className="text-white/80 text-lg font-semibold mb-4">일기 내용</h3>
-                    <div className="text-white/90 text-base leading-relaxed whitespace-pre-wrap">
+                    <h3 className="text-black/80 text-lg font-semibold mb-4">일기 내용</h3>
+                    <div className="text-black/90 text-base leading-relaxed blackspace-pre-wrap">
                       {displayDiary?.content || "내용을 불러올 수 없습니다."}
                     </div>
                   </div>
@@ -539,11 +534,11 @@ const DiaryCards = ({
                   {/* Todo 리스트 (있는 경우) */}
                   {displayDiary?.todos && displayDiary.todos.length > 0 && (
                     <div className="mt-6 bg-black/20 backdrop-blur-sm rounded-2xl p-6">
-                      <h3 className="text-white/80 text-lg font-semibold mb-4">할 일</h3>
+                      <h3 className="text-black/80 text-lg font-semibold mb-4">할 일</h3>
                       <ul className="space-y-2">
                         {displayDiary.todos.map((todo: any, index: number) => (
-                          <li key={index} className="text-white/90 flex items-center gap-2">
-                            <span className="w-2 h-2 bg-white/60 rounded-full"></span>
+                          <li key={index} className="text-black/90 flex items-center gap-2">
+                            <span className="w-2 h-2 bg-black/60 rounded-full"></span>
                             {todo.Todocontent}
                           </li>
                         ))}
@@ -582,7 +577,7 @@ const DiaryCards = ({
             onClick={handleCancelDelete}
           >
             <motion.div
-              className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl"
+              className="bg-black rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
@@ -646,6 +641,13 @@ const DiaryCards = ({
             </motion.div>
           </motion.div>
         )}
+        <div className="z-40 flex justify-center ">
+          <div className="flex flex-col items-center">
+            <h1 className="text-3xl font-bold mb-5"> 하루뒤 시작하기</h1>
+            <p className="text-xm text-stone-500"> 나만의 하루를 기록해 보세요.</p>
+            <p className="text-xm text-stone-500"> 시작하려면 중앙의 '+' 버튼을 탭하세요.</p>
+          </div>
+        </div>
       </AnimatePresence>
     </>
   );

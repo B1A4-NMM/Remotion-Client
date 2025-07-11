@@ -62,6 +62,7 @@ const Home = () => {
   return (
     <div className="base">
     
+      {/*상단* 고정*/}
       <Title/>
 
       <div className="container">

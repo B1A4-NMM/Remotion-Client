@@ -34,6 +34,7 @@ const Diary = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showLocationPicker, setShowLocationPicker] = useState(false); // 위치 모달 상태
+  const [inputFocused, setInputFocused] = React.useState(false); // 키패드 올라옴?
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } =
@@ -94,16 +95,6 @@ const Diary = () => {
   };
 
 
-  const handleStartListening = () => {
-    resetTranscript();
-    prevTranscriptRef.current = "";
-    SpeechRecognition.startListening({ language: "ko-KR", continuous: true });
-  };
-
-  const handleStopListening = () => {
-    SpeechRecognition.stopListening();
-  };
-
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -142,6 +133,8 @@ const Diary = () => {
     mutate(formData);
   };
 
+
+
   if (!browserSupportsSpeechRecognition) {
     return <p>⚠️ 브라우저가 음성 인식을 지원하지 않습니다.</p>;
   }
@@ -153,7 +146,7 @@ const Diary = () => {
       <DiaryTitle />
 
       {/* 일기 작성 폼 */}
-      <form onSubmit={handleSubmit(onSubmit)} className="h-auto flex flex-col p-4 pb-20">
+      <form onSubmit={handleSubmit(onSubmit)} className="h-screen flex flex-col p-4 pb-[100px]">
         <div className="flex-1 flex flex-col space-y-4 min-h-0 overflow-hidden">
           <div className="flex-1 flex flex-col min-h-0">
             <Textarea
@@ -163,22 +156,24 @@ const Diary = () => {
                 setAnimatedText(e.target.value);
                 setValue("content", e.target.value);
               }}
+              onFocus={() => setInputFocused(true)}
+              onBlur={() => setInputFocused(false)}
               placeholder="오늘은 무슨 일이 있으셨나요?"
-              className="resize-none flex-1 min-h-0"
+              className="resize-none h-[50vh] min-h-0"
             />
             {errors.content && (
               <p className="text-red-500 text-sm mt-1">{errors.content.message as string}</p>
             )}
           </div>
 
-          {/* 이미지 미리보기 영역 (업로드 버튼은 BottomNavi로 이동) */}
+          {/* 이미지 미리보기 영역 */}
           {preview && (
             <Card className="w-full h-48 mt-[1vh] border-2 border-gray-400 flex items-center justify-center overflow-hidden bg-transparent">
               <img src={preview} alt="미리보기" className="object-cover w-full h-full" />
             </Card>
           )}
 
-          {/* 숨겨진 파일 input - BottomNavi에서 사용 */}
+          {/* 숨겨진 파일 input */}
           <input
             type="file"
             accept="image/*"
@@ -202,20 +197,21 @@ const Diary = () => {
         onMicClick={handleMicClick}
         onLocationClick={handleLocationClick}
         isListening={listening}
+        inputFocused={inputFocused}
       />
 
       {/* 위치 선택 모달 */}
       {showLocationPicker && (
-      <LocationPicker
-        open={showLocationPicker}
-        onClose={() => setShowLocationPicker(false)}
-        onLocationSelect={loc => {
-          console.log("📥 부모에서 받은 위치:", loc);
-          setLocation(loc);
-          setShowLocationPicker(false);
-        }}
-      />
-    )}
+        <LocationPicker
+          open={showLocationPicker}
+          onClose={() => setShowLocationPicker(false)}
+          onLocationSelect={loc => {
+            console.log("📥 부모에서 받은 위치:", loc);
+            setLocation(loc);
+            // 주소 변환 (선택사항)
+          }}
+        />
+      )}
     </>
   );
 };

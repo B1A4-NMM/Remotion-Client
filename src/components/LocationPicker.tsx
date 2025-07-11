@@ -4,9 +4,10 @@ import {
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Loader } from "@googlemaps/js-api-loader";
 import { useState, useEffect, useRef } from "react";
-import { X } from "lucide-react";
+import { X, Check } from "lucide-react";
 
 interface LocationPickerProps {
   open: boolean;
@@ -16,9 +17,10 @@ interface LocationPickerProps {
 
 const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps) => {
   const [mapInitialized, setMapInitialized] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const markerRef = useRef<google.maps.Marker | null>(null);
-  const mapInstanceRef = useRef<google.maps.Map | null>(null); // 지도 인스턴스 참조 추가
+  const mapInstanceRef = useRef<google.maps.Map | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -51,9 +53,9 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
                 fullscreenControl: false,
               });
 
-              mapInstanceRef.current = map; // 지도 인스턴스 저장
+              mapInstanceRef.current = map;
 
-              // 현재 위치에 기본 마커 표시 (선택사항)
+              // 현재 위치에 기본 마커 표시
               const currentLocationMarker = new window.google.maps.Marker({
                 position: { lat: latitude, lng: longitude },
                 map,
@@ -71,11 +73,10 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
 
                 if (lat !== undefined && lng !== undefined) {
                   console.log("📍 클릭한 위치:", { lat, lng });
-                  onLocationSelect({ latitude: lat, longitude: lng });
+                  setSelectedLocation({ lat, lng }); // 위치 선택 상태만 저장 (아직 부모에게 전달하지 않음)
 
                   const position = { lat, lng };
 
-                  // 기존 선택 마커가 있으면 위치 이동, 없으면 새로 생성
                   if (markerRef.current) {
                     markerRef.current.setPosition(position);
                   } else {
@@ -87,11 +88,10 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
                         scaledSize: new window.google.maps.Size(40, 40),
                       },
                       title: "선택한 위치",
-                      animation: window.google.maps.Animation.DROP, // 드롭 애니메이션 추가
+                      animation: window.google.maps.Animation.DROP,
                     });
                   }
 
-                  // 선택한 위치로 지도 중심 이동
                   map.panTo(position);
                 }
               });
@@ -100,7 +100,7 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
             },
             error => {
               console.warn("위치 정보 가져오기 실패. 기본 위치로 지도 초기화", error);
-              const fallbackLatLng = { lat: 37.5665, lng: 126.978 }; // 서울 시청
+              const fallbackLatLng = { lat: 37.5665, lng: 126.978 };
               const map = new window.google.maps.Map(mapRef.current!, {
                 center: fallbackLatLng,
                 zoom: 13,
@@ -117,7 +117,7 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
 
                 if (lat !== undefined && lng !== undefined) {
                   console.log("📍 클릭한 위치:", { lat, lng });
-                  onLocationSelect({ latitude: lat, longitude: lng });
+                  setSelectedLocation({ lat, lng });
 
                   const position = { lat, lng };
 
@@ -150,14 +150,26 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [open, mapInitialized, onLocationSelect]);
+  }, [open, mapInitialized]);
+
+  // 확인 버튼 클릭 핸들러
+  const handleConfirm = () => {
+    if (selectedLocation) {
+      onLocationSelect({ 
+        latitude: selectedLocation.lat, 
+        longitude: selectedLocation.lng 
+      });
+      handleClose();
+    }
+  };
 
   // 모달이 닫힐 때 상태 초기화
   const handleClose = () => {
     onClose();
     setMapInitialized(false);
+    setSelectedLocation(null);
     if (markerRef.current) {
-      markerRef.current.setMap(null); // 마커 제거
+      markerRef.current.setMap(null);
     }
     markerRef.current = null;
     mapInstanceRef.current = null;
@@ -175,6 +187,7 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
       <DialogContent className="w-full max-w-md h-[70vh] p-0 rounded-t-2xl overflow-hidden">
         <DialogTitle className="sr-only">위치 선택</DialogTitle>
 
+        {/* X 버튼 */}
         <DialogClose 
           className="absolute top-2 right-2 z-20 text-white bg-black/50 rounded-full p-1 hover:bg-black/70"
           onClick={handleClose}
@@ -186,9 +199,26 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
         {/* 지도 영역 */}
         <div ref={mapRef} className="w-full h-full bg-gray-100 relative z-10" id="map-container" />
 
-        {/* 안내 메시지 */}
-        <div className="absolute bottom-4 left-4 right-4 z-20 bg-black/70 text-white text-sm p-2 rounded">
-          📍 지도를 클릭하여 위치를 선택하세요
+        {/* 하단 컨트롤 영역 */}
+        <div className="absolute bottom-4 left-4 right-4 z-20 space-y-2">
+          {/* 안내 메시지 */}
+          <div className="bg-black/70 text-white text-sm p-2 rounded">
+            {selectedLocation 
+              ? `✅ 위치 선택됨 (${selectedLocation.lat.toFixed(4)}, ${selectedLocation.lng.toFixed(4)})` 
+              : "📍 지도를 클릭하여 위치를 선택하세요"
+            }
+          </div>
+          
+          {/* 확인 버튼 */}
+          {selectedLocation && (
+            <Button
+              onClick={handleConfirm}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2"
+            >
+              <Check className="w-4 h-4" />
+              확인
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>

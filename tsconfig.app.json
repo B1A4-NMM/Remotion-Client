@@ -10,7 +10,6 @@
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
@@ -19,22 +18,21 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
 
-    // ✅ 여기에 추가
+    /* Path mapping */
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
-    }
-    "noUncheckedSideEffectImports": true,
+    },
 
-    // React Three Fiber 관련 설정 추가
-    "typeRoots": ["./node_modules/@types", "./src/types"],
+    /* Module compatibility */
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+
+    /* Type checking */
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
   "include": ["src/**/*", "global.d.ts"]
 }

@@ -61,25 +61,23 @@ const Home = () => {
 
   return (
     <div className="base">
-    
       {/*상단* 고정*/}
-      <Title/>
+      <Title />
 
       <div className="container">
         <Canvas>
-          <Blob diaryContent={diaryContent}/>
+          <Blob diaryContent={diaryContent} />
         </Canvas>
       </div>
 
-
       {/* 하단 일기 카드들 */}
-      <DiaryCards
+      {/* <DiaryCards
         hasTodayDiary={hasTodayDiary}
         todayDiary={todayDiary}
         diaryContent={diaryContent}
         isContentLoading={isContentLoading}
         isContentError={isContentError}
-      />
+      /> */}
     </div>
   );
 };

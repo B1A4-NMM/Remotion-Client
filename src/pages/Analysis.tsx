@@ -45,7 +45,8 @@ const CardList = () => {
 
   return (
     <>
-      <section className="hero-section">
+      <div>심층분석 페이지</div>
+      {/* <section className="hero-section">
         <div className="card-grid column-layout">
           {cards.map((card, index) => (
             <CardItem
@@ -59,7 +60,7 @@ const CardList = () => {
           ))}
         </div>
       </section>
-      <div className={`fade-screen ${isFading ? "fade-out" : ""}`} />
+      <div className={`fade-screen ${isFading ? "fade-out" : ""}`} /> */}
     </>
   );
 };

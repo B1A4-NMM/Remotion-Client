@@ -71,13 +71,13 @@ const Home = () => {
       </div>
 
       {/* 하단 일기 카드들 */}
-      {/* <DiaryCards
+      <DiaryCards
         hasTodayDiary={hasTodayDiary}
         todayDiary={todayDiary}
         diaryContent={diaryContent}
         isContentLoading={isContentLoading}
         isContentError={isContentError}
-      /> */}
+      />
     </div>
   );
 };

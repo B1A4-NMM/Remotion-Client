@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Image as LucideImage, Mic, MicOff } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { usePostDiary } from "@/api/queries/diary/usePostDiary.ts";
 import Loading6 from "../components/Loading/Loading6";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
@@ -12,17 +11,16 @@ import LocationPicker from "@/components/LocationPicker"; // 분리된 지도 �
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 
+import DiaryTitle from "@/components/DiaryTitle";
+
 const Diary = () => {
   const { date } = useParams();
 
-  const navigate = useNavigate();
-  const [mapOpen, setMapOpen] = useState(false);
   const {
     register,
     handleSubmit,
     reset,
     setValue,
-    getValues,
     formState: { errors },
   } = useForm();
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
@@ -133,6 +131,10 @@ const Diary = () => {
 
   return (
     <>
+      {/* 상단 날짜 */}
+      <DiaryTitle/>
+
+
       {/* 일기 작성 폼 */}
       <form onSubmit={handleSubmit(onSubmit)} className="h-screen flex flex-col p-4 pb-20">
         <div className="flex-1 flex flex-col space-y-4 min-h-0 overflow-hidden">

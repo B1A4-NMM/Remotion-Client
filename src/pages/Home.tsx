@@ -61,35 +61,32 @@ const Home = () => {
   }
 
   return (
-    <div className="base">
+    <div>
       {/* 오류 메시지 표시 */}
       {errorMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 bg-red-500 text-white rounded-lg shadow-lg animate-pulse">
           {errorMessage}
         </div>
       )}
-
-      {/* 상단 주간 캘린더 */}
-      <MonthlyCalendar onDateSelect={handleDateSelect} selectedDate={selectedDate} />
-
+      <div> home 화면 </div>
+      {/* <MonthlyCalendar onDateSelect={handleDateSelect} selectedDate={selectedDate} /> */}
       {/* MoodCircle */}
-      <MoodCircle
+      {/* <MoodCircle
         hasTodayDiary={hasTodayDiary}
         todayDiary={todayDiary}
         onClickWrite={() => {
           const formattedDate = dayjs(selectedDate).format("YYYY-MM-DD");
           navigate(`/diary/${formattedDate}`);
         }}
-      />
-
+      /> */}
       {/* 하단 일기 카드들 */}
-      <DiaryCards
+      {/* <DiaryCards
         hasTodayDiary={hasTodayDiary}
         todayDiary={todayDiary}
         diaryContent={diaryContent}
         isContentLoading={isContentLoading}
         isContentError={isContentError}
-      />
+      /> */}
     </div>
   );
 };

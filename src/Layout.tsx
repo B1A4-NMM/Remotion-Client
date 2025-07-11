@@ -12,14 +12,14 @@ export default function Layout() {
   const shouldShowNav = !HIDE_NAV_PATHS.includes(location.pathname);
 
   return (
-    <div className="w-full flex justify-center items-start min-h-screen">
+    <div className="w-full flex justify-center items-start min-h-screen font-pretendard">
       <div className="w-full max-w-[414px] min-h-screen relative bg-[#FAF6F4] text-black">
         <main>
           <Outlet />
           <Toaster
             position="top-center"
             expand={true}
-            richColors={false} // richColors를 false로 변경
+            richColors={false}
             closeButton={true}
             toastOptions={{
               duration: 4000,

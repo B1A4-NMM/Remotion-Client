@@ -85,7 +85,7 @@
 
 /* ✅ react-calendar 다크모드 기본 스타일 추가 */
 .react-calendar {
-  background-color: #1E1E1E;
+  background-color: #1e1e1e;
   color: #fff;
   border: none; /* 흰색 아웃라인 제거 */
   width: 100%;
@@ -132,4 +132,17 @@
   background: #555; /* 선택된 날짜: 진회색 배경 */
   color: white;
   border-radius: 9999px;
+}
+@font-face {
+  font-family: "Pretendard";
+  src: url("/src/assets/fonts/Pretendard-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("/src/assets/fonts/Pretendard-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
 }

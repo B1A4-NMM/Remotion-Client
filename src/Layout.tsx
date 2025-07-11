@@ -3,7 +3,7 @@ import BottomNavigation from "./components/BottomNavigation";
 import { Toaster } from "sonner";
 
 // 하단 네비게이션을 숨길 경로 목록
-const HIDE_NAV_PATHS = ["/signup", "/login"];
+const HIDE_NAV_PATHS = ["/signup", "/login", "/diary/2025-07-12"];
 
 export default function Layout() {
   const location = useLocation();

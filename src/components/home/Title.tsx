@@ -3,7 +3,7 @@ const Title = () => {
         <div className="absolute top-10 left-0 w-full z-50">
             {/* 메인 헤더 */}
             <div className="flex items-center justify-between px-4 py-3">
-                <h1 className="text-4xl font-bold text-gray-900">하루 기록</h1>
+                <h1 className="text-4xl font-bold text-gray-900 ml-2">하루 기록</h1>
                 
                 {/* 액션 버튼들 */}
                 <div className="flex items-center gap-2">

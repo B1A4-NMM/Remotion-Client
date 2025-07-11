@@ -10,7 +10,7 @@ export default function CalendarSection() {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col h-full">
       {/* View toggle */}
       <div className="text-lg font-bold flex gap-4 px-4 mt-4 mb-4">
         <button
@@ -35,12 +35,14 @@ export default function CalendarSection() {
       )}
 
     {view === "month" && (
+      <div className="h-full w-full">
       <Calendar
         value={selectedDate}
         onChange={(value) => setSelectedDate(value as Date)}
         view="month"
-        className="react-calendar rounded-lg p-2 bg-[#1E1E1E] text-white"
+        className="react-calendar rounded-lg p-2 bg-[#1E1E1E] text-white h-full"
       />
+      </div>
     )}
     </div>
   );

@@ -83,53 +83,57 @@
   height: 100%;
 }
 
-/* ✅ react-calendar 다크모드 기본 스타일 추가 */
 .react-calendar {
   background-color: #1E1E1E;
   color: #fff;
-  border: none; /* 흰색 아웃라인 제거 */
+  border: none;
   width: 100%;
   max-width: 100%;
-}
-
-.react-calendar__navigation {
+  height: 100%;
   display: flex;
-  justify-content: center; /* 센터 정렬 */
-  align-items: center;
-  margin-bottom: 1rem;
+  flex-direction: column;
 }
 
-.react-calendar__navigation button {
-  background: none;
-  color: #fff;
-  font-weight: 500;
-  border: none;
-}
-
-.react-calendar__navigation__label {
-  text-decoration: none; /* 밑줄 제거 */
-  border: none;
-  outline: none;
-  box-shadow: none;
-}
-
-.react-calendar__month-view__weekdays {
-  text-align: center;
+.react-calendar__month-view__days {
+  flex-grow: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
 }
 
 .react-calendar__tile {
-  text-align: center;
-  background: none;
+  flex: 1 0 14.28%;
+  height: 100px; /* ✅ 기본 크기 늘리기 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* ✅ 텍스트 상단 */
+  position: relative;
+  padding-top: 0.5rem;
+  font-size: 1rem;
 }
 
+/* 오늘 날짜: 빨간색 */
 .react-calendar__tile--now {
-  background: #f87171; /* 오늘: 빨간 배경 */
+  background: #ef4444 !important;
   color: white;
   border-radius: 9999px;
 }
 
+/* 선택된 날짜: 진회색 */
 .react-calendar__tile--active {
-  background: #555; /* 선택된 날짜: 진회색 배경 */
+  background: #555;
   color: white;
   border-radius: 9999px;
+}
+
+/* ✅ ToDo 매핑 공간 확보용 마커 (임시 자리 표시용) */
+.react-calendar__tile::after {
+  content: "";
+  margin-top: 4px;
+  width: 6px;
+  height: 6px;
+  background: #3b82f6; /* 파란색 마커 */
+  border-radius: 50%;
+  display: block;
 }

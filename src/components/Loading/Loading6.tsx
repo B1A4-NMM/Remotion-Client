@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
-const phrases = [
+const phrases: string[] = [
   "감정을 곱씹는 중이에요",
   "일기를 읽고 마음을 살펴보는 중입니다",
   "당신의 하루를 들여다보는 중이에요",
@@ -21,7 +21,8 @@ const phrases = [
 
 const COLORS = ["#82e79f", "#fcbcba", "#f8e76c", "#70cfe4"]; // green, red, yellow, blue
 
-const shuffleArray = array => {
+// ✅ 타입 명시
+const shuffleArray = (array: string[]): string[] => {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
@@ -29,19 +30,24 @@ const shuffleArray = array => {
   return array;
 };
 
-const easeInOut = t => {
+const easeInOut = (t: number): number => {
   const period = 200;
   return (Math.sin(t / period + 100) + 1) / 2;
 };
 
-const Loading6 = () => {
-  const phrasesRef = useRef(null);
-  const checksRef = useRef([]);
+// ✅ 체크 아이콘 타입 정의
+interface CheckRef {
+  circle: SVGCircleElement | null;
+  check: SVGPolygonElement | null;
+}
+
+const Loading6: React.FC = () => {
+  const phrasesRef = useRef<SVGGElement | null>(null);
+  const checksRef = useRef<CheckRef[]>([]);
   const colorMapRef = useRef<string[]>([]);
-  const shuffledPhrases = useRef(shuffleArray([...phrases]));
+  const shuffledPhrases = useRef<string[]>(shuffleArray([...phrases]));
 
   useEffect(() => {
-    // 랜덤 색상 맵핑
     colorMapRef.current = shuffledPhrases.current.map(() => {
       const randIdx = Math.floor(Math.random() * COLORS.length);
       return COLORS[randIdx];
@@ -55,6 +61,7 @@ const Loading6 = () => {
     const animate = () => {
       const now = new Date().getTime();
       if (!upwardGroup) return;
+
       upwardGroup.setAttribute("transform", `translate(0 ${currentY})`);
       currentY -= 1.35 * easeInOut(now);
 
@@ -122,14 +129,24 @@ const Loading6 = () => {
                     </text>
                     <g transform={`translate(10 ${y - 20}) scale(.9)`}>
                       <circle
-                        ref={el => (checksRef.current[i] = { ...checksRef.current[i], circle: el })}
+                        ref={el =>
+                          (checksRef.current[i] = {
+                            ...checksRef.current[i],
+                            circle: el,
+                          })
+                        }
                         cx="16"
                         cy="16"
                         r="15"
                         fill="rgba(255,255,255,0)"
                       />
                       <polygon
-                        ref={el => (checksRef.current[i] = { ...checksRef.current[i], check: el })}
+                        ref={el =>
+                          (checksRef.current[i] = {
+                            ...checksRef.current[i],
+                            check: el,
+                          })
+                        }
                         points="21.661,7.643 13.396,19.328 9.429,15.361 7.075,17.714 13.745,24.384 24.345,9.708"
                         fill="white"
                       />

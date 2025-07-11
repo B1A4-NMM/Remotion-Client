@@ -23,6 +23,13 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
+    // ✅ 여기에 추가
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+    "noUncheckedSideEffectImports": true,
+
     // React Three Fiber 관련 설정 추가
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "allowJs": true,

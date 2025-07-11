@@ -44,10 +44,7 @@ export default function Calendar() {
   }, [dragging]);
 
   return (
-    <div
-      ref={containerRef}
-      className="flex flex-col min-h-screen bg-black overflow-hidden"
-    >
+    <div ref={containerRef} className="flex flex-col min-h-screen bg-black overflow-hidden">
       {/* ✅ 상단 CalendarSection */}
       <section
         className="bg-[#1E1E1E] flex-none p-4 mb-1 rounded-b-3xl overflow-y-auto"

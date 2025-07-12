@@ -5,11 +5,9 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    /* --foreground: 0 0% 3.9%; */
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
-    /* --card-foreground: 0 0% 3.9%; */
     --card-foreground: 222.2 84% 4.9%;
 
     --popover: 0 0% 100%;
@@ -36,13 +34,9 @@
   }
 
   .dark {
-    /* --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%; */
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 
-    /* --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%; */
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
 
@@ -84,56 +78,112 @@
 }
 
 .react-calendar {
-  background-color: #1E1E1E;
-  color: #fff;
-  border: none;
+  background-color: rgba(250, 246, 244, 0.8); /* ✅ 유리 효과 */
+  /*backdrop-filter: blur(80%) !important; */
+  border: 2px solid rgba(75, 2, 2, 0.3);
+  
+  color: #000;
   width: 100%;
   max-width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  
 }
 
-.react-calendar__month-view__days {
-  flex-grow: 1;
+.react-calendar__navigation {
   display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  color: #000;
 }
+
+.react-calendar__month-view__weekdays {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  font-weight: bold;
+  color: #888;
+  padding: 0.5rem 0;
+}
+
+/* 전체 요일 기본은 검정 */
+.react-calendar__month-view__weekdays__weekday {
+  color: #000;
+}
+
+/* --- 요일 헤더 색상 --- */
+/* 일요일 (첫 번째 열): 요일 텍스트만 */
+.react-calendar__month-view__weekdays__weekday:nth-child(7) abbr {
+  color: #ef4444; /* 빨강 */
+}
+
+/* 토요일 (마지막 열): 요일 텍스트만 */
+.react-calendar__month-view__weekdays__weekday:nth-child(6) abbr {
+  color: #3b82f6; /* 파랑 */
+}
+
+/* --- 날짜 숫자 색상 --- */
+/* 일요일 날짜 숫자: 7, 14, 21... */
+.react-calendar__tile:nth-child(7n) {
+  color: #ef4444; /* 빨강 */
+}
+
+/* 토요일 날짜 숫자: 6, 13, 20... */
+.react-calendar__tile:nth-child(7n-1) {
+  color: #3b82f6; /* 파랑 */
+}
+
 
 .react-calendar__tile {
   flex: 1 0 14.28%;
-  height: 100px; /* ✅ 기본 크기 늘리기 */
+  height: 83px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-start; /* ✅ 텍스트 상단 */
-  position: relative;
-  padding-top: 0.5rem;
+  align-items: flex-start;
+  justify-content: flex-start;
   font-size: 1rem;
+  position: relative;
+  padding: 0.4rem;
+  background: none;
+  border: none;
 }
 
-/* 오늘 날짜: 빨간색 */
 .react-calendar__tile--now {
-  background: #ef4444 !important;
-  color: white;
-  border-radius: 9999px;
+  background: none !important;
+  border: 2px solid #6983E3 !important;
+  color: #000;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
 }
 
-/* 선택된 날짜: 진회색 */
 .react-calendar__tile--active {
-  background: #555;
-  color: white;
-  border-radius: 9999px;
+  background: none !important; /*important쓰면 라이브러리보다 우선 사용됨*/
+  border: 2px solid #EF7C80 !important;
+  color: #000;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
 }
 
-/* ✅ ToDo 매핑 공간 확보용 마커 (임시 자리 표시용) */
 .react-calendar__tile::after {
   content: "";
-  margin-top: 4px;
+  margin-top: 0.5rem;
   width: 6px;
   height: 6px;
-  background: #3b82f6; /* 파란색 마커 */
   border-radius: 50%;
   display: block;
+  background-color: transparent;
+}
+
+.react-calendar__tile abbr {
+  text-decoration: none;
+  font-weight: 400;
+  
+}
+
+.react-calendar_title abbr::before{
+  content: attr(title); 
 }

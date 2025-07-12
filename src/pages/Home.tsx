@@ -5,7 +5,7 @@ import { useGetDiaryDate } from "../api/queries/home/useGetDiaryDate";
 
 import DiaryCards from "../components/home/DiaryCards";
 import Title from "../components/home/Title";
-
+import Index from "../components/home/Index";
 import { useNavigate } from "react-router-dom";
 
 import { Canvas } from "@react-three/fiber";
@@ -49,8 +49,6 @@ const Home = () => {
     isError: isContentError,
   } = useGetDiaryContent(token, todayDiary?.todayDiaries?.[0]?.diaryId?.toString() || "sample");
 
-  const hasTodayDiary = todayDiary?.todayDiaries?.length ? true : false;
-
   if (isLoading) {
     return (
       <div className="base flex items-center justify-center min-h-screen">
@@ -61,23 +59,9 @@ const Home = () => {
 
   return (
     <div className="base">
-      {/*상단* 고정*/}
       <Title />
 
-      <div className="container">
-        <Canvas>
-          <Blob diaryContent={diaryContent} />
-        </Canvas>
-      </div>
-
-      {/* 하단 일기 카드들 */}
-      {/* <DiaryCards
-        hasTodayDiary={hasTodayDiary}
-        todayDiary={todayDiary}
-        diaryContent={diaryContent}
-        isContentLoading={isContentLoading}
-        isContentError={isContentError}
-      /> */}
+      <Index />
     </div>
   );
 };

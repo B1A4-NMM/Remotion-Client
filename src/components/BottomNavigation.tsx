@@ -5,7 +5,7 @@ export default function BottomNavigation() {
   const path = location.pathname.toLowerCase();
 
   return (
-    <div className="relative w-full h-[84px] mx-auto z-50">
+    <div className="relative w-full h-[84px] mx-auto z-40">
       {/* ✅ SVG는 절대 그대로 유지 + 일부 아이콘은 동적으로 색상 변경 */}
       <svg
         width={393}

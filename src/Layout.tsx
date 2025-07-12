@@ -3,7 +3,7 @@ import BottomNavigation from "./components/BottomNavigation";
 import { Toaster } from "sonner";
 
 // 하단 네비게이션을 숨길 경로 목록
-const HIDE_NAV_PATHS = ["/signup", "/login"];
+const HIDE_NAV_PATHS = ["/signup", "/login", "/diary/2025-07-12"];
 
 export default function Layout() {
   const location = useLocation();
@@ -12,14 +12,14 @@ export default function Layout() {
   const shouldShowNav = !HIDE_NAV_PATHS.includes(location.pathname);
 
   return (
-    <div className="w-full flex justify-center items-start min-h-screen overflow-hidden">
-      <div className="w-full max-w-[414px] min-h-screen relative bg-[#FAF6F4] text-black">
-        <main>
+    <div className="w-full flex justify-center items-start h-screen font-pretendard">
+      <div className="w-full max-w-[414px] h-screen flex flex-col relative bg-[#FAF6F4] text-black">
+        <main className="flex-1 h-full ">
           <Outlet />
           <Toaster
             position="top-center"
             expand={true}
-            richColors={false} // richColors를 false로 변경
+            richColors={false}
             closeButton={true}
             toastOptions={{
               duration: 4000,

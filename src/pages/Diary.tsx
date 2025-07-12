@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Image as LucideImage, Mic, MicOff } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { usePostDiary } from "@/api/queries/diary/usePostDiary.ts";
 import Loading6 from "../components/Loading/Loading6";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
@@ -12,17 +11,17 @@ import LocationPicker from "@/components/LocationPicker"; // 분리된 지도 �
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 
+import DiaryTitle from "@/components/diary/DiaryTitle";
+import BottomNavi from "@/components/diary/BottomNavi";
+
 const Diary = () => {
   const { date } = useParams();
 
-  const navigate = useNavigate();
-  const [mapOpen, setMapOpen] = useState(false);
   const {
     register,
     handleSubmit,
     reset,
     setValue,
-    getValues,
     formState: { errors },
   } = useForm();
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
@@ -30,9 +29,13 @@ const Diary = () => {
   if (!isValidDate) {
     return <div className="p-4 text-red-500">❌ 유효하지 않은 날짜입니다: {date}</div>;
   }
+
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showLocationPicker, setShowLocationPicker] = useState(false); // 위치 모달 상태
+  const [inputFocused, setInputFocused] = useState(false); // 키패드 올라옴?
+  const [keyboardHeight, setKeyboardHeight] = useState(0); // 키패드 높이
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } =
@@ -77,14 +80,40 @@ const Diary = () => {
     return () => clearInterval(interval);
   }, [animationQueue.current.length, listening]);
 
-  const handleStartListening = () => {
-    resetTranscript();
-    prevTranscriptRef.current = "";
-    SpeechRecognition.startListening({ language: "ko-KR", continuous: true });
+  // 키보드 높이 감지 useEffect 추가
+  useEffect(() => {
+    const handleResize = () => {
+      if (inputFocused) {
+        const viewport = window.visualViewport;
+        if (viewport) {
+          const height = window.innerHeight - viewport.height;  // 키보드 높이 계산
+          setKeyboardHeight(height > 0 ? height : 0);
+        }
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.visualViewport?.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.visualViewport?.removeEventListener('resize', handleResize);
+    };
+  }, [inputFocused]);
+
+  // BottomNavi에서 사용할 핸들러 함수들
+  const handleMicClick = () => {
+    if (listening) {
+      SpeechRecognition.stopListening();
+    } else {
+      resetTranscript();
+      prevTranscriptRef.current = "";
+      SpeechRecognition.startListening({ language: "ko-KR", continuous: true });
+    }
   };
 
-  const handleStopListening = () => {
-    SpeechRecognition.stopListening();
+  const handleLocationClick = () => {
+    setShowLocationPicker(true);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,85 +162,70 @@ const Diary = () => {
 
   return (
     <>
-      {/* 일기 작성 폼 */}
-      <form onSubmit={handleSubmit(onSubmit)} className="h-screen flex flex-col p-4 pb-20">
-        <div className="flex-1 flex flex-col space-y-4 min-h-0 overflow-hidden">
-          <div className="flex-1 flex flex-col min-h-0">
-            <Textarea
-              {...register("content", { required: "내용을 작성해주세요" })}
-              value={animatedText}
-              onChange={e => {
-                setAnimatedText(e.target.value);
-                setValue("content", e.target.value);
-              }}
-              placeholder="오늘은 무슨 일이 있으셨나요?"
-              className="resize-none flex-1 min-h-0"
-            />
-            {errors.content && (
-              <p className="text-red-500 text-sm mt-1">{errors.content.message as string}</p>
-            )}
-            <div className="flex justify-end mt-2">
-              <LocationPicker
-                onLocationSelect={loc => {
-                  console.log("📥 부모에서 받은 위치:", loc);
-                  setLocation(loc); // 상태 저장도 가능
+      <div className="relative flex flex-col h-screen border">
+        <DiaryTitle />
+        {/* 일기 작성 폼 - h-screen 제거하여 중복 높이 방지 */}
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col p-4 flex-1">
+          <div className="flex-1 flex flex-col space-y-4 min-h-0 overflow-hidden">
+            <div className="flex-1 flex flex-col min-h-0">
+              <Textarea
+                {...register("content", { required: "내용을 작성해주세요" })}
+                value={animatedText}
+                onChange={e => {
+                  setAnimatedText(e.target.value);
+                  setValue("content", e.target.value);
                 }}
+                onFocus={() => setInputFocused(true)}
+                onBlur={() => setInputFocused(false)}
+                placeholder="오늘은 무슨 일이 있으셨나요?"
+                className="resize-none flex-1 min-h-0"
               />
-
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={listening ? handleStopListening : handleStartListening}
-                className={`flex items-center gap-2 text-sm px-4 py-2 ${
-                  listening ? "!bg-red-800 !text-white" : "!bg-blue-800 !text-white"
-                } hover:!bg-red-600 hover:!text-white`}
-              >
-                {listening ? (
-                  <>
-                    <MicOff size={16} />
-                    일기 듣는 중
-                  </>
-                ) : (
-                  <>
-                    <Mic size={16} />
-                    일기 말하기
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* 이미지 업로드 */}
-          <label htmlFor="image-upload">
-            <Card className="w-full h-48 mt-[1vh] border-dashed border-2 border-gray-400 flex items-center justify-center cursor-pointer overflow-hidden bg-transparent">
-              {preview ? (
-                <img src={preview} alt="미리보기" className="object-cover w-full h-full" />
-              ) : (
-                <div className="flex flex-col items-center text-white">
-                  <LucideImage className="w-8 h-8 mb-2 text-white" />
-                </div>
+              {errors.content && (
+                <p className="text-red-500 text-sm mt-1">{errors.content.message as string}</p>
               )}
-            </Card>
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            id="image-upload"
-            {...register("image")}
-            onChange={handleImageChange}
-            className="hidden"
-            ref={fileInputRef}
-          />
-        </div>
-
-        <div className="pt-4">
-          <Button type="submit" className="w-full bg-white text-black hover:bg-gray-200">
-            저장하기
-          </Button>
-        </div>
-      </form>
+            </div>
+  
+            {preview && (
+              <Card className="w-full h-48 mt-[1vh] border-2 border-gray-400 flex items-center justify-center overflow-hidden bg-transparent">
+                <img src={preview} alt="미리보기" className="object-cover w-full h-full" />
+              </Card>
+            )}
+  
+            <input
+              type="file"
+              accept="image/*"
+              id="image-upload"
+              {...register("image")}
+              onChange={handleImageChange}
+              className="hidden"
+              ref={fileInputRef}
+            />
+          </div>
+        </form>
+  
+        {/* BottomNavi 컴포넌트 */}
+        <BottomNavi
+          onMicClick={handleMicClick}
+          onLocationClick={handleLocationClick}
+          isListening={listening}
+          keyboardHeight={keyboardHeight}
+        />
+      </div>
+      {/* 위치 선택 모달 */}
+      {showLocationPicker && (
+        <LocationPicker
+          open={showLocationPicker}
+          onClose={() => setShowLocationPicker(false)}
+          onLocationSelect={loc => {
+            console.log("📥 부모에서 받은 위치:", loc);
+            setLocation(loc);
+            // 주소 변환 (선택사항)
+          }}
+        />
+      )}
     </>
   );
-};
+}
+  
 
 export default Diary;

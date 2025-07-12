@@ -60,7 +60,7 @@ export default function BottomNavigation() {
       {/* ✅ 클릭 영역 덧씌우기 */}
       <div className="absolute inset-0 flex justify-between px-5 items-end pb-4">
         <Link to="/" className="w-[48px] h-[48px]" />
-        <Link to="/report" className="w-[48px] h-[48px]" />
+        <Link to="/routine" className="w-[48px] h-[48px]" />
         <Link to="/diary/2025-07-12" className="w-[60px] h-[60px] -mt-4 z-10 rounded-full" />
         <Link to="/analysis" className="w-[48px] h-[48px]" />
         <Link to="/map" className="w-[48px] h-[48px]" />

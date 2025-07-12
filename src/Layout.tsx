@@ -12,7 +12,7 @@ export default function Layout() {
   const shouldShowNav = !HIDE_NAV_PATHS.includes(location.pathname);
 
   return (
-    <div className="w-full flex justify-center items-start h-screen font-pretendard">
+    <div className="w-full flex justify-center items-start h-[100dvh] font-pretendard overflow-hidden">
       <div className="w-full max-w-[414px] h-screen flex flex-col relative bg-[#FAF6F4] text-black">
         <main className="flex-1 h-full ">
           <Outlet />

@@ -3,7 +3,7 @@ import Title from "@/components/recommend/Title";
 const Routine=()=>{
 
     return(
-        <div className="relative flex flex-col h-screen border">
+        <div className="">
             <Title/>
 
             <div className="flex justify-between">

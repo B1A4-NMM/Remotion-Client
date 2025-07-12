@@ -2,22 +2,26 @@ interface BottomNaviProps {
   onMicClick: () => void;
   onLocationClick: () => void;
   onImageClick: () => void;
+  onSaveClick: () => void; // 저장 버튼 핸들러 추가
   isListening: boolean;
   isPhotoActive: boolean;
   isLocationActive: boolean;
+  isSaveEnabled: boolean; // 저장 버튼 활성화 상태 추가
   keyboardHeight: number;
-  }
+}
 
-  const BottomNavi = ({
+const BottomNavi = ({
   onMicClick,
   onLocationClick,
   onImageClick,
+  onSaveClick, // 저장 버튼 핸들러
   isListening,
   isPhotoActive,
   isLocationActive,
+  isSaveEnabled, // 저장 버튼 활성화 상태
   keyboardHeight,
-    }: BottomNaviProps) => {
-    return (
+}: BottomNaviProps) => {
+  return (
     <div
     className={`absolute bottom-0 w-full h-[84px] z-50 flex justify-center transition-transform duration-300 ease-in-out`}
     style={{
@@ -31,6 +35,7 @@ interface BottomNaviProps {
         viewBox="0 0 178 72"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
+        className="relative z-10" // z-index 명시
       >
         <g filter="url(#filter0_d_548_3742)">
           <rect
@@ -97,26 +102,43 @@ interface BottomNaviProps {
         </defs>
       </svg>
 
-      {/* ✅ 클릭 영역을 정확한 아이콘 위치에 덧씌우기 */}
-      <div className="absolute inset-0 flex justify-center px-3 items-end pb-6 pr-5">
-      {/* 마이크 아이콘 버튼 */}
-      <button
-        className="w-[56px] h-[56px] rounded-full transition-all"
-        onClick={onMicClick}
-      />
+       {/* ✅ 클릭 영역을 정확한 아이콘 위치에 덧씌우기 */}
+       <div className="absolute inset-0 flex justify-center items-end pr-20 pb-7">
+        {/* 마이크 아이콘 버튼 */}
+        <button
+          className="w-[50px] h-[50px] rounded-full transition-all"
+          onClick={onMicClick}
+          style={{ zIndex: 30 }}
+        />
 
-      {/* 카메라 아이콘 버튼 */}
-      <button
-        className="w-[52px] h-[52px] rounded-full cursor-pointer flex items-center justify-center transition-all "
-        onClick={onImageClick}
-      />
+        {/* 카메라 아이콘 버튼 */}
+        <button
+          className="w-[50px] h-[50px] rounded-full cursor-pointer flex items-center justify-center transition-all"
+          onClick={onImageClick}
+          style={{ zIndex: 30 }}
+        />
 
-      {/* 위치 아이콘 버튼 */}
+        {/* 위치 아이콘 버튼 */}
+        <button
+          className="w-[50px] h-[50px] rounded-full transition-all"
+          onClick={onLocationClick}
+          style={{ zIndex: 30 }}
+        />
+      </div>
+
+      {/* 저장 버튼 - 조건부 스타일 적용 */}
       <button
-        className="w-[52px] h-[52px] rounded-full transition-all"
-        onClick={onLocationClick}
-      />
-    </div>
+        className={`size-fit text-xl rounded-full pl-6 pr-6 pt-4 pb-4 mt-2 transition-all duration-300 ${
+          isSaveEnabled
+            ? "bg-black text-white hover:bg-gray-800 cursor-pointer"
+            : "bg-gray-400 text-gray-600 cursor-not-allowed"
+        }`}
+        onClick={isSaveEnabled ? onSaveClick : undefined}
+        disabled={!isSaveEnabled}
+        style={{ zIndex: 30 }} // 인라인 스타일로도 보장
+      >
+        저장
+      </button>
     </div>
   );
 };

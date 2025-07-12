@@ -5,8 +5,7 @@ import FolderCardList from "@/components/routine/FolderCardList";
 const Routine=()=>{
 
     return(
-
-        <div >
+        <div className="">
             <Title/>
 
             <div className="mt-[78px] flex justify-between px-7">

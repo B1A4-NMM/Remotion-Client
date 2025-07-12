@@ -30,7 +30,7 @@ const Meditation = ({ type = 1, onClose }: MeditationProps) => {
         setSound("/assets/audio/Tranquility.mp3");
         break;
       case 3:
-        setSound("/assets/audio/MindWave.mp3");
+        setSound("/assets/audio/Mindwave.mp3");
         break;
       default:
         setSound("");

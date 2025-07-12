@@ -48,12 +48,12 @@ export default function BottomNavigation() {
           fill={path === "/analysis" ? "black" : "#B6B6B6"}
         />
 
-        {/* Map 아이콘 복원 */}
+        {/* 캘린더 아이콘 복원 */}
         <path
           fillRule="evenodd"
           clipRule="evenodd"
           d="M327.333 39.0002C327.333 32.5602 332.548 27.3335 339 27.3335C345.44 27.3335 350.666 32.5602 350.666 39.0002C350.666 45.4518 345.44 50.6668 339 50.6668C332.548 50.6668 327.333 45.4518 327.333 39.0002ZM341.601 41.1352L343.491 35.1618C343.62 34.7535 343.246 34.3685 342.838 34.4968L336.865 36.3635C336.62 36.4452 336.421 36.6318 336.351 36.8768L334.485 42.8618C334.356 43.2585 334.741 43.6435 335.138 43.5152L341.088 41.6485C341.333 41.5785 341.531 41.3802 341.601 41.1352Z"
-          fill={path === "/map" ? "black" : "#B6B6B6"}
+          fill={path === "/calendar" ? "black" : "#B6B6B6"}
         />
       </svg>
 
@@ -63,7 +63,7 @@ export default function BottomNavigation() {
         <Link to="/report" className="w-[48px] h-[48px]" />
         <Link to="/diary/2025-07-12" className="w-[60px] h-[60px] -mt-4 z-10 rounded-full" />
         <Link to="/analysis" className="w-[48px] h-[48px]" />
-        <Link to="/map" className="w-[48px] h-[48px]" />
+        <Link to="/calendar" className="w-[48px] h-[48px]" />
       </div>
     </div>
   );

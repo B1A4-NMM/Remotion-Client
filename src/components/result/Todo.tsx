@@ -7,11 +7,13 @@ import { toast } from 'sonner';
 import { useCreateTodo } from '@/api/queries/todo/useCreateTodo';
 
 interface TodosProps {
-  todos: string[]; // Result.tsx에서 전달받은 투두 리스트
+  todos: string[]; // Result.tsx에서 전달받은 투두 리스트 :  결과로 받은 todo
 }
 
 const Todos: React.FC<TodosProps> = ({ todos }) => {
+
   const { mutate } = useCreateTodo();
+
   // todos가 빈 배열이면 아무것도 렌더링하지 않음
   if (!todos || todos.length === 0) {
     return null;

@@ -1,6 +1,6 @@
 import React from "react";
 import { Canvas } from "@react-three/fiber";
-import Blob from "../home/Blob/Blob";
+import Blob from "../Blob/Blob";
 
 const Index = () => {
   return (

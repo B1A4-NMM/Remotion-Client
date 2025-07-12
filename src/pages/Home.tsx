@@ -12,7 +12,7 @@ import { Canvas } from "@react-three/fiber";
 
 import "../styles/homeCard.css";
 import dayjs from "dayjs";
-import Blob from "../components/home/Blob/Blob";
+import Blob from "../components/Blob/Blob";
 
 const Home = () => {
   const token = localStorage.getItem("accessToken") || "";

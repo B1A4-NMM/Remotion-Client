@@ -34,7 +34,8 @@ const Diary = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showLocationPicker, setShowLocationPicker] = useState(false); // 위치 모달 상태
-  const [inputFocused, setInputFocused] = React.useState(false); // 키패드 올라옴?
+  const [inputFocused, setInputFocused] = useState(false); // 키패드 올라옴?
+  const [keyboardHeight, setKeyboardHeight] = useState(0); // 키패드 높이
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } =
@@ -78,6 +79,27 @@ const Diary = () => {
     }, 50);
     return () => clearInterval(interval);
   }, [animationQueue.current.length, listening]);
+
+  // 키보드 높이 감지 useEffect 추가
+  useEffect(() => {
+    const handleResize = () => {
+      if (inputFocused) {
+        const viewport = window.visualViewport;
+        if (viewport) {
+          const height = window.innerHeight - viewport.height;  // 키보드 높이 계산
+          setKeyboardHeight(height > 0 ? height : 0);
+        }
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.visualViewport?.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.visualViewport?.removeEventListener('resize', handleResize);
+    };
+  }, [inputFocused]);
 
   // BottomNavi에서 사용할 핸들러 함수들
   const handleMicClick = () => {
@@ -142,8 +164,8 @@ const Diary = () => {
     <>
       <div className="relative flex flex-col h-screen border">
         <DiaryTitle />
-        {/* 일기 작성 폼 */}
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col p-4 h-screen">
+        {/* 일기 작성 폼 - h-screen 제거하여 중복 높이 방지 */}
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col p-4 flex-1">
           <div className="flex-1 flex flex-col space-y-4 min-h-0 overflow-hidden">
             <div className="flex-1 flex flex-col min-h-0">
               <Textarea
@@ -162,13 +184,13 @@ const Diary = () => {
                 <p className="text-red-500 text-sm mt-1">{errors.content.message as string}</p>
               )}
             </div>
-
+  
             {preview && (
               <Card className="w-full h-48 mt-[1vh] border-2 border-gray-400 flex items-center justify-center overflow-hidden bg-transparent">
                 <img src={preview} alt="미리보기" className="object-cover w-full h-full" />
               </Card>
             )}
-
+  
             <input
               type="file"
               accept="image/*"
@@ -180,13 +202,13 @@ const Diary = () => {
             />
           </div>
         </form>
-
+  
         {/* BottomNavi 컴포넌트 */}
         <BottomNavi
           onMicClick={handleMicClick}
           onLocationClick={handleLocationClick}
           isListening={listening}
-          inputFocused={inputFocused}
+          keyboardHeight={keyboardHeight}
         />
       </div>
       {/* 위치 선택 모달 */}
@@ -203,6 +225,7 @@ const Diary = () => {
       )}
     </>
   );
-};
+}
+  
 
 export default Diary;

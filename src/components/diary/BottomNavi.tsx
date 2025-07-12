@@ -2,20 +2,21 @@ interface BottomNaviProps {
   onMicClick: () => void;
   onLocationClick: () => void;
   isListening: boolean;
-  inputFocused: boolean;
+  keyboardHeight: number;
 }
 
 const BottomNavi = ({
   onMicClick,
   onLocationClick,
   isListening,
-  inputFocused,
+  keyboardHeight,
 }: BottomNaviProps) => {
   return (
     <div
-      className={`absolute bottom-0 w-full h-[84px] z-50 flex justify-center transition-transform duration-300 ease-in-out ${
-        inputFocused ? "-translate-y-[300px]" : "translate-y-0"
-      }`}
+    className={`absolute bottom-0 w-full h-[84px] z-50 flex justify-center transition-transform duration-300 ease-in-out`}
+    style={{
+      transform:  `translateY(-${keyboardHeight}px)`,
+    }}
     >
       {/* ✅ SVG는 절대 그대로 유지 */}
       <svg

@@ -12,6 +12,8 @@ const Meditation = ({ type = 1, onClose }: MeditationProps) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isStart, setIsStart] = useState(false);
   const [sound, setSound] = useState("");
+
+  console.log(sound);
   
   // 명상 단계 관리
   const [meditationPhase, setMeditationPhase] = useState('start');
@@ -284,7 +286,7 @@ const Meditation = ({ type = 1, onClose }: MeditationProps) => {
       </button>
 
       {/* 배경 음악 */}
-      <audio ref={audioRef} loop className="hidden">
+      <audio ref={audioRef} key={sound} loop className="hidden">
         <source src={sound} type="audio/mpeg" />
       </audio>
 

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useGetDiaryContent } from "../api/queries/home/useGetDiary";
 import { useGetDiaryDate } from "../api/queries/home/useGetDiaryDate";
-
+import { useGetHomeData } from "../api/queries/home/useGetHome";
 import DiaryCards from "../components/home/DiaryCards";
 import Title from "../components/home/Title";
 import Index from "../components/home/Index";
@@ -41,27 +41,32 @@ const Home = () => {
     dayjs(selectedDate).format("YYYY-MM-DD")
   );
 
-  const todayDiary = todayData ? todayData : null;
+  // 새로운 Home API 호출
+  const { data: homeData, isLoading: homeLoading, error: homeError } = useGetHomeData(token);
 
-  const {
-    data: diaryContent,
-    isLoading: isContentLoading,
-    isError: isContentError,
-  } = useGetDiaryContent(token, todayDiary?.todayDiaries?.[0]?.diaryId?.toString() || "sample");
+  // 데이터 확인용 console.log
+  console.log("=== Home API 데이터 확인 ===");
+  console.log("homeData:", homeData);
+  console.log("homeLoading:", homeLoading);
+  console.log("homeError:", homeError);
+  console.log("token:", token);
 
-  if (isLoading) {
-    return (
-      <div className="base flex items-center justify-center min-h-screen">
-        <div className="text-white">로딩 중...</div>
-      </div>
-    );
+  if (homeData) {
+    console.log("연속 기록:", homeData.continuousWritingDate);
+    console.log("이 달의 감정:", homeData.emotionCountByMonth);
+    console.log("누적 하루뒤:", homeData.totalDiaryCount);
+    console.log("일기 목록:", homeData.diaries);
   }
 
+  const todayDiary = todayData ? todayData : null;
+
   return (
-    <div className="base">
+    <div className="h-screen flex flex-col">
       <Title />
 
-      <Index />
+      <DiaryCards />
+
+      {/* <Index className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" /> */}
     </div>
   );
 };

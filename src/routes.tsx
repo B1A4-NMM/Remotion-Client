@@ -13,7 +13,7 @@ import Loading6 from "./components/Loading/Loading6";
 import Analysis from "./pages/Analysis";
 import AboutMe from "./pages/AboutMe";
 import Map from "./pages/Map";
-import Video from "./pages/Video";
+import Video from "./components/recommend/Video";
 import Routine from "./pages/Routine";
 import Contents from "./pages/Contents";
 

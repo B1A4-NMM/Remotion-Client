@@ -13,11 +13,13 @@ import {
 } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Trash2 } from "lucide-react";
+import { useDeleteDiary } from "../../api/queries/home/useDeleteDiary";
+import dayjs from "dayjs";
 
 interface Diary {
   id: number;
   emotion: string;
-  emotions: string[];
+  emotions: { emotion: string; intensity: number }[];
   targets: string[];
   activities: string[];
   photoUrl: string | string[] | null;
@@ -35,6 +37,9 @@ interface DiaryCardsProps {
 
 const DiaryCards: React.FC<DiaryCardsProps> = props => {
   const { diaries } = props;
+  const deleteDiaryMutation = useDeleteDiary();
+  const token = localStorage.getItem("accessToken") || "";
+
   return (
     <div className="flex flex-col gap-6 w-full max-w-[420px] mx-auto">
       {/* 기존 하드코딩 예시 카드 (수정하지 않음) */}
@@ -80,14 +85,17 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
                 <div className="flex flex-col gap-3">
                   <Button
                     variant="outline"
-                    className="flex items-center justify-center gap-2  rounded-xl"
+                    className="flex items-center justify-center gap-2 rounded-xl"
                   >
                     <img src={BookmarkIcon} alt="북마크" className="w-4 h-4" />
-                    북마크
+                    북마크하기
                   </Button>
                   <Button
                     variant="outline"
-                    className="flex items-center justify-center gap-2  rounded-xl"
+                    className="flex items-center justify-center gap-2 rounded-xl"
+                    onClick={() => {
+                      deleteDiaryMutation.mutate({ token, diaryId: "1" });
+                    }}
                   >
                     <Trash2 className="w-4 h-4" />
                     일기 삭제하기
@@ -139,7 +147,12 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
                     {/* 감정 요약 */}
                     <div className="text-[15px] font-medium text-gray-700 truncate ">
                       {diary.emotions && diary.emotions.length > 0
-                        ? `${diary.emotions.slice(0, 2).join(", ")}${diary.emotions.length > 2 ? ` 외 ${diary.emotions.length - 2}가지` : ""}`
+                        ? `${diary.emotions
+                            .slice(0, 2)
+                            .map(e => e.emotion)
+                            .join(
+                              ", "
+                            )}${diary.emotions.length > 2 ? ` 외 ${diary.emotions.length - 2}가지` : ""}`
                         : "감정 없음"}
                     </div>
                     {/* 타겟 요약 */}
@@ -164,8 +177,45 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
                 <hr className="border-t border-[#E5E5EA] mb-2" />
                 {/* 날짜 & 오른쪽 아이콘들 */}
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-400">{diary.date}</span>
-                  <div className="flex items-center gap-2">{/* 북마크 등 아이콘 */}</div>
+                  <span className="text-xs text-gray-400">
+                    {dayjs(diary.date).format("YYYY년 MM월 DD일")}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={BookmarkIcon}
+                      alt="북마크"
+                      className={`w-5 h-5 cursor-pointer ${diary.bookmarked ? "opacity-100" : "opacity-40"}`}
+                    />
+                    {/* Dialog(필터/삭제) ... */}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <img src={FilterIcon} alt="필터" className="w-5 h-5 cursor-pointer" />
+                      </DialogTrigger>
+                      <DialogOverlay className="!bg-transparent" />
+                      <DialogContent className="max-w-[320px] w-full rounded-2xl bg-[#FAF6F4] border border-[#D6D3F0] shadow-lg px-6 pt-12 pb-6">
+                        <div className="flex flex-col gap-3">
+                          <Button
+                            variant="outline"
+                            className="flex items-center justify-center gap-2 rounded-xl"
+                          >
+                            <img src={BookmarkIcon} alt="북마크" className="w-4 h-4" />
+                            북마크하기
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="flex items-center justify-center gap-2 rounded-xl"
+                            onClick={() => {
+                              deleteDiaryMutation.mutate({ token, diaryId: String(diary.id) });
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            일기 삭제하기
+                          </Button>
+                        </div>
+                        <DialogFooter />
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                 </div>
               </div>
             );
@@ -173,24 +223,55 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
           return (
             <div key={diary.id} className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col">
               {/* 상단: Blob + 사진(들) 분할 */}
-              <div className={`grid ${gridCols} gap-2 items-center rounded-2xl mb-2`}>
-                {/* Blob */}
-                <div
-                  className={`flex items-center justify-center rounded-full overflow-hidden aspect-square mx-auto ${blobSize}`}
-                >
+              <div
+                className={`grid grid-cols-3 gap-2 items-center rounded-2xl mb-2`}
+                style={{ height: "130px" }}
+              >
+                {/* 1. Blob */}
+                <div className="flex items-center justify-center rounded-full overflow-hidden aspect-square mx-auto w-[120px] h-[120px]">
                   <Canvas className="w-full h-full">
-                    <Blob diaryContent={diary.emotion} />
+                    <Blob diaryContent={diary.emotions} />
                   </Canvas>
                 </div>
-                {/* 사진들 */}
-                {gridImages.map((url, idx) => (
+                {/* 2,3. 사진/지도 */}
+                {gridImages.length > 0 && diary.map ? (
+                  <>
+                    {/* 사진 */}
+                    <img
+                      src={gridImages[0]}
+                      alt="diary-photo-0"
+                      className="rounded-lg object-cover aspect-square w-full max-w-[140px] mx-auto h-full"
+                    />
+                    {/* 지도 */}
+                    <img
+                      src={`https://maps.googleapis.com/maps/api/staticmap?center=${diary.map.lat},${diary.map.lng}&zoom=15&size=200x200&markers=color:red%7C${diary.map.lat},${diary.map.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
+                      alt="map-preview"
+                      className="rounded-lg object-cover aspect-square w-full max-w-[140px] mx-auto h-full"
+                    />
+                  </>
+                ) : gridImages.length > 0 ? (
+                  // 사진만 있을 때: 오른쪽 2칸을 사진이 차지
                   <img
-                    key={idx}
-                    src={url}
-                    alt={`diary-photo-${idx}`}
-                    className="rounded-lg object-cover aspect-square w-full max-w-[140px] mx-auto"
+                    src={gridImages[0]}
+                    alt="diary-photo-0"
+                    className="rounded-lg object-cover w-full h-full max-h-[120px] col-span-2"
+                    style={{ aspectRatio: "2 / 1" }}
                   />
-                ))}
+                ) : diary.map ? (
+                  // 지도만 있을 때: 오른쪽 2칸을 지도 미리보기가 차지
+                  <img
+                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${diary.map.lat},${diary.map.lng}&zoom=15&size=200x200&markers=color:red%7C${diary.map.lat},${diary.map.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
+                    alt="map-preview"
+                    className="rounded-lg object-cover w-full h-full max-h-[120px] col-span-2"
+                    style={{ aspectRatio: "2 / 1" }}
+                  />
+                ) : (
+                  // 아무것도 없으면 빈칸 2개
+                  <>
+                    <div />
+                    <div />
+                  </>
+                )}
               </div>
               {/* 키워드/행동 summary */}
               {/* <div className="flex-1 min-w-0 mb-2">
@@ -213,13 +294,16 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
               <hr className="border-t border-[#E5E5EA] mb-2" />
               {/* 날짜 & 오른쪽 아이콘들 */}
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-400">{diary.date}</span>
+                <span className="text-xs text-gray-400">
+                  {dayjs(diary.date).format("YYYY년 MM월 DD일")}
+                </span>
                 <div className="flex items-center gap-2">
                   <img
                     src={BookmarkIcon}
                     alt="북마크"
                     className={`w-5 h-5 cursor-pointer ${diary.bookmarked ? "opacity-100" : "opacity-40"}`}
                   />
+                  {/* 북마크 등 아이콘 */}
                   <Dialog>
                     <DialogTrigger asChild>
                       <img src={FilterIcon} alt="필터" className="w-5 h-5 cursor-pointer" />
@@ -229,14 +313,17 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
                       <div className="flex flex-col gap-3">
                         <Button
                           variant="outline"
-                          className="flex items-center justify-center gap-2  rounded-xl"
+                          className="flex items-center justify-center gap-2 rounded-xl"
                         >
                           <img src={BookmarkIcon} alt="북마크" className="w-4 h-4" />
-                          북마크
+                          북마크하기
                         </Button>
                         <Button
                           variant="outline"
-                          className="flex items-center justify-center gap-2  rounded-xl"
+                          className="flex items-center justify-center gap-2 rounded-xl"
+                          onClick={() => {
+                            deleteDiaryMutation.mutate({ token, diaryId: String(diary.id) });
+                          }}
                         >
                           <Trash2 className="w-4 h-4" />
                           일기 삭제하기

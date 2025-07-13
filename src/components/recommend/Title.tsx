@@ -22,7 +22,8 @@ const Title = () => {
   };
 
   return (
-    <div className="mt-10 w-full z-50">
+    <div className="w-full px-5 pt-8">
+
       {/* 메인 헤더 */}
       <div className="flex items-center justify-between px-4 py-3">
         <h1 className="text-4xl font-bold text-gray-900 ml-2">추천</h1>

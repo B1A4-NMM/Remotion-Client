@@ -1,6 +1,7 @@
 // api/queries/home/useGetHome.ts
 import { useQuery } from "@tanstack/react-query";
-import { getTodayDiary, getHomeData } from "../../services/home";
+import { getHomeData } from "../../services/home";
+import type { HomeResponse } from "../../../types/diary";
 
 export const useGetTodayDiary = (token: string) => {
   return useQuery({
@@ -13,7 +14,7 @@ export const useGetTodayDiary = (token: string) => {
 };
 
 export const useGetHomeData = (token: string) => {
-  return useQuery({
+  return useQuery<HomeResponse>({
     queryKey: ["homeData", token],
     queryFn: () => getHomeData(token),
     enabled: !!token,

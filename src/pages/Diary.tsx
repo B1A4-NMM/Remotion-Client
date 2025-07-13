@@ -7,7 +7,7 @@ import { Image as LucideImage, Mic, MicOff } from "lucide-react";
 import { usePostDiary } from "@/api/queries/diary/usePostDiary.ts";
 import Loading6 from "../components/Loading/Loading6";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
-import LocationPicker from "@/components/LocationPicker"; // 분리된 지도 모달 컴포넌트
+import LocationPicker from "@/components/LocationPicker";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 
@@ -33,13 +33,20 @@ const Diary = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showLocationPicker, setShowLocationPicker] = useState(false); // 위치 모달 상태
-  const [inputFocused, setInputFocused] = React.useState(false); // 키패드 올라옴?
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  
+  // 글자 수 상태 추가
+  const [contentLength, setContentLength] = useState(0);
+  
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } =
     useSpeechRecognition();
 
+  const [isPhotoActive, setIsPhotoActive] = useState(false);
+  const [isLocationActive, setIsLocationActive] = useState(false);
   const prevTranscriptRef = useRef("");
   const animationQueue = useRef<string[]>([]);
   const [animatedText, setAnimatedText] = useState("");
@@ -50,6 +57,7 @@ const Diary = () => {
       setPreview(null);
       setIsSubmitting(false);
       setAnimatedText("");
+      setContentLength(0); // 글자 수 리셋
     },
   });
 
@@ -72,6 +80,7 @@ const Diary = () => {
         setAnimatedText(prev => {
           const updated = prev + nextChar;
           setValue("content", updated);
+          setContentLength(updated.length); // 글자 수 업데이트
           return updated;
         });
       }
@@ -79,7 +88,26 @@ const Diary = () => {
     return () => clearInterval(interval);
   }, [animationQueue.current.length, listening]);
 
-  // BottomNavi에서 사용할 핸들러 함수들
+  useEffect(() => {
+    const handleResize = () => {
+      if (inputFocused) {
+        const viewport = window.visualViewport;
+        if (viewport) {
+          const height = window.innerHeight - viewport.height;
+          setKeyboardHeight(height > 0 ? height : 0);
+        }
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.visualViewport?.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.visualViewport?.removeEventListener('resize', handleResize);
+    };
+  }, [inputFocused]);
+
   const handleMicClick = () => {
     if (listening) {
       SpeechRecognition.stopListening();
@@ -91,7 +119,22 @@ const Diary = () => {
   };
 
   const handleLocationClick = () => {
+    setIsLocationActive(!isLocationActive);
     setShowLocationPicker(true);
+  };
+
+  const handleImageClick = () => {
+    setIsPhotoActive(true);
+
+    const handleWindowFocus = () => {
+      if (!fileInputRef.current?.files?.length) {
+        setIsPhotoActive(false);
+      }
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+
+    window.addEventListener('focus', handleWindowFocus, { once: true });
+    fileInputRef.current?.click();
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,14 +142,24 @@ const Diary = () => {
     if (file) {
       setPreview(URL.createObjectURL(file));
       setImageFile(file);
+    } else {
+      setPreview(null);
+      setImageFile(null);
+      setIsPhotoActive(false);
     }
   };
+
+  // 저장 버튼 클릭 핸들러 추가
+  const handleSaveClick = () => {
+    handleSubmit(onSubmit)();
+  };
+
   const onSubmit = (data: any) => {
     const file = fileInputRef.current?.files?.[0];
     const formData = new FormData();
 
     formData.append("content", data.content);
-    formData.append("writtenDate", date!); // ✅ URL에서 받은 날짜로 작성
+    formData.append("writtenDate", date!);
     formData.append("weather", "SUNNY");
 
     if (location) {
@@ -118,7 +171,6 @@ const Diary = () => {
       formData.append("photo", file);
     }
 
-    // 디버깅 로그
     console.log("📤 전송할 FormData 내용:");
     formData.forEach((value, key) => {
       if (key === "photo" && value instanceof File) {
@@ -142,8 +194,7 @@ const Diary = () => {
     <>
       <div className="relative flex flex-col h-screen border">
         <DiaryTitle />
-        {/* 일기 작성 폼 */}
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col p-4 h-screen">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col p-4 flex-1">
           <div className="flex-1 flex flex-col space-y-4 min-h-0 overflow-hidden">
             <div className="flex-1 flex flex-col min-h-0">
               <Textarea
@@ -152,6 +203,7 @@ const Diary = () => {
                 onChange={e => {
                   setAnimatedText(e.target.value);
                   setValue("content", e.target.value);
+                  setContentLength(e.target.value.length); // 글자 수 업데이트
                 }}
                 onFocus={() => setInputFocused(true)}
                 onBlur={() => setInputFocused(false)}
@@ -161,6 +213,10 @@ const Diary = () => {
               {errors.content && (
                 <p className="text-red-500 text-sm mt-1">{errors.content.message as string}</p>
               )}
+              {/* 글자 수 표시 */}
+              <div className="text-right text-sm text-gray-500 mt-1">
+                {contentLength}자
+              </div>
             </div>
 
             {preview && (
@@ -181,23 +237,29 @@ const Diary = () => {
           </div>
         </form>
 
-        {/* BottomNavi 컴포넌트 */}
         <BottomNavi
           onMicClick={handleMicClick}
           onLocationClick={handleLocationClick}
+          onImageClick={handleImageClick}
+          onSaveClick={handleSaveClick} // 저장 버튼 핸들러 추가
           isListening={listening}
-          inputFocused={inputFocused}
+          isPhotoActive={isPhotoActive}
+          isLocationActive={isLocationActive}
+          isSaveEnabled={contentLength >= 100} // 저장 버튼 활성화 조건
+          keyboardHeight={keyboardHeight}
         />
       </div>
-      {/* 위치 선택 모달 */}
+
       {showLocationPicker && (
         <LocationPicker
           open={showLocationPicker}
-          onClose={() => setShowLocationPicker(false)}
+          onClose={() => {
+            setShowLocationPicker(false);
+            setIsLocationActive(!isLocationActive);
+          }}
           onLocationSelect={loc => {
             console.log("📥 부모에서 받은 위치:", loc);
             setLocation(loc);
-            // 주소 변환 (선택사항)
           }}
         />
       )}

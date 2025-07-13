@@ -1,70 +1,112 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTodos } from "@/api/queries/todo/useTodos";
 import CalendarSection from "../components/calendar/CalendarSection";
 import TodoSection from "../components/todo/TodoSection";
 
-export default function Calendar() {
-  useTodos(); // 할 일 데이터 패칭
+export default function CalendarPage() {
+  useTodos(); // 📌 할 일 데이터 패칭
 
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const [size, setSize] = React.useState(50); // 상단 높이 비율
-  const [dragging, setDragging] = React.useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState(50); // 상단 Calendar 영역 비율
+  const [dragging, setDragging] = useState(false);
+  const startYRef = useRef<number | null>(null);
+  let animationFrame: number | null = null;
 
-  // 드래그로 캘린더 높이 조절
-  React.useEffect(() => {
-    if (!dragging) return;
+  // 🖱️ Mouse Down
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    setDragging(true);
+    startYRef.current = e.clientY;
+  };
 
-    document.body.style.userSelect = "none";
-    document.body.style.overflow = "hidden";
+  // 🖱️ Mouse Move
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!dragging || startYRef.current === null || !containerRef.current) return;
 
-    const handleMove = (e: MouseEvent) => {
-      e.preventDefault();
-      if (!containerRef.current) return;
+    if (animationFrame) cancelAnimationFrame(animationFrame);
+    animationFrame = requestAnimationFrame(() => {
+      const deltaY = e.clientY - startYRef.current!;
       const rect = containerRef.current.getBoundingClientRect();
-      const y = e.clientY - rect.top;
-      const percent = (y / rect.height) * 100;
-      setSize(Math.min(90, Math.max(10, percent))); // 최소 10%, 최대 90%
-    };
+      const percentDelta = (deltaY / rect.height) * 100 * 1.5;
+      const newSize = Math.min(75, Math.max(20, size + percentDelta));
+      setSize(newSize);
+      startYRef.current = e.clientY;
+    });
+  };
 
-    const stop = () => {
-      setDragging(false);
-      document.body.style.userSelect = "";
-      document.body.style.overflow = "";
-    };
+  const handleMouseUp = () => {
+    setDragging(false);
+    startYRef.current = null;
+  };
 
-    window.addEventListener("mousemove", handleMove);
-    window.addEventListener("mouseup", stop);
+  // 📱 Touch Start
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    setDragging(true);
+    startYRef.current = e.touches[0].clientY;
+  };
+
+  // 📱 Touch Move
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!dragging || startYRef.current === null || !containerRef.current) return;
+    const deltaY = e.touches[0].clientY - startYRef.current!;
+    const rect = containerRef.current.getBoundingClientRect();
+    const percentDelta = (deltaY / rect.height) * 100 * 1.5;
+    const newSize = Math.min(80, Math.max(20, size + percentDelta));
+    setSize(newSize);
+    startYRef.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = () => {
+    setDragging(false);
+    startYRef.current = null;
+  };
+
+  //이벤트 리스너 등록
+  useEffect(() => {
+    if (dragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    } else {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    }
 
     return () => {
-      window.removeEventListener("mousemove", handleMove);
-      window.removeEventListener("mouseup", stop);
-      document.body.style.userSelect = "";
-      document.body.style.overflow = "";
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [dragging]);
 
   return (
-    <div ref={containerRef} className="flex flex-col min-h-screen bg-black overflow-hidden">
-      {/* ✅ 상단 CalendarSection */}
+    <div
+      ref={containerRef}
+      className="flex flex-col h-screen overflow-hidden"
+      style={{ backgroundColor: "#FAF6F4" }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* 📅 상단 Calendar */}
       <section
-        className="bg-[#1E1E1E] flex-none p-4 mb-1 rounded-b-3xl overflow-y-auto"
-        style={{ flexBasis: `${size}%` }}
+        className="transition-[flex-basis] duration-200 ease-in-out px-4 pt-4 pb-2 overflow-hidden"
+        style={{ height: `calc(${size}vh)` }}
       >
-        <CalendarSection />
+        <div className="h-full w-full rounded-2xl overflow-hidden">
+          <CalendarSection />
+        </div>
       </section>
 
-      {/* ✅ 리사이즈 바 */}
+      {/* 🔘 커스텀 리사이즈 바 */}
       <div
-        className="h-2 w-24 self-center my-2 cursor-row-resize bg-gray-300 rounded"
-        onMouseDown={() => setDragging(true)}
+        className="h-2 w-24 self-center my-1 bg-black/40 rounded-full cursor-row-resize"
+        onMouseDown={handleMouseDown}
       />
 
-      {/* ✅ 하단 TodoSection */}
+      {/* ✅ 하단 Todo */}
       <section
-        className="bg-[#1E1E1E] flex-grow flex flex-col overflow-hidden p-4 mt-1 mb-10 rounded-t-3xl"
+        className="transition-[flex-basis] duration-200 ease-in-out p-4 rounded-t-3xl overflow-hidden flex-grow"
         style={{ flexBasis: `${100 - size}%` }}
       >
-        <div className="overflow-y-auto flex-grow">
+        <div className="overflow-y-auto h-full">
           <TodoSection />
         </div>
       </section>

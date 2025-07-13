@@ -1,6 +1,17 @@
 import React from "react";
 import HomeBar from "./HomeBar";
-const Title = () => {
+
+interface TitleProps {
+  continuousWritingDate: number;
+  emotionCountByMonth: number;
+  totalDiaryCount: number;
+}
+
+const Title: React.FC<TitleProps> = ({
+  continuousWritingDate,
+  emotionCountByMonth,
+  totalDiaryCount,
+}) => {
   return (
     <>
       <div className="w-full ">
@@ -90,8 +101,12 @@ const Title = () => {
             </button>
           </div>
         </div>
+        <HomeBar
+          continuousWritingDate={continuousWritingDate}
+          emotionCountByMonth={emotionCountByMonth}
+          totalDiaryCount={totalDiaryCount}
+        />
       </div>
-      <HomeBar />
     </>
   );
 };

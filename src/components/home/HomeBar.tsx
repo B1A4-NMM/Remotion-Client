@@ -1,6 +1,16 @@
 import React from "react";
 
-const HomeBar = () => {
+interface HomeBarProps {
+  continuousWritingDate: number;
+  emotionCountByMonth: number;
+  totalDiaryCount: number;
+}
+
+const HomeBar: React.FC<HomeBarProps> = ({
+  continuousWritingDate,
+  emotionCountByMonth,
+  totalDiaryCount,
+}) => {
   return (
     <div className="w-full px-4 pb-4">
       <div className="grid grid-cols-3 relative">
@@ -19,9 +29,10 @@ const HomeBar = () => {
             </div>
             <p className="text-[12px] text-[#85848f] text-center">연속 기록</p>
           </div>
-          <p className="text-[16px] font-semibold text-black text-center">25일</p>
+          <p className="text-[16px] font-semibold text-black text-center">
+            {continuousWritingDate}일
+          </p>
         </div>
-
         {/* 이 달의 감정 */}
         <div className="flex flex-col items-center">
           <div className="flex items-center gap-1 mb-1">
@@ -35,9 +46,10 @@ const HomeBar = () => {
             </div>
             <p className="text-[12px] text-[#85848f] text-center whitespace-nowrap">이 달의 감정</p>
           </div>
-          <p className="text-[16px] font-semibold text-black text-center">128가지</p>
+          <p className="text-[16px] font-semibold text-black text-center">
+            {emotionCountByMonth}가지
+          </p>
         </div>
-
         {/* 누적 하루뒤 */}
         <div className="flex flex-col items-center">
           <div className="flex items-center gap-1 mb-1">
@@ -51,9 +63,8 @@ const HomeBar = () => {
             </div>
             <p className="text-[12px] text-[#85848f] text-center whitespace-nowrap">누적 하루뒤</p>
           </div>
-          <p className="text-[16px] font-semibold text-black text-center">200개</p>
+          <p className="text-[16px] font-semibold text-black text-center">{totalDiaryCount}개</p>
         </div>
-
         {/* 구분선들 */}
         <div className="absolute left-1/3 top-0 bottom-0 w-px bg-[#D9D9D9]" />
         <div className="absolute left-2/3 top-0 bottom-0 w-px bg-[#D9D9D9]" />

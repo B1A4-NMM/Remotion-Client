@@ -34,10 +34,14 @@ export interface HomeDiary {
 }
 
 export interface HomeResponse {
-  diaries: HomeDiary[];
-  continuousWritingDate: number;
-  totalDiaryCount: number;
-  emotionCountByMonth: number;
+  item: {
+    diaries: HomeDiary[];
+    continuousWritingDate: number;
+    totalDiaryCount: number;
+    emotionCountByMonth: number;
+  };
+  hasMore: boolean;
+  nextCursor: number;
 }
 
 export interface DiaryPayload {

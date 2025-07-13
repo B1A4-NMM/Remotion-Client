@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from "zustand"; // 상태관리
 
 export type Todo = {
     id: number;

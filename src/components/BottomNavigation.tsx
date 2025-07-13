@@ -15,7 +15,7 @@ export default function BottomNavigation() {
           preserveAspectRatio="none"
         >
           <path
-            opacity="0.9"
+            opacity="0.96"
             d="M197.5 0C207.24 0 215.877 4.72168 221.249 12H369C382.255 12 393 22.7452 393 36V84H0V36C0 22.7452 10.7452 12 24 12H173.751C179.123 4.72168 187.76 0 197.5 0Z"
             fill="white"
           />

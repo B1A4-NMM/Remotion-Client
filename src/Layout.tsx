@@ -14,7 +14,7 @@ export default function Layout() {
   return (
     <div className="w-full min-h-[100dvh] flex justify-center bg-[#FAF6F4] font-pretendard">
       <div className="w-full max-w-[414px] flex flex-col relative bg-[#FAF6F4] text-black min-h-[100dvh]">
-        <main className="flex-1 h-full">
+        <main className="flex-1 h-full bg-[#FAF6F4]">
           <Outlet />
           <Toaster
             position="top-center"

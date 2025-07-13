@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';  // React Router import 추가
 import "../../styles/recommend-button.css";  // 수정된 CSS 파일로 변경
 
@@ -24,6 +23,7 @@ const Title = () => {
 
   return (
     <div className="w-full px-5 pt-8">
+
       {/* 메인 헤더 */}
       <div className="flex items-center justify-between px-4 py-3">
         <h1 className="text-4xl font-bold text-gray-900 ml-2">추천</h1>

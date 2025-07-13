@@ -36,6 +36,10 @@ const Diary = () => {
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  
+  // 글자 수 상태 추가
+  const [contentLength, setContentLength] = useState(0);
+  
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } =
@@ -53,6 +57,7 @@ const Diary = () => {
       setPreview(null);
       setIsSubmitting(false);
       setAnimatedText("");
+      setContentLength(0); // 글자 수 리셋
     },
   });
 
@@ -75,6 +80,7 @@ const Diary = () => {
         setAnimatedText(prev => {
           const updated = prev + nextChar;
           setValue("content", updated);
+          setContentLength(updated.length); // 글자 수 업데이트
           return updated;
         });
       }
@@ -118,19 +124,17 @@ const Diary = () => {
   };
 
   const handleImageClick = () => {
-    setIsPhotoActive(true);  // 버튼 클릭 시 즉시 활성 상태로 변경 (검은색으로)
+    setIsPhotoActive(true);
 
-    // 파일 선택 창 취소 감지: 창이 닫히면 window.focus 이벤트가 발생
     const handleWindowFocus = () => {
       if (!fileInputRef.current?.files?.length) {
-        setIsPhotoActive(false);  // 파일이 선택되지 않았다면 상태 리셋
+        setIsPhotoActive(false);
       }
       window.removeEventListener('focus', handleWindowFocus);
     };
 
     window.addEventListener('focus', handleWindowFocus, { once: true });
-
-    fileInputRef.current?.click();  // 파일 선택 창 열기
+    fileInputRef.current?.click();
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,12 +142,16 @@ const Diary = () => {
     if (file) {
       setPreview(URL.createObjectURL(file));
       setImageFile(file);
-      // 파일 선택 시 active 상태 유지 (이미 true로 설정됨)
     } else {
       setPreview(null);
       setImageFile(null);
-      setIsPhotoActive(false);  // 파일 선택 취소 시 리셋 (하지만 취소 시 change 이벤트가 발생하지 않으므로, window.focus로 대체)
+      setIsPhotoActive(false);
     }
+  };
+
+  // 저장 버튼 클릭 핸들러 추가
+  const handleSaveClick = () => {
+    handleSubmit(onSubmit)();
   };
 
   const onSubmit = (data: any) => {
@@ -195,6 +203,7 @@ const Diary = () => {
                 onChange={e => {
                   setAnimatedText(e.target.value);
                   setValue("content", e.target.value);
+                  setContentLength(e.target.value.length); // 글자 수 업데이트
                 }}
                 onFocus={() => setInputFocused(true)}
                 onBlur={() => setInputFocused(false)}
@@ -204,6 +213,10 @@ const Diary = () => {
               {errors.content && (
                 <p className="text-red-500 text-sm mt-1">{errors.content.message as string}</p>
               )}
+              {/* 글자 수 표시 */}
+              <div className="text-right text-sm text-gray-500 mt-1">
+                {contentLength}자
+              </div>
             </div>
 
             {preview && (
@@ -228,9 +241,11 @@ const Diary = () => {
           onMicClick={handleMicClick}
           onLocationClick={handleLocationClick}
           onImageClick={handleImageClick}
+          onSaveClick={handleSaveClick} // 저장 버튼 핸들러 추가
           isListening={listening}
           isPhotoActive={isPhotoActive}
           isLocationActive={isLocationActive}
+          isSaveEnabled={contentLength >= 100} // 저장 버튼 활성화 조건
           keyboardHeight={keyboardHeight}
         />
       </div>

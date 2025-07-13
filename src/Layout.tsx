@@ -12,9 +12,9 @@ export default function Layout() {
   const shouldShowNav = !HIDE_NAV_PATHS.includes(location.pathname);
 
   return (
-    <div className="w-full flex justify-center items-start h-[100dvh] font-pretendard overflow-hidden">
-      <div className="w-full max-w-[414px] h-screen flex flex-col relative bg-[#FAF6F4] text-black">
-        <main className="flex-1 h-full ">
+    <div className="w-full min-h-[100dvh] flex justify-center bg-[#FAF6F4] font-pretendard">
+      <div className="w-full max-w-[414px] flex flex-col relative bg-[#FAF6F4] text-black min-h-[100dvh]">
+        <main className="flex-1 h-full">
           <Outlet />
           <Toaster
             position="top-center"
@@ -34,7 +34,7 @@ export default function Layout() {
         </main>
 
         {shouldShowNav && (
-          <div className="fixed bottom-0 left-0 right-0 w-full max-w-[414px] mx-auto z-49">
+          <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[414px] z-50">
             <BottomNavigation />
           </div>
         )}

@@ -1,12 +1,12 @@
-import React, { useRef, useMemo, useState, useEffect, useCallback } from 'react';
-import { Mesh, Vector3 } from 'three';
-import { useFrame } from '@react-three/fiber';
+import React, { useRef, useMemo, useState, useEffect, useCallback } from "react";
+import { Mesh, Vector3 } from "three";
+import { useFrame } from "@react-three/fiber";
 
-import vertexShader from './vertexShader';
-import fragmentShader from './fragmentShader';
+import vertexShader from "./vertexShader";
+import fragmentShader from "./fragmentShader";
 
 // 타입 정의
-type ColorKey = 'gray' | 'gray1' | 'gray2' | 'blue' | 'green' | 'red' | 'yellow';
+type ColorKey = "gray" | "gray1" | "gray2" | "blue" | "green" | "red" | "yellow";
 
 interface Emotion {
   color: ColorKey;
@@ -20,7 +20,7 @@ interface BlobProps {
 // 기본 색상 정의
 const baseColors: Record<ColorKey, string> = {
   green: "#23db91",
-  red: "#fc1111", 
+  red: "#fc1111",
   yellow: "#d8cc21",
   blue: "#1c90d8",
   gray: "#E1E1E1",
@@ -31,35 +31,80 @@ const baseColors: Record<ColorKey, string> = {
 // 감정을 ColorKey로 매핑하는 함수
 const mapEmotionToColor = (emotion: string): ColorKey => {
   const highEnergyPleasant = new Set([
-    '행복', '기쁨', '즐거움', '설렘', '흥분', '활력',
-    '자긍심', '자신감', '뿌듯함', '성취감',
-    '사랑', '애정', '기대', '놀람'
+    "행복",
+    "기쁨",
+    "즐거움",
+    "설렘",
+    "흥분",
+    "활력",
+    "자긍심",
+    "자신감",
+    "뿌듯함",
+    "성취감",
+    "사랑",
+    "애정",
+    "기대",
+    "놀람",
   ]);
 
   const highEnergyUnpleasant = new Set([
-    '분노', '짜증', '질투', '시기', '경멸', '거부감', '불쾌',
-    '긴장', '불안', '초조', '억울', '배신감', '상처'
+    "분노",
+    "짜증",
+    "질투",
+    "시기",
+    "경멸",
+    "거부감",
+    "불쾌",
+    "긴장",
+    "불안",
+    "초조",
+    "억울",
+    "배신감",
+    "상처",
   ]);
 
   const lowEnergyUnpleasant = new Set([
-    '우울', '슬픔', '공허', '외로움', '실망', '속상',
-    '부끄러움', '수치', '죄책감', '후회', '뉘우침', '창피', '굴욕',
-    '피로', '지침', '무기력', '지루', '부담'
+    "우울",
+    "슬픔",
+    "공허",
+    "외로움",
+    "실망",
+    "속상",
+    "부끄러움",
+    "수치",
+    "죄책감",
+    "후회",
+    "뉘우침",
+    "창피",
+    "굴욕",
+    "피로",
+    "지침",
+    "무기력",
+    "지루",
+    "부담",
   ]);
 
   const lowEnergyPleasant = new Set([
-    '평온', '편안', '안정', '차분', '감사', '존경', 
-    '신뢰', '친밀', '유대', '공감', '만족감'
+    "평온",
+    "편안",
+    "안정",
+    "차분",
+    "감사",
+    "존경",
+    "신뢰",
+    "친밀",
+    "유대",
+    "공감",
+    "만족감",
   ]);
 
-  if (highEnergyPleasant.has(emotion)) return 'yellow';
-  if (highEnergyUnpleasant.has(emotion)) return 'red';
-  if (lowEnergyUnpleasant.has(emotion)) return 'blue';
-  if (lowEnergyPleasant.has(emotion)) return 'green';
-  return 'gray1';
+  if (highEnergyPleasant.has(emotion)) return "yellow";
+  if (highEnergyUnpleasant.has(emotion)) return "red";
+  if (lowEnergyUnpleasant.has(emotion)) return "blue";
+  if (lowEnergyPleasant.has(emotion)) return "green";
+  return "gray1";
 };
 
- 
 const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
   const mesh = useRef<Mesh>(null);
   const [emotions, setEmotions] = useState<Emotion[]>([]);
@@ -74,7 +119,7 @@ const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
         // Material 정리
         if (mesh.current.material) {
           if (Array.isArray(mesh.current.material)) {
-            mesh.current.material.forEach((mat) => mat.dispose());
+            mesh.current.material.forEach(mat => mat.dispose());
           } else {
             mesh.current.material.dispose();
           }
@@ -83,7 +128,7 @@ const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
         // Uniform 정리
         if (!Array.isArray(mesh.current.material) && mesh.current.material?.uniforms) {
           Object.values(mesh.current.material.uniforms).forEach((uniform: any) => {
-            if (uniform.value && typeof uniform.value.dispose === 'function') {
+            if (uniform.value && typeof uniform.value.dispose === "function") {
               uniform.value.dispose();
             }
           });
@@ -97,7 +142,7 @@ const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
     return () => {
       if (mesh.current?.material) {
         if (Array.isArray(mesh.current.material)) {
-          mesh.current.material.forEach((mat) => mat.dispose());
+          mesh.current.material.forEach(mat => mat.dispose());
         } else {
           mesh.current.material.dispose();
         }
@@ -117,33 +162,33 @@ const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
     if (!content) {
       return [{ color: "gray1" as ColorKey, intensity: 1 }];
     }
-  
+
     const allEmotions: { type: string; intensity: number }[] = [];
-  
+
     // selfEmotion 처리
     if (content.selfEmotion && Array.isArray(content.selfEmotion)) {
       content.selfEmotion.forEach((emotion: any) => {
         if (emotion && emotion.emotionType) {
           allEmotions.push({
             type: emotion.emotionType,
-            intensity: emotion.intensity || emotion.emotionIntensity || 5
+            intensity: emotion.intensity || emotion.emotionIntensity || 5,
           });
         }
       });
     }
-  
+
     // stateEmotion 처리
     if (content.stateEmotion && Array.isArray(content.stateEmotion)) {
       content.stateEmotion.forEach((emotion: any) => {
         if (emotion && emotion.emotionType) {
           allEmotions.push({
             type: emotion.emotionType,
-            intensity: emotion.intensity || emotion.emotionIntensity || 5
+            intensity: emotion.intensity || emotion.emotionIntensity || 5,
           });
         }
       });
     }
-  
+
     // people 처리
     if (content.people && Array.isArray(content.people)) {
       content.people.forEach((person: any) => {
@@ -152,7 +197,7 @@ const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
             if (emotion && emotion.emotionType) {
               allEmotions.push({
                 type: emotion.emotionType,
-                intensity: (emotion.intensity || emotion.emotionIntensity || 5)
+                intensity: emotion.intensity || emotion.emotionIntensity || 5,
               });
             }
           });
@@ -195,7 +240,7 @@ const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
         color3: grayRgb,
         intensity1: 1.0,
         intensity2: 0.0,
-        intensity3: 0.0
+        intensity3: 0.0,
       };
     }
 
@@ -203,13 +248,13 @@ const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
     const secondaryEmotion = emotions[1] || emotions[0];
     const tertiaryEmotion = emotions[2] || emotions[0];
 
-    const result= {
+    const result = {
       color1: hexToRgb(baseColors[primaryEmotion.color]),
       color2: hexToRgb(baseColors[secondaryEmotion.color]),
       color3: hexToRgb(baseColors[tertiaryEmotion.color]),
       intensity1: primaryEmotion.intensity,
       intensity2: emotions[1]?.intensity || 0.0,
-      intensity3: emotions[2]?.intensity || 0.0
+      intensity3: emotions[2]?.intensity || 0.0,
     };
 
     return result;
@@ -232,7 +277,7 @@ const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
     const processedEmotions = processDiaryContentEmotions(diaryContent);
     setEmotions(processedEmotions);
   }, [diaryContent, processDiaryContentEmotions]);
-  
+
   // 5. 색상 업데이트
   useEffect(() => {
     uniforms.current.u_color1.value = emotionColors.color1;
@@ -244,7 +289,7 @@ const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
   }, [emotionColors]);
 
   // 6. 프레임 업데이트
-  useFrame((state) => {
+  useFrame(state => {
     const t = state.clock.getElapsedTime();
     uniforms.current.u_time.value = t;
     uniforms.current.u_intensity.value = 0.2 + 0.1 * Math.sin(t * 0.4);

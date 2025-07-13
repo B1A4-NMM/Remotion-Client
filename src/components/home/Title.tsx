@@ -5,12 +5,16 @@ interface TitleProps {
   continuousWritingDate: number;
   emotionCountByMonth: number;
   totalDiaryCount: number;
+  selectedTab: "menu" | "location" | "search";
+  setSelectedTab: (tab: "menu" | "location" | "search") => void;
 }
 
 const Title: React.FC<TitleProps> = ({
   continuousWritingDate,
   emotionCountByMonth,
   totalDiaryCount,
+  selectedTab,
+  setSelectedTab,
 }) => {
   return (
     <>
@@ -25,9 +29,10 @@ const Title: React.FC<TitleProps> = ({
             <button
               className="p-2 rounded-full bg-white transition-colors box-shadow shadow-xl"
               aria-label="검색"
+              onClick={() => setSelectedTab("search")}
             >
               <svg
-                className="w-5 h-5 text-gray-600"
+                className={`w-5 h-5 ${selectedTab === "search" ? "text-black" : "text-gray-400"}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -45,9 +50,10 @@ const Title: React.FC<TitleProps> = ({
             <button
               className="p-2 rounded-full bg-white transition-colors box-shadow shadow-xl"
               aria-label="위치"
+              onClick={() => setSelectedTab("location")}
             >
               <svg
-                className="w-5 h-5 text-gray-600"
+                className={`w-5 h-5 ${selectedTab === "location" ? "text-black" : "text-gray-400"}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -71,6 +77,7 @@ const Title: React.FC<TitleProps> = ({
             <button
               className="p-2 rounded-full bg-white transition-colors box-shadow shadow-xl"
               aria-label="메뉴"
+              onClick={() => setSelectedTab("menu")}
             >
               <svg
                 width="22"
@@ -78,12 +85,13 @@ const Title: React.FC<TitleProps> = ({
                 viewBox="0 0 22 22"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
+                className={selectedTab === "menu" ? "text-black" : "text-gray-400"}
               >
                 <path
                   fillRule="evenodd"
                   clipRule="evenodd"
                   d="M4 6.75C4 4.68733 4.05622 4 11 4C17.9438 4 18 4.68733 18 6.75C18 8.81267 18.0221 9.5 11 9.5C3.97785 9.5 4 8.81267 4 6.75Z"
-                  stroke="black"
+                  stroke="currentColor"
                   strokeWidth="1.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -92,7 +100,7 @@ const Title: React.FC<TitleProps> = ({
                   fillRule="evenodd"
                   clipRule="evenodd"
                   d="M4 15.25C4 13.1873 4.05622 12.5 11 12.5C17.9438 12.5 18 13.1873 18 15.25C18 17.3127 18.0221 18 11 18C3.97785 18 4 17.3127 4 15.25Z"
-                  stroke="black"
+                  stroke="currentColor"
                   strokeWidth="1.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState} from "react";
-import JustBlob from "../Blob/JustBlob";
+import JustBlob from "../Blob/MenditationBlob";
 import { Canvas } from "@react-three/fiber";
 import { X } from "lucide-react";
 
@@ -276,7 +276,7 @@ const Meditation = ({ type = 1, onClose }: MeditationProps) => {
   };
 
   return (
-    <div className="absolute inset-0 bg-black z-50 w-full h-full">
+    <div className="absolute inset-0 bg-black z-50 w-dvh h-dvh">
       {/* 우측 상단 X 버튼 - 닫기 기능 추가 */}
       <button 
         onClick={handleClose}

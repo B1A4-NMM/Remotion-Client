@@ -18,7 +18,7 @@
 
 .button {
   flex: 1;  /* 버튼이 동일한 너비 차지 */
-  padding: 8px 16px;  /* 패딩 조정 */
+  padding: 6px 16px;  /* 패딩 조정 */
   border: 2px solid #000000;
   border-radius: 9999px;
   background: #000000;  /* 기본 배경 흰색 */

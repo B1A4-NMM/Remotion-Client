@@ -16,44 +16,71 @@ import "../styles/App.css";
 
 // ✅ 안전한 샘플 데이터
 const sampleDiary = {
-  writtenDate: "2025-07-13T12:00:00Z",
-  date: "2025-07-13T12:00:00Z",
-  content: "샘플 일기 내용입니다. 실제 일기가 없을 때 기본으로 보여집니다.",
-
-  activity_analysis: [
-    {
-      activity: "예시 활동",
-      peoples: ["친구1", "친구2"],
-
-      self_emotions: {
-        self_emotion: ["기쁨"],
-        self_emotion_intensity: [5],
-      },
-
-      state_emotions: {
-        state_emotion: ["무난"],
-        s_emotion_intensity: [3],
-      },
-
-      problem: [
-        {
-          situation: "예시 상황",
-          approach: "예시 접근",
-          outcome: "예시 결과",
-          decision_code: "None",
-          conflict_response_code: "None",
+  "id": 102,
+  "writtenDate": "2025-07-14",
+  "photoPath": [],
+  "audioPath": null,
+  "content": "일기를 매일 쓰는거는 쉬운 일이 아니다...",
+  "latitude": null,
+  "longitude": null,
+  "analysis": {
+    "activity_analysis": [
+      {
+        "activity": "농구하기",
+        "peoples": [
+          {
+            "name": "도영",
+            "interactions": {
+              "emotion": [
+                "string"
+              ],
+              "emotion_intensity": [
+                0
+              ]
+            },
+            "name_intimacy": "0.9"
+          }
+        ],
+        "self_emotions": {
+          "emotion": [
+            "string"
+          ],
+          "emotion_intensity": [
+            0
+          ]
         },
+        "state_emotions": {
+          "emotion": [
+            "string"
+          ],
+          "emotion_intensity": [
+            0
+          ]
+        },
+        "problem": [
+          {
+            "situation": "string",
+            "approach": "string",
+            "outcome": "string",
+            "decision_code": "string",
+            "conflict_response_code": "string"
+          }
+        ],
+        "strength": "string"
+      }
+    ],
+    "reflection": {
+      "achievements": [
+        "string"
       ],
-
-      strength: "팀워크",
-    },
-  ],
-
-  reflection: {
-    achievements: ["오늘 목표 달성!"],
-    shortcomings: ["조금 늦잠을 잤음"],
-    todo: ["긍정적 태도 유지", "컨디션 관리"],
-  },
+      "shortcomings": [
+        "string"
+      ],
+      "todo": [
+        "string"
+      ]
+    }
+  }
 };
 
 const Result: React.FC = () => {
@@ -124,39 +151,43 @@ const Result: React.FC = () => {
 
   const finalDiaryContent = diaryContent || sampleDiary;
 
+  console.log(finalDiaryContent);
+
   return (
     <div
-    className={`
-      result-container px-4 h-screen
-      ${isTouchDevice 
-        ? 'overflow-y-auto scrollbar-hide touch-scroll' 
-        : 'overflow-y-auto'
-      }
-      ${isScrolling ? 'scrolling' : ''}
-    `}
+      className={`
+        result-container px-4 h-screen
+        ${isTouchDevice 
+          ? 'overflow-y-auto scrollbar-hide touch-scroll' 
+          : 'overflow-y-auto'
+        }
+        ${isScrolling ? 'scrolling' : ''}
+      `}
       style={{
         WebkitOverflowScrolling: isTouchDevice ? 'touch' : 'auto',
         scrollBehavior: 'smooth',
         overscrollBehavior: 'contain'
       }}
     >
-      {/* ✅ Header */}
+      {/* ✅ Header - 원래 위치 유지 */}
       <ResultHeader writtenDate={finalDiaryContent.writtenDate || ""} />
-
-      {/* ✅ Emotion Summary */}
-      <EmotionSummary diaryContent={finalDiaryContent} />
-
-      {/* ✅ Toggle */}
-      <ResultToggle view={view} setView={setView} />
-
-      {/* ✅ View */}
-      {view === "record" ? (
-        <DiaryView diaryContent={finalDiaryContent} />
-      ) : (
-        <ResultView diaryContent={finalDiaryContent} memSummary={memsummary} />
-      )}
+  
+      <div className="mt-[200px]">
+        {/* ✅ Emotion Summary */}
+        <EmotionSummary diaryContent={finalDiaryContent} />
+  
+        {/* ✅ Toggle */}
+        <ResultToggle view={view} setView={setView} />
+  
+        {/* ✅ View */}
+        {view === "record" ? (
+          <DiaryView diaryContent={finalDiaryContent} />
+        ) : (
+          <ResultView diaryContent={finalDiaryContent} memSummary={memsummary} />
+        )}
+      </div>
     </div>
   );
-};
+}  
 
 export default Result;

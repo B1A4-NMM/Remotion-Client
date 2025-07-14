@@ -13,8 +13,7 @@ interface DiaryPhotosProps {
 }
 
 const DiaryPhotos: React.FC<DiaryPhotosProps> = ({ photos }) => {
-  // if (!photos || photos.length === 0) return null;
-  if (!photos || photos.length === 0) photos=sample;
+  if (!photos || photos.length === 0) return null;
 
   const renderPhotos=()=>{
     switch(photos.length){
@@ -24,7 +23,7 @@ const DiaryPhotos: React.FC<DiaryPhotosProps> = ({ photos }) => {
             <img
               src={photos[0]}
               alt="Diary Photo"
-              className="object-cover w-full h-64 rounded-2xl"
+              className="object-cover w-full h-full rounded-2xl"
             />
           </div>
         )
@@ -36,7 +35,7 @@ const DiaryPhotos: React.FC<DiaryPhotosProps> = ({ photos }) => {
                 key={idx}
                 src={url}
                 alt={`Diary Photo ${idx}`}
-                className="object-cover w-full h-40 rounded-lg"
+                className="object-cover w-full h-full rounded-lg"
               />
             ))}
           </div>
@@ -51,7 +50,7 @@ const DiaryPhotos: React.FC<DiaryPhotosProps> = ({ photos }) => {
                   key={idx + 1}
                   src={url}
                   alt={`Diary Photo ${idx + 2}`}
-                  className="object-cover w-full h-32 rounded-lg"
+                  className="object-cover w-full h-full rounded-lg"
                 />
               ))}
             </div>
@@ -60,7 +59,7 @@ const DiaryPhotos: React.FC<DiaryPhotosProps> = ({ photos }) => {
             <img
               src={photos[0]}
               alt="Diary Photo 1"
-              className="object-cover w-full h-48 rounded-xl"
+              className="object-cover w-full h-full rounded-xl"
             />
           </div>
         );
@@ -72,7 +71,7 @@ const DiaryPhotos: React.FC<DiaryPhotosProps> = ({ photos }) => {
                 key={idx}
                 src={url}
                 alt={`Diary Photo ${idx + 1}`}
-                className="object-cover w-full h-40 rounded-xl"
+                className="object-cover w-full h-full rounded-xl"
               />
             ))}
           </div>
@@ -81,7 +80,7 @@ const DiaryPhotos: React.FC<DiaryPhotosProps> = ({ photos }) => {
   }
 
   return (
-    <div className="rounded-2xl overflow-hidden">
+    <div className="rounded-2xl overflow-hidden shadow-lg">
       {renderPhotos()}
     </div>
   );

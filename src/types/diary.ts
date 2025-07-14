@@ -53,8 +53,16 @@ export interface DiaryPayload {
 
 // 내가 받는 데이터
 export interface DiaryResponse {
+  diaryId: number;
+  title: string;
+  writtenDate: string;
+  content: string;
+  photoPath: string;
+  audioPath: string;
+  isBookmarked: boolean;
+  latitude: number;
+  longitude: number;
   activity_analysis: ActivityAnalysis[];
-  reflection: Reflection;
 }
 
 export interface ActivityAnalysis {

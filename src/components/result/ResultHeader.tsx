@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Bookmark, BookMarked, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
@@ -9,18 +9,23 @@ interface ResultHeaderProps {
 
 const ResultHeader: React.FC<ResultHeaderProps> = ({ writtenDate }) => {
   const navigate = useNavigate();
+  const [isBookmarked, setIsBookmarked ] = useState(false);
+
+  const handleBookmark=()=>{
+    setIsBookmarked(!isBookmarked);
+  }
 
   return (
-    <div className="w-full">
+    <div className="w-full mb-8">
       {/* ✅ 메인 헤더 */}
-      <div className="flex items-start justify-between px-4 pt-6 pb-4">
+      <div className="flex items-start justify-between px-4 pt-6 pb-4 shadow-sm rounded-3xl">
         {/* 왼쪽: 시각 + 날짜 */}
         <div className="flex flex-col">
           <span className="text-sm text-black mt-1">
             {dayjs(writtenDate).format("YYYY년 M월 D일")}
           </span>
           <span className="text-sm text-black">
-            {dayjs(writtenDate).format("dddd A HH:mm")}
+            {dayjs(writtenDate).format("dddd")}
           </span>
         </div>
 
@@ -29,8 +34,10 @@ const ResultHeader: React.FC<ResultHeaderProps> = ({ writtenDate }) => {
           <button
             className="p-2 rounded-full bg-white shadow transition-colors"
             aria-label="북마크"
+            onClick={handleBookmark}
           >
-            <Bookmark className="w-5 h-5 text-black" />
+            <Bookmark className="w-5 h-5"
+            style={{ fill: isBookmarked ? '#EF7C80' : 'none' , color: isBookmarked? '#EF7C80' : 'black' }} />
           </button>
 
           <button

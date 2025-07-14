@@ -11,8 +11,9 @@ interface DiaryViewProps {
 }
 
 const DiaryView: React.FC<DiaryViewProps> = ({ diaryContent }) => {
+  console.log(diaryContent);
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mb-20">
       <DiaryPhotos photos={diaryContent?.photos} />
       <DiaryAudio audio={diaryContent?.audio} />
       <DiaryContent content={diaryContent?.content} />

@@ -15,19 +15,19 @@ const ResultToggle: React.FC<ResultToggleProps> = ({ view, setView }) => {
 
   const handleRoutineClick = () => {
     if (!isRecordActive) {  // 이미 루틴 페이지라면 이동하지 않음
-      view='record';
+      setView('record');
     }
   };
 
   const handleContentsClick = () => {
     if (!isAnalysisActive) {  // 이미 컨텐츠 페이지라면 이동하지 않음
-      view='analysis';
+      setView('analysis');
     }
   };
 
 
   return (
-    <div className="flex justify-center gap-2 mb-6">
+    <div className="flex justify-center gap-2 mb-10 mt-10">
 
       <div className="buttonContainer w-fit">
         <button

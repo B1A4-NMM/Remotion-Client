@@ -71,7 +71,6 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent }) => {
           y: scrollY,
           borderRadius: scrollY < -100 ? "0px" : "24px 24px 0 0",
           minHeight: "100vh",
-          backgroundColor: "#1e1e1e",
         }}
       >
         <ActivityCardSlider data={diaryContent} />

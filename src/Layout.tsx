@@ -3,13 +3,16 @@ import BottomNavigation from "./components/BottomNavigation";
 import { Toaster } from "sonner";
 
 // 하단 네비게이션을 숨길 경로 목록
-const HIDE_NAV_PATHS = ["/signup", "/login", "/diary/2025-07-12", "/video"];
+const HIDE_NAV_PATHS = ["/signup", "/login", "/diary/", "/video"];
 
 export default function Layout() {
   const location = useLocation();
 
   // 현재 경로가 네비게이션을 숨겨야 하는 경로에 포함되지 않는 경우만 보여줌
-  const shouldShowNav = !HIDE_NAV_PATHS.includes(location.pathname);
+  // 경로가 숨겨야 하는 경로로 시작하는지 확인
+  const shouldShowNav = !HIDE_NAV_PATHS.some(path => 
+    location.pathname.startsWith(path)
+  );
 
   return (
     <div className="w-full min-h-[100dvh] flex justify-center bg-[#FAF6F4] font-pretendard">

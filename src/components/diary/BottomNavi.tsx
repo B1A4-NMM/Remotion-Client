@@ -7,7 +7,6 @@ interface BottomNaviProps {
   isPhotoActive: boolean;
   isLocationActive: boolean;
   isSaveEnabled: boolean; // 저장 버튼 활성화 상태 추가
-  keyboardHeight: number;
 }
 
 const BottomNavi = ({
@@ -19,14 +18,10 @@ const BottomNavi = ({
   isPhotoActive,
   isLocationActive,
   isSaveEnabled, // 저장 버튼 활성화 상태
-  keyboardHeight,
 }: BottomNaviProps) => {
   return (
     <div
     className={`absolute bottom-0 w-full h-[84px] z-50 flex justify-center transition-transform duration-300 ease-in-out`}
-    style={{
-      transform:  `translateY(-${keyboardHeight}px)`,
-    }}
     >
       {/* ✅ SVG는 절대 그대로 유지 */}
       <svg
@@ -128,7 +123,7 @@ const BottomNavi = ({
 
       {/* 저장 버튼 - 조건부 스타일 적용 */}
       <button
-        className={`size-fit text-xl rounded-full pl-6 pr-6 pt-4 pb-4 mt-2 transition-all duration-300 ${
+        className={`size-fit text-xl rounded-full pl-5 pr-5 pt-3 pb-3 mt-2 transition-all duration-300 ${
           isSaveEnabled
             ? "bg-black text-white hover:bg-gray-800 cursor-pointer"
             : "bg-gray-400 text-gray-600 cursor-not-allowed"

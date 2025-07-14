@@ -17,7 +17,7 @@ export const usePatchDiaryBookmark = () => {
       isBookmarked: boolean;
     }) => patchDiaryBookmark(token, diaryId, isBookmarked),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["homeData"] });
+      queryClient.invalidateQueries({ queryKey: ["diaries"] });
       toast.success("북마크 상태가 변경되었습니다.", {
         duration: 2000,
       });

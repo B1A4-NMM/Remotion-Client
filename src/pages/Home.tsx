@@ -14,7 +14,8 @@ import { Canvas } from "@react-three/fiber";
 import "../styles/homeCard.css";
 import dayjs from "dayjs";
 import Blob from "../components/Blob/Blob";
-import { useDeleteDiary } from "../../api/queries/home/useDeleteDiary";
+import { useDeleteDiary } from "../api/queries/home/useDeleteDiary";
+import { useInfiniteDiaries } from "../api/queries/home/useInfiniteDiaries";
 
 // S3 → http 변환 (실제 CDN 도메인에 맞게 수정 필요)
 const s3ToHttpUrl = (s3Path: string) =>
@@ -67,6 +68,27 @@ const Home = () => {
     setErrorMessage("");
   }, []);
 
+  // 무한스크롤용 react-query
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteDiaries();
+  // observer ref
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastDiaryRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isFetchingNextPage) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [isFetchingNextPage, hasNextPage, fetchNextPage]
+  );
+  // 무한스크롤 diaries
+  const infiniteDiaries =
+    data?.pages.flatMap(page => page.item.diaries.map(mapApiDiaryToDiaryCard)) ?? [];
+
   // API 호출 시 string 변환
   const { data: todayData, isLoading } = useGetDiaryDate(
     token,
@@ -95,7 +117,13 @@ const Home = () => {
         selectedTab={selectedTab}
         setSelectedTab={setSelectedTab}
       />
-      {selectedTab === "menu" && <DiaryCards diaries={diaries} />}
+      {selectedTab === "menu" && (
+        <DiaryCards
+          diaries={infiniteDiaries}
+          isLoading={isFetchingNextPage}
+          lastItemRef={lastDiaryRef}
+        />
+      )}
       {selectedTab === "location" && (
         <Map
           continuousWritingDate={continuousWritingDate}

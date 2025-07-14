@@ -1,6 +1,6 @@
 import React from "react";
 import HomeBar from "./HomeBar";
-
+import { useNavigate } from "react-router-dom";
 interface TitleProps {
   continuousWritingDate: number;
   emotionCountByMonth: number;
@@ -16,6 +16,7 @@ const Title: React.FC<TitleProps> = ({
   selectedTab,
   setSelectedTab,
 }) => {
+  const navigate = useNavigate();
   return (
     <>
       <div className="w-full ">
@@ -29,7 +30,7 @@ const Title: React.FC<TitleProps> = ({
             <button
               className="p-2 rounded-full bg-white transition-colors box-shadow shadow-xl"
               aria-label="검색"
-              onClick={() => setSelectedTab("search")}
+              onClick={() => navigate("/search")}
             >
               <svg
                 className={`w-5 h-5 ${selectedTab === "search" ? "text-black" : "text-gray-400"}`}

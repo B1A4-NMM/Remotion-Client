@@ -16,7 +16,7 @@ import Map from "./pages/Map";
 import Video from "./pages/Video";
 import Routine from "./pages/Routine";
 import Contents from "./pages/Contents";
-
+import SearchPage from "./pages/SearchPage";
 import Action from "./pages/Action";
 export const routes = [
   { path: "/", element: <Home /> },
@@ -36,4 +36,5 @@ export const routes = [
   { path: "/action", element: <Action /> },
   { path: "/routine", element: <Routine /> },
   { path: "/contents", element: <Contents /> },
+  { path: "/search", element: <SearchPage /> },
 ];

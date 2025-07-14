@@ -44,3 +44,17 @@ export const getInfiniteDiaries = async (cursor: number = 0, limit: number = 10)
   });
   return response.data;
 };
+
+export const searchDiaries = async (q: string) => {
+  const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
+  const token = localStorage.getItem("accessToken");
+  console.log("[searchDiaries] 검색 쿼리 파라미터 q:", q);
+  const response = await axios.get(`${BASE_URL}/diary/search`, {
+    params: { q },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  console.log("[searchDiaries] 응답 데이터:", response.data);
+  return response.data; // { diaries: [...], totalCount: N }
+};

@@ -16,6 +16,9 @@ import { Button } from "../ui/button";
 import { Trash2 } from "lucide-react";
 import { useDeleteDiary } from "../../api/queries/home/useDeleteDiary";
 import dayjs from "dayjs";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useEffect, useRef, useCallback } from "react";
+import { useInfiniteDiaries } from "../../api/queries/home/useInfiniteDiaries";
 
 interface Diary {
   id: number;
@@ -42,90 +45,143 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
   const token = localStorage.getItem("accessToken") || "";
   const [openId, setOpenId] = useState<number | null>(null);
 
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteDiaries();
+
+  const prevPageLen = useRef(0);
+
+  useEffect(() => {
+    if (data && data.pages.length > prevPageLen.current) {
+      // 새로 추가된 마지막 page만 콘솔에!
+      const lastPage = data.pages[data.pages.length - 1];
+      console.log("방금 fetchNextPage로 받아온 데이터:", lastPage);
+      prevPageLen.current = data.pages.length;
+    }
+  }, [data]);
+
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastDiaryRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isFetchingNextPage) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage().then(result => {
+            // result는 react-query의 쿼리 상태 객체
+            console.log("fetchNextPage 이후 쿼리 상태", result);
+          });
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [isFetchingNextPage, hasNextPage, fetchNextPage]
+  );
+
+  // data.pages.flatMap(page => page.item.diaries)로 전체 리스트 생성
+
   return (
     <div className="flex flex-col gap-6 w-full max-w-[420px] mx-auto">
-      {diaries &&
-        diaries.length > 0 &&
-        diaries.map(diary => {
-          const images = diary.photoUrl
-            ? Array.isArray(diary.photoUrl)
-              ? diary.photoUrl
-              : [diary.photoUrl]
+      {data?.pages
+        .flatMap(page => page.item.diaries)
+        .map((diary: any, index: number, arr: any[]) => {
+          const mappedDiary = {
+            id: diary.diaryId,
+            emotions: diary.emotions ?? [],
+            targets: diary.targets ?? [],
+            activities: diary.activities ?? [],
+            photoUrl: diary.photoPath ?? [],
+            map:
+              diary.latitude !== null && diary.longitude !== null
+                ? { lat: diary.latitude, lng: diary.longitude }
+                : null,
+            content: diary.content,
+            date: diary.writtenDate,
+            keywords: diary.keywords ?? [],
+            behaviors: diary.behaviors ?? [],
+            bookmarked: diary.isBookmarked,
+          };
+          const images = mappedDiary.photoUrl
+            ? Array.isArray(mappedDiary.photoUrl)
+              ? mappedDiary.photoUrl
+              : [mappedDiary.photoUrl]
             : [];
-          const filteredImages = images.filter(img => !!img && img.trim() !== "");
-          const isEmotionOnly = !diary.map && (!diary.photoUrl || filteredImages.length === 0);
-
+          const filteredImages = images.filter((img: string) => !!img && img.trim() !== "");
+          const isEmotionOnly =
+            !mappedDiary.map && (!mappedDiary.photoUrl || filteredImages.length === 0);
+          const isLast = index === arr.length - 1;
           // 1. 감정만 있는 경우
           if (isEmotionOnly) {
             return (
               <div
-                key={diary.id}
+                key={mappedDiary.id}
+                ref={isLast ? lastDiaryRef : undefined}
                 className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
               >
                 <div className="flex gap-4 items-center rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] mb-4 py-[14px] px-[20px]">
                   <div className="w-[70px] h-[70px] flex items-center justify-center rounded-full overflow-hidden">
                     <Canvas className="w-full h-full">
-                      <Blob diaryContent={{ emotions: diary.emotions }} />
+                      <Blob diaryContent={{ emotions: mappedDiary.emotions }} />
                     </Canvas>
                   </div>
                   <div className="flex-1 min-w-0">
                     {/* 감정 요약 */}
                     <div className="text-[14px] font-medium text-gray-700 truncate ">
-                      {diary.emotions && diary.emotions.length > 0
-                        ? `${diary.emotions
+                      {mappedDiary.emotions && mappedDiary.emotions.length > 0
+                        ? `${mappedDiary.emotions
                             .slice(0, 2)
                             .map(e => e.emotion)
                             .join(
                               ", "
-                            )}${diary.emotions.length > 2 ? ` 외 ${diary.emotions.length - 2}가지 감정` : ""}`
+                            )}${mappedDiary.emotions.length > 2 ? ` 외 ${mappedDiary.emotions.length - 2}가지 감정` : ""}`
                         : "감정 없음"}
                     </div>
                     {/* 타겟 요약 */}
                     <div className="text-xs text-[#85848F] truncate">
-                      {diary.targets && diary.targets.length > 0
-                        ? `${diary.targets.slice(0, 3).join(", ")}${diary.targets.length >= 4 ? " 등" : ""}`
+                      {mappedDiary.targets && mappedDiary.targets.length > 0
+                        ? `${mappedDiary.targets.slice(0, 3).join(", ")}${mappedDiary.targets.length >= 4 ? " 등" : ""}`
                         : "나혼자"}
                     </div>
                     {/* 액티비티 요약 */}
                     <div className="text-xs text-[#85848F] truncate">
-                      {diary.activities && diary.activities.length > 0
-                        ? `${diary.activities.slice(0, 3).join(", ")}${diary.activities.length >= 3 ? " 등" : ""}`
+                      {mappedDiary.activities && mappedDiary.activities.length > 0
+                        ? `${mappedDiary.activities.slice(0, 3).join(", ")}${mappedDiary.activities.length >= 3 ? " 등" : ""}`
                         : "활동 없음"}
                     </div>
                   </div>
                 </div>
                 {/* 본문 */}
                 <div className="text-base text-gray-800 leading-relaxed break-words mb-3 line-clamp-4">
-                  {diary.content}
+                  {mappedDiary.content}
                 </div>
                 {/* 구분선 */}
                 <hr className="border-t border-[#E5E5EA] mb-2" />
                 {/* 날짜 & 오른쪽 아이콘들 */}
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-400">
-                    {dayjs(diary.date).format("YYYY년 MM월 DD일")}
+                    {dayjs(mappedDiary.date).format("YYYY년 MM월 DD일")}
                   </span>
                   <div className="flex items-center gap-2">
-                    {diary.bookmarked && (
+                    {mappedDiary.bookmarked && (
                       <img src={BookmarkIcon} alt="북마크" className="w-5 h-5 cursor-pointer" />
                     )}
                     <DiaryActionModal
-                      open={openId === diary.id}
-                      setOpen={v => setOpenId(v ? diary.id : null)}
+                      open={openId === mappedDiary.id}
+                      setOpen={v => setOpenId(v ? mappedDiary.id : null)}
                       onDelete={() => {
-                        deleteDiaryMutation.mutate({ token, diaryId: String(diary.id) });
+                        deleteDiaryMutation.mutate({ token, diaryId: String(mappedDiary.id) });
                       }}
                       trigger={
                         <img
                           src={FilterIcon}
                           alt="필터"
                           className="w-5 h-5 cursor-pointer"
-                          onClick={() => setOpenId(diary.id)}
+                          onClick={(e: React.MouseEvent<HTMLImageElement, MouseEvent>) =>
+                            setOpenId(mappedDiary.id)
+                          }
                         />
                       }
                       titleHidden={true}
-                      diaryId={diary.id}
-                      isBookmarked={diary.bookmarked}
+                      diaryId={mappedDiary.id}
+                      isBookmarked={mappedDiary.bookmarked}
                     />
                   </div>
                 </div>
@@ -133,11 +189,12 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
             );
           }
           // 2. 지도 + 사진 1장 이상
-          else if (diary.map && filteredImages.length >= 1) {
+          else if (mappedDiary.map && filteredImages.length >= 1) {
             // 사진이 여러 장이면 1장만 + 지도
             return (
               <div
-                key={diary.id}
+                key={mappedDiary.id}
+                ref={isLast ? lastDiaryRef : undefined}
                 className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
               >
                 <div
@@ -149,22 +206,22 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
                     <div className="h-full w-full max-h-[120px] rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
                       {/* 감정 요약 (위) */}
                       <div className="text-xs text-[#85848F] font-medium text-center ">
-                        {diary.emotions && diary.emotions.length > 0
-                          ? `${diary.emotions
+                        {mappedDiary.emotions && mappedDiary.emotions.length > 0
+                          ? `${mappedDiary.emotions
                               .slice(0, 2)
                               .map(e => e.emotion)
-                              .join(", ")}${diary.emotions.length > 2 ? " 등" : ""}`
+                              .join(", ")}${mappedDiary.emotions.length > 2 ? " 등" : ""}`
                           : "감정 없음"}
                       </div>
                       <div className="w-full h-full max-w-[120px] max-h-[120px] flex items-center justify-center rounded-full overflow-hidden mx-auto">
                         <Canvas className="w-full h-full">
-                          <Blob diaryContent={{ emotions: diary.emotions }} />
+                          <Blob diaryContent={{ emotions: mappedDiary.emotions }} />
                         </Canvas>
                       </div>
                       {/* 대상 요약 (아래) */}
                       <div className="text-xs text-[#85848F] text-center">
-                        {diary.targets && diary.targets.length > 0
-                          ? `${diary.targets.slice(0, 2).join(", ")}${diary.targets.length > 2 ? " 등" : ""}`
+                        {mappedDiary.targets && mappedDiary.targets.length > 0
+                          ? `${mappedDiary.targets.slice(0, 2).join(", ")}${mappedDiary.targets.length > 2 ? " 등" : ""}`
                           : "나 혼자"}
                       </div>
                     </div>
@@ -178,7 +235,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
                       style={{ aspectRatio: "1 / 1" }}
                     />
                     <img
-                      src={`https://maps.googleapis.com/maps/api/staticmap?center=${diary.map?.lat},${diary.map?.lng}&zoom=15&size=200x200&markers=color:red%7C${diary.map?.lat},${diary.map?.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
+                      src={`https://maps.googleapis.com/maps/api/staticmap?center=${mappedDiary.map?.lat},${mappedDiary.map?.lng}&zoom=15&size=200x200&markers=color:red%7C${mappedDiary.map?.lat},${mappedDiary.map?.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
                       alt="map-preview"
                       className="rounded-lg object-cover w-full h-full"
                       style={{ aspectRatio: "1 / 1" }}
@@ -187,34 +244,36 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
                 </div>
                 {/* 본문/날짜/아이콘 등 기존과 동일하게... */}
                 <div className="text-base text-gray-800 leading-relaxed break-words mb-3 line-clamp-4">
-                  {diary.content}
+                  {mappedDiary.content}
                 </div>
                 <hr className="border-t border-[#E5E5EA] mb-2" />
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-400">
-                    {dayjs(diary.date).format("YYYY년 MM월 DD일")}
+                    {dayjs(mappedDiary.date).format("YYYY년 MM월 DD일")}
                   </span>
                   <div className="flex items-center gap-2">
-                    {diary.bookmarked && (
+                    {mappedDiary.bookmarked && (
                       <img src={BookmarkIcon} alt="북마크" className="w-5 h-5 cursor-pointer" />
                     )}
                     <DiaryActionModal
-                      open={openId === diary.id}
-                      setOpen={v => setOpenId(v ? diary.id : null)}
+                      open={openId === mappedDiary.id}
+                      setOpen={v => setOpenId(v ? mappedDiary.id : null)}
                       onDelete={() => {
-                        deleteDiaryMutation.mutate({ token, diaryId: String(diary.id) });
+                        deleteDiaryMutation.mutate({ token, diaryId: String(mappedDiary.id) });
                       }}
                       trigger={
                         <img
                           src={FilterIcon}
                           alt="필터"
                           className="w-5 h-5 cursor-pointer"
-                          onClick={() => setOpenId(diary.id)}
+                          onClick={(e: React.MouseEvent<HTMLImageElement, MouseEvent>) =>
+                            setOpenId(mappedDiary.id)
+                          }
                         />
                       }
                       titleHidden={true}
-                      diaryId={diary.id}
-                      isBookmarked={diary.bookmarked}
+                      diaryId={mappedDiary.id}
+                      isBookmarked={mappedDiary.bookmarked}
                     />
                   </div>
                 </div>
@@ -222,10 +281,11 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
             );
           }
           // 3. 지도만 있고 사진 없음
-          else if (diary.map && filteredImages.length === 0) {
+          else if (mappedDiary.map && filteredImages.length === 0) {
             return (
               <div
-                key={diary.id}
+                key={mappedDiary.id}
+                ref={isLast ? lastDiaryRef : undefined}
                 className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
               >
                 <div
@@ -237,22 +297,22 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
                     <div className="h-full w-full max-h-[120px] rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
                       {/* 감정 요약 (위) */}
                       <div className="text-xs text-[#85848F] font-medium text-center ">
-                        {diary.emotions && diary.emotions.length > 0
-                          ? `${diary.emotions
+                        {mappedDiary.emotions && mappedDiary.emotions.length > 0
+                          ? `${mappedDiary.emotions
                               .slice(0, 2)
                               .map(e => e.emotion)
-                              .join(", ")}${diary.emotions.length > 2 ? " 등" : ""}`
+                              .join(", ")}${mappedDiary.emotions.length > 2 ? " 등" : ""}`
                           : "감정 없음"}
                       </div>
                       <div className="w-full h-full max-w-[120px] max-h-[120px] flex items-center justify-center rounded-full overflow-hidden mx-auto">
                         <Canvas className="w-full h-full">
-                          <Blob diaryContent={{ emotions: diary.emotions }} />
+                          <Blob diaryContent={{ emotions: mappedDiary.emotions }} />
                         </Canvas>
                       </div>
                       {/* 대상 요약 (아래) */}
                       <div className="text-xs text-[#85848F] text-center">
-                        {diary.targets && diary.targets.length > 0
-                          ? `${diary.targets.slice(0, 2).join(", ")}${diary.targets.length > 2 ? " 등" : ""}`
+                        {mappedDiary.targets && mappedDiary.targets.length > 0
+                          ? `${mappedDiary.targets.slice(0, 2).join(", ")}${mappedDiary.targets.length > 2 ? " 등" : ""}`
                           : "나 혼자"}
                       </div>
                     </div>
@@ -260,7 +320,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
                   {/* 지도만 */}
                   <div className="col-span-2 h-full flex items-center">
                     <img
-                      src={`https://maps.googleapis.com/maps/api/staticmap?center=${diary.map?.lat},${diary.map?.lng}&zoom=15&size=200x200&markers=color:red%7C${diary.map?.lat},${diary.map?.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
+                      src={`https://maps.googleapis.com/maps/api/staticmap?center=${mappedDiary.map?.lat},${mappedDiary.map?.lng}&zoom=15&size=200x200&markers=color:red%7C${mappedDiary.map?.lat},${mappedDiary.map?.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
                       alt="map-preview"
                       className="rounded-lg object-cover w-full h-full"
                       style={{ aspectRatio: "2 / 1" }}
@@ -269,34 +329,36 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
                 </div>
                 {/* 본문/날짜/아이콘 등 기존과 동일하게... */}
                 <div className="text-base text-gray-800 leading-relaxed break-words mb-3 line-clamp-4">
-                  {diary.content}
+                  {mappedDiary.content}
                 </div>
                 <hr className="border-t border-[#E5E5EA] mb-2" />
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-400">
-                    {dayjs(diary.date).format("YYYY년 MM월 DD일")}
+                    {dayjs(mappedDiary.date).format("YYYY년 MM월 DD일")}
                   </span>
                   <div className="flex items-center gap-2">
-                    {diary.bookmarked && (
+                    {mappedDiary.bookmarked && (
                       <img src={BookmarkIcon} alt="북마크" className="w-5 h-5 cursor-pointer" />
                     )}
                     <DiaryActionModal
-                      open={openId === diary.id}
-                      setOpen={v => setOpenId(v ? diary.id : null)}
+                      open={openId === mappedDiary.id}
+                      setOpen={v => setOpenId(v ? mappedDiary.id : null)}
                       onDelete={() => {
-                        deleteDiaryMutation.mutate({ token, diaryId: String(diary.id) });
+                        deleteDiaryMutation.mutate({ token, diaryId: String(mappedDiary.id) });
                       }}
                       trigger={
                         <img
                           src={FilterIcon}
                           alt="필터"
                           className="w-5 h-5 cursor-pointer"
-                          onClick={() => setOpenId(diary.id)}
+                          onClick={(e: React.MouseEvent<HTMLImageElement, MouseEvent>) =>
+                            setOpenId(mappedDiary.id)
+                          }
                         />
                       }
                       titleHidden={true}
-                      diaryId={diary.id}
-                      isBookmarked={diary.bookmarked}
+                      diaryId={mappedDiary.id}
+                      isBookmarked={mappedDiary.bookmarked}
                     />
                   </div>
                 </div>
@@ -304,10 +366,11 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
             );
           }
           // 4. 지도 없고 사진 2장 이상
-          else if (!diary.map && filteredImages.length >= 2) {
+          else if (!mappedDiary.map && filteredImages.length >= 2) {
             return (
               <div
-                key={diary.id}
+                key={mappedDiary.id}
+                ref={isLast ? lastDiaryRef : undefined}
                 className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
               >
                 <div
@@ -319,22 +382,22 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
                     <div className="h-full w-full max-h-[120px] rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
                       {/* 감정 요약 (위) */}
                       <div className="text-xs text-[#85848F] font-medium text-center ">
-                        {diary.emotions && diary.emotions.length > 0
-                          ? `${diary.emotions
+                        {mappedDiary.emotions && mappedDiary.emotions.length > 0
+                          ? `${mappedDiary.emotions
                               .slice(0, 2)
                               .map(e => e.emotion)
-                              .join(", ")}${diary.emotions.length > 2 ? " 등" : ""}`
+                              .join(", ")}${mappedDiary.emotions.length > 2 ? " 등" : ""}`
                           : "감정 없음"}
                       </div>
                       <div className="w-full h-full max-w-[120px] max-h-[120px] flex items-center justify-center rounded-full overflow-hidden mx-auto">
                         <Canvas className="w-full h-full">
-                          <Blob diaryContent={{ emotions: diary.emotions }} />
+                          <Blob diaryContent={{ emotions: mappedDiary.emotions }} />
                         </Canvas>
                       </div>
                       {/* 대상 요약 (아래) */}
                       <div className="text-xs text-[#85848F] text-center">
-                        {diary.targets && diary.targets.length > 0
-                          ? `${diary.targets.slice(0, 2).join(", ")}${diary.targets.length > 2 ? " 등" : ""}`
+                        {mappedDiary.targets && mappedDiary.targets.length > 0
+                          ? `${mappedDiary.targets.slice(0, 2).join(", ")}${mappedDiary.targets.length > 2 ? " 등" : ""}`
                           : "나 혼자"}
                       </div>
                     </div>
@@ -357,34 +420,36 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
                 </div>
                 {/* 본문/날짜/아이콘 등 기존과 동일하게... */}
                 <div className="text-base text-gray-800 leading-relaxed break-words mb-3 line-clamp-4">
-                  {diary.content}
+                  {mappedDiary.content}
                 </div>
                 <hr className="border-t border-[#E5E5EA] mb-2" />
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-400">
-                    {dayjs(diary.date).format("YYYY년 MM월 DD일")}
+                    {dayjs(mappedDiary.date).format("YYYY년 MM월 DD일")}
                   </span>
                   <div className="flex items-center gap-2">
-                    {diary.bookmarked && (
+                    {mappedDiary.bookmarked && (
                       <img src={BookmarkIcon} alt="북마크" className="w-5 h-5 cursor-pointer" />
                     )}
                     <DiaryActionModal
-                      open={openId === diary.id}
-                      setOpen={v => setOpenId(v ? diary.id : null)}
+                      open={openId === mappedDiary.id}
+                      setOpen={v => setOpenId(v ? mappedDiary.id : null)}
                       onDelete={() => {
-                        deleteDiaryMutation.mutate({ token, diaryId: String(diary.id) });
+                        deleteDiaryMutation.mutate({ token, diaryId: String(mappedDiary.id) });
                       }}
                       trigger={
                         <img
                           src={FilterIcon}
                           alt="필터"
                           className="w-5 h-5 cursor-pointer"
-                          onClick={() => setOpenId(diary.id)}
+                          onClick={(e: React.MouseEvent<HTMLImageElement, MouseEvent>) =>
+                            setOpenId(mappedDiary.id)
+                          }
                         />
                       }
                       titleHidden={true}
-                      diaryId={diary.id}
-                      isBookmarked={diary.bookmarked}
+                      diaryId={mappedDiary.id}
+                      isBookmarked={mappedDiary.bookmarked}
                     />
                   </div>
                 </div>
@@ -392,10 +457,11 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
             );
           }
           // 5. 지도 없고 사진 1장
-          else if (!diary.map && filteredImages.length === 1) {
+          else if (!mappedDiary.map && filteredImages.length === 1) {
             return (
               <div
-                key={diary.id}
+                key={mappedDiary.id}
+                ref={isLast ? lastDiaryRef : undefined}
                 className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
               >
                 <div
@@ -407,22 +473,22 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
                     <div className="h-full w-full max-h-[120px] rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
                       {/* 감정 요약 (위) */}
                       <div className="text-xs text-[#85848F] font-medium text-center ">
-                        {diary.emotions && diary.emotions.length > 0
-                          ? `${diary.emotions
+                        {mappedDiary.emotions && mappedDiary.emotions.length > 0
+                          ? `${mappedDiary.emotions
                               .slice(0, 2)
                               .map(e => e.emotion)
-                              .join(", ")}${diary.emotions.length > 2 ? " 등" : ""}`
+                              .join(", ")}${mappedDiary.emotions.length > 2 ? " 등" : ""}`
                           : "감정 없음"}
                       </div>
                       <div className="w-full h-full max-w-[120px] max-h-[120px] flex items-center justify-center rounded-full overflow-hidden mx-auto">
                         <Canvas className="w-full h-full">
-                          <Blob diaryContent={{ emotions: diary.emotions }} />
+                          <Blob diaryContent={{ emotions: mappedDiary.emotions }} />
                         </Canvas>
                       </div>
                       {/* 대상 요약 (아래) */}
                       <div className="text-xs text-[#85848F] text-center">
-                        {diary.targets && diary.targets.length > 0
-                          ? `${diary.targets.slice(0, 2).join(", ")}${diary.targets.length > 2 ? " 등" : ""}`
+                        {mappedDiary.targets && mappedDiary.targets.length > 0
+                          ? `${mappedDiary.targets.slice(0, 2).join(", ")}${mappedDiary.targets.length > 2 ? " 등" : ""}`
                           : "나 혼자"}
                       </div>
                     </div>
@@ -439,34 +505,36 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
                 </div>
                 {/* 본문/날짜/아이콘 등 기존과 동일하게... */}
                 <div className="text-base text-gray-800 leading-relaxed break-words mb-3 line-clamp-4">
-                  {diary.content}
+                  {mappedDiary.content}
                 </div>
                 <hr className="border-t border-[#E5E5EA] mb-2" />
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-400">
-                    {dayjs(diary.date).format("YYYY년 MM월 DD일")}
+                    {dayjs(mappedDiary.date).format("YYYY년 MM월 DD일")}
                   </span>
                   <div className="flex items-center gap-2">
-                    {diary.bookmarked && (
+                    {mappedDiary.bookmarked && (
                       <img src={BookmarkIcon} alt="북마크" className="w-5 h-5 cursor-pointer" />
                     )}
                     <DiaryActionModal
-                      open={openId === diary.id}
-                      setOpen={v => setOpenId(v ? diary.id : null)}
+                      open={openId === mappedDiary.id}
+                      setOpen={v => setOpenId(v ? mappedDiary.id : null)}
                       onDelete={() => {
-                        deleteDiaryMutation.mutate({ token, diaryId: String(diary.id) });
+                        deleteDiaryMutation.mutate({ token, diaryId: String(mappedDiary.id) });
                       }}
                       trigger={
                         <img
                           src={FilterIcon}
                           alt="필터"
                           className="w-5 h-5 cursor-pointer"
-                          onClick={() => setOpenId(diary.id)}
+                          onClick={(e: React.MouseEvent<HTMLImageElement, MouseEvent>) =>
+                            setOpenId(mappedDiary.id)
+                          }
                         />
                       }
                       titleHidden={true}
-                      diaryId={diary.id}
-                      isBookmarked={diary.bookmarked}
+                      diaryId={mappedDiary.id}
+                      isBookmarked={mappedDiary.bookmarked}
                     />
                   </div>
                 </div>
@@ -477,7 +545,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
           else {
             return (
               <div
-                key={diary.id}
+                key={mappedDiary.id}
+                ref={isLast ? lastDiaryRef : undefined}
                 className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
               >
                 <div className="flex items-center justify-center h-24 text-gray-400">
@@ -487,6 +556,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
             );
           }
         })}
+      {isFetchingNextPage && (
+        <div className="w-full text-center py-4 text-gray-400">다음 데이터 불러오는 중...</div>
+      )}
+      {isFetchingNextPage && <div ref={lastDiaryRef} className="h-1 w-full" />}
     </div>
   );
 };

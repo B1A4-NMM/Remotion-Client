@@ -1,4 +1,4 @@
-// api/queries/diary/useDeleteDiary.ts
+// src/api/queries/home/useDeleteDiary.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteDiary } from "../../services/deleteDiary";
 import { toast } from "sonner";
@@ -10,11 +10,10 @@ export const useDeleteDiary = () => {
     mutationFn: ({ token, diaryId }: { token: string; diaryId: string }) =>
       deleteDiary(token, diaryId),
     onSuccess: () => {
-      // 성공 시 관련 캐시 무효화
       queryClient.invalidateQueries({ queryKey: ["todayDiary"] });
       queryClient.invalidateQueries({ queryKey: ["diaryContent"] });
       queryClient.invalidateQueries({ queryKey: ["diaryDate"] });
-      
+      queryClient.invalidateQueries({ queryKey: ["homeData"] });
       toast.success("일기가 성공적으로 삭제되었습니다.", {
         description: "홈 화면으로 돌아갑니다.",
         duration: 3000,

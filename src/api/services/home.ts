@@ -11,7 +11,7 @@ export const getHomeData = async (token: string): Promise<HomeResponse> => {
       Authorization: `Bearer ${token}`,
     },
   });
-
+  console.log("response.data", response.data);
   return response.data;
 };
 

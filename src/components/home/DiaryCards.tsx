@@ -73,15 +73,15 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
                 key={diary.id}
                 className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
               >
-                <div className="flex gap-4 items-center rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] mb-4">
-                  <div className="w-[80px] h-[100px] flex items-center justify-center rounded-full overflow-hidden">
+                <div className="flex gap-4 items-center rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] mb-4 py-[14px] px-[20px]">
+                  <div className="w-[70px] h-[70px] flex items-center justify-center rounded-full overflow-hidden">
                     <Canvas className="w-full h-full">
-                      <Blob diaryContent={diary.emotions} />
+                      <Blob diaryContent={{ emotions: diary.emotions }} />
                     </Canvas>
                   </div>
                   <div className="flex-1 min-w-0">
                     {/* 감정 요약 */}
-                    <div className="text-[15px] font-medium text-gray-700 truncate ">
+                    <div className="text-[14px] font-medium text-gray-700 truncate ">
                       {diary.emotions && diary.emotions.length > 0
                         ? `${diary.emotions
                             .slice(0, 2)
@@ -142,9 +142,97 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
                 </div>
               </div>
             );
+          } else if (images.length === 1 || (diary.map && images.length === 0)) {
+            // 사진 1개만 있거나 지도만 있을 때
+            return (
+              <div
+                key={diary.id}
+                className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
+              >
+                <div className="grid grid-cols-3 gap-2 items-center mb-2">
+                  {/* Blob (1칸, 배경) */}
+                  <div className="col-span-1 h-full">
+                    <div className="h-full w-full max-h-[120px] rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
+                      {/* 감정 요약 (위) */}
+                      <div className="text-xs text-[#85848F] font-medium text-center ">
+                        {diary.emotions && diary.emotions.length > 0
+                          ? `${diary.emotions
+                              .slice(0, 2)
+                              .map(e => e.emotion)
+                              .join(", ")}${diary.emotions.length > 2 ? " 등" : ""}`
+                          : "감정 없음"}
+                      </div>
+                      <div className="w-full h-full max-w-[120px] max-h-[120px] flex items-center justify-center rounded-full overflow-hidden mx-auto">
+                        <Canvas className="w-full h-full">
+                          <Blob diaryContent={{ emotions: diary.emotions }} />
+                        </Canvas>
+                      </div>
+                      {/* 대상 요약 (아래) */}
+                      <div className="text-xs text-[#85848F] text-center">
+                        {diary.targets && diary.targets.length > 0
+                          ? `${diary.targets.slice(0, 2).join(", ")}${diary.targets.length > 2 ? " 등" : ""}`
+                          : "나 혼자"}
+                      </div>
+                    </div>
+                  </div>
+                  {/* 사진/지도 (2칸, 넓게) */}
+                  <div className="col-span-2 h-full flex items-center">
+                    {images.length === 1 ? (
+                      <img
+                        src={images[0]}
+                        alt="diary-photo-0"
+                        className="rounded-lg object-cover w-full h-full max-h-[120px]"
+                        style={{ aspectRatio: "2 / 1" }}
+                      />
+                    ) : (
+                      <img
+                        src={`https://maps.googleapis.com/maps/api/staticmap?center=${diary.map.lat},${diary.map.lng}&zoom=15&size=200x200&markers=color:red%7C${diary.map.lat},${diary.map.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
+                        alt="map-preview"
+                        className="rounded-lg object-cover w-full h-full max-h-[120px]"
+                        style={{ aspectRatio: "2 / 1" }}
+                      />
+                    )}
+                  </div>
+                </div>
+                {/* 본문 */}
+                <div className="text-base text-gray-800 leading-relaxed break-words mb-3 line-clamp-4">
+                  {diary.content}
+                </div>
+                {/* 구분선 */}
+                <hr className="border-t border-[#E5E5EA] mb-2" />
+                {/* 날짜 & 오른쪽 아이콘들 */}
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-400">
+                    {dayjs(diary.date).format("YYYY년 MM월 DD일")}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {diary.bookmarked && (
+                      <img src={BookmarkIcon} alt="북마크" className="w-5 h-5 cursor-pointer" />
+                    )}
+                    <DiaryActionModal
+                      open={openId === diary.id}
+                      setOpen={v => setOpenId(v ? diary.id : null)}
+                      onDelete={() => {
+                        deleteDiaryMutation.mutate({ token, diaryId: String(diary.id) });
+                      }}
+                      trigger={
+                        <img
+                          src={FilterIcon}
+                          alt="필터"
+                          className="w-5 h-5 cursor-pointer"
+                          onClick={() => setOpenId(diary.id)}
+                        />
+                      }
+                      titleHidden={true}
+                      diaryId={diary.id}
+                      isBookmarked={diary.bookmarked}
+                    />
+                  </div>
+                </div>
+              </div>
+            );
           }
           // 각 diary별로 open 상태 관리
-          const [open, setOpen] = useState(false);
           return (
             <div key={diary.id} className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col">
               {/* 상단: Blob + 사진(들) 분할 */}
@@ -153,9 +241,9 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
                 style={{ height: "130px" }}
               >
                 {/* 1. Blob */}
-                <div className="flex items-center justify-center rounded-full overflow-hidden aspect-square mx-auto w-[120px] h-[120px]">
+                <div className="flex items-center justify-center rounded-full overflow-hidden aspect-square mx-auto w-[110px] h-[110px]">
                   <Canvas className="w-full h-full">
-                    <Blob diaryContent={diary.emotions} />
+                    <Blob diaryContent={{ emotions: diary.emotions }} />
                   </Canvas>
                 </div>
                 {/* 2,3. 사진/지도 */}
@@ -211,16 +299,18 @@ const DiaryCards: React.FC<DiaryCardsProps> = props => {
                   {dayjs(diary.date).format("YYYY년 MM월 DD일")}
                 </span>
                 <div className="flex items-center gap-2">
-                  {diary.bookmarked && (
-                    <img src={BookmarkIcon} alt="북마크" className="w-5 h-5 cursor-pointer" />
-                  )}
+                  <img
+                    src={BookmarkIcon}
+                    alt="북마크"
+                    className={`w-5 h-5 cursor-pointer ${diary.bookmarked ? "opacity-100" : "opacity-40"}`}
+                  />
                   <DiaryActionModal
-                    open={open}
-                    setOpen={setOpen}
+                    open={openId === diary.id}
+                    setOpen={v => setOpenId(v ? diary.id : null)}
                     onDelete={() => {
                       deleteDiaryMutation.mutate(
                         { token, diaryId: String(diary.id) },
-                        { onSuccess: () => setOpen(false) }
+                        { onSuccess: () => setOpenId(null) }
                       );
                     }}
                     trigger={<img src={FilterIcon} alt="필터" className="w-5 h-5 cursor-pointer" />}

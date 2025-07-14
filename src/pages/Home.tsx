@@ -87,7 +87,7 @@ const Home = () => {
   const todayDiary = todayData ? todayData : null;
 
   return (
-    <div className="h-screen flex flex-col px-4">
+    <div className=" flex flex-col px-4">
       <Title
         emotionCountByMonth={emotionCountByMonth}
         totalDiaryCount={totalDiaryCount}

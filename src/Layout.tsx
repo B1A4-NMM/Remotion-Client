@@ -10,14 +10,12 @@ export default function Layout() {
 
   // 현재 경로가 네비게이션을 숨겨야 하는 경로에 포함되지 않는 경우만 보여줌
   // 경로가 숨겨야 하는 경로로 시작하는지 확인
-  const shouldShowNav = !HIDE_NAV_PATHS.some(path => 
-    location.pathname.startsWith(path)
-  );
+  const shouldShowNav = !HIDE_NAV_PATHS.some(path => location.pathname.startsWith(path));
 
   return (
     <div className="w-full min-h-[100dvh] flex justify-center bg-[#FAF6F4] font-pretendard">
       <div className="w-full max-w-[414px] flex flex-col relative bg-[#FAF6F4] text-black min-h-[100dvh]">
-        <main className="flex-1 h-full bg-[#FAF6F4]">
+        <main className="flex-1 h-full bg-[#FAF6F4] pb-[84px]">
           <Outlet />
           <Toaster
             position="top-center"

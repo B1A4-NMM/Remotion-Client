@@ -191,7 +191,7 @@ const Map: React.FC<MapProps> = _ => {
     <div
       ref={mapRef}
       className="bg-white rounded-2xl shadow  overflow-hidden"
-      style={{ height: "calc(100vh - 120px - 110px)", minHeight: 300 }}
+      style={{ height: "calc(100vh - 250px )", minHeight: 150 }}
     />
   );
 };

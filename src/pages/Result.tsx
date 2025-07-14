@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 
@@ -62,6 +62,44 @@ const Result: React.FC = () => {
 
   const { data: diaryContent, isLoading, isError } = useGetDiaryContentResult(token, id || "sample");
   const { data: memsummary } = useGetMemberSummary(token);
+  const [view, setView] = useState<"record" | "analysis">("record");
+
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
+
+  useEffect(() => {
+    const checkTouchDevice = () => {
+      setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    };
+    
+    checkTouchDevice();
+  }, []);
+
+  // 스크롤 상태 감지 (선택사항)
+  useEffect(() => {
+    let scrollTimeout: NodeJS.Timeout;
+    
+    const handleScroll = () => {
+      setIsScrolling(true);
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        setIsScrolling(false);
+      }, 150);
+    };
+
+    const container = document.querySelector('.result-container');
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener('scroll', handleScroll);
+      }
+      clearTimeout(scrollTimeout);
+    };
+  }, []);
+
 
   if (isLoading) {
     return (
@@ -84,11 +122,24 @@ const Result: React.FC = () => {
     );
   }
 
-  const [view, setView] = useState<"record" | "analysis">("record");
   const finalDiaryContent = diaryContent || sampleDiary;
 
   return (
-    <div className="px-4 overflow-hidden">
+    <div
+    className={`
+      result-container px-4 h-screen
+      ${isTouchDevice 
+        ? 'overflow-y-auto scrollbar-hide touch-scroll' 
+        : 'overflow-y-auto'
+      }
+      ${isScrolling ? 'scrolling' : ''}
+    `}
+      style={{
+        WebkitOverflowScrolling: isTouchDevice ? 'touch' : 'auto',
+        scrollBehavior: 'smooth',
+        overscrollBehavior: 'contain'
+      }}
+    >
       {/* ✅ Header */}
       <ResultHeader writtenDate={finalDiaryContent.writtenDate || ""} />
 

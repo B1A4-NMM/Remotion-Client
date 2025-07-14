@@ -1,7 +1,8 @@
 // src/components/result/EmotionSummary.tsx
 
 import React from "react";
-import MoodCircle from "./MoodCircle";
+import { Canvas } from "@react-three/fiber";
+import Blob from "../Blob/Blob";
 
 interface EmotionSummaryProps {
   diaryContent: any;
@@ -18,7 +19,10 @@ const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
   return (
     <div className="flex flex-col items-center text-center space-y-3 mb-4">
       <p className="text-sm text-gray-500">하루의 감정</p>
-      <MoodCircle diaryContent={diaryContent} />
+      <Canvas
+        camera={{ position: [0, 0, 10], fov: 30 }}>
+        <Blob />
+      </Canvas>
       {mainEmotions && (
         <p className="text-lg font-bold text-gray-900">{mainEmotions}</p>
       )}

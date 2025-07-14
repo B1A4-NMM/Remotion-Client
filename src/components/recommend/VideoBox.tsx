@@ -43,7 +43,6 @@ const YouTubeBoard: React.FC<YouTubeBoardProps> = ({
   autoPlay = false,
   showControls = true,
 }) => {
-  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   

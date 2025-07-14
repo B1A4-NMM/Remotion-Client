@@ -26,7 +26,7 @@ const Title = () => {
 
       {/* 메인 헤더 */}
       <div className="flex items-center justify-between px-4 py-3">
-        <h1 className="text-4xl font-bold text-gray-900 ml-2">추천</h1>
+        <h1 className="text-3xl font-bold text-gray-900 ml-2">추천</h1>
       </div>
 
       {/* 버튼 위치 - 두 개의 버튼으로 변경 */}

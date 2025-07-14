@@ -26,3 +26,7 @@ dist-ssr
 # 환경변수 파일 
 .env*
 !.env.example
+
+# Gemini CLI 설정 폴더 무시
+.gemini/
+**/.gemini/

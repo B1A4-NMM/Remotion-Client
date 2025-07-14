@@ -1,15 +1,39 @@
-const DiaryTitle = () => {
+import React from "react";
+import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
+
+interface DiaryTitleProps {
+  selectedDate: string;
+  onCalendarClick: () => void;
+}
+
+const DiaryTitle:React.FC<DiaryTitleProps> = ({
+    selectedDate,
+    onCalendarClick
+}) => {
+
+    const navigate = useNavigate();
+
+    const formatDate = (date: string) => {
+        return dayjs(date).format('YYYY년 M월 D일');
+    };
+
+    const backHome = ()=>{
+        navigate(`/`);
+    }  
+
     return (
         <div className="relative top-10 left-0 w-full mb-10">
             <div className="flex items-center justify-between px-4 py-3">
-                <h1 className="text-3xl font-bold text-gray-900 ml-2">2025년 7월 12일</h1>
+                <h1 className="text-3xl font-bold text-gray-900 ml-2">{formatDate(selectedDate)}</h1>
 
                  {/* 액션 버튼들 */}
                  <div className="flex items-center gap-2">
                     {/* 검색 버튼 */}
                     <button 
                         className="p-2 rounded-full bg-white transition-colors box-shadow shadow-xl"
-                        aria-label="검색"
+                        aria-label="달력"
+                        onClick={onCalendarClick}
                     >
                         <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 20 20">
                             <path d="M2.57715 7.83688H17.4304" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -27,10 +51,11 @@ const DiaryTitle = () => {
                     </button>
 
 
-                    {/* 위치 버튼 */}
+                    {/* 닫기 버튼 */}
                     <button 
                         className="p-2 rounded-full bg-white transition-colors box-shadow shadow-xl"
-                        aria-label="닫기?"
+                        aria-label="닫기"
+                        onClick={backHome}
                     >
                         <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 20 20">
                             <path d="M15 5L5 15" stroke="#090909" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

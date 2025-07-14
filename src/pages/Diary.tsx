@@ -7,11 +7,10 @@ import { Image as LucideImage, Mic, MicOff } from "lucide-react";
 import { usePostDiary } from "@/api/queries/diary/usePostDiary.ts";
 import Loading6 from "../components/Loading/Loading6";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
-import {LocationPicker,LocationPreview} from "@/components/LocationPicker";
+import { LocationPicker, LocationPreview } from "@/components/LocationPicker";
 import { useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import FilePreview, { Attachment } from "@/components/diary/FilePreview";
-
 
 import DiaryTitle from "@/components/diary/DiaryTitle";
 import BottomNavi from "@/components/diary/BottomNavi";
@@ -23,7 +22,7 @@ const Diary = () => {
   const navigate = useNavigate();
 
   const [showCalendar, setShowCalendar] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(date || dayjs().format('YYYY-MM-DD'));
+  const [selectedDate, setSelectedDate] = useState(date || dayjs().format("YYYY-MM-DD"));
 
   // URL 파라미터와 selectedDate 동기화
   useEffect(() => {
@@ -31,7 +30,6 @@ const Diary = () => {
       setSelectedDate(date);
     }
   }, [date]);
-
 
   const {
     register,
@@ -44,11 +42,10 @@ const Diary = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
-  
-  
+
   // 글자 수 상태 추가
   const [contentLength, setContentLength] = useState(0);
-  
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } =
@@ -73,15 +70,14 @@ const Diary = () => {
   // 날짜 선택 핸들러
   const handleDateSelect = (newDate: string) => {
     const selectedDay = dayjs(newDate);
-    const today=dayjs();
-    
-    if (selectedDay.isSame(today, 'day') || selectedDay.isBefore(today, 'day')) {
+    const today = dayjs();
+
+    if (selectedDay.isSame(today, "day") || selectedDay.isBefore(today, "day")) {
       setSelectedDate(newDate);
       navigate(`/diary/${newDate}`);
     } else {
       toast.error("미래 날짜로는 이동할 수 없습니다!");
     }
-  
   };
 
   // 달력 버튼 클릭 핸들러
@@ -121,8 +117,6 @@ const Diary = () => {
     return () => clearInterval(interval);
   }, [animationQueue.current.length, listening]);
 
-  
-
   const handleMicClick = () => {
     if (listening) {
       SpeechRecognition.stopListening();
@@ -140,15 +134,15 @@ const Diary = () => {
 
   const handleImageClick = () => {
     setIsPhotoActive(true);
-    
+
     const handleWindowFocus = () => {
       if (attachments.length < 5) {
         setIsPhotoActive(false);
       }
-      window.removeEventListener('focus', handleWindowFocus);
+      window.removeEventListener("focus", handleWindowFocus);
     };
-    
-    window.addEventListener('focus', handleWindowFocus, { once: true });
+
+    window.addEventListener("focus", handleWindowFocus, { once: true });
     fileInputRef.current?.click();
   };
 
@@ -156,7 +150,7 @@ const Diary = () => {
     const files = e.target.files;
     if (files) {
       const newFiles = Array.from(files);
-      const imageCount = attachments.filter(att => att.type === 'image').length;
+      const imageCount = attachments.filter(att => att.type === "image").length;
 
       if (imageCount + newFiles.length > 4) {
         alert("최대 4개의 이미지만 첨부할 수 있습니다.");
@@ -164,7 +158,7 @@ const Diary = () => {
       }
 
       const newImageAttachments: Attachment[] = newFiles.map(file => ({
-        type: 'image',
+        type: "image",
         file,
         preview: URL.createObjectURL(file),
       }));
@@ -175,12 +169,12 @@ const Diary = () => {
 
   const handleLocationSelect = (location: { latitude: number; longitude: number }) => {
     const newLocationAttachment: Attachment = {
-      type: 'location',
+      type: "location",
       location,
     };
 
     setAttachments(prev => {
-      const withoutLocation = prev.filter(att => att.type !== 'location');
+      const withoutLocation = prev.filter(att => att.type !== "location");
       return [newLocationAttachment, ...withoutLocation];
     });
 
@@ -189,7 +183,7 @@ const Diary = () => {
 
   const handleRemoveAttachment = (index: number) => {
     const attachment = attachments[index];
-    if (attachment.type === 'image') {
+    if (attachment.type === "image") {
       URL.revokeObjectURL(attachment.preview);
     }
     setAttachments(prev => prev.filter((_, i) => i !== index));
@@ -207,17 +201,19 @@ const Diary = () => {
     formData.append("writtenDate", date!);
     formData.append("weather", "SUNNY");
 
-    const locationAttachment = attachments.find(att => att.type === 'location') as Attachment | undefined;
-    if (locationAttachment && locationAttachment.type === 'location') {
+    const locationAttachment = attachments.find(att => att.type === "location") as
+      | Attachment
+      | undefined;
+    if (locationAttachment && locationAttachment.type === "location") {
       formData.append("latitude", String(locationAttachment.location.latitude));
       formData.append("longitude", String(locationAttachment.location.longitude));
     }
 
-    const imageAttachments = attachments.filter(att => att.type === 'image') as Attachment[];
+    const imageAttachments = attachments.filter(att => att.type === "image") as Attachment[];
     imageAttachments.forEach(att => {
-        if(att.type === 'image'){
-            formData.append("photos", att.file);
-        }
+      if (att.type === "image") {
+        formData.append("photo", att.file);
+      }
     });
 
     console.log("📤 전송할 FormData 내용:");
@@ -239,13 +235,10 @@ const Diary = () => {
 
   if (isSubmitting) return <Loading6 key={Date.now()} />;
 
-
   return (
     <>
       <div className="relative flex flex-col h-dvh border">
-        <DiaryTitle 
-          selectedDate={selectedDate}
-          onCalendarClick={handleCalendarClick}/>
+        <DiaryTitle selectedDate={selectedDate} onCalendarClick={handleCalendarClick} />
 
         {/* 달력 컴포넌트 */}
         <MonthlyCalendar
@@ -254,9 +247,12 @@ const Diary = () => {
           onClose={handleCalendarClose}
           isOpen={showCalendar}
         />
-        <FilePreview attachments={attachments} onRemove={handleRemoveAttachment} onEditLocation={() => setShowLocationPicker(true)} />
-          
-        
+        <FilePreview
+          attachments={attachments}
+          onRemove={handleRemoveAttachment}
+          onEditLocation={() => setShowLocationPicker(true)}
+        />
+
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col p-4 flex-1">
           <div className="flex-1 flex flex-col space-y-4 min-h-0 overflow-hidden">
             <div className="flex-1 flex flex-col min-h-0">
@@ -277,11 +273,8 @@ const Diary = () => {
                 <p className="text-red-500 text-sm mt-1">{errors.content.message as string}</p>
               )}
               {/* 글자 수 표시 */}
-              <div className="text-right text-sm text-gray-500 mt-1">
-                {contentLength}자
-              </div>
+              <div className="text-right text-sm text-gray-500 mt-1">{contentLength}자</div>
             </div>
-
 
             <input
               type="file"

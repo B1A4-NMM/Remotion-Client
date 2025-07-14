@@ -83,16 +83,11 @@ const Home = () => {
   const diaries = homeData?.item?.diaries?.map(mapApiDiaryToDiaryCard) || [];
 
   // 데이터 확인용 console.log
-  console.log("=== Home API 데이터 확인 ===");
-  console.log("homeData:", homeData);
-  console.log("homeLoading:", homeLoading);
-  console.log("homeError:", homeError);
-  console.log("token:", token);
 
   const todayDiary = todayData ? todayData : null;
 
   return (
-    <div className="h-screen flex flex-col px-4">
+    <div className=" flex flex-col px-4">
       <Title
         emotionCountByMonth={emotionCountByMonth}
         totalDiaryCount={totalDiaryCount}

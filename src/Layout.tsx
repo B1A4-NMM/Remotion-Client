@@ -19,16 +19,17 @@ export default function Layout() {
           <Toaster
             position="top-center"
             expand={true}
-            richColors={false}
+            richColors={true}
             closeButton={true}
             toastOptions={{
               duration: 4000,
               style: {
-                background: "#FFFFFF",
-                color: "#000000",
-                border: "1px solid #000000",
+                background: "#ffff",
+                color: "#EF7C80",
+                border: "1px solid #E5E5EA",
+                boxShadow: "0 4px 24px 0 rgba(80, 80, 120, 0.08)",
+                borderRadius: "16px",
               },
-              className: "my-toast",
             }}
           />
         </main>

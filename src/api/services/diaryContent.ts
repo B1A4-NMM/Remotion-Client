@@ -11,7 +11,7 @@ export const getDiaryContent = async (token: string, id: string): Promise<DiaryR
       Authorization: `Bearer ${token}`,
     },
   });
-  console.log(response.data);
+  // console.log(response.data);
   return response.data;
 };
 export const getDiaryContentResult = async (token: string, id: string): Promise<DiaryResponse> => {
@@ -23,6 +23,6 @@ export const getDiaryContentResult = async (token: string, id: string): Promise<
       Authorization: `Bearer ${token}`,
     },
   });
-  console.log(response.data);
+  // console.log(response.data);
   return response.data;
 };

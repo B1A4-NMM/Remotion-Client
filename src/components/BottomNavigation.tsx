@@ -1,8 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
+import dayjs from "dayjs";
 
 export default function BottomNavigation() {
   const location = useLocation();
   const path = location.pathname.toLowerCase();
+  const today = dayjs().format('YYYY-MM-DD');
 
   return (
     <div className="fixed bottom-0 left-0 w-full max-w-md mx-auto z-40" style={{ minWidth: 0 }}>
@@ -54,7 +56,7 @@ export default function BottomNavigation() {
         <div className="absolute inset-0 flex justify-between items-end pb-4 px-2">
           <Link to="/" className="flex-1 h-full" />
           <Link to="/routine" className="flex-1 h-full" />
-          <Link to="/diary/2025-07-12" className="flex-1 h-full flex justify-center items-end">
+          <Link to={`/diary/${today}`} className="flex-1 h-full flex justify-center items-end">
             <div className="w-14 h-14 -mt-4 z-10 rounded-full" />
           </Link>
           <Link to="/analysis" className="flex-1 h-full" />

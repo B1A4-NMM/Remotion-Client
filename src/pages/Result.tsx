@@ -19,7 +19,7 @@ const sampleDiary = {
   "id": 102,
   "writtenDate": "2025-07-14",
   "photoPath": [],
-  "audiosPath": null,
+  "audioPath": null,
   "content": "일기를 매일 쓰는거는 쉬운 일이 아니다...",
   "latitude": null,
   "longitude": null,
@@ -150,43 +150,44 @@ const Result: React.FC = () => {
   }
 
   const finalDiaryContent = diaryContent || sampleDiary;
-  // const finalDiaryContent = sampleDiary;
-  console.log(finalDiaryContent);
 
+  console.log(finalDiaryContent);
 
   return (
     <div
-    className={`
-      result-container px-4 h-screen
-      ${isTouchDevice 
-        ? 'overflow-y-auto scrollbar-hide touch-scroll' 
-        : 'overflow-y-auto'
-      }
-      ${isScrolling ? 'scrolling' : ''}
-    `}
+      className={`
+        result-container px-4 h-screen
+        ${isTouchDevice 
+          ? 'overflow-y-auto scrollbar-hide touch-scroll' 
+          : 'overflow-y-auto'
+        }
+        ${isScrolling ? 'scrolling' : ''}
+      `}
       style={{
         WebkitOverflowScrolling: isTouchDevice ? 'touch' : 'auto',
         scrollBehavior: 'smooth',
         overscrollBehavior: 'contain'
       }}
     >
-      {/* ✅ Header */}
+      {/* ✅ Header - 원래 위치 유지 */}
       <ResultHeader writtenDate={finalDiaryContent.writtenDate || ""} />
-
-      {/* ✅ Emotion Summary */}
-      <EmotionSummary diaryContent={finalDiaryContent} />
-
-      {/* ✅ Toggle */}
-      <ResultToggle view={view} setView={setView} />
-
-      {/* ✅ View */}
-      {view === "record" ? (
-        <DiaryView diaryContent={finalDiaryContent} />
-      ) : (
-        <ResultView diaryContent={finalDiaryContent} memSummary={memsummary} />
-      )}
+  
+      <div className="mt-[200px]">
+        {/* ✅ Emotion Summary */}
+        <EmotionSummary diaryContent={finalDiaryContent} />
+  
+        {/* ✅ Toggle */}
+        <ResultToggle view={view} setView={setView} />
+  
+        {/* ✅ View */}
+        {view === "record" ? (
+          <DiaryView diaryContent={finalDiaryContent} />
+        ) : (
+          <ResultView diaryContent={finalDiaryContent} memSummary={memsummary} />
+        )}
+      </div>
     </div>
   );
-};
+}  
 
 export default Result;

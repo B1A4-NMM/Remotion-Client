@@ -18,6 +18,8 @@ import { useDeleteDiary } from "../api/queries/home/useDeleteDiary";
 import { useInfiniteDiaries } from "../api/queries/home/useInfiniteDiaries";
 import { useQueryClient } from "@tanstack/react-query";
 import { usePatchDiaryBookmark } from "../api/queries/home/usePatchDiaryBookmark";
+import RecommendHome from "@/components/home/RecommendHome";
+import RecommendHomeCard from "@/components/home/RecommendHomeCard";
 
 // S3 → http 변환 (실제 CDN 도메인에 맞게 수정 필요)
 const s3ToHttpUrl = (s3Path: string) =>
@@ -151,11 +153,15 @@ const Home = () => {
         setSelectedTab={setSelectedTab}
       />
       {selectedTab === "menu" && (
-        <DiaryCards
-          diaries={infiniteDiaries}
-          onDeleteDiary={handleDeleteDiary}
-          onToggleBookmark={handleToggleBookmark}
-        />
+        <>
+          <RecommendHomeCard />
+          <DiaryCards
+            diaries={infiniteDiaries}
+            onDeleteDiary={handleDeleteDiary}
+            onToggleBookmark={handleToggleBookmark}
+            lastItemRef={lastDiaryRef}
+          />
+        </>
       )}
       {selectedTab === "location" && (
         <Map

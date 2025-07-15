@@ -155,7 +155,7 @@ const EmotionalGraph = () => {
     edgesRef.current = [];
     animatedBranchesRef.current = [];
 
-    const rootNode = createRootNode(centerX + 100, centerY);
+    const rootNode = createRootNode(centerX, centerY);
     nodesRef.current.push(rootNode);
 
     // ✅ 수정: relationData를 기반으로 branches 생성

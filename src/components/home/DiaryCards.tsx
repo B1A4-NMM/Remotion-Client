@@ -205,7 +205,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                 {mappedDiary.content}
               </div>
               <hr className="border-t border-[#E5E5EA] mb-2" />
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
                 <span className="text-xs text-gray-400">
                   {dayjs(mappedDiary.date).format("YYYY년 MM월 DD일")}
                 </span>
@@ -291,7 +291,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                 {mappedDiary.content}
               </div>
               <hr className="border-t border-[#E5E5EA] mb-2" />
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
                 <span className="text-xs text-gray-400">
                   {dayjs(mappedDiary.date).format("YYYY년 MM월 DD일")}
                 </span>
@@ -383,7 +383,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                 {mappedDiary.content}
               </div>
               <hr className="border-t border-[#E5E5EA] mb-2" />
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
                 <span className="text-xs text-gray-400">
                   {dayjs(mappedDiary.date).format("YYYY년 MM월 DD일")}
                 </span>
@@ -469,7 +469,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                 {mappedDiary.content}
               </div>
               <hr className="border-t border-[#E5E5EA] mb-2" />
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
                 <span className="text-xs text-gray-400">
                   {dayjs(mappedDiary.date).format("YYYY년 MM월 DD일")}
                 </span>

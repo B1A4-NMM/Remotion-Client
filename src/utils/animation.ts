@@ -46,12 +46,27 @@ export type AnimatedBranch = {
   opacity: number;
 };
 
+// 시드 기반 난수 생성 함수 (간단한 해시)
+function seededRandom(seed: number | string) {
+  let str = String(seed);
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) + hash + str.charCodeAt(i);
+  }
+  let x = Math.abs(hash) % 10000;
+  return () => {
+    // Linear congruential generator
+    x = (x * 9301 + 49297) % 233280;
+    return x / 233280;
+  };
+}
+
 export const createAnimatedBranches = (
   rootNode: Node,
   centerX: number,
   centerY: number,
   relations: {
-    id: number; // id 포함
+    id: number;
     name: string;
     affection: number;
     highestEmotion: string;
@@ -60,7 +75,10 @@ export const createAnimatedBranches = (
   }[]
 ): AnimatedBranch[] => {
   return relations.map((rel, index) => {
-    const angle = index * ((Math.PI * 2) / relations.length) + (Math.random() - 0.5) * 0.4;
+    // 시드 기반 난수 생성기: id를 seed로 사용
+    const rand = seededRandom(rel.id);
+    // 각도에 약간의 시드 기반 랜덤 오프셋 추가
+    const angle = index * ((Math.PI * 2) / relations.length) + (rand() - 0.5) * 0.4;
 
     // affection 값이 클수록 더 멀리
     const affection = Math.max(Math.min(rel.affection, 150), 0);
@@ -99,7 +117,7 @@ export const createAnimatedBranches = (
       from: rootNode,
       toPos: { x: targetX, y: targetY },
       startTime: 400 + index * 300,
-      duration: 1000 + Math.random() * 400,
+      duration: 1000 + rand() * 400, // duration도 시드 기반
       finished: false,
       nodeData: {
         id: rel.id, // 추가!

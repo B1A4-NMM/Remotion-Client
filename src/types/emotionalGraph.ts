@@ -15,8 +15,10 @@ export interface Node {
   startTime: number;
   fadeInDuration: number;
   isStatic?: boolean;
-  colorA: string;
-  colorB: string;
+  colorA?: string; // optional, matches utils/animation.ts
+  colorB?: string; // optional, matches utils/animation.ts
+  id?: number | string; // 추가
+  diaryId?: number | string; // 필요하다면 추가
 }
 
 export interface AnimatedBranch {
@@ -25,7 +27,14 @@ export interface AnimatedBranch {
   startTime: number;
   duration: number;
   finished: boolean;
-  nodeData: { label: string; color: string; level: number };
+  nodeData: {
+    id: number | string;
+    label: string;
+    colorA: string;
+    colorB: string;
+    affection: number;
+    emotion: string;
+  };
   progress: number;
   opacity: number;
 }

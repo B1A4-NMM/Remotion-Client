@@ -1,5 +1,5 @@
-import React, { useState, useEffect} from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useLocation } from "react-router-dom";
 import dayjs from "dayjs";
 
 import { useGetDiaryContentResult } from "../api/queries/home/useGetDiary";
@@ -13,99 +13,87 @@ import ResultView from "../components/result/ResultView";
 
 import "../styles/resultCard.css";
 import "../styles/App.css";
+import PeopleCard from "@/components/home/PeopleCard";
 
 // ✅ 안전한 샘플 데이터
 const sampleDiary = {
-  "id": 102,
-  "writtenDate": "2025-07-14",
-  "photoPath": [],
-  "audioPath": null,
-  "content": "일기를 매일 쓰는거는 쉬운 일이 아니다...",
-  "latitude": null,
-  "longitude": null,
-  "analysis": {
-    "activity_analysis": [
+  id: 102,
+  writtenDate: "2025-07-14",
+  photoPath: [],
+  audioPath: null,
+  content: "일기를 매일 쓰는거는 쉬운 일이 아니다...",
+  latitude: null,
+  longitude: null,
+  analysis: {
+    activity_analysis: [
       {
-        "activity": "농구하기",
-        "peoples": [
+        activity: "농구하기",
+        peoples: [
           {
-            "name": "도영",
-            "interactions": {
-              "emotion": [
-                "string"
-              ],
-              "emotion_intensity": [
-                0
-              ]
+            name: "도영",
+            interactions: {
+              emotion: ["string"],
+              emotion_intensity: [0],
             },
-            "name_intimacy": "0.9"
-          }
+            name_intimacy: "0.9",
+          },
         ],
-        "self_emotions": {
-          "emotion": [
-            "string"
-          ],
-          "emotion_intensity": [
-            0
-          ]
+        self_emotions: {
+          emotion: ["string"],
+          emotion_intensity: [0],
         },
-        "state_emotions": {
-          "emotion": [
-            "string"
-          ],
-          "emotion_intensity": [
-            0
-          ]
+        state_emotions: {
+          emotion: ["string"],
+          emotion_intensity: [0],
         },
-        "problem": [
+        problem: [
           {
-            "situation": "string",
-            "approach": "string",
-            "outcome": "string",
-            "decision_code": "string",
-            "conflict_response_code": "string"
-          }
+            situation: "string",
+            approach: "string",
+            outcome: "string",
+            decision_code: "string",
+            conflict_response_code: "string",
+          },
         ],
-        "strength": "string"
-      }
+        strength: "string",
+      },
     ],
-    "reflection": {
-      "achievements": [
-        "string"
-      ],
-      "shortcomings": [
-        "string"
-      ],
-      "todo": [
-        "string"
-      ]
-    }
-  }
+    reflection: {
+      achievements: ["string"],
+      shortcomings: ["string"],
+      todo: ["string"],
+    },
+  },
 };
 
 const Result: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const token = localStorage.getItem("accessToken") || "";
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const view = params.get("view") === "analysis" ? "analysis" : "record";
 
-  const { data: diaryContent, isLoading, isError } = useGetDiaryContentResult(token, id || "sample");
-  const { data: memsummary } = useGetMemberSummary(token);
-  const [view, setView] = useState<"record" | "analysis">("record");
+  const {
+    data: diaryContent,
+    isLoading,
+    isError,
+  } = useGetDiaryContentResult(token, id || "sample");
 
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
 
   useEffect(() => {
     const checkTouchDevice = () => {
-      setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+      setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
     };
-    
+
     checkTouchDevice();
   }, []);
 
   // 스크롤 상태 감지 (선택사항)
   useEffect(() => {
     let scrollTimeout: NodeJS.Timeout;
-    
+
     const handleScroll = () => {
       setIsScrolling(true);
       clearTimeout(scrollTimeout);
@@ -114,19 +102,18 @@ const Result: React.FC = () => {
       }, 150);
     };
 
-    const container = document.querySelector('.result-container');
+    const container = document.querySelector(".result-container");
     if (container) {
-      container.addEventListener('scroll', handleScroll);
+      container.addEventListener("scroll", handleScroll);
     }
 
     return () => {
       if (container) {
-        container.removeEventListener('scroll', handleScroll);
+        container.removeEventListener("scroll", handleScroll);
       }
       clearTimeout(scrollTimeout);
     };
   }, []);
-
 
   if (isLoading) {
     return (
@@ -157,37 +144,34 @@ const Result: React.FC = () => {
     <div
       className={`
         result-container px-4 h-screen
-        ${isTouchDevice 
-          ? 'overflow-y-auto scrollbar-hide touch-scroll' 
-          : 'overflow-y-auto'
-        }
-        ${isScrolling ? 'scrolling' : ''}
+        ${isTouchDevice ? "overflow-y-auto scrollbar-hide touch-scroll" : "overflow-y-auto"}
+        ${isScrolling ? "scrolling" : ""}
       `}
       style={{
-        WebkitOverflowScrolling: isTouchDevice ? 'touch' : 'auto',
-        scrollBehavior: 'smooth',
-        overscrollBehavior: 'contain'
+        WebkitOverflowScrolling: isTouchDevice ? "touch" : "auto",
+        scrollBehavior: "smooth",
+        overscrollBehavior: "contain",
       }}
     >
       {/* ✅ Header - 원래 위치 유지 */}
       <ResultHeader writtenDate={finalDiaryContent.writtenDate || ""} />
-  
+
       <div className="mt-[200px]">
         {/* ✅ Emotion Summary */}
         <EmotionSummary diaryContent={finalDiaryContent} />
-  
+
         {/* ✅ Toggle */}
-        <ResultToggle view={view} setView={setView} />
-  
+        <ResultToggle view={view} />
+
         {/* ✅ View */}
         {view === "record" ? (
           <DiaryView diaryContent={finalDiaryContent} />
         ) : (
-          <ResultView diaryContent={finalDiaryContent} memSummary={memsummary} />
+          <ResultView diaryContent={finalDiaryContent} />
         )}
       </div>
     </div>
   );
-}  
+};
 
 export default Result;

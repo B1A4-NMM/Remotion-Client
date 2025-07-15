@@ -3,16 +3,15 @@
 import React, { useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useGetDiaryHealth } from "../../api/queries/result/useGetDiaryHealth";
 
 import ActivityCardSlider from "./ActivityCardSlider";
 import Todos from "./Todo";
 import WarningTestBox from "../WariningTestBox";
 import TestModal from "../TestModal";
+import PeopleCard from "../home/PeopleCard";
 
 interface ResultViewProps {
   diaryContent: any | null;
-  memSummary: any | null;
 }
 
 const ResultView: React.FC<ResultViewProps> = ({ diaryContent }) => {
@@ -21,8 +20,6 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const { id } = useParams<{ id: string }>();
   const period = 7;
-
-  const { data: healthData } = useGetDiaryHealth(id!, period);
 
   const handleDrag = (_: any, info: any) => {
     setScrollY(info.offset.y);
@@ -39,13 +36,17 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent }) => {
     };
   };
 
-  const todos = diaryContent?.reflection?.todo ?? [];
+  const activityAnalysis = diaryContent?.analysis?.activity_analysis ?? [];
 
-  const showWarnings = [
-    healthData?.stressWarning && "stress",
-    healthData?.anxietyWarning && "anxiety",
-    healthData?.depressionWarning && "depression",
-  ].filter(Boolean) as ("stress" | "anxiety" | "depression")[];
+  // 사람별 카드 데이터로 변환
+  const peopleCardsData = activityAnalysis.flatMap((activityItem: any) =>
+    (activityItem.peoples || []).map((person: any) => ({
+      activity: activityItem.activity,
+      person, // 해당 사람 객체 전체 전달
+    }))
+  );
+
+  const todos = diaryContent?.analysis?.todos ?? [];
 
   const convertWarningToTestType = (warning: "stress" | "anxiety" | "depression") => {
     switch (warning) {
@@ -58,8 +59,10 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent }) => {
     }
   };
 
+  // Pass peopleCardsData to PeopleCard
   return (
     <>
+      <PeopleCard data={peopleCardsData} />
       <motion.div
         ref={contentRef}
         drag="y"
@@ -73,18 +76,15 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent }) => {
           minHeight: "100vh",
         }}
       >
-        <ActivityCardSlider data={diaryContent} />
+        {/* <ActivityCardSlider data={activityAnalysis} /> */}
         <Todos todos={todos} />
-        {showWarnings.map(type => (
-          <WarningTestBox key={type} type={type} onClick={setTestType} />
-        ))}
       </motion.div>
 
       {testType && (
         <TestModal
           type={convertWarningToTestType(testType)}
           onClose={() => setTestType(null)}
-          onFinish={(score) => console.log(`${testType} 점수:`, score)}
+          onFinish={score => console.log(`${testType} 점수:`, score)}
         />
       )}
     </>

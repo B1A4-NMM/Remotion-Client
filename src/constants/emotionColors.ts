@@ -5,7 +5,7 @@ export type ColorKey = "gray" | "gray1" | "gray2" | "blue" | "green" | "red" | "
 export const baseColors: Record<ColorKey, string> = {
   green: "#23db91",
   red: "#fc1111",
-  yellow: "#d8cc21",
+  yellow: "#f2e52a",
   blue: "#1c90d8",
   gray: "#E1E1E1",
   gray1: "#E1E1E1",

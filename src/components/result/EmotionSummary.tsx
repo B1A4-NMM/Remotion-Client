@@ -12,7 +12,7 @@ interface EmotionSummaryProps {
 const mapEmotionsWithIntensity = (diaryContent: any) => {
   const activityAnalysis = diaryContent?.analysis?.activity_analysis;
   if (!activityAnalysis || activityAnalysis.length === 0) return [];
-  
+
   // Map을 사용하여 감정별로 강도 합산
   const emotionMap = new Map<string, number>();
 
@@ -23,7 +23,8 @@ const mapEmotionsWithIntensity = (diaryContent: any) => {
         const interactions = person.interactions;
         if (interactions && interactions.emotion && interactions.emotion_intensity) {
           interactions.emotion.forEach((emotion: string, index: number) => {
-            if (emotion && emotion !== "string") { // 기본값 제외
+            if (emotion && emotion !== "string") {
+              // 기본값 제외
               const intensity = interactions.emotion_intensity[index] || 0;
               emotionMap.set(emotion, (emotionMap.get(emotion) || 0) + intensity);
             }
@@ -37,7 +38,8 @@ const mapEmotionsWithIntensity = (diaryContent: any) => {
       const selfEmotions = activity.self_emotions;
       if (selfEmotions.emotion && selfEmotions.emotion_intensity) {
         selfEmotions.emotion.forEach((emotion: string, index: number) => {
-          if (emotion && emotion !== "string") { // 기본값 제외
+          if (emotion && emotion !== "string") {
+            // 기본값 제외
             const intensity = selfEmotions.emotion_intensity[index] || 0;
             emotionMap.set(emotion, (emotionMap.get(emotion) || 0) + intensity);
           }
@@ -50,7 +52,8 @@ const mapEmotionsWithIntensity = (diaryContent: any) => {
       const stateEmotions = activity.state_emotions;
       if (stateEmotions.emotion && stateEmotions.emotion_intensity) {
         stateEmotions.emotion.forEach((emotion: string, index: number) => {
-          if (emotion && emotion !== "string") { // 기본값 제외
+          if (emotion && emotion !== "string") {
+            // 기본값 제외
             const intensity = stateEmotions.emotion_intensity[index] || 0;
             emotionMap.set(emotion, (emotionMap.get(emotion) || 0) + intensity);
           }
@@ -62,7 +65,7 @@ const mapEmotionsWithIntensity = (diaryContent: any) => {
   // Map을 배열로 변환
   return Array.from(emotionMap.entries()).map(([emotion, intensity]) => ({
     emotion,
-    intensity
+    intensity,
   }));
 };
 
@@ -70,17 +73,18 @@ const mapEmotionsWithIntensity = (diaryContent: any) => {
 const extractTargets = (diaryContent: any) => {
   const activityAnalysis = diaryContent?.analysis?.activity_analysis;
   if (!activityAnalysis || activityAnalysis.length === 0) return [];
-  
+
   // Set을 사용하여 중복 자동 제거
   const targetSet = new Set<string>();
 
-  console.log(activityAnalysis);
+  console.log("activityAnalysis", activityAnalysis);
 
   // peoples 배열에서 이름 추출
   activityAnalysis.forEach(activity => {
     if (activity.peoples && Array.isArray(activity.peoples)) {
       activity.peoples.forEach((person: any) => {
-        if (person.name && person.name !== "string") { // 기본값 제외
+        if (person.name && person.name !== "string") {
+          // 기본값 제외
           targetSet.add(person.name.trim()); // 공백 제거 후 추가
         }
       });
@@ -90,8 +94,6 @@ const extractTargets = (diaryContent: any) => {
   // Set을 배열로 변환
   return Array.from(targetSet);
 };
-
-
 
 const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
   const emotions = mapEmotionsWithIntensity(diaryContent);
@@ -106,20 +108,18 @@ const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
       <p className="text-sm text-gray-500">하루의 감정</p>
       <div>
         <Canvas camera={{ position: [0, 0, 10], fov: 30 }}>
-          <Blob diaryContent={{emotions}}/>
+          <Blob diaryContent={{ emotions }} />
         </Canvas>
       </div>
-      
+
       {mainEmotions && (
         <p className="text-xl font-bold text-gray-900 line-clamp-2 leading-relaxed m-8">
           {mainEmotions}
         </p>
       )}
-      
+
       {targetNames && (
-        <p className="text-base text-gray-500 line-clamp-2 leading-relaxed m-7">
-          {targetNames}
-        </p>
+        <p className="text-base text-gray-500 line-clamp-2 leading-relaxed m-7">{targetNames}</p>
       )}
     </div>
   );

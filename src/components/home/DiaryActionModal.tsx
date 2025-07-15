@@ -17,7 +17,7 @@ interface DiaryActionModalProps {
   open: boolean;
   setOpen: (v: boolean) => void;
   onDelete: () => void;
-  onBookmark?: () => void;
+  onToggleBookmark?: () => void;
   trigger: React.ReactNode;
   titleHidden?: boolean;
   diaryId: number;
@@ -28,14 +28,12 @@ const DiaryActionModal: React.FC<DiaryActionModalProps> = ({
   open,
   setOpen,
   onDelete,
-  onBookmark,
+  onToggleBookmark,
   trigger,
   titleHidden = false,
   diaryId,
   isBookmarked,
 }) => {
-  const token = localStorage.getItem("accessToken") || "";
-  const patchBookmark = usePatchDiaryBookmark();
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -57,19 +55,8 @@ const DiaryActionModal: React.FC<DiaryActionModalProps> = ({
           <button
             type="button"
             onClick={() => {
-              patchBookmark.mutate(
-                {
-                  token,
-                  diaryId,
-                  isBookmarked: !isBookmarked,
-                },
-                {
-                  onSuccess: data => {
-                    console.log("북마크 상태 변경 성공:", data);
-                    setOpen(false);
-                  },
-                }
-              );
+              if (onToggleBookmark) onToggleBookmark();
+              setOpen(false);
             }}
             tabIndex={-1}
             className="flex items-center justify-center gap-2 rounded-xl bg-white border border-[#E5E5EA] text-gray-900 w-full h-11 text-sm font-medium transition-colors focus:outline-none focus:ring-0 focus:border-[#E5E5EA] focus-visible:outline-none focus-visible:border-[#E5E5EA] hover:bg-white hover:border-[#E5E5EA] hover:text-gray-900 active:bg-white active:border-[#E5E5EA] active:text-gray-900 shadow-none"

@@ -14,6 +14,6 @@ export const getCharacter = async (token: string): Promise<Character> => {
 
     return response.data;
   } catch (err) {
-    throw err; 
+    throw err;
   }
 };

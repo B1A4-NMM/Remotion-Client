@@ -6,6 +6,7 @@ import FilterIcon from "../../assets/img/filter.svg";
 import DiaryActionModal from "./DiaryActionModal";
 import dayjs from "dayjs";
 import { useDeleteDiary } from "../../api/queries/home/useDeleteDiary";
+import { useNavigate } from "react-router-dom";
 
 interface Diary {
   id: number;
@@ -24,29 +25,41 @@ interface Diary {
 
 interface DiaryCardsProps {
   diaries: Diary[];
-  isLoading?: boolean;
-  onLoadMore?: () => void;
+  onDeleteDiary?: (diaryId: number) => void;
+  onToggleBookmark?: (diaryId: number) => void;
   lastItemRef?: (node: HTMLDivElement | null) => void;
 }
 
-const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore, lastItemRef }) => {
-  const deleteDiaryMutation = useDeleteDiary();
-  const token = localStorage.getItem("accessToken") || "";
+const DiaryCards: React.FC<DiaryCardsProps> = ({
+  diaries,
+  onDeleteDiary,
+  onToggleBookmark,
+  lastItemRef,
+}) => {
   const [openId, setOpenId] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   if (!diaries || diaries.length === 0) {
     return <div className="w-full text-center py-8 text-gray-400">검색 결과가 없습니다.</div>;
   }
+
+  const handleCardClick = (diaryId: number) => {
+    navigate(`/result/${diaryId}?view=record`);
+  };
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-[420px] mx-auto">
       {diaries.map((mappedDiary, index) => {
         const images = mappedDiary.photoUrl
           ? Array.isArray(mappedDiary.photoUrl)
-            ? mappedDiary.photoUrl
-            : [mappedDiary.photoUrl]
+            ? mappedDiary.photoUrl.filter(img => typeof img === "string")
+            : typeof mappedDiary.photoUrl === "string"
+              ? [mappedDiary.photoUrl]
+              : []
           : [];
-        const filteredImages = images.filter((img: string) => !!img && img.trim() !== "");
+        const filteredImages = images.filter(
+          (img: string | null | undefined) => typeof img === "string" && img.trim() !== ""
+        );
         const isEmotionOnly =
           !mappedDiary.map && (!mappedDiary.photoUrl || filteredImages.length === 0);
         const isLast = index === diaries.length - 1;
@@ -56,7 +69,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
+              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col cursor-pointer"
+              onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="flex gap-4 items-center rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] mb-4 py-[14px] px-[20px]">
                 <div className="w-[70px] h-[70px] flex items-center justify-center rounded-full overflow-hidden">
@@ -97,7 +111,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
               {/* 구분선 */}
               <hr className="border-t border-[#E5E5EA] mb-2" />
               {/* 날짜 & 오른쪽 아이콘들 */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
                 <span className="text-xs text-gray-400">
                   {dayjs(mappedDiary.date).format("YYYY년 MM월 DD일")}
                 </span>
@@ -109,16 +123,20 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
                     open={openId === mappedDiary.id}
                     setOpen={v => setOpenId(v ? mappedDiary.id : null)}
                     onDelete={() => {
-                      deleteDiaryMutation.mutate({ token, diaryId: String(mappedDiary.id) });
+                      if (onDeleteDiary) onDeleteDiary(mappedDiary.id);
+                    }}
+                    onToggleBookmark={() => {
+                      if (onToggleBookmark) onToggleBookmark(mappedDiary.id);
                     }}
                     trigger={
                       <img
                         src={FilterIcon}
                         alt="필터"
                         className="w-5 h-5 cursor-pointer"
-                        onClick={(e: React.MouseEvent<HTMLImageElement, MouseEvent>) =>
-                          setOpenId(mappedDiary.id)
-                        }
+                        onClick={(e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+                          e.stopPropagation();
+                          setOpenId(mappedDiary.id);
+                        }}
                       />
                     }
                     titleHidden={true}
@@ -137,7 +155,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
+              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col cursor-pointer"
+              onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="grid grid-cols-3 gap-2 rounded-2xl mb-2" style={{ height: "120px" }}>
                 {/* Blob */}
@@ -198,7 +217,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
                     open={openId === mappedDiary.id}
                     setOpen={v => setOpenId(v ? mappedDiary.id : null)}
                     onDelete={() => {
-                      deleteDiaryMutation.mutate({ token, diaryId: String(mappedDiary.id) });
+                      if (onDeleteDiary) onDeleteDiary(mappedDiary.id);
+                    }}
+                    onToggleBookmark={() => {
+                      if (onToggleBookmark) onToggleBookmark(mappedDiary.id);
                     }}
                     trigger={
                       <img
@@ -225,7 +247,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
+              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col cursor-pointer"
+              onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="grid grid-cols-3 gap-2 rounded-2xl mb-2" style={{ height: "130px" }}>
                 {/* Blob */}
@@ -280,7 +303,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
                     open={openId === mappedDiary.id}
                     setOpen={v => setOpenId(v ? mappedDiary.id : null)}
                     onDelete={() => {
-                      deleteDiaryMutation.mutate({ token, diaryId: String(mappedDiary.id) });
+                      if (onDeleteDiary) onDeleteDiary(mappedDiary.id);
+                    }}
+                    onToggleBookmark={() => {
+                      if (onToggleBookmark) onToggleBookmark(mappedDiary.id);
                     }}
                     trigger={
                       <img
@@ -307,7 +333,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
+              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col cursor-pointer"
+              onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="grid grid-cols-3 gap-2 rounded-2xl mb-2" style={{ height: "120px" }}>
                 {/* Blob */}
@@ -368,7 +395,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
                     open={openId === mappedDiary.id}
                     setOpen={v => setOpenId(v ? mappedDiary.id : null)}
                     onDelete={() => {
-                      deleteDiaryMutation.mutate({ token, diaryId: String(mappedDiary.id) });
+                      if (onDeleteDiary) onDeleteDiary(mappedDiary.id);
+                    }}
+                    onToggleBookmark={() => {
+                      if (onToggleBookmark) onToggleBookmark(mappedDiary.id);
                     }}
                     trigger={
                       <img
@@ -395,7 +425,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
+              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col cursor-pointer"
+              onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="grid grid-cols-3 gap-2 rounded-2xl mb-2" style={{ height: "120px" }}>
                 {/* Blob */}
@@ -450,7 +481,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
                     open={openId === mappedDiary.id}
                     setOpen={v => setOpenId(v ? mappedDiary.id : null)}
                     onDelete={() => {
-                      deleteDiaryMutation.mutate({ token, diaryId: String(mappedDiary.id) });
+                      if (onDeleteDiary) onDeleteDiary(mappedDiary.id);
+                    }}
+                    onToggleBookmark={() => {
+                      if (onToggleBookmark) onToggleBookmark(mappedDiary.id);
                     }}
                     trigger={
                       <img
@@ -477,7 +511,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
+              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col cursor-pointer"
+              onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="flex items-center justify-center h-24 text-gray-400">
                 표시할 수 없는 조합입니다.
@@ -486,11 +521,6 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
           );
         }
       })}
-      {isLoading && (
-        <div className="w-full text-center py-4 text-gray-400">다음 데이터 불러오는 중...</div>
-      )}
-      {/* observer div for infinite scroll */}
-      {onLoadMore && lastItemRef && <div ref={lastItemRef} className="h-1 w-full" />}
     </div>
   );
 };

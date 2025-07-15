@@ -291,53 +291,55 @@ const Meditation = ({ type = 1, onClose }: MeditationProps) => {
       </audio>
 
       <div className="w-full h-full">
-        {isStart ? (
-          <div className="w-full h-full flex flex-col">
-            <div className="flex-1">
-              <Canvas
-                camera={{ position: [0, 0, 15], fov: 90 }}
-                style={{ background: 'transparent' }}
-                gl={{ alpha: true }}
-              >
-                <ambientLight intensity={0.6} />
-                <pointLight position={[10, 10, 10]} intensity={0.8} />
-                <pointLight position={[-10, -10, -10]} intensity={0.3} color="#4A90E2" />
-                
-                <JustBlob type={type} />
-              </Canvas>
+      {isStart ? (
+        <div className="w-full h-full flex flex-col relative">
+          <div className="flex-1">
+            <Canvas
+              camera={{ position: [0, 0, 15], fov: 90 }}
+              style={{ background: 'transparent' }}
+              gl={{ alpha: true }}
+            >
+              <ambientLight intensity={0.6} />
+              <pointLight position={[10, 10, 10]} intensity={0.8} />
+              <pointLight position={[-10, -10, -10]} intensity={0.3} color="#4A90E2" />
+              
+              <JustBlob type={type} />
+            </Canvas>
+          </div>
+          
+          {/* 단계별 안내 텍스트 - 화면 정중앙에 위치 */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+            <div 
+              className={`text-white text-xl font-light transition-all duration-700 ease-in-out ${
+                isTextVisible 
+                  ? 'opacity-100 translate-y-0 scale-100' 
+                  : 'opacity-0 translate-y-6 scale-95'
+              }`}
+              style={{
+                textShadow: '0 0 20px rgba(255,255,255,0.3)',
+                letterSpacing: '0.05em',
+                marginTop: '4rem' // Blob와 텍스트 간 수직 간격 추가
+              }}
+            >
+              {getCurrentMessage()}
             </div>
             
-            {/* 단계별 안내 텍스트 */}
-            <div className="absolute bottom-72 left-0 right-0 text-center">
-              <div 
-                className={`text-white text-2xl font-light transition-all duration-700 ease-in-out ${
-                  isTextVisible 
-                    ? 'opacity-100 translate-y-0 scale-100' 
-                    : 'opacity-0 translate-y-6 scale-95'
-                }`}
-                style={{
-                  textShadow: '0 0 20px rgba(255,255,255,0.3)',
-                  letterSpacing: '0.05em'
-                }}
-              >
-                {getCurrentMessage()}
-              </div>
-              
-              {/* 진행 상태 표시 */}
-              <div className="mt-8 flex justify-center space-x-2">
-                <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  meditationPhase === 'start' ? 'bg-white' : 'bg-white/30'
-                }`} />
-                <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  meditationPhase === 'breathing' ? 'bg-white' : 'bg-white/30'
-                }`} />
-                <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  meditationPhase === 'end' ? 'bg-white' : 'bg-white/30'
-                }`} />
-              </div>
+            {/* 진행 상태 표시 */}
+            <div className="mt-8 flex justify-center space-x-2">
+              <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                meditationPhase === 'start' ? 'bg-white' : 'bg-white/30'
+              }`} />
+              <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                meditationPhase === 'breathing' ? 'bg-white' : 'bg-white/30'
+              }`} />
+              <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                meditationPhase === 'end' ? 'bg-white' : 'bg-white/30'
+              }`} />
             </div>
           </div>
-        ) : (
+        </div>
+      ) : (
+
           <div className="flex justify-center items-center min-h-full">
             <button 
               onClick={handlePlayMusic}

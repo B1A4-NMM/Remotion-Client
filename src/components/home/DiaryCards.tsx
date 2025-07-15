@@ -1,8 +1,8 @@
 import React, { useState, forwardRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import Blob from "../Blob/Blob";
-import BookmarkIcon from "../../assets/img/bookmark.svg";
-import FilterIcon from "../../assets/img/filter.svg";
+import BookmarkIcon from "../../assets/img/Bookmark.svg";
+import FilterIcon from "../../assets/img/Filter.svg";
 import DiaryActionModal from "./DiaryActionModal";
 import dayjs from "dayjs";
 import { useDeleteDiary } from "../../api/queries/home/useDeleteDiary";

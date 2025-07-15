@@ -8,7 +8,7 @@ import {
 } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Trash2 } from "lucide-react";
-import BookmarkIcon from "../../assets/img/bookmark.svg";
+import BookmarkIcon from "../../assets/img/Bookmark.svg";
 import React from "react";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { usePatchDiaryBookmark } from "../../api/queries/home/usePatchDiaryBookmark";

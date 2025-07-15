@@ -1,4 +1,5 @@
 import { useLocation, Outlet } from "react-router-dom";
+import { useBottomPopupStore } from "./store/useBottomPopupStore";
 import BottomNavigation from "./components/BottomNavigation";
 import { Toaster } from "sonner";
 
@@ -7,10 +8,10 @@ const HIDE_NAV_PATHS = ["/signup", "/login", "/diary/", "/video"];
 
 export default function Layout() {
   const location = useLocation();
+  const isPopupOpen =useBottomPopupStore((state) => state.isOpen);
 
   // 현재 경로가 네비게이션을 숨겨야 하는 경로에 포함되지 않는 경우만 보여줌
-  // 경로가 숨겨야 하는 경로로 시작하는지 확인
-  const shouldShowNav = !HIDE_NAV_PATHS.some(path => location.pathname.startsWith(path));
+  const shouldShowNav = !HIDE_NAV_PATHS.includes(location.pathname) && !isPopupOpen;
 
   return (
     <div className="w-full min-h-[100dvh] flex justify-center bg-[black] font-pretendard">

@@ -24,7 +24,7 @@ export const usePostDiary = (options?: UseMutationOptions<any, unknown, FormData
         return;
       }
 
-      navigate(`/result/${diaryId}`);
+      navigate(`/result/${diaryId}?view=analysis`);
 
       try {
         options?.onSuccess?.(data, variables, context);

@@ -16,6 +16,8 @@ import dayjs from "dayjs";
 import Blob from "../components/Blob/Blob";
 import { useDeleteDiary } from "../api/queries/home/useDeleteDiary";
 import { useInfiniteDiaries } from "../api/queries/home/useInfiniteDiaries";
+import { useQueryClient } from "@tanstack/react-query";
+import { usePatchDiaryBookmark } from "../api/queries/home/usePatchDiaryBookmark";
 
 // S3 → http 변환 (실제 CDN 도메인에 맞게 수정 필요)
 const s3ToHttpUrl = (s3Path: string) =>
@@ -67,6 +69,37 @@ const Home = () => {
     setSelectedDate(date);
     setErrorMessage("");
   }, []);
+
+  const queryClient = useQueryClient();
+  const deleteDiaryMutation = useDeleteDiary();
+  const patchBookmark = usePatchDiaryBookmark();
+
+  const handleDeleteDiary = (diaryId: number) => {
+    const token = localStorage.getItem("accessToken") || "";
+    deleteDiaryMutation.mutate(
+      { token, diaryId: String(diaryId) },
+      {
+        onSuccess: () => {
+          // useInfiniteDiaries의 query key와 동일하게 맞춤
+          queryClient.invalidateQueries({ queryKey: ["infiniteDiaries"] });
+        },
+      }
+    );
+  };
+
+  const handleToggleBookmark = (diaryId: number) => {
+    const token = localStorage.getItem("accessToken") || "";
+    const diary = infiniteDiaries.find(d => d.id === diaryId);
+    if (!diary) return;
+    patchBookmark.mutate(
+      { token, diaryId, isBookmarked: !diary.bookmarked },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["infiniteDiaries"] });
+        },
+      }
+    );
+  };
 
   // 무한스크롤용 react-query
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteDiaries();
@@ -120,8 +153,8 @@ const Home = () => {
       {selectedTab === "menu" && (
         <DiaryCards
           diaries={infiniteDiaries}
-          isLoading={isFetchingNextPage}
-          lastItemRef={lastDiaryRef}
+          onDeleteDiary={handleDeleteDiary}
+          onToggleBookmark={handleToggleBookmark}
         />
       )}
       {selectedTab === "location" && (

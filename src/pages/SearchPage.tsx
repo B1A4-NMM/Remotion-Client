@@ -3,6 +3,8 @@ import { useSearchDiaries } from "../api/queries/home/useSearchDiaries";
 import { Search } from "lucide-react";
 import DiaryCards from "../components/home/DiaryCards";
 import SearchBar from "../components/home/SearchBar";
+import { useQueryClient } from "@tanstack/react-query";
+import { useDeleteDiary } from "../api/queries/home/useDeleteDiary";
 
 function mapApiDiaryToDiaryCard(apiDiary: any) {
   return {
@@ -33,8 +35,23 @@ const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState(""); // 실제 검색 요청에 쓸 값
   const [searchActive, setSearchActive] = useState(false);
 
-  const { data, isLoading } = useSearchDiaries(searchQuery, !!searchQuery);
+  const { data, isLoading, refetch } = useSearchDiaries(searchQuery, !!searchQuery);
   const diaries = data?.diaries?.map(mapApiDiaryToDiaryCard) ?? [];
+
+  const queryClient = useQueryClient();
+  const deleteDiaryMutation = useDeleteDiary();
+  const handleDeleteDiary = (diaryId: number) => {
+    const token = localStorage.getItem("accessToken") || "";
+    deleteDiaryMutation.mutate(
+      { token, diaryId: String(diaryId) },
+      {
+        onSuccess: () => {
+          // 검색 결과를 다시 불러오거나, 쿼리 무효화
+          refetch();
+        },
+      }
+    );
+  };
 
   return (
     <div className="max-w-xl mx-auto  px-4">
@@ -45,7 +62,12 @@ const SearchPage = () => {
         onSearch={() => setSearchQuery(inputValue)} // 버튼 클릭 시에만 쿼리 업데이트
       />
       {/* 검색 결과 */}
-      {searchQuery && (isLoading ? <div>검색 중...</div> : <DiaryCards diaries={diaries} />)}
+      {searchQuery &&
+        (isLoading ? (
+          <div>검색 중...</div>
+        ) : (
+          <DiaryCards diaries={diaries} onDeleteDiary={handleDeleteDiary} />
+        ))}
     </div>
   );
 };

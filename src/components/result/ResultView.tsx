@@ -9,6 +9,7 @@ import ActivityCardSlider from "./ActivityCardSlider";
 import Todos from "./Todo";
 import WarningTestBox from "../WariningTestBox";
 import TestModal from "../TestModal";
+import PeopleCard from "../home/PeopleCard";
 
 interface ResultViewProps {
   diaryContent: any | null;
@@ -60,6 +61,7 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent }) => {
 
   return (
     <>
+      <PeopleCard />
       <motion.div
         ref={contentRef}
         drag="y"
@@ -73,7 +75,7 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent }) => {
           minHeight: "100vh",
         }}
       >
-        <ActivityCardSlider data={diaryContent} />
+        {/* <ActivityCardSlider data={diaryContent} /> */}
         <Todos todos={todos} />
         {showWarnings.map(type => (
           <WarningTestBox key={type} type={type} onClick={setTestType} />
@@ -84,7 +86,7 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent }) => {
         <TestModal
           type={convertWarningToTestType(testType)}
           onClose={() => setTestType(null)}
-          onFinish={(score) => console.log(`${testType} 점수:`, score)}
+          onFinish={score => console.log(`${testType} 점수:`, score)}
         />
       )}
     </>

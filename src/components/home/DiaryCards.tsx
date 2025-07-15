@@ -24,14 +24,11 @@ interface Diary {
 
 interface DiaryCardsProps {
   diaries: Diary[];
-  isLoading?: boolean;
-  onLoadMore?: () => void;
-  lastItemRef?: (node: HTMLDivElement | null) => void;
+  onDeleteDiary?: (diaryId: number) => void;
+  onToggleBookmark?: (diaryId: number) => void;
 }
 
-const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore, lastItemRef }) => {
-  const deleteDiaryMutation = useDeleteDiary();
-  const token = localStorage.getItem("accessToken") || "";
+const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, onToggleBookmark }) => {
   const [openId, setOpenId] = useState<number | null>(null);
 
   if (!diaries || diaries.length === 0) {
@@ -40,7 +37,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-[420px] mx-auto">
-      {diaries.map((mappedDiary, index) => {
+      {diaries.map(mappedDiary => {
         const images = mappedDiary.photoUrl
           ? Array.isArray(mappedDiary.photoUrl)
             ? mappedDiary.photoUrl
@@ -49,13 +46,11 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
         const filteredImages = images.filter((img: string) => !!img && img.trim() !== "");
         const isEmotionOnly =
           !mappedDiary.map && (!mappedDiary.photoUrl || filteredImages.length === 0);
-        const isLast = index === diaries.length - 1;
         // 1. 감정만 있는 경우
         if (isEmotionOnly) {
           return (
             <div
               key={mappedDiary.id}
-              ref={isLast && lastItemRef ? lastItemRef : undefined}
               className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
             >
               <div className="flex gap-4 items-center rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] mb-4 py-[14px] px-[20px]">
@@ -109,7 +104,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
                     open={openId === mappedDiary.id}
                     setOpen={v => setOpenId(v ? mappedDiary.id : null)}
                     onDelete={() => {
-                      deleteDiaryMutation.mutate({ token, diaryId: String(mappedDiary.id) });
+                      if (onDeleteDiary) onDeleteDiary(mappedDiary.id);
+                    }}
+                    onToggleBookmark={() => {
+                      if (onToggleBookmark) onToggleBookmark(mappedDiary.id);
                     }}
                     trigger={
                       <img
@@ -136,7 +134,6 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
           return (
             <div
               key={mappedDiary.id}
-              ref={isLast && lastItemRef ? lastItemRef : undefined}
               className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
             >
               <div className="grid grid-cols-3 gap-2 rounded-2xl mb-2" style={{ height: "120px" }}>
@@ -198,7 +195,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
                     open={openId === mappedDiary.id}
                     setOpen={v => setOpenId(v ? mappedDiary.id : null)}
                     onDelete={() => {
-                      deleteDiaryMutation.mutate({ token, diaryId: String(mappedDiary.id) });
+                      if (onDeleteDiary) onDeleteDiary(mappedDiary.id);
+                    }}
+                    onToggleBookmark={() => {
+                      if (onToggleBookmark) onToggleBookmark(mappedDiary.id);
                     }}
                     trigger={
                       <img
@@ -224,7 +224,6 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
           return (
             <div
               key={mappedDiary.id}
-              ref={isLast && lastItemRef ? lastItemRef : undefined}
               className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
             >
               <div className="grid grid-cols-3 gap-2 rounded-2xl mb-2" style={{ height: "130px" }}>
@@ -280,7 +279,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
                     open={openId === mappedDiary.id}
                     setOpen={v => setOpenId(v ? mappedDiary.id : null)}
                     onDelete={() => {
-                      deleteDiaryMutation.mutate({ token, diaryId: String(mappedDiary.id) });
+                      if (onDeleteDiary) onDeleteDiary(mappedDiary.id);
+                    }}
+                    onToggleBookmark={() => {
+                      if (onToggleBookmark) onToggleBookmark(mappedDiary.id);
                     }}
                     trigger={
                       <img
@@ -306,7 +308,6 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
           return (
             <div
               key={mappedDiary.id}
-              ref={isLast && lastItemRef ? lastItemRef : undefined}
               className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
             >
               <div className="grid grid-cols-3 gap-2 rounded-2xl mb-2" style={{ height: "120px" }}>
@@ -368,7 +369,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
                     open={openId === mappedDiary.id}
                     setOpen={v => setOpenId(v ? mappedDiary.id : null)}
                     onDelete={() => {
-                      deleteDiaryMutation.mutate({ token, diaryId: String(mappedDiary.id) });
+                      if (onDeleteDiary) onDeleteDiary(mappedDiary.id);
+                    }}
+                    onToggleBookmark={() => {
+                      if (onToggleBookmark) onToggleBookmark(mappedDiary.id);
                     }}
                     trigger={
                       <img
@@ -394,7 +398,6 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
           return (
             <div
               key={mappedDiary.id}
-              ref={isLast && lastItemRef ? lastItemRef : undefined}
               className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
             >
               <div className="grid grid-cols-3 gap-2 rounded-2xl mb-2" style={{ height: "120px" }}>
@@ -450,7 +453,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
                     open={openId === mappedDiary.id}
                     setOpen={v => setOpenId(v ? mappedDiary.id : null)}
                     onDelete={() => {
-                      deleteDiaryMutation.mutate({ token, diaryId: String(mappedDiary.id) });
+                      if (onDeleteDiary) onDeleteDiary(mappedDiary.id);
+                    }}
+                    onToggleBookmark={() => {
+                      if (onToggleBookmark) onToggleBookmark(mappedDiary.id);
                     }}
                     trigger={
                       <img
@@ -476,7 +482,6 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
           return (
             <div
               key={mappedDiary.id}
-              ref={isLast && lastItemRef ? lastItemRef : undefined}
               className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col"
             >
               <div className="flex items-center justify-center h-24 text-gray-400">
@@ -486,11 +491,6 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, isLoading, onLoadMore,
           );
         }
       })}
-      {isLoading && (
-        <div className="w-full text-center py-4 text-gray-400">다음 데이터 불러오는 중...</div>
-      )}
-      {/* observer div for infinite scroll */}
-      {onLoadMore && lastItemRef && <div ref={lastItemRef} className="h-1 w-full" />}
     </div>
   );
 };

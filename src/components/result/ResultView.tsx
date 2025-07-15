@@ -9,6 +9,8 @@ import Todos from "./Todo";
 import WarningTestBox from "../WariningTestBox";
 import TestModal from "../TestModal";
 import PeopleCard from "../home/PeopleCard";
+import IntensityChart from "./IntensityChart";
+import BrainEmotionMap from "./BrainEmotionMap";
 
 interface ResultViewProps {
   diaryContent: any | null;
@@ -48,6 +50,9 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent }) => {
 
   const todos = diaryContent?.analysis?.todos ?? [];
 
+  // beforeDiaryScores 데이터 추출
+  const beforeDiaryScores = diaryContent?.beforeDiaryScores?.scores ?? [];
+
   const convertWarningToTestType = (warning: "stress" | "anxiety" | "depression") => {
     switch (warning) {
       case "anxiety":
@@ -62,6 +67,8 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent }) => {
   // Pass peopleCardsData to PeopleCard
   return (
     <>
+      <IntensityChart scores={beforeDiaryScores} />
+      <BrainEmotionMap activityAnalysis={activityAnalysis} />
       <PeopleCard data={peopleCardsData} />
       <motion.div
         ref={contentRef}

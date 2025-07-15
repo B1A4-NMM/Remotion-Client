@@ -10,6 +10,7 @@ import EmotionSummary from "../components/result/EmotionSummary";
 import ResultToggle from "../components/result/ResultToggle";
 import DiaryView from "../components/result/DiaryView";
 import ResultView from "../components/result/ResultView";
+import ActivityEmotionCard from "../components/result/ActivityEmotionCard";
 
 import "../styles/resultCard.css";
 import "../styles/App.css";
@@ -156,7 +157,7 @@ const Result: React.FC = () => {
       {/* ✅ Header - 원래 위치 유지 */}
       <ResultHeader writtenDate={finalDiaryContent.writtenDate || ""} />
 
-      <div className="mt-[200px]">
+      <div style={{ marginTop: "11vh" }}>
         {/* ✅ Emotion Summary */}
         <EmotionSummary diaryContent={finalDiaryContent} />
 

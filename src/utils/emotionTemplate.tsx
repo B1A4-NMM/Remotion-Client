@@ -26,6 +26,7 @@ function highlightEmotions(emotions: string[]) {
           padding: "0.1em 0.4em",
           marginRight: "0.2em",
           color: "#333",
+          fontWeight: "bold",
         }}
       >
         {emo}
@@ -45,6 +46,7 @@ function highlightTargets(targets: { name: string; colorKey: string }[]) {
         padding: "0.1em 0.4em",
         marginRight: "0.2em",
         color: "#333",
+        fontWeight: "bold",
       }}
     >
       {t.name}
@@ -52,116 +54,183 @@ function highlightTargets(targets: { name: string; colorKey: string }[]) {
   ));
 }
 
+// 액티비티 하이라이트 span 생성 함수 (밑줄)
+function highlightActivity(activity: string, colorKey: string) {
+  const underlineColor = hexToRgba(baseColors[colorKey as keyof typeof baseColors], 0.25);
+  return (
+    <span
+      style={{
+        borderBottom: `2.5px solid ${underlineColor}`,
+        paddingBottom: "0.03em",
+        fontWeight: "500",
+      }}
+    >
+      {activity}
+    </span>
+  );
+}
+
 // 템플릿 문구 함수들
 const TEMPLATES = {
-  "1": (targets: { name: string; colorKey: string }[], activity: string, emotions: string[]) => (
+  "1": (
+    targets: { name: string; colorKey: string }[],
+    activity: string,
+    emotions: string[],
+    mainColorKey: string
+  ) => (
     <div className="text-base leading-relaxed text-gray-800">
-      {highlightTargets(targets)}과 함께한 {activity} 속에서, {highlightEmotions(emotions)}이
-      또렷하게 피어났고, 그 순간이 오랫동안 마음에 남았어요.
+      {highlightTargets(targets)}과 함께한 {highlightActivity(activity, mainColorKey)} 에서,{" "}
+      {highlightEmotions(emotions)}이 또렷하게 피어났고, 그 순간이 오랫동안 마음에 남았어요.
     </div>
   ),
-  "2": (targets: { name: string; colorKey: string }[], activity: string, emotions: string[]) => (
-    <div className="text-lg leading-relaxed text-gray-800">
-      {highlightTargets(targets)}
-      과의 {activity} 속에, {highlightEmotions(emotions)}이 살며시 피어났어요. 그 따뜻한 기분이
-      아직도 맴돌아요.
-    </div>
-  ),
-  "3": (targets: { name: string; colorKey: string }[], activity: string, emotions: string[]) => (
-    <div className="text-base leading-relaxed text-gray-800">
-      {highlightTargets(targets)}
-      과의 {activity} 중, {highlightEmotions(emotions)}이 교차했지만, 결국 따뜻함이 더 크게
-      다가왔어요.
-    </div>
-  ),
-  "4": (targets: { name: string; colorKey: string }[], activity: string, emotions: string[]) => (
-    <div className="text-base leading-relaxed text-gray-800">
-      {highlightTargets(targets)}과 함께한 {activity}에서, {highlightEmotions(emotions)}이 마음을
-      무겁게 했어요. 아쉬움이 오래 남은 하루였어요.
-    </div>
-  ),
-  "5": (targets: { name: string; colorKey: string }[], activity: string, emotions: string[]) => (
-    <div className="text-base leading-relaxed text-gray-800">
-      {highlightTargets(targets)}을 떠올리며 했던 {activity}, 강한 {highlightEmotions(emotions)}이
-      하루 내내 마음을 흔들었어요.
-    </div>
-  ),
-  "6": (targets: { name: string; colorKey: string }[], activity: string, emotions: string[]) => (
-    <div className="text-base leading-relaxed text-gray-800">
-      {highlightTargets(targets)}과 함께한 {activity}에서, {highlightEmotions(emotions)}이 차례로
-      떠올랐어요. 쉽게 흘려보낼 수 없는 하루였어요.
-    </div>
-  ),
-  "7": (targets: { name: string; colorKey: string }[], activity: string, emotions: string[]) => (
+  "2": (
+    targets: { name: string; colorKey: string }[],
+    activity: string,
+    emotions: string[],
+    mainColorKey: string
+  ) => (
     <div className="text-base leading-relaxed text-gray-800">
       {highlightTargets(targets)}
-      과의 {activity} 중, {highlightEmotions(emotions)}이 살며시 지나갔어요. 마음에 잔잔히 머물다
-      사라진 하루였어요.
+      과의 {highlightActivity(activity, mainColorKey)} 에, {highlightEmotions(emotions)}이 살며시
+      피어났어요. 그 따뜻한 기분이 아직도 맴돌아요.
+    </div>
+  ),
+  "3": (
+    targets: { name: string; colorKey: string }[],
+    activity: string,
+    emotions: string[],
+    mainColorKey: string
+  ) => (
+    <div className="text-base leading-relaxed text-gray-800">
+      {highlightTargets(targets)}
+      과의 {highlightActivity(activity, mainColorKey)} 중, {highlightEmotions(emotions)}이
+      교차했지만, 결국 따뜻함이 더 크게 다가왔어요.
+    </div>
+  ),
+  "4": (
+    targets: { name: string; colorKey: string }[],
+    activity: string,
+    emotions: string[],
+    mainColorKey: string
+  ) => (
+    <div className="text-base leading-relaxed text-gray-800">
+      {highlightTargets(targets)}과 함께한 {highlightActivity(activity, mainColorKey)}에서,{" "}
+      {highlightEmotions(emotions)}이 마음을 무겁게 했어요. 아쉬움이 오래 남은 하루였어요.
+    </div>
+  ),
+  "5": (
+    targets: { name: string; colorKey: string }[],
+    activity: string,
+    emotions: string[],
+    mainColorKey: string
+  ) => (
+    <div className="text-base leading-relaxed text-gray-800">
+      {highlightTargets(targets)}을 떠올리며 했던 {highlightActivity(activity, mainColorKey)}, 강한{" "}
+      {highlightEmotions(emotions)}이 하루 내내 마음을 흔들었어요.
+    </div>
+  ),
+  "6": (
+    targets: { name: string; colorKey: string }[],
+    activity: string,
+    emotions: string[],
+    mainColorKey: string
+  ) => (
+    <div className="text-base leading-relaxed text-gray-800">
+      {highlightTargets(targets)}과 함께한 {highlightActivity(activity, mainColorKey)}에서,{" "}
+      {highlightEmotions(emotions)}이 차례로 떠올랐어요. 쉽게 흘려보낼 수 없는 하루였어요.
+    </div>
+  ),
+  "7": (
+    targets: { name: string; colorKey: string }[],
+    activity: string,
+    emotions: string[],
+    mainColorKey: string
+  ) => (
+    <div className="text-base leading-relaxed text-gray-800">
+      {highlightTargets(targets)}
+      과의 {highlightActivity(activity, mainColorKey)} 중, {highlightEmotions(emotions)}이 살며시
+      지나갔어요. 마음에 잔잔히 머물다 사라진 하루였어요.
     </div>
   ),
   "8_1_pos": (
     targets: { name: string; colorKey: string }[],
     activity: string,
-    emotions: string[]
+    emotions: string[],
+    mainColorKey: string
   ) => (
     <div className="text-base leading-relaxed text-gray-800">
       {highlightTargets(targets)}
-      과의 {activity}에서, 느낀 {highlightEmotions(emotions)}이 은은하게 퍼져, 하루를 부드럽게
-      감쌌어요.
+      과의 {highlightActivity(activity, mainColorKey)}에서, 느낀 {highlightEmotions(emotions)}이
+      은은하게 퍼져, 하루를 부드럽게 감쌌어요.
     </div>
   ),
   "8_1_neg": (
     targets: { name: string; colorKey: string }[],
     activity: string,
-    emotions: string[]
+    emotions: string[],
+    mainColorKey: string
   ) => (
     <div className="text-base leading-relaxed text-gray-800">
-      {highlightTargets(targets)}과 함께한 {activity} 속, {highlightEmotions(emotions)}이 가볍진
-      않았지만, 조용히 마음에 남았어요.
+      {highlightTargets(targets)}과 함께한 {highlightActivity(activity, mainColorKey)} 속,{" "}
+      {highlightEmotions(emotions)}이 가볍진 않았지만, 조용히 마음에 남았어요.
     </div>
   ),
   "8_2_pos": (
     targets: { name: string; colorKey: string }[],
     activity: string,
-    emotions: string[]
+    emotions: string[],
+    mainColorKey: string
   ) => (
     <div className="text-base leading-relaxed text-gray-800">
       {highlightTargets(targets)}
-      과의 {activity}에서, {highlightEmotions(emotions)}이 조용히 퍼졌어요. 마음이 편안하게
-      물들었어요.
+      과의 {highlightActivity(activity, mainColorKey)}에서, {highlightEmotions(emotions)}이 조용히
+      퍼졌어요. 마음이 편안하게 물들었어요.
     </div>
   ),
   "8_2_neg": (
     targets: { name: string; colorKey: string }[],
     activity: string,
-    emotions: string[]
+    emotions: string[],
+    mainColorKey: string
   ) => (
     <div className="text-base leading-relaxed text-gray-800">
       {highlightTargets(targets)}
-      과의 {activity}에서, {highlightEmotions(emotions)}이 은근히 스며들었고, 하루를 살짝 무겁게
-      눌렀어요.
+      과의 {highlightActivity(activity, mainColorKey)}에서, {highlightEmotions(emotions)}이 은근히
+      스며들었고, 하루를 살짝 무겁게 눌렀어요.
     </div>
   ),
   "8_2_mix": (
     targets: { name: string; colorKey: string }[],
     activity: string,
-    emotions: string[]
+    emotions: string[],
+    mainColorKey: string
   ) => (
     <div className="text-base leading-relaxed text-gray-800">
-      {highlightTargets(targets)}과 함께한 {activity}에서, {highlightEmotions(emotions)}이 엇갈리듯
-      떠올랐어요. 하루가 조금은 복잡하게 느껴졌어요.
+      {highlightTargets(targets)}과 함께한 {highlightActivity(activity, mainColorKey)}에서,{" "}
+      {highlightEmotions(emotions)}이 엇갈리듯 떠올랐어요. 하루가 조금은 복잡하게 느껴졌어요.
     </div>
   ),
-  "9": (targets: { name: string; colorKey: string }[], activity: string, emotions: string[]) => (
+  "9": (
+    targets: { name: string; colorKey: string }[],
+    activity: string,
+    emotions: string[],
+    mainColorKey: string
+  ) => (
     <div className="text-base leading-relaxed text-gray-800">
-      {highlightTargets(targets)}과 함께한 {activity} 속, <b className="text-blue-500">긍정감정</b>
-      과 <b className="text-rose-500">부정감정</b>이 함께 밀려와, 감정이 소용돌이친 하루였어요.
+      {highlightTargets(targets)}과 함께한 {highlightActivity(activity, mainColorKey)} 속,{" "}
+      <b className="text-blue-500">긍정감정</b>과 <b className="text-rose-500">부정감정</b>이 함께
+      밀려와, 감정이 소용돌이친 하루였어요.
     </div>
   ),
-  no_emotion: (targets: { name: string; colorKey: string }[], activity: string) => (
+  no_emotion: (
+    targets: { name: string; colorKey: string }[],
+    activity: string,
+    emotions: string[],
+    mainColorKey: string
+  ) => (
     <div className="text-base leading-relaxed text-gray-800">
-      {highlightTargets(targets)}과의 {activity}, 감정은 명확히 떠오르지 않지만, 그 순간이 당신에게
-      어떤 의미였을지 궁금해져요.
+      {highlightTargets(targets)}과의 {highlightActivity(activity, mainColorKey)}, 감정은 명확히
+      떠오르지 않지만, 그 순간이 당신에게 어떤 의미였을지 궁금해져요.
     </div>
   ),
 };
@@ -220,9 +289,10 @@ function getEmotionTemplate({ activity, peoples }: EmotionTemplateParams) {
   // 감정이 하나도 없으면 no_emotion 템플릿 사용
   if (allEmotions.length === 0) {
     const Template = TEMPLATES["no_emotion"];
+    const mainColorKey = targets[0]?.colorKey || "yellow";
     return {
-      jsx: Template ? Template(targets, activity) : null,
-      mainColorKey: targets[0]?.colorKey || "yellow",
+      jsx: Template ? Template(targets, activity, [], mainColorKey) : null,
+      mainColorKey,
     };
   }
 
@@ -261,9 +331,10 @@ function getEmotionTemplate({ activity, peoples }: EmotionTemplateParams) {
 
   const emotionsArr = allEmotions.map(e => e.type);
   const Template = TEMPLATES[caseKey as keyof typeof TEMPLATES];
+  const mainColorKey = targets[0]?.colorKey || "yellow";
   return {
-    jsx: Template ? Template(targets, activity, emotionsArr) : null,
-    mainColorKey: targets[0]?.colorKey || "yellow",
+    jsx: Template ? Template(targets, activity, emotionsArr, mainColorKey) : null,
+    mainColorKey,
   };
 }
 

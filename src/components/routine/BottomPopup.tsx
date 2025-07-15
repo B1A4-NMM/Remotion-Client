@@ -25,11 +25,11 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
     : _heightPixel || window.innerHeight / 2;
 
   const [springProps, api] = useSpring(() => ({
-    height: '0px',
+    height: "0px",
     config: { tension: 300, friction: 30 },
     onRest: {
-      height: (value) => {
-        if (value.value === '0px') {
+      height: value => {
+        if (value.value === "0px") {
           setIsInDOM(false);
         }
       },
@@ -45,11 +45,10 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
       const currY = window.scrollY || 0;
       bodyOverflowRef.current = document.body.style.overflow;
       topRef.current = document.body.style.top;
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
       document.body.style.top = `-${currY}px`;
-      
     } else {
-      api.start({ height: '0px' });
+      api.start({ height: "0px" });
     }
   }, [isOpen, api]);
 
@@ -62,10 +61,13 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
     }
   }, [isInDOM, api, heightPixel]);
 
-  useEffect(() => () => {
-    document.body.style.overflow = bodyOverflowRef.current;
-    document.body.style.top = topRef.current;
-  }, []);
+  useEffect(
+    () => () => {
+      document.body.style.overflow = bodyOverflowRef.current;
+      document.body.style.top = topRef.current;
+    },
+    []
+  );
 
   if (!wrapChildren && !isInDOM) return null;
 
@@ -73,13 +75,13 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
     <>
       {isInDOM && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-30 z-40"
+          className="absolute inset-0 bg-black bg-opacity-30 z-40"
           onClick={handleOverlayClick}
         />
       )}
       <animated.div
         style={springProps}
-        className="fixed bottom-0 left-0 w-full z-50 bg-white rounded-t-2xl overflow-y-auto shadow-xl"
+        className="absolute bottom-0 left-0 w-full z-50 bg-white rounded-t-2xl overflow-y-auto shadow-xl"
         onClick={handleContentClick}
       >
         <div ref={contentRef} className="p-6">

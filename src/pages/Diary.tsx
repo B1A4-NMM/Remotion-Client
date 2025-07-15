@@ -237,7 +237,7 @@ const Diary = () => {
 
   return (
     <>
-      <div className="relative flex flex-col h-dvh border">
+      <div className="relative flex flex-col h-full border">
         <DiaryTitle selectedDate={selectedDate} onCalendarClick={handleCalendarClick} />
 
         {/* 달력 컴포넌트 */}
@@ -253,39 +253,42 @@ const Diary = () => {
           onEditLocation={() => setShowLocationPicker(true)}
         />
 
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col p-4 flex-1">
-          <div className="flex-1 flex flex-col space-y-4 min-h-0 overflow-hidden">
-            <div className="flex-1 flex flex-col min-h-0">
-              <Textarea
-                {...register("content", { required: "내용을 작성해주세요" })}
-                value={animatedText}
-                onChange={e => {
-                  setAnimatedText(e.target.value);
-                  setValue("content", e.target.value);
-                  setContentLength(e.target.value.length); // 글자 수 업데이트
-                }}
-                onFocus={() => setInputFocused(true)}
-                onBlur={() => setInputFocused(false)}
-                placeholder="오늘은 무슨 일이 있으셨나요? 100자 이상으로 작성 해 주세요."
-                className="resize-none flex-1 min-h-0"
-              />
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col p-4 flex-1 min-h-0 overflow-hidden"
+        >
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            <Textarea
+              {...register("content", { required: "내용을 작성해주세요" })}
+              value={animatedText}
+              onChange={e => {
+                setAnimatedText(e.target.value);
+                setValue("content", e.target.value);
+                setContentLength(e.target.value.length); // 글자 수 업데이트
+              }}
+              onFocus={() => setInputFocused(true)}
+              onBlur={() => setInputFocused(false)}
+              placeholder="오늘은 무슨 일이 있으셨나요? 100자 이상으로 작성 해 주세요."
+              className="resize-none flex-1 w-full min-h-[200px] max-h-none overflow-y-auto"
+            />
+            <div className="flex-shrink-0 mt-2">
               {errors.content && (
-                <p className="text-red-500 text-sm mt-1">{errors.content.message as string}</p>
+                <p className="text-red-500 text-sm mb-1">{errors.content.message as string}</p>
               )}
               {/* 글자 수 표시 */}
-              <div className="text-right text-sm text-gray-500 mt-1">{contentLength}자</div>
+              <div className="text-right text-sm text-gray-500">{contentLength}자</div>
             </div>
-
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              id="image-upload"
-              onChange={handleImageChange}
-              className="hidden"
-              ref={fileInputRef}
-            />
           </div>
+
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            id="image-upload"
+            onChange={handleImageChange}
+            className="hidden"
+            ref={fileInputRef}
+          />
         </form>
 
         {!inputFocused && (

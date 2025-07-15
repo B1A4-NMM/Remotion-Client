@@ -7,10 +7,8 @@ import BottomPopup from "@/components/routine/BottomPopup";
 import RoutineModalContent from "@/components/routine/RoutineModalContent";
 import PersonalizedRoutineList from "@/components/routine/PersonalizedRoutineList";
 import RecommendedRoutinePopup from "@/components/routine/RecommendedRoutinePoPup";
-import { getTriggerRoutine,getRoutineByType } from "@/api/services/routine";
+import { getTriggerRoutine, getRoutineByType } from "@/api/services/routine";
 import { RoutineType } from "@/types/routine";
-
-
 
 export interface RoutineItem {
   id: number;
@@ -18,10 +16,7 @@ export interface RoutineItem {
   routineType: RoutineType;
 }
 
-
-
 const Routine = () => {
-
   const queryClient = useQueryClient();
 
   const [triggeredRoutines, setTriggeredRoutines] = useState<RoutineItem[]>([]);
@@ -32,7 +27,6 @@ const Routine = () => {
 
   const [allRoutines, setAllRoutines] = useState<RoutineItem[]>([]);
   const [emotionRoutines, setEmotionRoutines] = useState<RoutineItem[]>([]);
-
 
   // // ✅ ✅ ✅ 이 부분 추가해봐! (Routine 컴포넌트 안에서만)
   // useEffect(() => {
@@ -65,16 +59,16 @@ const Routine = () => {
       title,
       routineType: selectedFilter,
     };
-    setAllRoutines((prev) => [...prev, newRoutine]);
+    setAllRoutines(prev => [...prev, newRoutine]);
   };
 
   const handleDeleteRoutine = (id: number) => {
-    setAllRoutines((prev) => prev.filter((r) => r.id !== id));
+    setAllRoutines(prev => prev.filter(r => r.id !== id));
   };
 
   // const handleFolderClick = async(emotionTitle: string) => {
   //   const emotionKey = emotionTitle as RoutineItem["routineType"];
-    
+
   //   console.log("Folder 클릭됨", emotionKey);
   //   setSelectedEmotion(emotionKey);
 
@@ -84,7 +78,7 @@ const Routine = () => {
 
   //   try{
   //     const data =await getRoutineByType(emotionKey);
-      
+
   //     if (data && data.length > 0) {
   //       setEmotionRoutines(
   //         data.map((item:any) => ({
@@ -92,11 +86,11 @@ const Routine = () => {
   //           title: item.content,
   //           routineType:item.routineType,
   //         }))
-  //       ) ;    
-        
+  //       ) ;
+
   //       // 응답 루틴 저장
   //       setShowRecommendation(false);     // 기본 추천 아님
-        
+
   //     } else {
   //       console.log("루틴 없음,추천 루틴 모달 표시");
   //       setEmotionRoutines([]);           // 루틴 없음
@@ -112,25 +106,24 @@ const Routine = () => {
   // };
 
   // Routine.tsx 내
-const handleFolderClick = (emotionTitle: string) => {
-  const emotionKey = emotionTitle as RoutineItem["routineType"];
-  console.log("🔥 폴더 클릭됨 (테스트)", emotionKey);
+  const handleFolderClick = (emotionTitle: string) => {
+    const emotionKey = emotionTitle as RoutineItem["routineType"];
+    console.log("🔥 폴더 클릭됨 (테스트)", emotionKey);
 
-  setSelectedEmotion(null);
-  setShowRecommendation(false);
-  
-  // setSelectedEmotion(emotionKey);
-  // setShowRecommendation(true); // 무조건 추천루틴 모달 뜨게 고정
+    setSelectedEmotion(null);
+    setShowRecommendation(false);
 
-   // 2단계: 약간의 딜레이 후 다시 설정
-   setTimeout(() => {
-    setSelectedEmotion(emotionKey);
-    setShowRecommendation(true); // 무조건 추천 뜨게
-  }, 0); // 또는 10~50ms
-};
+    // setSelectedEmotion(emotionKey);
+    // setShowRecommendation(true); // 무조건 추천루틴 모달 뜨게 고정
 
-  
-  //추천 루틴 추가 
+    // 2단계: 약간의 딜레이 후 다시 설정
+    setTimeout(() => {
+      setSelectedEmotion(emotionKey);
+      setShowRecommendation(true); // 무조건 추천 뜨게
+    }, 0); // 또는 10~50ms
+  };
+
+  //추천 루틴 추가
   const handleRecommendedAdd = (title: string) => {
     if (!selectedEmotion) return;
     const newRoutine: RoutineItem = {
@@ -138,7 +131,7 @@ const handleFolderClick = (emotionTitle: string) => {
       title,
       routineType: selectedEmotion,
     };
-    setAllRoutines((prev) => [...prev, newRoutine]);
+    setAllRoutines(prev => [...prev, newRoutine]);
     setShowRecommendation(false);
   };
 
@@ -158,64 +151,59 @@ const handleFolderClick = (emotionTitle: string) => {
         <h1 className="text-xl font-bold">하루뒤가 선별한 루틴</h1>
       </div>
       <div className="flex gap-3 px-7 mt-2 mb-4">
-        {(["depression", "stress", "anxiety"] as RoutineItem["routineType"][]).map((type) => (
+        {(["depression", "stress", "anxiety"] as RoutineItem["routineType"][]).map(type => (
           <button
             key={type}
             className={`px-4 py-1 rounded-full border text-sm ${
               selectedFilter === type ? "bg-black text-white" : "bg-white text-black"
             }`}
-            onClick={() =>
-              setSelectedFilter(selectedFilter === type ? null : type)
-            }
+            onClick={() => setSelectedFilter(selectedFilter === type ? null : type)}
           >
-            {{
-              depression: "우울",
-              stress: "스트레스",
-              anxiety: "분노",
-            }[type]}
+            {
+              {
+                depression: "우울",
+                stress: "스트레스",
+                anxiety: "분노",
+              }[type]
+            }
           </button>
         ))}
       </div>
 
       {/* 루틴 리스트 */}
-  {triggeredRoutines.length === 0 ? (
-    <div className="flex items-center justify-center px-7 min-h-[230px]">
-    <p className="text-sm text-gray-500 text-center">
-      아직 선별된 루틴이 없어요.
-    </p>
-  </div>
-  ) : (
-  <PersonalizedRoutineList
-    routines={triggeredRoutines.map((r) => ({
-      id: r.id,
-      title: r.title,
-      onAdd: () => handleAddRoutine(r.title),
-    }))}
-  />
-)}
+      {triggeredRoutines.length === 0 ? (
+        <div className="flex items-center justify-center px-7 min-h-[230px]">
+          <p className="text-sm text-gray-500 text-center">아직 선별된 루틴이 없어요.</p>
+        </div>
+      ) : (
+        <PersonalizedRoutineList
+          routines={triggeredRoutines.map(r => ({
+            id: r.id,
+            title: r.title,
+            onAdd: () => handleAddRoutine(r.title),
+          }))}
+        />
+      )}
 
-<BottomPopup
-  isOpen={!!selectedEmotion}
-  onClose={() => {
-    setSelectedEmotion(null);
-    setShowRecommendation(false);
-  }}
-  heightOption={{ heightPixel: 700 }}
->
-  {selectedEmotion && showRecommendation && (
-    <RecommendedRoutinePopup
-      emotion={selectedEmotion}
-      onAdd={handleRecommendedAdd}
-      onClose={() => {
-        setSelectedEmotion(null);
-        setShowRecommendation(false);
-        
-      }}
-    />
-  )}
-</BottomPopup>
-
-
+      <BottomPopup
+        isOpen={!!selectedEmotion}
+        onClose={() => {
+          setSelectedEmotion(null);
+          setShowRecommendation(false);
+        }}
+        heightOption={{ heightPixel: 500 }}
+      >
+        {selectedEmotion && showRecommendation && (
+          <RecommendedRoutinePopup
+            emotion={selectedEmotion}
+            onAdd={handleRecommendedAdd}
+            onClose={() => {
+              setSelectedEmotion(null);
+              setShowRecommendation(false);
+            }}
+          />
+        )}
+      </BottomPopup>
     </div>
   );
 };

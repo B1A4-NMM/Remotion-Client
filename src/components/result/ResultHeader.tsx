@@ -19,11 +19,11 @@ const ResultHeader: React.FC<ResultHeaderProps> = ({ writtenDate }) => {
   dayjs.locale("ko");
 
   return (
-    <div className="fixed mb-8 z-10 left-0 right-0 top-0 flex justify-center">
+    <div className="sticky mb-8 z-10 top-0 flex justify-center bg-[#FAF6F4]">
       <div className="w-full max-w-md mx-4">
         {/* ✅ 메인 헤더 */}
         <div
-          className="flex items-start justify-between px-4 pt-6 pb-4 shadow-sm rounded-3xl"
+          className="flex items-start justify-between px-4 pt-6 pb-4 "
           style={{ backgroundColor: "#FAF6F4" }}
         >
           {/* 기존 내용 */}

@@ -12,7 +12,7 @@ const Analysis=()=>{
 
     return(
       <div>
-        <Title/>
+        <Title name={"심층 분석"} isBackActive={false}/>
         <StrengthGraph
             userName="user Name"/>
 

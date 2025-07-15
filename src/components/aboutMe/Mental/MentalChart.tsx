@@ -53,11 +53,10 @@ const MentalChart = ({ type, data }: MentalChartProps) => {
   const maxValue = 100;
 
   return (
-    <div className="w-full h-[20vh] rounded-lg p-1">
+    <div className="w-full rounded-lg p-1">
       <ChartContainer config={chartConfig} className="h-full w-full">
         <BarChart 
           data={chartData} 
-          width={195} 
           height={154}
           margin={{ top: 25, right: 10, left: 0, bottom: 10 }}
           barCategoryGap="0%"

@@ -1,11 +1,20 @@
 import { ChevronRight } from "lucide-react";
 import MentalChart from "../aboutMe/Mental/MentalChart";
 import { useMentalData } from "./../../api/queries/aboutme/useMentalData";
+import { useNavigate } from "react-router-dom";
+
 
 const Depress=()=>{
+    const navigator= useNavigate();
+
+    const onClickHandler=()=>{
+        navigator("/analysis/depress");
+    }
+
     const { data } = useMentalData("우울", 4); // 최근 3일치
+    
     return(
-        <div className="w-full mt-2 " >
+        <div className="w-full mt-5 " >
             {/* 메인 컨테이너 */}
             <div className="rounded-3xl shadow-xl bg-white">
                 {/* 헤더 */}
@@ -13,11 +22,15 @@ const Depress=()=>{
                 <h1 className="text-lg font-bold text-gray-900">
                     우울
                 </h1>
-                <ChevronRight className="text-gray-400"/>
+                <div onClick={onClickHandler} className="cursor-pointer">
+                    <ChevronRight className="text-gray-400"/>
+                </div>
                 </div>
                 <hr className="mr-5 ml-5"/>
-                <div className="h-44">
-                    <MentalChart type={"우울"} data={data?.date ?? []} />
+                <div className="h-44 content-end">
+                    <div className="h-fit">
+                        <MentalChart type={"우울"} data={data?.date ?? []} />
+                    </div>
                 </div>
             </div>
         </div>

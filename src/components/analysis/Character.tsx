@@ -6,6 +6,7 @@ import { useGetEmotionAnalysis } from "../../api/queries/aboutme/useGetEmoanalys
 
 
 import type { AnimalKey, AnimalTypeProps } from "@/types/diary";
+import { useNavigate } from "react-router-dom";
 
 
 // 동물 정보 데이터
@@ -115,13 +116,18 @@ const animalData: Record<AnimalKey, { name: string; description: string; imgSrc:
 
 
 const Character=()=>{
-    const [animalType, setAnimalType] = useState<{ character: AnimalKey } | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isError, setIsError] = useState(false);
-
-    const token = localStorage.getItem("accessToken") || "";
-    const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
-
+  const [animalType, setAnimalType] = useState<{ character: AnimalKey } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+  
+  const token = localStorage.getItem("accessToken") || "";
+  const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
+  
+  const navigator = useNavigate();
+  
+  const onClickHandler=()=>{
+    navigator("/analysis/character");
+  }
     useEffect(() => {
         const fetchCharacter = async () => {
         try {
@@ -160,8 +166,9 @@ const Character=()=>{
     const currentAnimal = animalData[animalType.character];
 
 
+
     return(
-        <div className="w-full h-48 mt-2 " >
+        <div className="w-full h-48 mt-5 " >
             {/* 메인 컨테이너 */}
             <div className="rounded-3xl shadow-xl bg-white">
                 {/* 헤더 */}
@@ -169,8 +176,9 @@ const Character=()=>{
                 <h1 className="text-lg font-bold text-gray-900">
                     캐릭터
                 </h1>
-                <ChevronRight className="text-gray-400"/>
-                </div>
+                <div onClick={onClickHandler} className="cursor-pointer">
+                    <ChevronRight className="text-gray-400"/>
+                </div>                </div>
                 <hr className="mr-5 ml-5"/>
                 <div>
                     <img

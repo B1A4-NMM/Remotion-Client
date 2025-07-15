@@ -12,7 +12,5 @@ export const getStrength = async () => {
     },
   });
 
-  console.log("✅ /strength 응답 데이터:", response.data);
-
   return response.data;
 };

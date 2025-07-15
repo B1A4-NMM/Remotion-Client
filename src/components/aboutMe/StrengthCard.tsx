@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import HexRadarChart from "./Strength/HexRadarChart";
-import StrengthBarChart from "./Strength/StrengthBarChart";
+import HexRadarChart from "../analysis/Strength/HexRadarChart";
+import StrengthBarChart from "../analysis/Strength/StrengthBarChart";
 import { motion } from "framer-motion";
 import { useGetStrength } from "@/api/queries/aboutme/useGetStrength";
 import type { DetailStrength } from "@/types/strength";
@@ -49,8 +49,7 @@ const StrengthCard = ({ isActive }: { isActive: boolean }) => {
       : null;
 
   return (
-    <div className="flex flex-col items-start gap-6 w-full pt-4 px-6">
-      <h1 className="text-white text-2xl font-bold pt-6">Strength</h1>
+    <div className="flex flex-col justify-center gap-6 w-full pt-4 px-6">
 
       {isLoading && <p className="text-white">로딩 중...</p>}
       {error && <p className="text-red-400">에러 발생: {`${error}`}</p>}
@@ -62,7 +61,10 @@ const StrengthCard = ({ isActive }: { isActive: boolean }) => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <HexRadarChart typeCount={data.typeCount} onSelectCategory={setSelectedCategory} />
+          <HexRadarChart 
+          totalTypeCount={data.typeCount} 
+          monthlyTypeCount={data.typeCount} 
+          onSelectCategory={setSelectedCategory} />
         </motion.div>
       )}
 
@@ -75,9 +77,13 @@ const StrengthCard = ({ isActive }: { isActive: boolean }) => {
             >
               {selectedCategory}
             </span>
-            <h3 className="text-white text-xl">의 세부 강점</h3>
+            <h3 className="text-black text-xl">의 세부 강점</h3>
           </div>
-          <StrengthBarChart data={detailData} color={selectedColor} />
+          <StrengthBarChart 
+            totalData={detailData}
+            monthlyData={detailData}
+            selectedCategory={selectedCategory}
+           />
         </div>
       )}
     </div>

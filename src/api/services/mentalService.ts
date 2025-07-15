@@ -7,10 +7,6 @@ export const getMentalData = async (
   const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
   const token = localStorage.getItem("accessToken");
 
-  console.log("📊 감정 데이터 요청 중...");
-  console.log("emotion:", emotion);
-  console.log("period:", period);
-
   const response = await axios.get(`${BASE_URL}/emotion`, {
     params: {
       emotion,
@@ -28,7 +24,6 @@ export const getMentalData = async (
     },
   });
 
-  console.log("✅ 감정 데이터 응답:", response.data); // 👉 추가된 부분
 
   return response.data;
 };

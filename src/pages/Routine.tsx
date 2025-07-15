@@ -72,44 +72,63 @@ const Routine = () => {
     setAllRoutines((prev) => prev.filter((r) => r.id !== id));
   };
 
-  const handleFolderClick = async(emotionTitle: string) => {
-    const emotionKey = emotionTitle as RoutineItem["routineType"];
+  // const handleFolderClick = async(emotionTitle: string) => {
+  //   const emotionKey = emotionTitle as RoutineItem["routineType"];
     
-    console.log("Folder 클릭됨", emotionKey);
-    setSelectedEmotion(emotionKey);
+  //   console.log("Folder 클릭됨", emotionKey);
+  //   setSelectedEmotion(emotionKey);
 
-    console.log("selectedEmotion SET 완료");
-    setIsPopupOpen(true);
-    setShowRecommendation(false);
+  //   console.log("selectedEmotion SET 완료");
+  //   setIsPopupOpen(true);
+  //   setShowRecommendation(false);
 
-    try{
-      const data =await getRoutineByType(emotionKey);
+  //   try{
+  //     const data =await getRoutineByType(emotionKey);
       
-      if (data && data.length > 0) {
-        setEmotionRoutines(
-          data.map((item:any) => ({
-            id:item.routineId,
-            title: item.content,
-            routineType:item.routineType,
-          }))
-        ) ;    
+  //     if (data && data.length > 0) {
+  //       setEmotionRoutines(
+  //         data.map((item:any) => ({
+  //           id:item.routineId,
+  //           title: item.content,
+  //           routineType:item.routineType,
+  //         }))
+  //       ) ;    
         
-        // 응답 루틴 저장
-        setShowRecommendation(false);     // 기본 추천 아님
+  //       // 응답 루틴 저장
+  //       setShowRecommendation(false);     // 기본 추천 아님
         
-      } else {
-        console.log("루틴 없음,추천 루틴 모달 표시");
-        setEmotionRoutines([]);           // 루틴 없음
-        setShowRecommendation(true);      // 기본 추천 보여주기
-      }
-    }catch(err){
-      console.error("루틴 불러오기 실패:",err);
-      setEmotionRoutines([]);
-      setShowRecommendation(true);
-    }
-    // const hasRoutines = allRoutines.some((r) => r.routineType === emotionKey);
-    // setShowRecommendation(!hasRoutines);
-  };
+  //     } else {
+  //       console.log("루틴 없음,추천 루틴 모달 표시");
+  //       setEmotionRoutines([]);           // 루틴 없음
+  //       setShowRecommendation(true);      // 기본 추천 보여주기
+  //     }
+  //   }catch(err){
+  //     console.error("루틴 불러오기 실패:",err);
+  //     setEmotionRoutines([]);
+  //     setShowRecommendation(true);
+  //   }
+  //   // const hasRoutines = allRoutines.some((r) => r.routineType === emotionKey);
+  //   // setShowRecommendation(!hasRoutines);
+  // };
+
+  // Routine.tsx 내
+const handleFolderClick = (emotionTitle: string) => {
+  const emotionKey = emotionTitle as RoutineItem["routineType"];
+  console.log("🔥 폴더 클릭됨 (테스트)", emotionKey);
+
+  setSelectedEmotion(null);
+  setShowRecommendation(false);
+  
+  // setSelectedEmotion(emotionKey);
+  // setShowRecommendation(true); // 무조건 추천루틴 모달 뜨게 고정
+
+   // 2단계: 약간의 딜레이 후 다시 설정
+   setTimeout(() => {
+    setSelectedEmotion(emotionKey);
+    setShowRecommendation(true); // 무조건 추천 뜨게
+  }, 0); // 또는 10~50ms
+};
+
   
   //추천 루틴 추가 
   const handleRecommendedAdd = (title: string) => {
@@ -176,33 +195,26 @@ const Routine = () => {
 )}
 
 <BottomPopup
-  isOpen={isPopupOpen}
+  isOpen={!!selectedEmotion}
   onClose={() => {
-    console.log("모달 닫힘")
     setSelectedEmotion(null);
     setShowRecommendation(false);
-    setIsPopupOpen(false);
   }}
   heightOption={{ heightPixel: 700 }}
 >
-{selectedEmotion && showRecommendation && (
-  <RecommendedRoutinePopup
-    emotion={selectedEmotion}
-    onAdd={handleRecommendedAdd}
-  />
-)}
-{selectedEmotion && !showRecommendation && (
-  <RoutineModalContent
-    emotion={selectedEmotion}
-    routines={emotionRoutines}
-    onAdd={handleAddRoutine}
-    onDelete={handleDeleteRoutine}
-    onClose={() =>{ 
-      setIsPopupOpen(false)
+  {selectedEmotion && showRecommendation && (
+    <RecommendedRoutinePopup
+      emotion={selectedEmotion}
+      onAdd={handleRecommendedAdd}
+      onClose={() => {
+        setSelectedEmotion(null);
+        setShowRecommendation(false);
+        
       }}
-  />
-)}
+    />
+  )}
 </BottomPopup>
+
 
     </div>
   );

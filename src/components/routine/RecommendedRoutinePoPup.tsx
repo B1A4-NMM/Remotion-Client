@@ -6,6 +6,7 @@ import { usePostRoutineByType } from "@/api/queries/routine/usePostRoutineByType
 interface RecommendedRoutinePopupProps {
     emotion: RoutineType;
     onAdd: (title: string) => void;
+    onClose:() => void;
   }
   
   const RECOMMENDED_ROUTINES = {
@@ -14,30 +15,31 @@ interface RecommendedRoutinePopupProps {
     stress: ["심호흡 명상", "하루 일정 정리", "따뜻한 차 한 잔"],
   };
   
-  export default function RecommendedRoutinePopup({ emotion,onAdd,
+  export default function RecommendedRoutinePopup({ emotion,onAdd, onClose
    }: RecommendedRoutinePopupProps) {
 
-    const { close } = useBottomPopupStore();
+    //const { close } = useBottomPopupStore();
     const queryClient = useQueryClient();
   
     const { mutate: postRoutine } = usePostRoutineByType();
   
     const handleClick = (title: string) => {
-      postRoutine(
-        { type:emotion,title },
-        {
-          onSuccess: () => {
-            onAdd(title); //화면에 반영
-            //바텀시트를 닫을 때 화면 갱신 , 여기서 하면 안됨
-          },
-        }
-      );
+      // postRoutine(
+      //   { type:emotion,title },
+      //   {
+      //     onSuccess: () => {
+      //       onAdd(title); //화면에 반영
+      //       //바텀시트를 닫을 때 화면 갱신 , 여기서 하면 안됨
+      //     },
+      //   }
+      // );
+      onAdd(title);
     };
 
     //바텀시트를 닫을 때 invalidate 처리
     const handleClose = () => {
       queryClient.invalidateQueries({ queryKey: ["routine",emotion]});
-      close();
+      onClose();
     };
   
     return (

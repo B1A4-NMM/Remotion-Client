@@ -5,6 +5,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { motion, useMotionValue } from "framer-motion";
 import type { Node, AnimatedBranch, Edge } from "@/types/emotionalGraph";
 import { useGetRelation } from "../api/queries/relation/useGetRelation";
+import { useNavigate } from "react-router-dom";
 
 import { updatePhysics } from "@/utils/physics";
 import {
@@ -34,6 +35,91 @@ const EmotionalGraph = () => {
 
   const offsetX = useMotionValue(0);
   const offsetY = useMotionValue(0);
+  const navigate = useNavigate();
+
+  // 클릭/드래그 구분용 ref
+  const clickStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  const handleCanvasMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    clickStartRef.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleCanvasMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!clickStartRef.current) return;
+    const dx = e.clientX - clickStartRef.current.x;
+    const dy = e.clientY - clickStartRef.current.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    // 5px 이하 이동이면 클릭으로 간주
+    if (distance < 5) {
+      handleCanvasClick(e);
+    }
+    clickStartRef.current = null;
+  };
+
+  // 캔버스 클릭 핸들러: 노드 클릭 시 /result/{diaryId}로 이동
+  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      console.warn("❌ canvasRef가 없음");
+      return;
+    }
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    console.log("🖱 클릭한 실제 좌표:", { x, y });
+    console.log("📐 canvas 사이즈:", {
+      canvasWidth: canvas.width,
+      canvasHeight: canvas.height,
+      cssWidth: rect.width,
+      cssHeight: rect.height,
+    });
+
+    const offsetXValue = typeof offsetX.get === "function" ? offsetX.get() : 0;
+    const offsetYValue = typeof offsetY.get === "function" ? offsetY.get() : 0;
+    console.log("📦 오프셋 값:", { offsetXValue, offsetYValue });
+
+    if (!nodesRef.current || nodesRef.current.length === 0) {
+      console.warn("❌ nodesRef가 비어 있음");
+      return;
+    }
+
+    console.log(
+      "🧠 현재 노드 목록:",
+      nodesRef.current.map(n => ({
+        id: n.id,
+        diaryId: n.diaryId,
+        label: n.label,
+        x: n.x,
+        y: n.y,
+        radius: n.radius,
+      }))
+    );
+
+    let clickedNode = null;
+
+    for (const node of nodesRef.current) {
+      const dx = x - (node.x - offsetXValue);
+      const dy = y - (node.y - offsetYValue);
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      console.log(`📏 노드 ${node.id} 거리:`, distance, `(반지름 ${node.radius})`);
+
+      if (distance <= node.radius) {
+        clickedNode = node;
+        break;
+      }
+    }
+
+    if (clickedNode) {
+      const id = clickedNode.diaryId || clickedNode.id;
+      console.log("🟢 클릭된 노드 ID:", id);
+      navigate(`/result/${id}`); // 실제 이동하려면 이걸 풀어
+    } else {
+      console.log("⚪️ 노드와 일치하는 클릭 없음");
+    }
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -197,25 +283,26 @@ const EmotionalGraph = () => {
   }, [canvasSize.width, canvasSize.height, relationData]);
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-screen overflow-x-scroll overflow-y-hidden bg-black relative"
-    >
+    <div ref={containerRef} className="w-full h-screen overflow-hidden relative">
       <motion.div
         drag
+        onClick={() => console.log("✅ Clicked!")}
         dragMomentum={false}
         dragElastic={0.1}
         style={{ x: offsetX, y: offsetY }}
-        className="w-[300%] h-full cursor-grab active:cursor-grabbing"
+        className="w-[300%] h-full relative"
       >
+        {/* canvas는 motion.div 내부에 있어야 같이 움직임 */}
         <canvas
           ref={canvasRef}
+          onMouseDown={handleCanvasMouseDown}
+          onMouseUp={handleCanvasMouseUp}
+          className="absolute top-0 left-0 w-full h-full z-10"
           style={{
-            width: "100%",
-            height: "100%",
+            cursor: "pointer",
             borderRadius: 20,
-            boxShadow: "0 0 30px rgba(255, 255, 255, 0.1)",
             display: "block",
+            pointerEvents: "auto", // 💡 아주 중요: 이벤트 통과 허용
           }}
         />
       </motion.div>

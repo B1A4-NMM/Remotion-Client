@@ -4,7 +4,9 @@
     justify-content: center;
     /* align-items: center; */
     min-height: 100vh;
-    background: #1E1E1E;
+    /* background: #1E1E1E; */
+    position: relative;
+    overflow: hidden;
 }
 
 .my-toast {

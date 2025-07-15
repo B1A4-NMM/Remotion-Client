@@ -3,38 +3,40 @@ import BottomNavigation from "./components/BottomNavigation";
 import { Toaster } from "sonner";
 
 // 하단 네비게이션을 숨길 경로 목록
-const HIDE_NAV_PATHS = ["/signup", "/login"];
+const HIDE_NAV_PATHS = ["/signup", "/login", "/diary/", "/video"];
 
 export default function Layout() {
   const location = useLocation();
 
   // 현재 경로가 네비게이션을 숨겨야 하는 경로에 포함되지 않는 경우만 보여줌
-  const shouldShowNav = !HIDE_NAV_PATHS.includes(location.pathname);
+  // 경로가 숨겨야 하는 경로로 시작하는지 확인
+  const shouldShowNav = !HIDE_NAV_PATHS.some(path => location.pathname.startsWith(path));
 
   return (
-    <div className="w-full flex justify-center items-start min-h-screen">
-      <div className="w-full max-w-[414px] min-h-screen relative bg-[#1E1E1E] text-white">
-        <main>
+    <div className="w-full min-h-[100dvh] flex justify-center bg-[#FAF6F4] font-pretendard">
+      <div className="w-full max-w-[414px] flex flex-col relative bg-[#FAF6F4] text-black min-h-[100dvh]">
+        <main className="flex-1 h-full bg-[#FAF6F4] pb-[84px]">
           <Outlet />
           <Toaster
             position="top-center"
             expand={true}
-            richColors={false} // richColors를 false로 변경
+            richColors={true}
             closeButton={true}
             toastOptions={{
               duration: 4000,
               style: {
-                background: "#FFFFFF",
-                color: "#000000",
-                border: "1px solid #000000",
+                background: "#ffff",
+                color: "#EF7C80",
+                border: "1px solid #E5E5EA",
+                boxShadow: "0 4px 24px 0 rgba(80, 80, 120, 0.08)",
+                borderRadius: "16px",
               },
-              className: "my-toast",
             }}
           />
         </main>
 
         {shouldShowNav && (
-          <div className="fixed bottom-0 left-0 right-0 w-full max-w-[414px] mx-auto z-50">
+          <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[414px] z-50">
             <BottomNavigation />
           </div>
         )}

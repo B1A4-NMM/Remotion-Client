@@ -1,0 +1,87 @@
+/* radarChart.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+
+.grid-line {
+    fill: none;
+    stroke: #f0f0f0;
+    stroke-width: 1;
+}
+
+.axis-line {
+    stroke: #dfdfdf;
+    stroke-width: 1;
+}
+
+.axis-label {
+    font-size: 14px;
+    font-weight: 500;
+    fill: #1d1d1f;
+    text-anchor: middle;
+    dominant-baseline: middle;
+}
+
+
+/* 그리드 점수 라벨 */
+.grid-score-label {
+    font-size: 20px;
+    font-weight: 400;
+    fill: #86868b;
+    text-anchor: middle;
+    dominant-baseline: middle;
+}
+
+/* 데이터 포인트 스타일 */
+.data-point-current {
+    fill: #007aff;
+    stroke: #ffffff;
+    stroke-width: 2;
+    filter: drop-shadow(0 2px 4px rgba(0, 122, 255, 0.3));
+}
+
+.data-point-average {
+    fill: #ff9500;
+    stroke: #ffffff;
+    stroke-width: 2;
+    filter: drop-shadow(0 2px 4px rgba(255, 149, 0, 0.3));
+}
+
+/* 데이터 값 라벨 */
+.data-value-label {
+    font-size: 20px;
+    font-weight: 600;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    pointer-events: none;
+}
+
+.data-value-label.current {
+    fill: #007aff;
+}
+
+.data-value-label.average {
+    fill: #ff9500;
+}
+
+/* 호버 효과 */
+.data-point-current:hover,
+.data-point-average:hover {
+    r: 6;
+    transition: r 0.2s ease;
+}
+
+/* 반응형 */
+@media (max-width: 480px) {
+    .grid-score-label {
+        font-size: 8px;
+    }
+    
+    .data-value-label {
+        font-size: 9px;
+    }
+    
+    .data-point-current,
+    .data-point-average {
+        r: 3;
+    }
+}

@@ -4,40 +4,55 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Image as LucideImage, Mic, MicOff } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { usePostDiary } from "@/api/queries/diary/usePostDiary.ts";
 import Loading6 from "../components/Loading/Loading6";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
-import LocationPicker from "@/components/LocationPicker"; // 분리된 지도 모달 컴포넌트
-import { useParams } from "react-router-dom";
+import { LocationPicker, LocationPreview } from "@/components/LocationPicker";
+import { useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
+import FilePreview, { Attachment } from "@/components/diary/FilePreview";
+
+import DiaryTitle from "@/components/diary/DiaryTitle";
+import BottomNavi from "@/components/diary/BottomNavi";
+import MonthlyCalendar from "@/components/diary/MontlyCalendar";
+import { toast } from "sonner";
 
 const Diary = () => {
   const { date } = useParams();
-
   const navigate = useNavigate();
-  const [mapOpen, setMapOpen] = useState(false);
+
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(date || dayjs().format("YYYY-MM-DD"));
+
+  // URL 파라미터와 selectedDate 동기화
+  useEffect(() => {
+    if (date && date !== selectedDate) {
+      setSelectedDate(date);
+    }
+  }, [date]);
+
   const {
     register,
     handleSubmit,
     reset,
     setValue,
-    getValues,
     formState: { errors },
   } = useForm();
-  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-  const isValidDate = date && dayjs(date, "YYYY-MM-DD", true).isValid();
-  if (!isValidDate) {
-    return <div className="p-4 text-red-500">❌ 유효하지 않은 날짜입니다: {date}</div>;
-  }
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
+
+  // 글자 수 상태 추가
+  const [contentLength, setContentLength] = useState(0);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } =
     useSpeechRecognition();
 
+  const [isPhotoActive, setIsPhotoActive] = useState(false);
+  const [isLocationActive, setIsLocationActive] = useState(false);
   const prevTranscriptRef = useRef("");
   const animationQueue = useRef<string[]>([]);
   const [animatedText, setAnimatedText] = useState("");
@@ -45,11 +60,35 @@ const Diary = () => {
   const { mutate } = usePostDiary({
     onSuccess: () => {
       reset();
-      setPreview(null);
+      setAttachments([]);
       setIsSubmitting(false);
       setAnimatedText("");
+      setContentLength(0); // 글자 수 리셋
     },
   });
+
+  // 날짜 선택 핸들러
+  const handleDateSelect = (newDate: string) => {
+    const selectedDay = dayjs(newDate);
+    const today = dayjs();
+
+    if (selectedDay.isSame(today, "day") || selectedDay.isBefore(today, "day")) {
+      setSelectedDate(newDate);
+      navigate(`/diary/${newDate}`);
+    } else {
+      toast.error("미래 날짜로는 이동할 수 없습니다!");
+    }
+  };
+
+  // 달력 버튼 클릭 핸들러
+  const handleCalendarClick = () => {
+    setShowCalendar(!showCalendar);
+  };
+
+  // 달력 닫기 핸들러
+  const handleCalendarClose = () => {
+    setShowCalendar(false);
+  };
 
   useEffect(() => {
     if (!listening) return;
@@ -70,6 +109,7 @@ const Diary = () => {
         setAnimatedText(prev => {
           const updated = prev + nextChar;
           setValue("content", updated);
+          setContentLength(updated.length); // 글자 수 업데이트
           return updated;
         });
       }
@@ -77,44 +117,108 @@ const Diary = () => {
     return () => clearInterval(interval);
   }, [animationQueue.current.length, listening]);
 
-  const handleStartListening = () => {
-    resetTranscript();
-    prevTranscriptRef.current = "";
-    SpeechRecognition.startListening({ language: "ko-KR", continuous: true });
+  const handleMicClick = () => {
+    if (listening) {
+      SpeechRecognition.stopListening();
+    } else {
+      resetTranscript();
+      prevTranscriptRef.current = "";
+      SpeechRecognition.startListening({ language: "ko-KR", continuous: true });
+    }
   };
 
-  const handleStopListening = () => {
-    SpeechRecognition.stopListening();
+  const handleLocationClick = () => {
+    setIsLocationActive(!isLocationActive);
+    setShowLocationPicker(true);
+  };
+
+  const handleImageClick = () => {
+    setIsPhotoActive(true);
+
+    const handleWindowFocus = () => {
+      if (attachments.length < 5) {
+        setIsPhotoActive(false);
+      }
+      window.removeEventListener("focus", handleWindowFocus);
+    };
+
+    window.addEventListener("focus", handleWindowFocus, { once: true });
+    fileInputRef.current?.click();
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setPreview(URL.createObjectURL(file));
-      setImageFile(file);
+    const files = e.target.files;
+    if (files) {
+      const newFiles = Array.from(files);
+      const imageCount = attachments.filter(att => att.type === "image").length;
+
+      if (imageCount + newFiles.length > 4) {
+        alert("최대 4개의 이미지만 첨부할 수 있습니다.");
+        return;
+      }
+
+      const newImageAttachments: Attachment[] = newFiles.map(file => ({
+        type: "image",
+        file,
+        preview: URL.createObjectURL(file),
+      }));
+
+      setAttachments(prev => [...newImageAttachments, ...prev]);
     }
   };
+
+  const handleLocationSelect = (location: { latitude: number; longitude: number }) => {
+    const newLocationAttachment: Attachment = {
+      type: "location",
+      location,
+    };
+
+    setAttachments(prev => {
+      const withoutLocation = prev.filter(att => att.type !== "location");
+      return [newLocationAttachment, ...withoutLocation];
+    });
+
+    setShowLocationPicker(false);
+  };
+
+  const handleRemoveAttachment = (index: number) => {
+    const attachment = attachments[index];
+    if (attachment.type === "image") {
+      URL.revokeObjectURL(attachment.preview);
+    }
+    setAttachments(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // 저장 버튼 클릭 핸들러 추가
+  const handleSaveClick = () => {
+    handleSubmit(onSubmit)();
+  };
+
   const onSubmit = (data: any) => {
-    const file = fileInputRef.current?.files?.[0];
     const formData = new FormData();
 
     formData.append("content", data.content);
-    formData.append("writtenDate", date!); // ✅ URL에서 받은 날짜로 작성
+    formData.append("writtenDate", date!);
     formData.append("weather", "SUNNY");
 
-    if (location) {
-      formData.append("latitude", String(location.latitude));
-      formData.append("longitude", String(location.longitude));
+    const locationAttachment = attachments.find(att => att.type === "location") as
+      | Attachment
+      | undefined;
+    if (locationAttachment && locationAttachment.type === "location") {
+      formData.append("latitude", String(locationAttachment.location.latitude));
+      formData.append("longitude", String(locationAttachment.location.longitude));
     }
 
-    if (file) {
-      formData.append("photo", file);
-    }
+    const imageAttachments = attachments.filter(att => att.type === "image") as Attachment[];
+    imageAttachments.forEach(att => {
+      if (att.type === "image") {
+        formData.append("photo", att.file);
+      }
+    });
 
-    // 디버깅 로그
     console.log("📤 전송할 FormData 내용:");
     formData.forEach((value, key) => {
-      if (key === "photo" && value instanceof File) {
+      if (key === "photos" && value instanceof File) {
         console.log(`📎 ${key}:`, value.name, `(size: ${value.size} bytes)`);
       } else {
         console.log(`📝 ${key}:`, value);
@@ -133,83 +237,81 @@ const Diary = () => {
 
   return (
     <>
-      {/* 일기 작성 폼 */}
-      <form onSubmit={handleSubmit(onSubmit)} className="h-screen flex flex-col p-4 pb-20">
-        <div className="flex-1 flex flex-col space-y-4 min-h-0 overflow-hidden">
-          <div className="flex-1 flex flex-col min-h-0">
-            <Textarea
-              {...register("content", { required: "내용을 작성해주세요" })}
-              value={animatedText}
-              onChange={e => {
-                setAnimatedText(e.target.value);
-                setValue("content", e.target.value);
-              }}
-              placeholder="오늘은 무슨 일이 있으셨나요?"
-              className="resize-none flex-1 min-h-0"
-            />
-            {errors.content && (
-              <p className="text-red-500 text-sm mt-1">{errors.content.message as string}</p>
-            )}
-            <div className="flex justify-end mt-2">
-              <LocationPicker
-                onLocationSelect={loc => {
-                  console.log("📥 부모에서 받은 위치:", loc);
-                  setLocation(loc); // 상태 저장도 가능
+      <div className="relative flex flex-col h-dvh border">
+        <DiaryTitle selectedDate={selectedDate} onCalendarClick={handleCalendarClick} />
+
+        {/* 달력 컴포넌트 */}
+        <MonthlyCalendar
+          selectedDate={selectedDate}
+          onDateSelect={handleDateSelect}
+          onClose={handleCalendarClose}
+          isOpen={showCalendar}
+        />
+        <FilePreview
+          attachments={attachments}
+          onRemove={handleRemoveAttachment}
+          onEditLocation={() => setShowLocationPicker(true)}
+        />
+
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col p-4 flex-1">
+          <div className="flex-1 flex flex-col space-y-4 min-h-0 overflow-hidden">
+            <div className="flex-1 flex flex-col min-h-0">
+              <Textarea
+                {...register("content", { required: "내용을 작성해주세요" })}
+                value={animatedText}
+                onChange={e => {
+                  setAnimatedText(e.target.value);
+                  setValue("content", e.target.value);
+                  setContentLength(e.target.value.length); // 글자 수 업데이트
                 }}
+                onFocus={() => setInputFocused(true)}
+                onBlur={() => setInputFocused(false)}
+                placeholder="오늘은 무슨 일이 있으셨나요? 100자 이상으로 작성 해 주세요."
+                className="resize-none flex-1 min-h-0"
               />
-
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={listening ? handleStopListening : handleStartListening}
-                className={`flex items-center gap-2 text-sm px-4 py-2 ${
-                  listening ? "!bg-red-800 !text-white" : "!bg-blue-800 !text-white"
-                } hover:!bg-red-600 hover:!text-white`}
-              >
-                {listening ? (
-                  <>
-                    <MicOff size={16} />
-                    일기 듣는 중
-                  </>
-                ) : (
-                  <>
-                    <Mic size={16} />
-                    일기 말하기
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* 이미지 업로드 */}
-          <label htmlFor="image-upload">
-            <Card className="w-full h-48 mt-[1vh] border-dashed border-2 border-gray-400 flex items-center justify-center cursor-pointer overflow-hidden bg-transparent">
-              {preview ? (
-                <img src={preview} alt="미리보기" className="object-cover w-full h-full" />
-              ) : (
-                <div className="flex flex-col items-center text-white">
-                  <LucideImage className="w-8 h-8 mb-2 text-white" />
-                </div>
+              {errors.content && (
+                <p className="text-red-500 text-sm mt-1">{errors.content.message as string}</p>
               )}
-            </Card>
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            id="image-upload"
-            {...register("image")}
-            onChange={handleImageChange}
-            className="hidden"
-            ref={fileInputRef}
-          />
-        </div>
+              {/* 글자 수 표시 */}
+              <div className="text-right text-sm text-gray-500 mt-1">{contentLength}자</div>
+            </div>
 
-        <div className="pt-4">
-          <Button type="submit" className="w-full bg-white text-black hover:bg-gray-200">
-            저장하기
-          </Button>
-        </div>
-      </form>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              id="image-upload"
+              onChange={handleImageChange}
+              className="hidden"
+              ref={fileInputRef}
+            />
+          </div>
+        </form>
+
+        {!inputFocused && (
+          <BottomNavi
+            onMicClick={handleMicClick}
+            onLocationClick={handleLocationClick}
+            onImageClick={handleImageClick}
+            onSaveClick={handleSaveClick} // 저장 버튼 핸들러 추가
+            isListening={listening}
+            isPhotoActive={isPhotoActive}
+            isLocationActive={isLocationActive}
+            isSaveEnabled={contentLength >= 100} // 저장 버튼 활성화 조건
+          />
+        )}
+      </div>
+
+      {showLocationPicker && (
+        <LocationPicker
+          open={showLocationPicker}
+          onClose={() => {
+            setShowLocationPicker(false);
+            setIsLocationActive(!isLocationActive);
+          }}
+          onLocationSelect={handleLocationSelect}
+        />
+      )}
     </>
   );
 };

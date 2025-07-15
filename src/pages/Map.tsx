@@ -18,7 +18,14 @@ interface ApiMarkerData {
   content?: string;
 }
 
-const Map = () => {
+interface MapProps {
+  continuousWritingDate: number;
+  emotionCountByMonth: number;
+  totalDiaryCount: number;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const Map: React.FC<MapProps> = _ => {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -181,10 +188,11 @@ const Map = () => {
   }, [markerDataList]);
 
   return (
-    <>
-      <div ref={mapRef} className="w-full h-screen rounded-lg shadow" />
-      {errorMsg && <div className="text-sm text-red-500 mt-2 text-center">{errorMsg}</div>}
-    </>
+    <div
+      ref={mapRef}
+      className="bg-white rounded-2xl shadow  overflow-hidden"
+      style={{ height: "calc(100vh - 250px )", minHeight: 150 }}
+    />
   );
 };
 

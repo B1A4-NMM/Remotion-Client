@@ -5,11 +5,9 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    /* --foreground: 0 0% 3.9%; */
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
-    /* --card-foreground: 0 0% 3.9%; */
     --card-foreground: 222.2 84% 4.9%;
 
     --popover: 0 0% 100%;
@@ -34,39 +32,6 @@
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
-
-  .dark {
-    /* --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%; */
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    /* --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%; */
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
 }
 
 @layer base {
@@ -77,59 +42,145 @@
     @apply bg-background text-foreground;
   }
 }
-
+::-webkit-scrollbar {
+  display: none;
+}
 .scroll-x {
   overflow: hidden;
   height: 100%;
 }
 
-/* ✅ react-calendar 다크모드 기본 스타일 추가 */
 .react-calendar {
-  background-color: #1E1E1E;
-  color: #fff;
-  border: none; /* 흰색 아웃라인 제거 */
+  background-color: rgba(250, 246, 244, 0.8); /* ✅ 유리 효과 */
+  /*backdrop-filter: blur(80%) !important; */
+  border: 2px solid rgba(75, 2, 2, 0.3);
+  color: #000;
   width: 100%;
   max-width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 1rem;
+  padding: 0.5rem;
 }
 
 .react-calendar__navigation {
   display: flex;
-  justify-content: center; /* 센터 정렬 */
+  justify-content: center;
   align-items: center;
   margin-bottom: 1rem;
-}
-
-.react-calendar__navigation button {
-  background: none;
-  color: #fff;
-  font-weight: 500;
-  border: none;
-}
-
-.react-calendar__navigation__label {
-  text-decoration: none; /* 밑줄 제거 */
-  border: none;
-  outline: none;
-  box-shadow: none;
+  color: #000;
 }
 
 .react-calendar__month-view__weekdays {
+  display: flex;
+  justify-content: space-between;
   text-align: center;
+  font-weight: bold;
+  color: #888;
+  padding: 0.5rem 0;
+}
+
+/* 전체 요일 기본은 검정 */
+.react-calendar__month-view__weekdays__weekday {
+  color: #000;
+}
+
+/* --- 요일 헤더 색상 --- */
+/* 일요일 (첫 번째 열): 요일 텍스트만 */
+.react-calendar__month-view__weekdays__weekday:nth-child(7) abbr {
+  color: #ef4444; /* 빨강 */
+}
+
+/* 토요일 (마지막 열): 요일 텍스트만 */
+.react-calendar__month-view__weekdays__weekday:nth-child(6) abbr {
+  color: #3b82f6; /* 파랑 */
+}
+
+/* --- 날짜 숫자 색상 --- */
+/* 일요일 날짜 숫자: 7, 14, 21... */
+.react-calendar__tile:nth-child(7n) {
+  color: #ef4444; /* 빨강 */
+}
+
+/* 토요일 날짜 숫자: 6, 13, 20... */
+.react-calendar__tile:nth-child(7n-1) {
+  color: #3b82f6; /* 파랑 */
 }
 
 .react-calendar__tile {
-  text-align: center;
+  flex: 1 0 14.28%;
+  height: 83px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  font-size: 1rem;
+  position: relative;
+  padding: 0.4rem;
   background: none;
+  border: none;
 }
 
 .react-calendar__tile--now {
-  background: #f87171; /* 오늘: 빨간 배경 */
-  color: white;
-  border-radius: 9999px;
+  background: none !important;
+  border: 2px solid #6983e3 !important;
+  color: #000;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
 }
 
 .react-calendar__tile--active {
-  background: #555; /* 선택된 날짜: 진회색 배경 */
-  color: white;
-  border-radius: 9999px;
+  background: none !important; /*important쓰면 라이브러리보다 우선 사용됨*/
+  border: 2px solid #ef7c80 !important;
+  color: #000;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+}
+
+.react-calendar__tile::after {
+  content: "";
+  margin-top: 0.5rem;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: block;
+  background-color: transparent;
+}
+
+.react-calendar__tile abbr {
+  text-decoration: none;
+  font-weight: 400;
+}
+
+.react-calendar_title abbr::before {
+  content: attr(title);
+}
+@font-face {
+  font-family: "Pretendard";
+  src: url("/fonts/Pretendard-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("/fonts/Pretendard-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-down-fade {
+  animation: slideDownFade 1s cubic-bezier(0.4, 0, 0.2, 1);
 }

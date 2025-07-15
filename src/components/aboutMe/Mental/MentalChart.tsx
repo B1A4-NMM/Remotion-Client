@@ -1,11 +1,10 @@
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   LabelList,
-  ResponsiveContainer,
 } from "recharts";
 import { ChartContainer } from "../../ui/chart";
 
@@ -22,9 +21,9 @@ interface MentalChartProps {
 }
 
 const chartConfig: Record<MentalType, { label: string; color: string }> = {
-  스트레스: { label: "스트레스", color: "#ff6b6b" },
-  불안: { label: "불안", color: "#5b9bd5" },
-  우울: { label: "우울", color: "#8e44ad" },
+  스트레스: { label: "스트레스", color: "#3b82f6" }, // 파란색
+  불안: { label: "불안", color: "#8b5cf6" }, // 보라색
+  우울: { label: "우울", color: "#f97316" }, // 주황색
 };
 
 const formatDateToMD = (dateStr: string) => {
@@ -35,7 +34,7 @@ const formatDateToMD = (dateStr: string) => {
 const CustomLabel = (props: any) => {
   const { x, y, value } = props;
   return (
-    <text x={x} y={y - 10} fill="#ffffff" textAnchor="middle" fontSize="12" fontWeight="500">
+    <text x={x + 20} y={y - 10} fill="#000000" textAnchor="middle" fontSize="12" fontWeight="500">
       {value}
     </text>
   );
@@ -51,44 +50,49 @@ const MentalChart = ({ type, data }: MentalChartProps) => {
   }));
 
   // 최대값 계산 (기본값은 최소 100 보장)
-  const maxValue = Math.max(...chartData.map(d => d.value), 100);
+  const maxValue = 100;
 
   return (
-    <div className="w-full h-[20vh] rounded-lg p-1">
-      <h1 className="text-white text-xl text-left tracking-tight drop-shadow-md mb-2">
-        날짜별 {config.label}
-      </h1>
+    <div className="w-full rounded-lg p-1">
       <ChartContainer config={chartConfig} className="h-full w-full">
-        <ResponsiveContainer width="100%">
-          <LineChart data={chartData} margin={{ top: 15, right: 10, left: 10, bottom: 10 }}>
-            <CartesianGrid
-              strokeDasharray="none"
-              stroke="#525a6a"
-              strokeWidth={1}
-              horizontal
-              vertical={false}
-            />
-            <XAxis
-              dataKey="date"
-              tickFormatter={formatDateToMD}
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "#ffffff", fontSize: 12 }}
-              interval={0}
-            />
-            <YAxis domain={[0, maxValue]} hide />
-            <Line
-              type="monotone"
-              dataKey="value"
-              stroke={config.color}
-              strokeWidth={2}
-              dot={{ fill: config.color, strokeWidth: 0, r: 4 }}
-              activeDot={{ r: 6, fill: config.color }}
-            >
-              <LabelList content={CustomLabel} />
-            </Line>
-          </LineChart>
-        </ResponsiveContainer>
+        <BarChart 
+          data={chartData} 
+          height={154}
+          margin={{ top: 25, right: 10, left: 0, bottom: 10 }}
+          barCategoryGap="0%"
+          barGap={0}
+        >
+          <defs>
+            <linearGradient id={`gradient-${type}`} x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%" stopColor={config.color} stopOpacity={0.9} />
+              <stop offset="100%" stopColor={config.color} stopOpacity={0.4} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid
+            strokeDasharray="none"
+            stroke="#ffffff"
+            strokeWidth={1}
+            horizontal
+            vertical={false}
+          />
+          <XAxis
+            dataKey="date"
+            tickFormatter={formatDateToMD}
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: "#ffffff", fontSize: 12 }}
+            interval={0}
+          />
+          <YAxis domain={[0, maxValue]} hide />
+          <Bar
+            dataKey="value"
+            fill={`url(#gradient-${type})`}
+            radius={[4, 4, 0, 0]}
+            barSize={40}
+          >
+            <LabelList content={CustomLabel} />
+          </Bar>
+        </BarChart>
       </ChartContainer>
     </div>
   );

@@ -1,6 +1,5 @@
 // 내가 보내는 데이터
 
-
 export interface TodayEmotion {
   emotionType: string;
   intensity: number;
@@ -19,6 +18,31 @@ export interface TodayDiaryResponse {
   todayDiaries: TodayDiary[];
 }
 
+// Home 페이지용 새로운 타입
+export interface HomeDiary {
+  diaryId: number;
+  title: string;
+  writtenDate: string;
+  content: string;
+  photoPath: string;
+  audioPath: string;
+  isBookmarked: boolean;
+  latitude: number;
+  longitude: number;
+  emotions: string[];
+  targets: string[];
+}
+
+export interface HomeResponse {
+  item: {
+    diaries: HomeDiary[];
+    continuousWritingDate: number;
+    totalDiaryCount: number;
+    emotionCountByMonth: number;
+  };
+  hasMore: boolean;
+  nextCursor: number;
+}
 
 export interface DiaryPayload {
   content: string;
@@ -29,8 +53,16 @@ export interface DiaryPayload {
 
 // 내가 받는 데이터
 export interface DiaryResponse {
+  diaryId: number;
+  title: string;
+  writtenDate: string;
+  content: string;
+  photoPath: string;
+  audioPath: string;
+  isBookmarked: boolean;
+  latitude: number;
+  longitude: number;
   activity_analysis: ActivityAnalysis[];
-  reflection: Reflection;
 }
 
 export interface ActivityAnalysis {
@@ -79,7 +111,6 @@ export interface TodoItem {
   content: string;
 }
 
-
 export interface EmotionSummary {
   emotion: string;
   intensity: number;
@@ -115,21 +146,34 @@ export interface ProcessedMemberSummary {
   };
 }
 
-export interface Character{
+export interface Character {
   character: string;
 }
 
-
-export type AnimalKey = "호랑이" | "새" | "개" | "고양이" | "팬더" | "펭귄" | 
-"나무늘보" | "다람쥐" | "독수리" | "코브라" | "여우" | "박쥐" | 
-"고래" | "거북이" | "개구리" | "문어" | "unknown";
+export type AnimalKey =
+  | "호랑이"
+  | "새"
+  | "개"
+  | "고양이"
+  | "팬더"
+  | "펭귄"
+  | "나무늘보"
+  | "다람쥐"
+  | "독수리"
+  | "코브라"
+  | "여우"
+  | "박쥐"
+  | "고래"
+  | "거북이"
+  | "개구리"
+  | "문어"
+  | "unknown";
 
 export interface AnimalTypeProps {
   animalType: {
     character: AnimalKey;
   };
 }
-
 
 export interface EmotionAnalysisItem {
   emotion: string;

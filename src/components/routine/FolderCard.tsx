@@ -2,9 +2,10 @@ interface FolderCardProps {
     title: string;
     subtitle: string;
     imageSrc: string;
+    onClick?: () => void; 
   }
   
-  const FolderCard = ({ title, subtitle, imageSrc }: FolderCardProps) => {
+  const FolderCard = ({ title, subtitle, imageSrc, onClick }: FolderCardProps) => {
     return (
       <div className="relative min-w-[240px] h-[160px] mr-4 rounded-[24px] overflow-hidden ">
         {/* 배경 이미지 */}
@@ -23,7 +24,11 @@ interface FolderCardProps {
         </div>
   
         {/* 플러스 버튼 */}
-        <button className="absolute bottom-[20px] right-[25px] w-8 h-8 bg-white/40 rounded-full text-white text-xl flex items-center justify-center">
+        <button
+            onClick={onClick}
+            className="absolute bottom-[20px] right-[25px] w-8 h-8 bg-white/40 rounded-full text-white text-xl flex items-center justify-center
+             hover:scale-110 transition-transform duration-200 ease-in-out"
+        >
           +
         </button>
       </div>

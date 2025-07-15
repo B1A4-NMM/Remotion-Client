@@ -1,60 +1,53 @@
-import React from "react";
+import * as React from "react";
 import Carousel from "./Carousel";
-import CommaIcon from "../../../public/assets/img/“.svg";
+import { getEmotionTemplate } from "@/utils/emotionTemplate.tsx";
+import CommaIcon from "./../../assets/img/comma.svg?react";
+import { baseColors } from "@/constants/emotionColors";
+import type { ColorKey } from "@/constants/emotionColors";
 
-function replaceCommaWithIcon(text: string) {
-  // 쉼표를 SVG <img>로 변환
-  return text.split(",").reduce<React.ReactNode[]>((acc, part, idx, arr) => {
-    acc.push(part);
-    if (idx < arr.length - 1) {
-      acc.push(
-        <img
-          key={idx}
-          src={CommaIcon}
-          alt=","
-          style={{ display: "inline", width: 16, height: 12, verticalAlign: "middle" }}
-        />
-      );
-    }
-    return acc;
-  }, []);
-}
-
-interface PeopleCardItem {
-  color: string; // ex: "green", "blue", "yellow"
-  text: string; // ex: "스터디에서 새로운 인연을 만나고, 성장의 기쁨을 느꼈어요."
-  highlight?: string[]; // 강조할 단어들 (선택)
-}
-
-interface PeopleCardProps {
-  data?: PeopleCardItem[];
-}
-
-const PeopleCard: React.FC<PeopleCardProps> = ({ data = [] }) => {
+const PeopleCard: React.FC<{ data?: any[] }> = ({ data = [] }) => {
+  // Add this console log to print the received data prop
+  console.log("[PeopleCard] received data:", data);
   if (!data || data.length === 0) return null;
+
   const cardList = data.map((item, idx) => {
-    // 강조 단어 <b>로 치환 (HTML string)
-    let htmlText = item.text;
-    if (item.highlight && item.highlight.length > 0) {
-      const regex = new RegExp(`(${item.highlight.join("|")})`, "g");
-      htmlText = htmlText.replace(regex, "<b>$1</b>");
+    // item: { activity, person }
+    const { activity, person } = item;
+    let activityText = "";
+    if (typeof activity === "string") {
+      activityText = activity;
+    } else if (activity && typeof activity.activity === "string") {
+      activityText = activity.activity;
+    } else if (activity && typeof activity.comment === "string") {
+      activityText = activity.comment;
+    } else {
+      activityText = JSON.stringify(activity);
     }
-    // 쉼표를 SVG로 변환 + <b> 강조 유지
-    const content = replaceCommaWithIcon(htmlText).map((part, i) =>
-      typeof part === "string" ? <span key={i} dangerouslySetInnerHTML={{ __html: part }} /> : part
-    );
+
+    // 디버깅용 콘솔
+    console.log("PeopleCard item.activity:", activity);
+    console.log("PeopleCard activityText:", activityText);
+    console.log("PeopleCard person:", person);
+
+    const { jsx, mainColorKey } = getEmotionTemplate({
+      activity: activityText,
+      peoples: [person], // 한 명만 배열로 전달
+    }) || { jsx: null, mainColorKey: "yellow" };
+
     return (
       <div
         key={idx}
-        className="bg-white rounded-2xl shadow p-5 text-center min-h-[140px] flex flex-col justify-center"
+        className="bg-white rounded-2xl shadow p-5 text-center h-[200px] flex flex-col justify-center"
       >
-        <div className={`text-2xl text-${item.color}-500 mb-2`}>“</div>
-        <div className="text-gray-800 text-base leading-relaxed">{content}</div>
+        <CommaIcon
+          style={{ color: baseColors[mainColorKey as ColorKey] }}
+          className="w-6 h-6 mb-6 mx-auto"
+        />
+        <div className="text-gray-800 text-base leading-relaxed">{jsx}</div>
       </div>
     );
   });
 
   return <Carousel items={cardList} />;
 };
-
 export default PeopleCard;

@@ -78,7 +78,6 @@ const Result: React.FC = () => {
     isLoading,
     isError,
   } = useGetDiaryContentResult(token, id || "sample");
-  const { data: memsummary } = useGetMemberSummary(token);
 
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -168,7 +167,7 @@ const Result: React.FC = () => {
         {view === "record" ? (
           <DiaryView diaryContent={finalDiaryContent} />
         ) : (
-          <ResultView diaryContent={finalDiaryContent} memSummary={memsummary} />
+          <ResultView diaryContent={finalDiaryContent} />
         )}
       </div>
     </div>

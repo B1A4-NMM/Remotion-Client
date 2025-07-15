@@ -2,8 +2,15 @@ import React, { useEffect, useState } from "react";
 import { getRecommendActivityWeekdayTomorrow } from "@/api/services/recommend";
 import { Card, CardContent } from "@/components/ui/card";
 
+// 추천 멘트 타입 정의
+interface RecommendType {
+  diaryId?: any;
+  activity?: string;
+  comment?: string;
+}
+
 const RecommendHomeCard = () => {
-  const [recommend, setRecommend] = useState<string>("");
+  const [recommend, setRecommend] = useState<RecommendType | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [visible, setVisible] = useState<boolean>(true);
@@ -14,7 +21,7 @@ const RecommendHomeCard = () => {
       setError("");
       try {
         const data = await getRecommendActivityWeekdayTomorrow();
-        setRecommend(data || "");
+        setRecommend(data || null);
       } catch (err: any) {
         setError("추천 멘트 불러오기 실패: " + (err?.message || ""));
       } finally {
@@ -70,7 +77,8 @@ const RecommendHomeCard = () => {
               🕊️ 오늘 하루, 당신의 마음은 어땠나요?
             </span>
             <span className="text-center text-[16px] text-gray-700 font-normal whitespace-pre-line leading-relaxed tracking-wide">
-              {recommend || "오늘도 고생 많았어요.\n마음 한 켠에 남은 감정을 천천히 꺼내볼까요?"}
+              {recommend?.comment ||
+                "오늘도 고생 많았어요.\n마음 한 켠에 남은 감정을 천천히 꺼내볼까요?"}
             </span>
           </>
         )}

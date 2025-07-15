@@ -15,12 +15,18 @@ interface LocationPickerProps {
   onLocationSelect: (location: { latitude: number; longitude: number }) => void;
 }
 
+interface LocationPreviewProps {
+  location: { latitude: number; longitude: number };
+  onEdit?: () => void;
+}
+
 const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps) => {
   const [mapInitialized, setMapInitialized] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const markerRef = useRef<google.maps.Marker | null>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
+  
 
   useEffect(() => {
     if (!open) return;
@@ -54,17 +60,6 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
               });
 
               mapInstanceRef.current = map;
-
-              // 현재 위치에 기본 마커 표시
-              const currentLocationMarker = new window.google.maps.Marker({
-                position: { lat: latitude, lng: longitude },
-                map,
-                icon: {
-                  url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-                  scaledSize: new window.google.maps.Size(32, 32),
-                },
-                title: "현재 위치",
-              });
 
               // 📍 지도 클릭 시 선택 마커 생성 또는 이동
               map.addListener("click", (e: google.maps.MapMouseEvent) => {
@@ -225,4 +220,25 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
   );
 };
 
-export default LocationPicker;
+const LocationPreview = ({ location }: LocationPreviewProps) => {
+  const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${location.latitude},${location.longitude}&zoom=15&size=300x200&markers=color:red%7C${location.latitude},${location.longitude}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
+
+  return (
+    <div className="border rounded-lg overflow-hidden bg-white shadow-sm">
+      <div className="relative">
+        <img
+          src={staticMapUrl}
+          alt="선택된 위치"
+          className="w-full h-48 object-cover"
+          onError={(e) => {
+            console.error("지도 이미지 로딩 실패");
+            (e.target as HTMLImageElement).src = "/placeholder-map.png"; // fallback 이미지
+          }}
+        />
+        
+      </div>
+    </div>
+  );
+};
+
+export {LocationPicker, LocationPreview};

@@ -42,6 +42,7 @@
     "react-hook-form": "^7.58.1",
     "react-icons": "^5.5.0",
     "react-indiana-drag-scroll": "^2.2.1",
+    "react-kakao-maps-sdk": "^1.2.0",
     "react-router-dom": "^7.6.2",
     "react-speech-recognition": "^4.0.1",
     "recharts": "^3.0.2",
@@ -60,6 +61,7 @@
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@types/three": "^0.178.1",
+    "@types/youtube": "^0.1.2",
     "@typescript-eslint/eslint-plugin": "^8.35.0",
     "@typescript-eslint/parser": "^8.35.0",
     "@vitejs/plugin-react": "^4.4.1",
@@ -77,6 +79,7 @@
     "tailwindcss": "^3.4.3",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.30.1",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vite-plugin-svgr": "^4.3.0"
   }
 }

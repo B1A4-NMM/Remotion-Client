@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';  // React Router import 추가
-import "../../styles/recommend-button.css";  // 수정된 CSS 파일로 변경
+import "@/styles/togle.css"
 
 const Title = () => {
   const navigate = useNavigate();

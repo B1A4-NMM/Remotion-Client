@@ -14,11 +14,6 @@ interface ActivitySectionProps {
     percentage: number;
   }[];
 }
-const titleMap: Record<MentalType, string> = {
-  스트레스: "스트레스를 유발한 활동",
-  불안: "불안을 느낀 활동",
-  우울: "우울감을 느낀 활동",
-};
 
 const ActivitySection = ({ type, data }: ActivitySectionProps) => {
   const ref = useRef<SVGSVGElement | null>(null);
@@ -74,9 +69,9 @@ const ActivitySection = ({ type, data }: ActivitySectionProps) => {
       .append("text")
       .attr("transform", d => `translate(${arc.centroid(d)})`)
       .attr("text-anchor", "middle")
-      .attr("dy", "0.35em")
-      .attr("fill", "white")
-      .attr("font-size", 12)
+      .attr("dy", "0.35rem")
+      .attr("fill", "black")
+      .attr("font-size", 16)
       .attr("opacity", 0)
       .transition()
       .delay(1000)
@@ -87,9 +82,7 @@ const ActivitySection = ({ type, data }: ActivitySectionProps) => {
 
   return (
     <section className="w-full">
-      <h1 className="text-white text-xl text-left tracking-tight drop-shadow-md mb-2">
-        {titleMap[type]}
-      </h1>
+        <hr className="ml-4 mr-4 mb-6"/>
 
       <div className="relative w-full h-[18vh]" style={{ aspectRatio: "1 / 1" }}>
         <svg

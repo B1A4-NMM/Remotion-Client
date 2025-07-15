@@ -17,7 +17,7 @@ export const getMemberSummary = async (
       days, // 검색 기간 파라미터 추가
     },
   });
-  console.log("📦 Member Summary Response:", response.data);
+  // console.log("📦 Member Summary Response:", response.data);
 
   return response.data;
 };

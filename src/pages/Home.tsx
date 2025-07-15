@@ -14,7 +14,12 @@ import { Canvas } from "@react-three/fiber";
 import "../styles/homeCard.css";
 import dayjs from "dayjs";
 import Blob from "../components/Blob/Blob";
-import { useDeleteDiary } from "../../api/queries/home/useDeleteDiary";
+import { useDeleteDiary } from "../api/queries/home/useDeleteDiary";
+import { useInfiniteDiaries } from "../api/queries/home/useInfiniteDiaries";
+import { useQueryClient } from "@tanstack/react-query";
+import { usePatchDiaryBookmark } from "../api/queries/home/usePatchDiaryBookmark";
+import RecommendHome from "@/components/home/RecommendHome";
+import RecommendHomeCard from "@/components/home/RecommendHomeCard";
 
 // S3 → http 변환 (실제 CDN 도메인에 맞게 수정 필요)
 const s3ToHttpUrl = (s3Path: string) =>
@@ -67,6 +72,58 @@ const Home = () => {
     setErrorMessage("");
   }, []);
 
+  const queryClient = useQueryClient();
+  const deleteDiaryMutation = useDeleteDiary();
+  const patchBookmark = usePatchDiaryBookmark();
+
+  const handleDeleteDiary = (diaryId: number) => {
+    const token = localStorage.getItem("accessToken") || "";
+    deleteDiaryMutation.mutate(
+      { token, diaryId: String(diaryId) },
+      {
+        onSuccess: () => {
+          // useInfiniteDiaries의 query key와 동일하게 맞춤
+          queryClient.invalidateQueries({ queryKey: ["infiniteDiaries"] });
+        },
+      }
+    );
+  };
+
+  const handleToggleBookmark = (diaryId: number) => {
+    const token = localStorage.getItem("accessToken") || "";
+    const diary = infiniteDiaries.find(d => d.id === diaryId);
+    if (!diary) return;
+    patchBookmark.mutate(
+      { token, diaryId, isBookmarked: !diary.bookmarked },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["infiniteDiaries"] });
+        },
+      }
+    );
+  };
+
+  // 무한스크롤용 react-query
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteDiaries();
+  // observer ref
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastDiaryRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isFetchingNextPage) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [isFetchingNextPage, hasNextPage, fetchNextPage]
+  );
+  // 무한스크롤 diaries
+  const infiniteDiaries =
+    data?.pages.flatMap(page => page.item.diaries.map(mapApiDiaryToDiaryCard)) ?? [];
+
   // API 호출 시 string 변환
   const { data: todayData, isLoading } = useGetDiaryDate(
     token,
@@ -83,16 +140,11 @@ const Home = () => {
   const diaries = homeData?.item?.diaries?.map(mapApiDiaryToDiaryCard) || [];
 
   // 데이터 확인용 console.log
-  console.log("=== Home API 데이터 확인 ===");
-  console.log("homeData:", homeData);
-  console.log("homeLoading:", homeLoading);
-  console.log("homeError:", homeError);
-  console.log("token:", token);
 
   const todayDiary = todayData ? todayData : null;
 
   return (
-    <div className="h-screen flex flex-col px-4">
+    <div className=" flex flex-col px-4">
       <Title
         emotionCountByMonth={emotionCountByMonth}
         totalDiaryCount={totalDiaryCount}
@@ -100,7 +152,17 @@ const Home = () => {
         selectedTab={selectedTab}
         setSelectedTab={setSelectedTab}
       />
-      {selectedTab === "menu" && <DiaryCards diaries={diaries} />}
+      {selectedTab === "menu" && (
+        <>
+          <RecommendHomeCard />
+          <DiaryCards
+            diaries={infiniteDiaries}
+            onDeleteDiary={handleDeleteDiary}
+            onToggleBookmark={handleToggleBookmark}
+            lastItemRef={lastDiaryRef}
+          />
+        </>
+      )}
       {selectedTab === "location" && (
         <Map
           continuousWritingDate={continuousWritingDate}

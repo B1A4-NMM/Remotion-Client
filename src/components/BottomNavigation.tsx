@@ -1,8 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
+import dayjs from "dayjs";
 
 export default function BottomNavigation() {
   const location = useLocation();
   const path = location.pathname.toLowerCase();
+  const today = dayjs().format('YYYY-MM-DD');
 
   return (
     <div className="fixed bottom-0 left-0 w-full max-w-md mx-auto z-40" style={{ minWidth: 0 }}>
@@ -15,7 +17,7 @@ export default function BottomNavigation() {
           preserveAspectRatio="none"
         >
           <path
-            opacity="0.9"
+            opacity="0.96"
             d="M197.5 0C207.24 0 215.877 4.72168 221.249 12H369C382.255 12 393 22.7452 393 36V84H0V36C0 22.7452 10.7452 12 24 12H173.751C179.123 4.72168 187.76 0 197.5 0Z"
             fill="white"
           />
@@ -35,7 +37,7 @@ export default function BottomNavigation() {
           {/* Report 아이콘 */}
           <path
             d="M115.58 40.5923C117.108 40.5923 118.332 41.8284 118.332 43.3667V47.0591C118.332 48.5866 117.108 49.8325 115.58 49.8325H111.919C110.402 49.8325 109.167 48.5866 109.167 47.0591V43.3667C109.167 41.8284 110.402 40.5923 111.919 40.5923H115.58ZM128.082 40.5923C129.599 40.5923 130.834 41.8284 130.834 43.3667V47.0591C130.834 48.5866 129.599 49.8325 128.082 49.8325H124.421C122.893 49.8325 121.669 48.5866 121.669 47.0591V43.3667C121.669 41.8284 122.893 40.5923 124.421 40.5923H128.082ZM115.58 28.1665C117.108 28.1665 118.332 29.4123 118.332 30.9409V34.6343C118.332 36.1725 117.107 37.4077 115.58 37.4077H111.919C110.402 37.4077 109.167 36.1725 109.167 34.6343V30.9409C109.167 29.4123 110.402 28.1665 111.919 28.1665H115.58ZM128.082 28.1665C129.599 28.1665 130.834 29.4123 130.834 30.9409V34.6343C130.834 36.1725 129.599 37.4077 128.082 37.4077H124.421C122.893 37.4077 121.669 36.1725 121.669 34.6343V30.9409C121.669 29.4123 122.893 28.1665 124.421 28.1665H128.082Z"
-            fill={path === "/report" ? "black" : "#B6B6B6"}
+            fill={path === "/routine" || path === "/contents" ? "black" : "#B6B6B6"}
           />
           {/* Analysis 아이콘 (새로운 디자인 반영) */}
           <path
@@ -54,7 +56,7 @@ export default function BottomNavigation() {
         <div className="absolute inset-0 flex justify-between items-end pb-4 px-2">
           <Link to="/" className="flex-1 h-full" />
           <Link to="/routine" className="flex-1 h-full" />
-          <Link to="/diary/2025-07-12" className="flex-1 h-full flex justify-center items-end">
+          <Link to={`/diary/${today}`} className="flex-1 h-full flex justify-center items-end">
             <div className="w-14 h-14 -mt-4 z-10 rounded-full" />
           </Link>
           <Link to="/analysis" className="flex-1 h-full" />

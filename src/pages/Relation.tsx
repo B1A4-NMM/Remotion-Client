@@ -5,6 +5,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { motion, useMotionValue } from "framer-motion";
 import type { Node, AnimatedBranch, Edge } from "@/types/emotionalGraph";
 import { useGetRelation } from "../api/queries/relation/useGetRelation";
+import { useNavigate } from "react-router-dom";
 
 import { updatePhysics } from "@/utils/physics";
 import {
@@ -34,6 +35,100 @@ const EmotionalGraph = () => {
 
   const offsetX = useMotionValue(0);
   const offsetY = useMotionValue(0);
+  const navigate = useNavigate();
+
+  // 클릭/드래그 구분용 ref
+  const clickStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  const handleCanvasMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    clickStartRef.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleCanvasMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!clickStartRef.current) return;
+    const dx = e.clientX - clickStartRef.current.x;
+    const dy = e.clientY - clickStartRef.current.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    // 5px 이하 이동이면 클릭으로 간주
+    if (distance < 5) {
+      handleCanvasClick(e);
+    }
+    clickStartRef.current = null;
+  };
+
+  // 캔버스 클릭 핸들러: 노드 클릭 시 /relation/{id}로 이동
+  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      console.warn("❌ canvasRef가 없음");
+      return;
+    }
+
+    const rect = canvas.getBoundingClientRect();
+    // 클릭 좌표 (CSS 기준)
+    const cssX = e.clientX - rect.left;
+    const cssY = e.clientY - rect.top;
+
+    console.log("🖱 클릭 좌표 (CSS):", { x: cssX, y: cssY });
+    console.log("📐 canvas rect:", rect);
+
+    const offsetXValue = offsetX.get();
+    const offsetYValue = offsetY.get();
+    console.log("📦 motion 오프셋 값:", { offsetXValue, offsetYValue });
+
+    if (!nodesRef.current || nodesRef.current.length === 0) {
+      console.warn("❌ nodesRef가 비어 있음");
+      return;
+    }
+
+    let clickedNode = null;
+
+    for (const node of nodesRef.current) {
+      // 노드는 draw() 함수에서 offsetX/Y를 적용해서 그려짐
+      // draw 함수에서: centerX = width/2 - offsetX.get(), centerY = height/2 - offsetY.get()
+      // 따라서 클릭 좌표도 같은 방식으로 계산해야 함
+
+      const { width, height } = canvasSize;
+      const drawCenterX = width / 2 - offsetXValue;
+      const drawCenterY = height / 2 - offsetYValue;
+
+      // 실제 화면에서 노드가 그려지는 위치
+      const nodeScreenX = node.x;
+      const nodeScreenY = node.y;
+
+      // 클릭 좌표를 노드 좌표계로 변환
+      const adjustedClickX = cssX;
+      const adjustedClickY = cssY;
+
+      const dx = adjustedClickX - nodeScreenX;
+      const dy = adjustedClickY - nodeScreenY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      console.log(`📏 노드 ${node.label}:`, {
+        캔버스크기: { width, height },
+        그리기중심: { x: drawCenterX, y: drawCenterY },
+        노드위치: { x: nodeScreenX, y: nodeScreenY },
+        클릭위치: { x: adjustedClickX, y: adjustedClickY },
+        motion오프셋: { x: offsetXValue, y: offsetYValue },
+        거리: distance,
+        반지름: node.radius,
+        선택됨: distance <= node.radius,
+      });
+
+      if (distance <= node.radius) {
+        clickedNode = node;
+        break;
+      }
+    }
+
+    if (clickedNode) {
+      const id = clickedNode.diaryId || clickedNode.id;
+      console.log("🟢 클릭된 노드:", { id, label: clickedNode.label });
+      navigate(`/relation/${id}`);
+    } else {
+      console.log("⚪️ 노드와 일치하는 클릭 없음");
+    }
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -69,7 +164,7 @@ const EmotionalGraph = () => {
     edgesRef.current = [];
     animatedBranchesRef.current = [];
 
-    const rootNode = createRootNode(centerX + 100, centerY);
+    const rootNode = createRootNode(centerX, centerY);
     nodesRef.current.push(rootNode);
 
     // ✅ 수정: relationData를 기반으로 branches 생성
@@ -197,25 +292,26 @@ const EmotionalGraph = () => {
   }, [canvasSize.width, canvasSize.height, relationData]);
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-screen overflow-x-scroll overflow-y-hidden bg-black relative"
-    >
+    <div ref={containerRef} className="w-full h-screen overflow-hidden relative">
       <motion.div
         drag
+        onClick={() => console.log("✅ Clicked!")}
         dragMomentum={false}
         dragElastic={0.1}
         style={{ x: offsetX, y: offsetY }}
-        className="w-[300%] h-full cursor-grab active:cursor-grabbing"
+        className="w-[300%] h-full relative"
       >
+        {/* canvas는 motion.div 내부에 있어야 같이 움직임 */}
         <canvas
           ref={canvasRef}
+          onMouseDown={handleCanvasMouseDown}
+          onMouseUp={handleCanvasMouseUp}
+          className="absolute top-0 left-0 w-full h-full z-10"
           style={{
-            width: "100%",
-            height: "100%",
+            cursor: "pointer",
             borderRadius: 20,
-            boxShadow: "0 0 30px rgba(255, 255, 255, 0.1)",
             display: "block",
+            pointerEvents: "auto", // 💡 아주 중요: 이벤트 통과 허용
           }}
         />
       </motion.div>

@@ -56,7 +56,7 @@ const EmotionalGraph = () => {
     clickStartRef.current = null;
   };
 
-  // 캔버스 클릭 핸들러: 노드 클릭 시 /result/{diaryId}로 이동
+  // 캔버스 클릭 핸들러: 노드 클릭 시 /relation/{id}로 이동
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) {
@@ -65,46 +65,55 @@ const EmotionalGraph = () => {
     }
 
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    // 클릭 좌표 (CSS 기준)
+    const cssX = e.clientX - rect.left;
+    const cssY = e.clientY - rect.top;
 
-    console.log("🖱 클릭한 실제 좌표:", { x, y });
-    console.log("📐 canvas 사이즈:", {
-      canvasWidth: canvas.width,
-      canvasHeight: canvas.height,
-      cssWidth: rect.width,
-      cssHeight: rect.height,
-    });
+    console.log("🖱 클릭 좌표 (CSS):", { x: cssX, y: cssY });
+    console.log("📐 canvas rect:", rect);
 
-    const offsetXValue = typeof offsetX.get === "function" ? offsetX.get() : 0;
-    const offsetYValue = typeof offsetY.get === "function" ? offsetY.get() : 0;
-    console.log("📦 오프셋 값:", { offsetXValue, offsetYValue });
+    const offsetXValue = offsetX.get();
+    const offsetYValue = offsetY.get();
+    console.log("📦 motion 오프셋 값:", { offsetXValue, offsetYValue });
 
     if (!nodesRef.current || nodesRef.current.length === 0) {
       console.warn("❌ nodesRef가 비어 있음");
       return;
     }
 
-    console.log(
-      "🧠 현재 노드 목록:",
-      nodesRef.current.map(n => ({
-        id: n.id,
-        diaryId: n.diaryId,
-        label: n.label,
-        x: n.x,
-        y: n.y,
-        radius: n.radius,
-      }))
-    );
-
     let clickedNode = null;
 
     for (const node of nodesRef.current) {
-      const dx = x - (node.x - offsetXValue);
-      const dy = y - (node.y - offsetYValue);
+      // 노드는 draw() 함수에서 offsetX/Y를 적용해서 그려짐
+      // draw 함수에서: centerX = width/2 - offsetX.get(), centerY = height/2 - offsetY.get()
+      // 따라서 클릭 좌표도 같은 방식으로 계산해야 함
+
+      const { width, height } = canvasSize;
+      const drawCenterX = width / 2 - offsetXValue;
+      const drawCenterY = height / 2 - offsetYValue;
+
+      // 실제 화면에서 노드가 그려지는 위치
+      const nodeScreenX = node.x;
+      const nodeScreenY = node.y;
+
+      // 클릭 좌표를 노드 좌표계로 변환
+      const adjustedClickX = cssX;
+      const adjustedClickY = cssY;
+
+      const dx = adjustedClickX - nodeScreenX;
+      const dy = adjustedClickY - nodeScreenY;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      console.log(`📏 노드 ${node.id} 거리:`, distance, `(반지름 ${node.radius})`);
+      console.log(`📏 노드 ${node.label}:`, {
+        캔버스크기: { width, height },
+        그리기중심: { x: drawCenterX, y: drawCenterY },
+        노드위치: { x: nodeScreenX, y: nodeScreenY },
+        클릭위치: { x: adjustedClickX, y: adjustedClickY },
+        motion오프셋: { x: offsetXValue, y: offsetYValue },
+        거리: distance,
+        반지름: node.radius,
+        선택됨: distance <= node.radius,
+      });
 
       if (distance <= node.radius) {
         clickedNode = node;
@@ -114,8 +123,8 @@ const EmotionalGraph = () => {
 
     if (clickedNode) {
       const id = clickedNode.diaryId || clickedNode.id;
-      console.log("🟢 클릭된 노드 ID:", id);
-      navigate(`/result/${id}`); // 실제 이동하려면 이걸 풀어
+      console.log("🟢 클릭된 노드:", { id, label: clickedNode.label });
+      navigate(`/relation/${id}`);
     } else {
       console.log("⚪️ 노드와 일치하는 클릭 없음");
     }
@@ -155,7 +164,7 @@ const EmotionalGraph = () => {
     edgesRef.current = [];
     animatedBranchesRef.current = [];
 
-    const rootNode = createRootNode(centerX + 100, centerY);
+    const rootNode = createRootNode(centerX, centerY);
     nodesRef.current.push(rootNode);
 
     // ✅ 수정: relationData를 기반으로 branches 생성

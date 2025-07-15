@@ -29,22 +29,23 @@ function mapApiDiaryToDiaryCard(apiDiary: any) {
 }
 
 const SearchPage = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [inputValue, setInputValue] = useState(""); // 입력창 값
+  const [searchQuery, setSearchQuery] = useState(""); // 실제 검색 요청에 쓸 값
   const [searchActive, setSearchActive] = useState(false);
 
-  const { data, isLoading } = useSearchDiaries(searchQuery, searchActive);
+  const { data, isLoading } = useSearchDiaries(searchQuery, !!searchQuery);
   const diaries = data?.diaries?.map(mapApiDiaryToDiaryCard) ?? [];
 
   return (
     <div className="max-w-xl mx-auto  px-4">
       {/* 검색 바 */}
       <SearchBar
-        value={searchQuery}
-        onChange={setSearchQuery}
-        onSearch={() => setSearchActive(true)}
+        value={inputValue}
+        onChange={setInputValue}
+        onSearch={() => setSearchQuery(inputValue)} // 버튼 클릭 시에만 쿼리 업데이트
       />
       {/* 검색 결과 */}
-      {searchActive && (isLoading ? <div>검색 중...</div> : <DiaryCards diaries={diaries} />)}
+      {searchQuery && (isLoading ? <div>검색 중...</div> : <DiaryCards diaries={diaries} />)}
     </div>
   );
 };

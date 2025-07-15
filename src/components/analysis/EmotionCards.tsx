@@ -51,26 +51,22 @@ const RelationCard = ({ data }: CardProps) => {
         <hr className="mr-5 ml-5"/>
         
         {/* 감정 데이터 표시 */}
-        <div className="p-6">
-          <div className="grid grid-cols-3 grid-rows-2 gap-3">
+        <div className="p-5">
+          <div className="grid grid-cols-3 grid-rows-2 gap-5">
             {processedData.slice(0, 6).map((item, index) => (
-            <div key={index} className="flex items-center gap-3">
-              {/* 파란색 원 */}
-              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100">
-                <span className="text-lg font-bold text-blue-600">
+            <div key={index} className="flex items-end gap-3">
+              <div className="grid grid-rows-1 w-15 h-15 ">
+                <span className="text-gl text-gray-700">
                   {item.emotion}
                 </span>
-              </div>
               
-              {/* 텍스트 정보 */}
-              <div className="flex-1">
-                <div className="text-lg font-bold text-gray-900">
+                <div className="text-2xl font-bold text-gray-900">
                   {item.count}
                 </div>
-                <div className="text-xs text-gray-500">
+              </div>
+                <div className="text-base text-gray-500 content-end">
                   {item.percentage}%
                 </div>
-              </div>
             </div>
             ))}
           </div>
@@ -97,26 +93,22 @@ const SelfCard = ({ data }: CardProps) => {
           <hr className="mr-5 ml-5"/>
           
           {/* 감정 데이터 표시 */}
-        <div className="p-6">
-          <div className="grid grid-cols-3 grid-rows-2 gap-3">
+        <div className="p-5">
+          <div className="grid grid-cols-3 grid-rows-2 gap-5">
             {processedData.slice(0, 6).map((item, index) => (
-            <div key={index} className="flex items-center gap-3">
-              {/* 파란색 원 */}
-              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100">
-                <span className="text-lg font-bold text-blue-600">
+            <div key={index} className="flex items-end gap-3">
+              <div className="grid grid-rows-1 w-15 h-15 ">
+                <span className="text-gl text-gray-700">
                   {item.emotion}
                 </span>
-              </div>
               
-              {/* 텍스트 정보 */}
-              <div className="flex-1">
-                <div className="text-lg font-bold text-gray-900">
+                <div className="text-2xl font-bold text-gray-900">
                   {item.count}
                 </div>
-                <div className="text-xs text-gray-500">
+              </div>
+                <div className="text-base text-gray-500 content-end">
                   {item.percentage}%
                 </div>
-              </div>
             </div>
             ))}
           </div>
@@ -143,26 +135,22 @@ const StateCard = ({ data }: CardProps) => {
           <hr className="mr-5 ml-5"/>
           
           {/* 감정 데이터 표시 */}
-        <div className="p-6">
-          <div className="grid grid-cols-3 grid-rows-2 gap-3">
+        <div className="p-5">
+          <div className="grid grid-cols-3 grid-rows-2 gap-5">
             {processedData.slice(0, 6).map((item, index) => (
-            <div key={index} className="flex items-center gap-3">
-              {/* 파란색 원 */}
-              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100">
-                <span className="text-lg font-bold text-blue-600">
+            <div key={index} className="flex items-end gap-3">
+              <div className="grid grid-rows-1 w-15 h-15 ">
+                <span className="text-gl text-gray-700">
                   {item.emotion}
                 </span>
-              </div>
               
-              {/* 텍스트 정보 */}
-              <div className="flex-1">
-                <div className="text-lg font-bold text-gray-900">
+                <div className="text-2xl font-bold text-gray-900">
                   {item.count}
                 </div>
-                <div className="text-xs text-gray-500">
+              </div>
+                <div className="text-base text-gray-500 content-end">
                   {item.percentage}%
                 </div>
-              </div>
             </div>
             ))}
           </div>

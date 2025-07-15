@@ -2,14 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
 type RadarChartProps = {
-  totalTypeCount: Record<string, number>; // 전체 데이터
-  monthlyTypeCount: Record<string, number>; // 이번 달 데이터
+  lastTypeCount: Record<string, number>; // 저번 달 데이터
+  currentTypeCount: Record<string, number>; // 이번 달 데이터
   onSelectCategory?: (label: string) => void;
 };
 
 const LABELS = ["지혜", "도전", "정의", "배려", "절제", "긍정"];
-const TOTAL_COLOR = "#007aff"; // 전체 데이터 - 파란색
-const MONTHLY_COLOR = "#ff9500"; // 이번 달 데이터 - 주황색
+const LAST_COLOR = "#007aff"; // 저번 달 데이터 - 파란색
+const CURRENT_COLOR = "#ff9500"; // 이번 달 데이터 - 주황색
 
 const API_TO_DISPLAY_LABEL_MAP: Record<string, string> = {
   지혜: "지혜",
@@ -20,7 +20,7 @@ const API_TO_DISPLAY_LABEL_MAP: Record<string, string> = {
   초월: "긍정",
 };
 
-const RadarChart = ({ totalTypeCount, monthlyTypeCount, onSelectCategory }: RadarChartProps) => {
+const RadarChart = ({ lastTypeCount, currentTypeCount, onSelectCategory }: RadarChartProps) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   
@@ -33,8 +33,28 @@ const RadarChart = ({ totalTypeCount, monthlyTypeCount, onSelectCategory }: Rada
   const centerY = height / 2;
   const angleSlice = (Math.PI * 2) / numAxes;
   
+  // 데이터 유효성 검증 함수
+  const isValidData = (typeCount: Record<string, number>): boolean => {
+    if (!typeCount || typeof typeCount !== 'object') return false;
+    
+    // 데이터가 빈 객체이거나 모든 값이 0이면 유효하지 않음
+    const entries = Object.entries(typeCount);
+    if (entries.length === 0) return false;
+    
+    // 유효한 값이 하나라도 있으면 true
+    return entries.some(([key, value]) => 
+      key && 
+      typeof key === "string" && 
+      key in API_TO_DISPLAY_LABEL_MAP && 
+      typeof value === "number" && 
+      value > 0
+    );
+  };
+
   // 데이터 정제 함수
   const cleanTypeCount = (typeCount: Record<string, number>) => {
+    if (!typeCount) return {};
+    
     return Object.fromEntries(
       Object.entries(typeCount).filter(
         ([key, value]) =>
@@ -48,6 +68,8 @@ const RadarChart = ({ totalTypeCount, monthlyTypeCount, onSelectCategory }: Rada
 
   // 값 계산 함수
   const calculateValues = (typeCount: Record<string, number>) => {
+    if (!typeCount) return Array(LABELS.length).fill(0);
+    
     const cleanedTypeCount = cleanTypeCount(typeCount);
     return LABELS.map(displayLabel => {
       const apiLabel = Object.entries(API_TO_DISPLAY_LABEL_MAP).find(
@@ -57,8 +79,12 @@ const RadarChart = ({ totalTypeCount, monthlyTypeCount, onSelectCategory }: Rada
     });
   };
 
-  const totalValues = calculateValues(totalTypeCount);
-  const monthlyValues = calculateValues(monthlyTypeCount);
+  // 데이터 유효성 검증
+  const hasLastData = isValidData(lastTypeCount);
+  const hasCurrentData = isValidData(currentTypeCount);
+
+  const lastValues = hasLastData ? calculateValues(lastTypeCount) : Array(LABELS.length).fill(0);
+  const currentValues = hasCurrentData ? calculateValues(currentTypeCount) : Array(LABELS.length).fill(0);
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
@@ -169,137 +195,156 @@ const RadarChart = ({ totalTypeCount, monthlyTypeCount, onSelectCategory }: Rada
       });
     };
 
-    const totalDataPoints = calculateDataPoints(totalValues);
-    const monthlyDataPoints = calculateDataPoints(monthlyValues);
+    // ✅ 저번 달 데이터가 있을 때만 그래프 그리기
+    if (hasLastData) {
+      const lastDataPoints = calculateDataPoints(lastValues);
 
-    // 📈 전체 데이터 영역 (파란색)
-    const totalArea = svg
-      .append("polygon")
-      .attr("points", totalDataPoints.map(() => `${centerX},${centerY}`).join(" "))
-      .attr("fill", TOTAL_COLOR)
-      .attr("opacity", 0.15)
-      .attr("stroke", TOTAL_COLOR)
-      .attr("stroke-width", 2);
+      // 📈 저번 달 데이터 영역 (파란색)
+      const lastArea = svg
+        .append("polygon")
+        .attr("points", lastDataPoints.map(() => `${centerX},${centerY}`).join(" "))
+        .attr("fill", LAST_COLOR)
+        .attr("opacity", 0.15)
+        .attr("stroke", LAST_COLOR)
+        .attr("stroke-width", 2);
 
-    totalArea
-      .transition()
-      .duration(1000)
-      .ease(d3.easeCubicOut)
-      .attr("points", totalDataPoints.map(p => `${p.x},${p.y}`).join(" "));
+      lastArea
+        .transition()
+        .duration(1000)
+        .ease(d3.easeCubicOut)
+        .attr("points", lastDataPoints.map(p => `${p.x},${p.y}`).join(" "));
 
-    // 📈 이번 달 데이터 영역 (주황색)
-    const monthlyArea = svg
-      .append("polygon")
-      .attr("points", monthlyDataPoints.map(() => `${centerX},${centerY}`).join(" "))
-      .attr("fill", MONTHLY_COLOR)
-      .attr("opacity", 0.15)
-      .attr("stroke", MONTHLY_COLOR)
-      .attr("stroke-width", 2);
+      // ✨ 저번 달 데이터 포인트 (파란색)
+      const lastPointsGroup = svg.append("g").attr("class", "last-data-points");
 
-    monthlyArea
-      .transition()
-      .duration(1000)
-      .ease(d3.easeCubicOut)
-      .delay(200)
-      .attr("points", monthlyDataPoints.map(p => `${p.x},${p.y}`).join(" "));
+      lastDataPoints.forEach((point, i) => {
+        const pointGroup = lastPointsGroup.append("g");
 
-    // ✨ 전체 데이터 포인트 (파란색)
-    const totalPointsGroup = svg.append("g").attr("class", "total-data-points");
+        const circle = pointGroup
+          .append("circle")
+          .attr("cx", centerX)
+          .attr("cy", centerY)
+          .attr("r", 6)
+          .attr("fill", LAST_COLOR)
+          .attr("stroke", "#fff")
+          .attr("stroke-width", 2)
+          .style("opacity", 0);
 
-    totalDataPoints.forEach((point, i) => {
-      const pointGroup = totalPointsGroup.append("g");
+        const text = pointGroup
+          .append("text")
+          .attr("x", centerX)
+          .attr("y", centerY - 15)
+          .attr("text-anchor", "middle")
+          .attr("dominant-baseline", "middle")
+          .style("font-size", "12px")
+          .style("font-weight", "600")
+          .attr("fill", LAST_COLOR)
+          .text(point.value)
+          .style("opacity", 0);
 
-      const circle = pointGroup
-        .append("circle")
-        .attr("cx", centerX)
-        .attr("cy", centerY)
-        .attr("r", 6)
-        .attr("fill", TOTAL_COLOR)
-        .attr("stroke", "#fff")
-        .attr("stroke-width", 2)
-        .style("opacity", 0);
+        // 애니메이션
+        circle
+          .transition()
+          .duration(1000)
+          .ease(d3.easeCubicOut)
+          .delay(500)
+          .attr("cx", point.x)
+          .attr("cy", point.y)
+          .style("opacity", 1);
 
-      const text = pointGroup
-        .append("text")
+        text
+          .transition()
+          .duration(1000)
+          .ease(d3.easeCubicOut)
+          .delay(500)
+          .attr("x", point.x)
+          .attr("y", point.y - 15)
+          .style("opacity", 1);
+      });
+    }
+
+    // ✅ 이번 달 데이터가 있을 때만 그래프 그리기
+    if (hasCurrentData) {
+      const currentDataPoints = calculateDataPoints(currentValues);
+
+      // 📈 이번 달 데이터 영역 (주황색)
+      const currentArea = svg
+        .append("polygon")
+        .attr("points", currentDataPoints.map(() => `${centerX},${centerY}`).join(" "))
+        .attr("fill", CURRENT_COLOR)
+        .attr("opacity", 0.15)
+        .attr("stroke", CURRENT_COLOR)
+        .attr("stroke-width", 2);
+
+      currentArea
+        .transition()
+        .duration(1000)
+        .ease(d3.easeCubicOut)
+        .delay(200)
+        .attr("points", currentDataPoints.map(p => `${p.x},${p.y}`).join(" "));
+
+      // ✨ 이번 달 데이터 포인트 (주황색)
+      const currentPointsGroup = svg.append("g").attr("class", "current-data-points");
+
+      currentDataPoints.forEach((point, i) => {
+        const pointGroup = currentPointsGroup.append("g");
+
+        const circle = pointGroup
+          .append("circle")
+          .attr("cx", centerX)
+          .attr("cy", centerY)
+          .attr("r", 6)
+          .attr("fill", CURRENT_COLOR)
+          .attr("stroke", "#fff")
+          .attr("stroke-width", 2)
+          .style("opacity", 0);
+
+        const text = pointGroup
+          .append("text")
+          .attr("x", centerX)
+          .attr("y", centerY + 20)
+          .attr("text-anchor", "middle")
+          .attr("dominant-baseline", "middle")
+          .style("font-size", "12px")
+          .style("font-weight", "600")
+          .attr("fill", CURRENT_COLOR)
+          .text(point.value)
+          .style("opacity", 0);
+
+        // 애니메이션
+        circle
+          .transition()
+          .duration(1000)
+          .ease(d3.easeCubicOut)
+          .delay(700)
+          .attr("cx", point.x)
+          .attr("cy", point.y)
+          .style("opacity", 1);
+
+        text
+          .transition()
+          .duration(1000)
+          .ease(d3.easeCubicOut)
+          .delay(700)
+          .attr("x", point.x)
+          .attr("y", point.y + 20)
+          .style("opacity", 1);
+      });
+    }
+
+    // 📝 데이터 없음 메시지 (선택사항)
+    if (!hasLastData && !hasCurrentData) {
+      svg.append("text")
         .attr("x", centerX)
-        .attr("y", centerY - 15)
+        .attr("y", centerY)
         .attr("text-anchor", "middle")
         .attr("dominant-baseline", "middle")
-        .style("font-size", "12px")
-        .style("font-weight", "600")
-        .attr("fill", TOTAL_COLOR)
-        .text(point.value)
-        .style("opacity", 0);
+        .style("font-size", "16px")
+        .style("fill", "#999")
+        .text("데이터가 없습니다");
+    }
 
-      // 애니메이션
-      circle
-        .transition()
-        .duration(1000)
-        .ease(d3.easeCubicOut)
-        .delay(500)
-        .attr("cx", point.x)
-        .attr("cy", point.y)
-        .style("opacity", 1);
-
-      text
-        .transition()
-        .duration(1000)
-        .ease(d3.easeCubicOut)
-        .delay(500)
-        .attr("x", point.x)
-        .attr("y", point.y - 15)
-        .style("opacity", 1);
-    });
-
-    // ✨ 이번 달 데이터 포인트 (주황색)
-    const monthlyPointsGroup = svg.append("g").attr("class", "monthly-data-points");
-
-    monthlyDataPoints.forEach((point, i) => {
-      const pointGroup = monthlyPointsGroup.append("g");
-
-      const circle = pointGroup
-        .append("circle")
-        .attr("cx", centerX)
-        .attr("cy", centerY)
-        .attr("r", 6)
-        .attr("fill", MONTHLY_COLOR)
-        .attr("stroke", "#fff")
-        .attr("stroke-width", 2)
-        .style("opacity", 0);
-
-      const text = pointGroup
-        .append("text")
-        .attr("x", centerX)
-        .attr("y", centerY + 20)
-        .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "middle")
-        .style("font-size", "12px")
-        .style("font-weight", "600")
-        .attr("fill", MONTHLY_COLOR)
-        .text(point.value)
-        .style("opacity", 0);
-
-      // 애니메이션
-      circle
-        .transition()
-        .duration(1000)
-        .ease(d3.easeCubicOut)
-        .delay(700)
-        .attr("cx", point.x)
-        .attr("cy", point.y)
-        .style("opacity", 1);
-
-      text
-        .transition()
-        .duration(1000)
-        .ease(d3.easeCubicOut)
-        .delay(700)
-        .attr("x", point.x)
-        .attr("y", point.y + 20)
-        .style("opacity", 1);
-    });
-
-  }, [totalTypeCount, monthlyTypeCount]);
+  }, [lastTypeCount, currentTypeCount, hasLastData, hasCurrentData]);
 
   return (
     <div className="w-full flex justify-center p-5">

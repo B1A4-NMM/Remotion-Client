@@ -1,226 +1,239 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
 
-import React, { useRef, useEffect, useState } from "react";
-import { motion, useMotionValue } from "framer-motion";
-import type { Node, AnimatedBranch, Edge } from "@/types/emotionalGraph";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { useGetRelation } from "../api/queries/relation/useGetRelation";
+import { baseColors, mapEmotionToColor } from "@/constants/emotionColors";
 
-import { updatePhysics } from "@/utils/physics";
-import {
-  createRootNode,
-  createAnimatedBranches,
-  updateNodeOpacity,
-  updateEdgeOpacity,
-  createNodeFromBranch,
-} from "@/utils/animation";
-import { drawEdges, drawAnimatedBranch, drawNodes } from "@/utils/drawing";
 
-const EmotionalGraph = () => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const hasScrolledToMe = useRef(false);
+interface RelationNode {
+  id: number;
+  name: string;
+  affection: number;
+  highestEmotion: string;
+  secondEmotion: string;
+  count: number;
+}
 
-  const animationRef = useRef<number>();
-  const nodesRef = useRef<Node[]>([]);
-  const edgesRef = useRef<Edge[]>([]);
-  const animatedBranchesRef = useRef<AnimatedBranch[]>([]);
-  const startTimeRef = useRef<number>(0);
-  const previousTimestampRef = useRef<number>(0);
-  const { data: relationData } = useGetRelation();
+interface RelationData {
+  todayMyEmotions: Array<{
+    emotion: string;
+    intensity: number;
+  }>;
+  relations: {
+    relations: RelationNode[];
+  };
+}
 
-  const dpr = window.devicePixelRatio || 1;
-  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
+const EmotionalMindMap = () => {
+  const navigate = useNavigate();
+  const { data: relationData, isLoading } = useGetRelation();
+  const [animationStep, setAnimationStep] = useState(0);
 
-  const offsetX = useMotionValue(0);
-  const offsetY = useMotionValue(0);
-
+  // 애니메이션 단계별 실행
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    if (!relationData) return;
 
-    const resizeCanvas = () => {
-      const parent = canvas.parentElement;
-      if (!parent) return;
-      const { width, height } = parent.getBoundingClientRect();
+    const steps = [
+      500,  // 중앙 노드 등장
+      1000, // 브랜치 라인 등장
+      1500, // 관계 노드들 등장
+    ];
 
-      canvas.width = width * dpr * 3 + 200;
-      canvas.height = height * dpr;
-      canvas.style.width = `${width * 3 + 200}px`;
-      canvas.style.height = `${height}px`;
+    steps.forEach((delay, index) => {
+      setTimeout(() => {
+        setAnimationStep(index + 1);
+      }, delay);
+    });
+  }, [relationData]);
 
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.scale(dpr, dpr);
-      setCanvasSize({ width, height });
-    };
+  // 노드 클릭 핸들러
+  const handleNodeClick = (id: number) => {
+    navigate(`/relation/${id}`);
+  };
 
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+  // affection에 따른 거리 계산 (높을수록 가까워짐)
+  const getDistanceByAffection = (affection: number) => {
+    const minDistance = 120;
+    const maxDistance = 300;
+    const normalizedAffection = Math.max(0, Math.min(100, affection));
+    return maxDistance - (normalizedAffection / 100) * (maxDistance - minDistance);
+  };
 
-    const parent = canvas.parentElement;
-    if (!parent) return;
-    const { width, height } = parent.getBoundingClientRect();
-    const centerX = width / 2;
-    const centerY = height / 2;
+  // count에 따른 노드 크기 계산
+  const getNodeSize = (count: number) => {
+    const minSize = 60;
+    const maxSize = 120;
+    const normalizedCount = Math.max(1, count);
+    const size = Math.min(maxSize, minSize + (normalizedCount - 1) * 8);
+    return size;
+  };
 
-    nodesRef.current = [];
-    edgesRef.current = [];
-    animatedBranchesRef.current = [];
+  // 원형 배치 좌표 계산 (affection 기반 거리 적용)
+  const getNodePosition = (index: number, total: number, affection: number) => {
+    const angle = (index * 360) / total;
+    const radius = getDistanceByAffection(affection);
+    const x = Math.cos((angle * Math.PI) / 180) * radius;
+    const y = Math.sin((angle * Math.PI) / 180) * radius;
+    return { x, y, angle, radius };
+  };
 
-    const rootNode = createRootNode(centerX + 100, centerY);
-    nodesRef.current.push(rootNode);
 
-    // ✅ 수정: relationData를 기반으로 branches 생성
-    const relationArray = relationData?.relations?.relations;
-    if (Array.isArray(relationArray)) {
-      animatedBranchesRef.current = createAnimatedBranches(
-        rootNode,
-        centerX,
-        centerY,
-        relationArray
-      );
-    }
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-900">
+        <div className="text-white text-xl">관계 데이터를 불러오는 중...</div>
+      </div>
+    );
+  }
 
-    const draw = (timestamp: number) => {
-      if (!startTimeRef.current) {
-        startTimeRef.current = timestamp;
-        previousTimestampRef.current = timestamp;
-      }
+  if (!relationData?.relations?.relations) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-900">
+        <div className="text-white text-xl">관계 데이터가 없습니다.</div>
+      </div>
+    );
+  }
 
-      const dt = (timestamp - previousTimestampRef.current) / 16;
-      const elapsed = timestamp - startTimeRef.current;
-      previousTimestampRef.current = timestamp;
-
-      const { width, height } = canvasSize;
-      ctx.clearRect(0, 0, width, height);
-
-      if (elapsed < 6000) {
-        updatePhysics(nodesRef.current, edgesRef.current, dt);
-      }
-
-      const centerX = width / 2 - offsetX.get();
-      const centerY = height / 2 - offsetY.get();
-
-      const rootNode = nodesRef.current[0];
-      if (rootNode) updateNodeOpacity(rootNode, elapsed);
-
-      drawEdges(ctx, edgesRef.current);
-
-      for (let i = animatedBranchesRef.current.length - 1; i >= 0; i--) {
-        const branch = animatedBranchesRef.current[i];
-        if (!branch.finished && elapsed >= branch.startTime) {
-          const branchElapsed = elapsed - branch.startTime;
-          branch.progress = Math.min(branchElapsed / branch.duration, 1);
-          branch.opacity = Math.min(branchElapsed / (branch.duration * 0.3), 1);
-          drawAnimatedBranch(ctx, branch);
-          if (branch.progress === 1) {
-            const newNode = createNodeFromBranch(branch, elapsed);
-            nodesRef.current.push(newNode);
-            edgesRef.current.push({
-              from: branch.from,
-              to: newNode,
-              restLength: Math.hypot(newNode.x - branch.from.x, newNode.y - branch.from.y),
-              opacity: branch.opacity,
-            });
-            branch.finished = true;
-            animatedBranchesRef.current.splice(i, 1);
-          }
-        }
-      }
-
-      nodesRef.current.forEach(node => {
-        if (node.label === "나") return;
-
-        const dx = node.x - centerX;
-        const dy = node.y - centerY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const activeRadius = 100;
-        const maxRadius = 50;
-        const minRadius = 30;
-
-        if (dist < activeRadius) {
-          node.radius = Math.min(node.radius + 0.5, maxRadius);
-        } else {
-          node.radius = Math.max(node.radius - 0.5, minRadius);
-        }
-
-        updateNodeOpacity(node, elapsed);
-        updateEdgeOpacity(edgesRef.current, node);
-      });
-
-      drawNodes(ctx, nodesRef.current);
-      ctx.globalAlpha = 1;
-
-      const smoothScrollTo = (element: HTMLElement, target: number, duration = 1500) => {
-        const start = element.scrollLeft;
-        const change = target - start;
-        const startTime = performance.now();
-
-        const easeInOutQuad = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
-
-        const animateScroll = (currentTime: number) => {
-          const elapsed = currentTime - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          const eased = easeInOutQuad(progress);
-
-          element.scrollLeft = start + change * eased;
-
-          if (progress < 1) {
-            requestAnimationFrame(animateScroll);
-          }
-        };
-
-        requestAnimationFrame(animateScroll);
-      };
-
-      if (!hasScrolledToMe.current) {
-        const meNode = nodesRef.current.find(n => n.label === "나");
-        const container = containerRef.current;
-        if (meNode && container) {
-          const targetX = meNode.x - container.clientWidth / 2;
-          smoothScrollTo(container, targetX, 1000);
-          hasScrolledToMe.current = true;
-        }
-      }
-
-      animationRef.current = requestAnimationFrame(draw);
-    };
-
-    animationRef.current = requestAnimationFrame(draw);
-
-    return () => {
-      if (animationRef.current) cancelAnimationFrame(animationRef.current);
-      window.removeEventListener("resize", resizeCanvas);
-    };
-  }, [canvasSize.width, canvasSize.height, relationData]);
+  const relations = relationData.relations.relations;
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-screen overflow-x-scroll overflow-y-hidden bg-black relative"
-    >
+    <div className="w-full h-screen overflow-hidden">
+      {/* 드래그 가능한 전체 컨테이너 */}
       <motion.div
         drag
         dragMomentum={false}
         dragElastic={0.1}
-        style={{ x: offsetX, y: offsetY }}
-        className="w-[300%] h-full cursor-grab active:cursor-grabbing"
+        dragConstraints={{
+          top: -500,
+          bottom: 500,
+          left: -500,
+          right: 500,
+        }}
+        className="relative w-full h-full cursor-grab active:cursor-grabbing"
+        style={{
+          width: "200%",
+          height: "200%",
+          transform: "translate(-25%, -25%)",
+        }}
       >
-        <canvas
-          ref={canvasRef}
-          style={{
-            width: "100%",
-            height: "100%",
-            borderRadius: 20,
-            boxShadow: "0 0 30px rgba(255, 255, 255, 0.1)",
-            display: "block",
-          }}
-        />
+        {/* 중앙 노드 - "나" */}
+        <AnimatePresence>
+          {animationStep >= 1 && (
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10"
+            >
+              <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center shadow-2xl border-4 border-white">
+                <span className="text-black text-xl font-bold">나</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* 브랜치 라인들 */}
+        <AnimatePresence>
+          {animationStep >= 2 && relations.map((relation, index) => {
+            const { x, y } = getNodePosition(index, relations.length, relation.affection);
+            
+            return (
+              <motion.div
+                key={`line-${relation.id}`}
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+              >
+                <svg
+                  width="800"
+                  height="800"
+                  className="absolute -top-96 -left-96"
+                >
+                  {/* <motion.line
+                    x1="400"
+                    y1="400"
+                    x2={400 + x}
+                    y2={400 + y}
+                    stroke="rgba(255, 255, 255, 0.3)"
+                    strokeWidth="2"
+                    strokeDasharray="5,5"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                  /> */}
+                </svg>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+
+        {/* 관계 노드들 */}
+        <AnimatePresence>
+          {animationStep >= 3 && relations.map((relation, index) => {
+            const { x, y } = getNodePosition(index, relations.length, relation.affection);
+            const emotionColor = mapEmotionToColor(relation.highestEmotion);
+            const nodeSize = getNodeSize(relation.count);
+            
+            return (
+              <motion.div
+                key={relation.id}
+                initial={{ scale: 0, opacity: 0, x: 0, y: 0 }}
+                animate={{ 
+                  scale: 1, 
+                  opacity: 1, 
+                  x: x, 
+                  y: y 
+                }}
+                transition={{ 
+                  duration: 0.6, 
+                  delay: index * 0.15,
+                  type: "spring",
+                  stiffness: 100
+                }}
+                whileHover={{ 
+                  scale: 1.1,
+                  transition: { duration: 0.2 }
+                }}
+                whileTap={{ scale: 0.95 }}
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 cursor-pointer pointer-events-auto"
+                onClick={() => handleNodeClick(relation.id)}
+              >
+                <div 
+                  className="rounded-full flex flex-col items-center justify-center shadow-lg relative"
+                  style={{ 
+                    backgroundColor: emotionColor,
+                    width: `${nodeSize}px`,
+                    height: `${nodeSize}px`,
+                  }}
+                >
+                  <span className="text-black font-bold text-center leading-tight" style={{
+                    fontSize: `${Math.max(12, nodeSize / 6)}px`
+                  }}>
+                    {relation.name}
+                  </span>
+                </div>
+                
+                {/* 호버 시 추가 정보 */}
+                <motion.div
+                  className="absolute left-1/2 transform -translate-x-1/2 bg-black bg-opacity-80 text-white px-3 py-2 rounded-lg text-sm whitespace-nowrap pointer-events-none"
+                  style={{ top: `${-nodeSize/2 - 40}px` }}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileHover={{ opacity: 1, y: 0 }}
+                >
+                  <div>{relation.highestEmotion}</div>
+                  <div className="text-xs opacity-70">애정도: {relation.affection}</div>
+                  <div className="text-xs opacity-70">상호작용: {relation.count}회</div>
+                </motion.div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </motion.div>
+
     </div>
   );
 };
 
-export default EmotionalGraph;
+export default EmotionalMindMap;

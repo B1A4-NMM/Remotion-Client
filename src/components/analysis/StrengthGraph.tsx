@@ -1,10 +1,11 @@
 import React, {useState} from "react";
 import '@/styles/radarChart.css'
 import { ChevronRight, Trophy, Award, Medal } from "lucide-react";
-import { useGetStrength } from "@/api/queries/aboutme/useGetStrength";
+import { useGetStrength, useGetStrengthPeriod } from "@/api/queries/aboutme/useGetStrength";
 import type { DetailStrength } from "@/types/strength";
 import { useNavigate } from "react-router-dom";
 import RadarChart from "@/components/analysis/Strength/HexRadarChart"
+import dayjs from "dayjs";
 
 interface StrengthData {
   label: string;
@@ -29,9 +30,45 @@ const API_TO_DISPLAY_LABEL_MAP: Record<string, string> = {
 const StrengthGraph: React.FC<StrengthGraphProps> = ({
   userName = "User Name",
 }) => {
+  const token = localStorage.getItem("accessToken") || "";
+
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const { data, isLoading, error } = useGetStrength();
+
+  // 현재 날짜 정보
+  const now = dayjs();
+  const currentYear = now.year();
+  const currentMonth = now.month() + 1; // dayjs month는 0부터 시작하므로 +1
+
+  // 지난 달 정보  
+  const lastMonthDate = now.subtract(1, 'month');
+  const lastYear = lastMonthDate.year();
+  const lastMonth = lastMonthDate.month() + 1;
+
+  // API 호출
+  const { 
+    data: currentData, 
+    isLoading: currentLoading, 
+    error: currentError 
+  } = useGetStrengthPeriod(token, currentYear.toString(), currentMonth.toString());
+
+  const { 
+    data: lastData, 
+    isLoading: lastLoading, 
+    error: lastError 
+  } = useGetStrengthPeriod(token, lastYear.toString(), lastMonth.toString());
+
+
+  // 로딩 상태 체크
+  if (currentLoading || lastLoading) {
+    return <div>로딩 중...</div>;
+  }
+
+  // 에러 체크
+  if (currentError || lastError) {
+    return <div>데이터를 불러오는 중 오류가 발생했습니다.</div>;
+  }
+
 
   // ✅ onClickHandler 함수 올바르게 닫기
   const onClickHandler = () => {
@@ -65,14 +102,14 @@ const StrengthGraph: React.FC<StrengthGraphProps> = ({
         <hr className="mr-5 ml-5"/>
 
         <div className="flex justify-center mt-2 pb-2">
-          {isLoading && <p className="text-white">로딩 중...</p>}
-          {error && <p className="text-red-400">에러 발생: {`${error}`}</p>}
+          {currentLoading && <p className="text-white">로딩 중...</p>}
+          {currentError && <p className="text-red-400">에러 발생: {`${currentError}`}</p>}
           
           {/* ✅ 데이터 존재 여부 확인 추가 */}
-          {data && (
+          {currentData && lastData && (
             <RadarChart
-              totalTypeCount={data.typeCount}
-              monthlyTypeCount={data.typeCount}
+              lastTypeCount={lastData.typeCount}
+              currentTypeCount={currentData.typeCount}
             />
           )}
         </div>

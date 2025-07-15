@@ -50,7 +50,6 @@ const StrengthCard = ({ isActive }: { isActive: boolean }) => {
 
   return (
     <div className="flex flex-col justify-center gap-6 w-full pt-4 px-6">
-
       {isLoading && <p className="text-white">로딩 중...</p>}
       {error && <p className="text-red-400">에러 발생: {`${error}`}</p>}
 
@@ -61,10 +60,11 @@ const StrengthCard = ({ isActive }: { isActive: boolean }) => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <HexRadarChart 
-          totalTypeCount={data.typeCount} 
-          monthlyTypeCount={data.typeCount} 
-          onSelectCategory={setSelectedCategory} />
+          <HexRadarChart
+            totalTypeCount={data.typeCount}
+            monthlyTypeCount={data.typeCount}
+            onSelectCategory={setSelectedCategory}
+          />
         </motion.div>
       )}
 
@@ -79,11 +79,11 @@ const StrengthCard = ({ isActive }: { isActive: boolean }) => {
             </span>
             <h3 className="text-black text-xl">의 세부 강점</h3>
           </div>
-          <StrengthBarChart 
+          <StrengthBarChart
             totalData={detailData}
             monthlyData={detailData}
             selectedCategory={selectedCategory}
-           />
+          />
         </div>
       )}
     </div>

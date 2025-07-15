@@ -5,6 +5,7 @@ import { Canvas } from "@react-three/fiber";
 import SimpleBlob from "@/components/Blob/Simple/SimpleBlob";
 import { demoLogin } from "@/api/services/auth";
 const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
+const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI || "http://localhost:5173"
 
 const SOCIAL_AUTH_URL = {
   kakao: `${BASE_URL}/auth/kakao`,
@@ -28,7 +29,7 @@ export default function Login() {
       {/* 소셜 로그인 버튼 */}
       <div className="flex flex-col gap-3 w-full max-w-xs">
         <Button
-          onClick={() => (window.location.href = SOCIAL_AUTH_URL.kakao)}
+          onClick={() => (window.location.href = SOCIAL_AUTH_URL.kakao+`?state=${REDIRECT_URI}`)}
           className="h-[48px] bg-white text-black hover:bg-[#ffe812] rounded-full justify-center items-center gap-3 px-4 py-2"
         >
           <img src={kakao} alt="Kakao Icon" className="w-5 h-5" />
@@ -36,7 +37,7 @@ export default function Login() {
         </Button>
 
         <Button
-          onClick={() => (window.location.href = SOCIAL_AUTH_URL.google)}
+          onClick={() => (window.location.href = SOCIAL_AUTH_URL.google+`?state=${REDIRECT_URI}`)}
           className="h-[48px] bg-white text-black hover:bg-gray-200 rounded-full justify-center items-center gap-3 px-4 py-2"
         >
           <img src={google} alt="Google Icon" className="w-5 h-5" />

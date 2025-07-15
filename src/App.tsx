@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { routes } from "./routes";
 import Layout from "./Layout";
-import { ThemeProvider } from "./components/Theme-provider";
+import { ThemeProvider } from "./components/theme-provider";
 
 export default function App() {
   return (

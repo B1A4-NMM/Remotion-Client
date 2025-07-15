@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import Title from "@/components/analysis/Title";
-import { useGetRelationDetail } from "@/api/useGetrelationDetail";
+import { useGetRelationDetail } from "@/api/useGetRelationDetail";
 import { RelationData } from "@/types/relation";
 import { motion } from "framer-motion";
 import { Calendar, MapPin, Activity, Heart, TrendingUp } from "lucide-react";

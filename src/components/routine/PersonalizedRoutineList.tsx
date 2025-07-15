@@ -3,7 +3,7 @@ import React from "react";
 interface RoutineItem {
     id: number;
     title: string;
-    onAdd?: () => void;
+    onAdd: () => void;
 }
 
 interface Props {
@@ -25,7 +25,8 @@ const PersonalizedRoutineList = ({ routines }: Props) => {
             >
               <span className="text-sm text-gray-800">{item.title}</span>
               <button
-                className="w-6 h-6 flex items-center justify-center text-lg rounded-full bg-[#F4F4F4] text-black"
+                className="w-6 h-6 flex items-center justify-center text-lg rounded-full bg-[#F4F4F4] text-black
+                           hover:scale-125 transition-transform duration-200 ease-in-out"
                 onClick={item.onAdd}
               >
                 +

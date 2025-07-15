@@ -17,6 +17,13 @@ import Video from "./pages/Video";
 import Routine from "./pages/Routine";
 import Contents from "./pages/Contents";
 import SearchPage from "./pages/SearchPage";
+
+import Strength from "./pages/analysis/Strength";
+import Stress from "./pages/analysis/Stress";
+import Anxiety from "./pages/analysis/Anxiety";
+import Depress from "./pages/analysis/Depress";
+import Character from "./pages/analysis/Character";
+
 import Action from "./pages/Action";
 export const routes = [
   { path: "/", element: <Home /> },
@@ -37,4 +44,9 @@ export const routes = [
   { path: "/routine", element: <Routine /> },
   { path: "/contents", element: <Contents /> },
   { path: "/search", element: <SearchPage /> },
+  { path: "/analysis/strength", element: <Strength /> },
+  { path: "/analysis/stress", element: <Stress /> },
+  { path: "/analysis/anxiety", element: <Anxiety /> },
+  { path: "/analysis/depress", element: <Depress /> },
+  { path: "/analysis/character", element: <Character /> },
 ];

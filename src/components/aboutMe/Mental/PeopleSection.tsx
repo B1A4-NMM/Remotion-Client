@@ -15,12 +15,6 @@ interface PeopleSectionProps {
   }[];
 }
 
-const titleMap: Record<MentalType, string> = {
-  스트레스: "스트레스를 준 사람",
-  불안: "불안하게 한 사람",
-  우울: "우울에 영향을 준 사람",
-};
-
 const gridLines = [0, 25, 50, 75, 100];
 
 // 감정별 색상 맵
@@ -45,19 +39,17 @@ const PeopleSection = ({ type, data }: PeopleSectionProps) => {
 
   return (
     <>
-      <h1 className="text-white text-xl text-left tracking-tight drop-shadow-md">
-        {titleMap[type]}
-      </h1>{" "}
-      <div className="relative w-full max-w-4xl mx-auto h-[17vh] py-2">
+      <div className="relative w-full max-w-4xl mx-auto h-[30vh] py-2 overflow-hidden">
+        <hr className="ml-4 mr-4 mb-6"/>
         {/* 그리드 라인 */}
-        <ul className="absolute left-0 top-0 w-full h-full z-0">
+        <ul className="absolute left-0 top-6 w-full h-full z-0">
           {gridLines.map(val => (
             <li
               key={val}
-              className="absolute top-0 h-full border-l border-white/20"
+              className="absolute top-0 h-full border-l border-gray/20"
               style={{ left: `${val}%` }}
             >
-              <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-white/60">
+              <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray/60">
                 {val}
               </span>
             </li>
@@ -83,7 +75,7 @@ const PeopleSection = ({ type, data }: PeopleSectionProps) => {
                       ease: "easeOut",
                     }}
                   >
-                    <PersonStanding className="w-5 h-5 text-white animate-pulse" />
+                    <PersonStanding className="w-5 h-5 text-gray animate-pulse" />
                   </motion.div>
 
                   {/* 퍼센트 바 */}
@@ -97,7 +89,7 @@ const PeopleSection = ({ type, data }: PeopleSectionProps) => {
                       duration: 1.2,
                     }}
                   >
-                    <span className="text-white text-sm pl-8 leading-[30px] block">
+                    <span className="text-gray text-sm pl-8 leading-[30px] block">
                       {person.label}
                     </span>
                   </motion.div>

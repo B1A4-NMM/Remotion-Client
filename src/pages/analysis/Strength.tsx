@@ -1,9 +1,10 @@
 import React,{useState} from "react";
-import HexRadarChart from "@/components/analysis/Strength/HexRadarChart";
+import RadarChart from "@/components/analysis/Strength/HexRadarChart";
 import StrengthBarChart from "@/components/analysis/strength/StrengthBarChart";
-import { useGetStrength } from "@/api/queries/aboutme/useGetStrength";
+import { useGetStrength, useGetStrengthPeriod } from "@/api/queries/aboutme/useGetStrength";
 import type { DetailStrength } from "@/types/strength";
 import Title from "@/components/analysis/Title";
+import dayjs from "dayjs";
 
 
 const LABELS = ["지혜", "도전", "정의", "배려", "절제", "긍정"];
@@ -19,19 +20,61 @@ const API_TO_DISPLAY_LABEL_MAP: Record<string, string> = {
 
 const Strength=()=>{
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-    const { data, isLoading, error } = useGetStrength();
+
+    console.log("selectedCategory", selectedCategory);
+
+    const token = localStorage.getItem("accessToken") || "";
+
+    // 현재 날짜 정보
+      const now = dayjs();
+      const currentYear = now.year();
+      const currentMonth = now.month() + 1; // dayjs month는 0부터 시작하므로 +1
+    
+      // 지난 달 정보  
+      const lastMonthDate = now.subtract(1, 'month');
+      const lastYear = lastMonthDate.year();
+      const lastMonth = lastMonthDate.month() + 1;
+    
+
+    // API 호출
+      const { 
+        data: currentData, 
+        isLoading: currentLoading, 
+        error: currentError 
+      } = useGetStrengthPeriod(token, currentYear.toString(), currentMonth.toString());
+    
+      const { 
+        data: lastData, 
+        isLoading: lastLoading, 
+        error: lastError 
+      } = useGetStrengthPeriod(token, lastYear.toString(), lastMonth.toString());
+    
+    
+      // 로딩 상태 체크
+      if (currentLoading || lastLoading) {
+        return <div>로딩 중...</div>;
+      }
+    
+      // 에러 체크
+      if (currentError || lastError) {
+        return <div>데이터를 불러오는 중 오류가 발생했습니다.</div>;
+      }
 
     // API label → Display label 변환
     const apiToDisplay = (apiLabel: string) => API_TO_DISPLAY_LABEL_MAP[apiLabel];
     const displayToApi = (displayLabel: string) =>
     Object.entries(API_TO_DISPLAY_LABEL_MAP).find(([, d]) => d === displayLabel)?.[0] || "";
 
-    const detailData: DetailStrength | null =
-    selectedCategory && data?.detailCount
-        ? (data.detailCount[displayToApi(selectedCategory)] ?? null)
-
-
+    const lastdetailData: DetailStrength | null =
+        selectedCategory && lastData?.detailCount
+        ? (lastData.detailCount[displayToApi(selectedCategory)] ?? null)
         : null;
+
+    const currentdetailData: DetailStrength | null =
+    selectedCategory && currentData?.detailCount
+        ? (currentData.detailCount[displayToApi(selectedCategory)] ?? null)
+        : null;
+
     return(
         <div className="mb-10">
             <Title name={"Strength"} isBackActive={true}/>
@@ -41,18 +84,18 @@ const Strength=()=>{
             </div>
 
             <div className="bg-white rounded-3xl shadow-xl mb-4">
-                <HexRadarChart 
-                    totalTypeCount={data.typeCount} 
-                    monthlyTypeCount={data.typeCount} 
+                <RadarChart 
+                    lastTypeCount={lastData.typeCount} 
+                    currentTypeCount={currentData.typeCount} 
                     onSelectCategory={setSelectedCategory} />
 
             </div>
             <div className="bg-white rounded-3xl shadow-xl">
-            {detailData && selectedCategory ? (
+            {lastdetailData || currentdetailData && selectedCategory ? (
                 
             <StrengthBarChart 
-                totalData={detailData}
-                monthlyData={detailData}
+                lastData={lastdetailData}
+                currentData={currentdetailData}
                 selectedCategory={selectedCategory}
             />
             ) : (

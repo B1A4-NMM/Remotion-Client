@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Calendar from "./pages/Calendar";
 import Diary from "./pages/Diary";
 import Relation from "./pages/Relation";
+import RelationDetail from "./pages/RelationDetail";
 
 import Result from "./pages/Result";
 import Test from "./pages/Test";
@@ -30,6 +31,7 @@ export const routes = [
   { path: "/diary/:date", element: <Diary /> },
   { path: "/calendar", element: <Calendar /> },
   { path: "/relation", element: <Relation /> },
+  { path: "/relation/:id", element: <RelationDetail /> },
   { path: "/result/:id", element: <Result /> },
   { path: "/test", element: <Test /> },
   { path: "/test/result", element: <TestResult /> },

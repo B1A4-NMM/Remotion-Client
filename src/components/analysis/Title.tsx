@@ -1,11 +1,11 @@
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const Title = ({name, isBackActive}:{name:string, isBackActive:boolean}) => {
+const Title = ({name, isBackActive=false, back="/analysis"}:{name:string, isBackActive:boolean, back:string}) => {
   const navigator = useNavigate();
 
   const onClickHandler=()=>{
-    navigator("/analysis")
+    navigator(back)
   }
 
   return (

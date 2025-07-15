@@ -283,7 +283,7 @@ const EmotionalGraph = () => {
   }, [canvasSize.width, canvasSize.height, relationData]);
 
   return (
-    <div ref={containerRef} className="w-full h-screen overflow-hidden bg-black relative">
+    <div ref={containerRef} className="w-full h-screen overflow-hidden relative">
       <motion.div
         drag
         onClick={() => console.log("✅ Clicked!")}

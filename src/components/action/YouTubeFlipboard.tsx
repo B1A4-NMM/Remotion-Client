@@ -1,14 +1,41 @@
-//YoutubeFlipboard.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronUp, ChevronDown, X, Maximize, Play, Pause } from 'lucide-react';
-import type { VideoType } from '../../types/video';
 import { Link } from "react-router-dom";
 
 interface YouTubeFlipboardProps {
-  videos: VideoType[];
+  videos: string | string[];
   autoPlay?: boolean;
   showControls?: boolean;
 }
+
+interface VideoInfo {
+  id: string;
+  title?: string;
+  description?: string;
+}
+
+// ✅ YouTube ID 검증 함수
+const isValidYouTubeId = (id: string): boolean => {
+  const youtubeIdRegex = /^[a-zA-Z0-9_-]{11}$/;
+  return youtubeIdRegex.test(id);
+};
+
+// ✅ 수정된 normalizeVideos 함수
+const normalizeVideos = (videoData: string | string[]): VideoInfo[] => {
+  if (!videoData) return [];
+  
+  const videoIds = Array.isArray(videoData) ? videoData : [videoData];
+  
+  return videoIds
+    .filter(id => id && typeof id === 'string' && id.trim() !== '')
+    .map(id => id.trim())
+    .filter(id => isValidYouTubeId(id)) // ✅ YouTube ID 검증 추가
+    .map(id => ({
+      id: id,
+      title: `YouTube Video ${id}`,
+      description: '동영상 설명이 없습니다.'
+    }));
+};
 
 const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
   videos,
@@ -17,47 +44,40 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const startY = useRef(0);
-  const isDragging = useRef(false);
-
-  const [player, setPlayer] = useState<any>(null); // YT.Player
+  const [player, setPlayer] = useState<any>(null); // ✅ YT.Player 대신 any 사용
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [progress, setProgress] = useState(0);
   const [isPlayerReady, setIsPlayerReady] = useState(false);
+  const [apiLoaded, setApiLoaded] = useState(false); // ✅ API 로드 상태 추가
+  
+  const containerRef = useRef<HTMLDivElement>(null);
+  const startY = useRef(0);
+  const isDragging = useRef(false);
   const playerRef = useRef<HTMLDivElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
 
-  // 안전한 접근을 위한 방어 코드
-  if (!videos || videos.length === 0) {
-    return (
-      <div className="flex items-center justify-center w-full h-screen bg-black text-white">
-        <div className="text-center">
-          <div className="text-xl mb-2">📹</div>
-          <div>추천 영상이 없습니다</div>
-        </div>
-      </div>
-    );
-  }
+  const normalizedVideos = normalizeVideos(videos);
+  const safeCurrentIndex = Math.max(0, Math.min(currentIndex, normalizedVideos.length - 1));
+  const currentVideo = normalizedVideos[safeCurrentIndex];
 
-  const safeCurrentIndex = Math.max(0, Math.min(currentIndex, videos.length - 1));
-  const currentVideo = videos[safeCurrentIndex];
-
-  if (!currentVideo || !currentVideo.id) {
-    return (
-      <div className="flex items-center justify-center w-full h-screen bg-black text-white">
-        <div className="text-center">
-          <div className="text-xl mb-2">⚠️</div>
-          <div>영상 정보를 불러올 수 없습니다</div>
-        </div>
-      </div>
-    );
-  }
-
-  // Load YouTube Iframe API
+  // ✅ YouTube IFrame API 로드 (주석 해제 및 수정)
   useEffect(() => {
+    // 이미 로드되었는지 확인
+    if ((window as any).YT && (window as any).YT.Player) {
+      setApiLoaded(true);
+      setIsPlayerReady(true);
+      return;
+    }
+
+    // 스크립트가 이미 있는지 확인
+    if (document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+      return;
+    }
+
     const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
+    tag.async = true;
+    
     const firstScriptTag = document.getElementsByTagName('script')[0];
     if (firstScriptTag && firstScriptTag.parentNode) {
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
@@ -65,50 +85,85 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
       document.head.appendChild(tag);
     }
 
+    // ✅ API 준비 콜백 설정
     (window as any).onYouTubeIframeAPIReady = () => {
+      setApiLoaded(true);
       setIsPlayerReady(true);
     };
 
     return () => {
-      (window as any).onYouTubeIframeAPIReady = null;
-    }
+      // cleanup 시 콜백 제거
+      if (!(window as any).YT || !(window as any).YT.Player) {
+        (window as any).onYouTubeIframeAPIReady = null;
+      }
+    };
   }, []);
 
-  // Initialize player
+  // ✅ 플레이어 초기화
   useEffect(() => {
-    if (isPlayerReady && playerRef.current && videos.length > 0 && !player) {
-      const newPlayer = new (window as any).YT.Player(playerRef.current.id, {
-        videoId: videos[safeCurrentIndex].id,
-        playerVars: {
-          autoplay: autoPlay ? 1 : 0,
-          controls: 0,
-          rel: 0,
-          modestbranding: 1,
-          showinfo: 0,
-          fs: 1,
-          iv_load_policy: 3,
-          mute: autoPlay ? 1 : 0,
-        },
-        events: {
-          'onReady': onPlayerReady,
-          'onStateChange': onPlayerStateChange,
-        }
-      });
-      setPlayer(newPlayer);
+    if (isPlayerReady && apiLoaded && playerRef.current && normalizedVideos.length > 0 && !player) {
+      const playerId = `youtube-player-${Date.now()}`;
+      playerRef.current.id = playerId;
+      
+      try {
+        const newPlayer = new (window as any).YT.Player(playerId, {
+          height: '100%',
+          width: '100%',
+          videoId: normalizedVideos[safeCurrentIndex].id,
+          playerVars: {
+            autoplay: autoPlay ? 1 : 0,
+            controls: 0,
+            rel: 0,
+            modestbranding: 1,
+            showinfo: 0,
+            fs: 1,
+            iv_load_policy: 3,
+            mute: autoPlay ? 1 : 0,
+            origin: window.location.origin, // ✅ origin 추가
+          },
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange,
+            'onError': onPlayerError,
+          }
+        });
+        setPlayer(newPlayer);
+      } catch (error) {
+        console.error('YouTube Player 초기화 실패:', error);
+      }
     }
-  }, [isPlayerReady, videos, player]);
+  }, [isPlayerReady, apiLoaded, normalizedVideos, player, safeCurrentIndex, autoPlay]);
 
-  // Update video when currentIndex changes
+  // ✅ 비디오 변경 시 처리
   useEffect(() => {
-    if (player && videos.length > 0) {
-      player.loadVideoById(videos[safeCurrentIndex].id);
+    if (player && normalizedVideos.length > 0 && normalizedVideos[safeCurrentIndex]) {
+      try {
+        player.loadVideoById(normalizedVideos[safeCurrentIndex].id);
+      } catch (error) {
+        console.error('비디오 로드 실패:', error);
+      }
     }
-  }, [safeCurrentIndex]);
+  }, [player, normalizedVideos, safeCurrentIndex]);
 
+  // 키보드 네비게이션
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowUp') goToPrevious();
+      else if (e.key === 'ArrowDown') goToNext();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
+  // ✅ 플레이어 이벤트 핸들러들
   const onPlayerReady = (event: any) => {
+    console.log('YouTube Player Ready');
     if (autoPlay) {
-      event.target.playVideo();
+      try {
+        event.target.playVideo();
+      } catch (error) {
+        console.error('자동 재생 실패:', error);
+      }
     }
   };
 
@@ -117,55 +172,96 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
       setIsPlaying(true);
       const intervalId = setInterval(() => {
         if (player && typeof player.getCurrentTime === 'function') {
-          const currentTime = player.getCurrentTime();
-          const duration = player.getDuration();
-          setProgress(duration > 0 ? currentTime / duration : 0);
+          try {
+            const currentTime = player.getCurrentTime();
+            const duration = player.getDuration();
+            setProgress(duration > 0 ? currentTime / duration : 0);
+          } catch (error) {
+            console.error('진행률 업데이트 실패:', error);
+          }
         }
       }, 250);
       
-      // player가 null이 아닐 때만 속성 설정
       if (player) {
         (player as any).progressInterval = intervalId;
       }
     } else {
       setIsPlaying(false);
       
-      // player가 null이 아닐 때만 interval 정리
       if (player && (player as any).progressInterval) {
         clearInterval((player as any).progressInterval);
-        (player as any).progressInterval = null; // 정리 후 null로 설정
+        (player as any).progressInterval = null;
       }
     }
   };
-  
+
+  const onPlayerError = (event: any) => {
+    console.error('YouTube Player Error:', event.data);
+    // 에러 코드에 따른 처리
+    switch (event.data) {
+      case 2:
+        console.error('잘못된 비디오 ID');
+        break;
+      case 5:
+        console.error('HTML5 플레이어 오류');
+        break;
+      case 100:
+        console.error('비디오를 찾을 수 없음');
+        break;
+      case 101:
+      case 150:
+        console.error('비디오 재생 제한');
+        break;
+    }
+    
+    if (normalizedVideos.length > 1) {
+      setTimeout(() => {
+        goToNext();
+      }, 2000);
+    }
+  };
 
   const togglePlay = () => {
     if (player) {
-      if (isPlaying) {
-        player.pauseVideo();
-      } else {
-        player.playVideo();
+      try {
+        if (isPlaying) {
+          player.pauseVideo();
+        } else {
+          player.playVideo();
+        }
+      } catch (error) {
+        console.error('재생/일시정지 실패:', error);
       }
     }
   };
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
     if (player && progressBarRef.current) {
-      const rect = progressBarRef.current.getBoundingClientRect();
-      const seekPosition = (e.clientX - rect.left) / rect.width;
-      const seekTime = player.getDuration() * seekPosition;
-      player.seekTo(seekTime, true);
-      setProgress(seekPosition);
+      try {
+        const rect = progressBarRef.current.getBoundingClientRect();
+        const seekPosition = (e.clientX - rect.left) / rect.width;
+        const seekTime = player.getDuration() * seekPosition;
+        player.seekTo(seekTime, true);
+        setProgress(seekPosition);
+      } catch (error) {
+        console.error('탐색 실패:', error);
+      }
     }
   };
 
   const toggleFullScreen = () => {
-    const iframe = player.getIframe();
-    if (iframe) {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      } else {
-        iframe.requestFullscreen();
+    if (player) {
+      try {
+        const iframe = player.getIframe();
+        if (iframe) {
+          if (document.fullscreenElement) {
+            document.exitFullscreen();
+          } else {
+            iframe.requestFullscreen();
+          }
+        }
+      } catch (error) {
+        console.error('전체화면 전환 실패:', error);
       }
     }
   };
@@ -173,14 +269,14 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
   const goToPrevious = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
-    setCurrentIndex((prev) => (prev === 0 ? videos.length - 1 : prev - 1));
+    setCurrentIndex((prev) => (prev === 0 ? normalizedVideos.length - 1 : prev - 1));
     setTimeout(() => setIsTransitioning(false), 300);
   };
 
   const goToNext = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
-    setCurrentIndex((prev) => (prev === videos.length - 1 ? 0 : prev + 1));
+    setCurrentIndex((prev) => (prev === normalizedVideos.length - 1 ? 0 : prev + 1));
     setTimeout(() => setIsTransitioning(false), 300);
   };
 
@@ -201,14 +297,39 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
     }
   };
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowUp') goToPrevious();
-      else if (e.key === 'ArrowDown') goToNext();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  // ✅ 로딩 상태 표시
+  if (!apiLoaded || !isPlayerReady) {
+    return (
+      <div className="flex items-center justify-center w-full h-screen bg-black text-white">
+        <div className="text-center">
+          <div className="text-xl mb-2">⏳</div>
+          <div>YouTube 플레이어 로딩 중...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!normalizedVideos || normalizedVideos.length === 0) {
+    return (
+      <div className="flex items-center justify-center w-full h-screen bg-black text-white">
+        <div className="text-center">
+          <div className="text-xl mb-2">📹</div>
+          <div>추천 영상이 없습니다</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentVideo || !currentVideo.id) {
+    return (
+      <div className="flex items-center justify-center w-full h-screen bg-black text-white">
+        <div className="text-center">
+          <div className="text-xl mb-2">⚠️</div>
+          <div>영상 정보를 불러올 수 없습니다</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
@@ -220,13 +341,14 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
         onTouchStart={(e) => handleStart(e.touches[0].clientY)}
         onTouchEnd={(e) => handleEnd(e.changedTouches[0].clientY)}
       >
+        {/* ✅ 플레이어 div에서 고정 id 제거 */}
         <div
-          id="youtube-player"
           ref={playerRef}
           className={`w-full h-full transition-opacity duration-300 ${isTransitioning ? 'opacity-50' : 'opacity-100'}`}
         />
 
-        {showControls && videos.length > 1 && (
+        {/* 나머지 UI는 동일 */}
+        {showControls && normalizedVideos.length > 1 && (
           <>
             <Link to="/contents" className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200 backdrop-blur-sm z-10">
               <X size={24} />
@@ -240,9 +362,9 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
           </>
         )}
 
-        {videos.length > 1 && (
+        {normalizedVideos.length > 1 && (
           <div className="absolute top-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm backdrop-blur-sm z-10">
-            {currentIndex + 1} / {videos.length}
+            {currentIndex + 1} / {normalizedVideos.length}
           </div>
         )}
 

@@ -62,14 +62,14 @@ const Test = () => {
   };
 
   return (
-    <div className="flex flex-col px-4 pt-6 pb-[80px] max-w-md mx-auto bg-[#1E1E1E] text-white min-h-screen">
+    <div className="flex flex-col px-4 pt-6 pb-[80px] max-w-md mx-auto   text-foreground min-h-screen">
       <div className="space-y-4">
         <h2 className="text-xl font-bold text-center text-white">{title}</h2>
 
         <Progress value={progress} className="mb-4 bg-gray-600 [&>div]:bg-gray-200" />
 
-        <Card className="p-4 bg-[#2C2C2C] border border-gray-600">
-          <p className="font-semibold mb-2 text-white">{`${step + 1}. ${questions[step]}`}</p>
+        <Card className="p-4 bg-card border border-border">
+          <p className="font-semibold mb-2 text-foreground">{`${step + 1}. ${questions[step]}`}</p>
           <RadioGroup
             value={String(answers[step])}
             onValueChange={val => handleSelect(Number(val))}

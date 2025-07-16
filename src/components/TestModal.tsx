@@ -77,7 +77,7 @@ const TestModal = ({ type, onClose, onFinish }: TestModalProps) => {
         exit={{ opacity: 0 }}
       >
         <motion.div
-          className="w-full max-w-md overflow-y-auto bg-[#1E1E1E] text-white rounded-t-xl p-6 pb-16"
+          className="w-full max-w-md overflow-y-auto   text-foreground rounded-t-xl p-6 pb-16"
           style={{ maxHeight: "calc(100vh - 3.5rem)", minHeight: "480px" }} // ✅ 추가
           initial={{ y: "100%" }}
           animate={{ y: 0 }}
@@ -96,7 +96,7 @@ const TestModal = ({ type, onClose, onFinish }: TestModalProps) => {
               <div className="w-full">
                 <h2 className="text-xl font-bold text-center mb-4">{title}</h2>
                 <div
-                  className="overflow-y-auto text-base leading-relaxed text-gray-200 bg-[#2c2c2c] rounded-lg p-5 border border-gray-100"
+                  className="overflow-y-auto text-base leading-relaxed text-foreground bg-card rounded-lg p-5 border border-border"
                   style={{ height: "70%" }}
                 >
                   {TEST_INTRO[type]}
@@ -104,7 +104,7 @@ const TestModal = ({ type, onClose, onFinish }: TestModalProps) => {
                 <div className="mt-6">
                   <Button
                     onClick={() => setMode("question")}
-                    className="w-full bg-white text-black hover:bg-gray-200"
+                    className="w-full   text-foreground hover:bg-secondary"
                   >
                     검사 시작하기
                   </Button>
@@ -119,7 +119,7 @@ const TestModal = ({ type, onClose, onFinish }: TestModalProps) => {
               <Progress value={progress} className="mb-4 bg-gray-600 [&>div]:bg-blue-400" />
 
               <Card className="p-4 bg-[#2C2C2C] border border-gray-600">
-                <p className="font-semibold mb-2 text-white">{`${step + 1}. ${questions[step]}`}</p>
+                <p className="font-semibold mb-2 text-foreground">{`${step + 1}. ${questions[step]}`}</p>
                 <RadioGroup
                   value={String(answers[step])}
                   onValueChange={val => handleSelect(Number(val))}

@@ -54,7 +54,7 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto  px-4">
+    <div className="max-w-xl mx-auto px-4   text-foreground min-h-screen">
       {/* 검색 바 */}
       <SearchBar
         value={inputValue}

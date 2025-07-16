@@ -16,8 +16,8 @@ export default function Layout() {
 
   return (
     <div className="w-full min-h-[100dvh] flex justify-center bg-[black] font-pretendard">
-      <div className="w-full max-w-[414px] flex flex-col relative bg-[#FAF6F4] text-black min-h-[100dvh]">
-        <main className={`flex-1 h-full bg-[#FAF6F4] ${shouldShowNav ? "pb-[84px]" : ""}`}>
+      <div className="w-full max-w-[414px] flex flex-col relative bg-[#FAF6F4] dark:bg-gradient-to-b dark:from-[#181718] dark:to-[#4A3551] dark:text-white min-h-[100dvh]">
+        <main className={`flex-1 h-full bg-[##4B3552] ${shouldShowNav ? "pb-[84px]" : ""}`}>
           <Outlet />
           <Toaster
             position="top-center"

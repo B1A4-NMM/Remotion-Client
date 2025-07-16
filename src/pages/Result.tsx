@@ -143,11 +143,7 @@ const Result: React.FC = () => {
 
   return (
     <div
-      className={`
-        result-container px-4 h-screen
-        ${isTouchDevice ? "overflow-y-auto scrollbar-hide touch-scroll" : "overflow-y-auto"}
-        ${isScrolling ? "scrolling" : ""}
-      `}
+      className={`result-container px-4 h-screen   text-foreground ${isTouchDevice ? "overflow-y-auto scrollbar-hide touch-scroll" : "overflow-y-auto"} ${isScrolling ? "scrolling" : ""}`}
       style={{
         WebkitOverflowScrolling: isTouchDevice ? "touch" : "auto",
         scrollBehavior: "smooth",

@@ -38,7 +38,7 @@ const CardList = () => {
 
   return (
     <>
-      <section className="hero-section">
+      <section className="hero-section   text-foreground min-h-screen">
         <div className="card-grid column-layout">
           {cards.map((card, index) => (
             <CardItem

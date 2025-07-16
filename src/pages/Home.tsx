@@ -18,7 +18,7 @@ import { useDeleteDiary } from "../api/queries/home/useDeleteDiary";
 import { useInfiniteDiaries } from "../api/queries/home/useInfiniteDiaries";
 import { useQueryClient } from "@tanstack/react-query";
 import { usePatchDiaryBookmark } from "../api/queries/home/usePatchDiaryBookmark";
-import RecommendHome from "@/components/home/RecommendHome";
+// import RecommendHome from "@/components/home/RecommendHome";
 import RecommendHomeCard from "@/components/home/RecommendHomeCard";
 
 // S3 → http 변환 (실제 CDN 도메인에 맞게 수정 필요)
@@ -144,7 +144,7 @@ const Home = () => {
   const todayDiary = todayData ? todayData : null;
 
   return (
-    <div className=" flex flex-col px-4">
+    <div className="flex flex-col px-4 text-foreground min-h-screen">
       <Title
         emotionCountByMonth={emotionCountByMonth}
         totalDiaryCount={totalDiaryCount}

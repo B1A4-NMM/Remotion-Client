@@ -136,7 +136,7 @@ const Routine = () => {
   };
 
   return (
-    <div>
+    <div className="  text-foreground min-h-screen">
       <Title />
 
       {/* 상단 제목 */}

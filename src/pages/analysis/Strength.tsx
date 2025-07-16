@@ -75,37 +75,39 @@ const Strength = () => {
   return (
     <div className="mb-10">
       <Title name={"Strength"} isBackActive={true} />
-      <div className="text-gray-400 text-right mb-6">
-        <p>
-          VIA (Values in Action)는 긍정 심리학의 연구 결과를 바탕으로 개발된 성격 강점 모델로,
-          개인의 강점을 파악하고 이를 통해 삶의 만족도와 웰빙을 향상시키는 데 활용됩니다.
-        </p>
-        <p>
-          {" "}
-          VIA 강점은 타고난 재능뿐만 아니라 노력으로 개발된 역량까지 포함하며, 6가지 핵심 덕목 아래
-          24가지 성격 강점으로 분류됩니다.{" "}
-        </p>
-      </div>
+      <div className="pl-3 pr-3">
+        <div className="text-gray-400 text-right mb-6">
+          <p>
+            VIA (Values in Action)는 긍정 심리학의 연구 결과를 바탕으로 개발된 성격 강점 모델로,
+            개인의 강점을 파악하고 이를 통해 삶의 만족도와 웰빙을 향상시키는 데 활용됩니다.
+          </p>
+          <p>
+            {" "}
+            VIA 강점은 타고난 재능뿐만 아니라 노력으로 개발된 역량까지 포함하며, 6가지 핵심 덕목 아래
+            24가지 성격 강점으로 분류됩니다.{" "}
+          </p>
+        </div>
 
-      <div className="bg-white rounded-3xl shadow-xl mb-4">
-        <RadarChart
-          lastTypeCount={lastData.typeCount}
-          currentTypeCount={currentData.typeCount}
-          onSelectCategory={setSelectedCategory}
-        />
-      </div>
-      <div className="bg-white rounded-3xl shadow-xl">
-        {lastdetailData || (currentdetailData && selectedCategory) ? (
-          <StrengthBarChart
-            lastData={lastdetailData}
-            currentData={currentdetailData}
-            selectedCategory={selectedCategory}
+        <div className="bg-white rounded-3xl shadow-xl mb-4">
+          <RadarChart
+            lastTypeCount={lastData.typeCount}
+            currentTypeCount={currentData.typeCount}
+            onSelectCategory={setSelectedCategory}
           />
-        ) : (
-          <div className="flex justify-center p-20">
-            <span className="text-gray-400 p-15">그래프의 라벨을 클릭 해 보세요.</span>
-          </div>
-        )}
+        </div>
+        <div className="bg-white rounded-3xl shadow-xl">
+          {lastdetailData || (currentdetailData && selectedCategory) ? (
+            <StrengthBarChart
+              lastData={lastdetailData}
+              currentData={currentdetailData}
+              selectedCategory={selectedCategory}
+            />
+          ) : (
+            <div className="flex justify-center p-20">
+              <span className="text-gray-400 p-15">그래프의 라벨을 클릭 해 보세요.</span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

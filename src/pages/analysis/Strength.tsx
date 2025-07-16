@@ -35,17 +35,18 @@ const Strength = () => {
   const lastMonth = lastMonthDate.month() + 1;
 
   // API 호출
-  const {
-    data: currentData,
-    isLoading: currentLoading,
-    error: currentError,
-  } = useGetStrengthPeriod(token, currentYear.toString(), currentMonth.toString());
-
-  const {
-    data: lastData,
-    isLoading: lastLoading,
-    error: lastError,
-  } = useGetStrengthPeriod(token, lastYear.toString(), lastMonth.toString());
+  const { 
+     data: currentData, 
+     isLoading: currentLoading, 
+     error: currentError 
+   } = useGetStrengthPeriod(token, "2024", "09");
+ 
+   const { 
+     data: lastData, 
+     isLoading: lastLoading, 
+     error: lastError 
+   } = useGetStrengthPeriod(token, "2024", "08");
+ 
 
   // 로딩 상태 체크
   if (currentLoading || lastLoading) {
@@ -95,7 +96,7 @@ const Strength = () => {
             onSelectCategory={setSelectedCategory}
           />
         </div>
-        <div className="bg-white rounded-3xl shadow-xl">
+        <div className="bg-white rounded-3xl shadow-xl p-4 flex justify-start left-0">
           {lastdetailData || (currentdetailData && selectedCategory) ? (
             <StrengthBarChart
               lastData={lastdetailData}

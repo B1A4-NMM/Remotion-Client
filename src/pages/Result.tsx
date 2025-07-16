@@ -144,7 +144,7 @@ const Result: React.FC = () => {
   return (
     <div
       className={`
-        result-container px-4 h-screen
+        result-container px-4 h-screen pb-[84px]
         ${isTouchDevice ? "overflow-y-auto scrollbar-hide touch-scroll" : "overflow-y-auto"}
         ${isScrolling ? "scrolling" : ""}
       `}
@@ -157,7 +157,7 @@ const Result: React.FC = () => {
       {/* ✅ Header - 원래 위치 유지 */}
       <ResultHeader writtenDate={finalDiaryContent.writtenDate || ""} />
 
-      <div style={{ marginTop: "11vh" }}>
+      <div>
         {/* ✅ Emotion Summary */}
         <EmotionSummary diaryContent={finalDiaryContent} />
 

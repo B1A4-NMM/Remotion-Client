@@ -12,28 +12,26 @@ export const getTriggerRoutine = async () => {
       Authorization: `Bearer ${token}`,
     },
   });
-
+  console.log("trigger", response);
   return response.data;
 };
 
-export const getRoutineByType =async (type: RoutineType) : Promise<Routine[]> => {
+export const getRoutineByType = async (type: RoutineType): Promise<Routine[]> => {
   const token = localStorage.getItem("accessToken");
-  const response =await axios.get(`${BASE_URL}/routine/${type}`,{
-    headers: {Authorization: `Bearer ${token}`},
-  });
-  return response.data;
-};
-
-export const postRoutineByType = async (
-  type: RoutineType,
-  title: string
-) : Promise<Routine> => {
-  const token = localStorage.getItem("accessToken");
-  const response = await axios.post(`${BASE_URL}/routine/${type}`, { title }, {
+  const response = await axios.get(`${BASE_URL}/routine/${type}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
 };
 
-
-
+export const postRoutineByType = async (type: RoutineType, title: string): Promise<Routine> => {
+  const token = localStorage.getItem("accessToken");
+  const response = await axios.post(
+    `${BASE_URL}/routine/${type}`,
+    { title },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};

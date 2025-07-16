@@ -66,62 +66,58 @@ const Routine = () => {
     setAllRoutines(prev => prev.filter(r => r.id !== id));
   };
 
-  // const handleFolderClick = async(emotionTitle: string) => {
+  // const handleFolderClick = async (emotionTitle: string) => {
   //   const emotionKey = emotionTitle as RoutineItem["routineType"];
 
-  //   console.log("Folder 클릭됨", emotionKey);
+  //   console.log("🔥 Folder 클릭됨", emotionKey);
+
+  //   // 상태를 한 번에 설정하여 동기화 문제 방지
   //   setSelectedEmotion(emotionKey);
+  //   setShowRecommendation(true);
 
-  //   console.log("selectedEmotion SET 완료");
-  //   setIsPopupOpen(true);
-  //   setShowRecommendation(false);
+  //   console.log("🔥 모달 상태 설정 완료:", { emotionKey });
 
-  //   try{
-  //     const data =await getRoutineByType(emotionKey);
+  //   // API 호출 (백그라운드)
+  //   try {
+  //     const data = await getRoutineByType(emotionKey);
 
   //     if (data && data.length > 0) {
-  //       setEmotionRoutines(
-  //         data.map((item:any) => ({
-  //           id:item.routineId,
-  //           title: item.content,
-  //           routineType:item.routineType,
-  //         }))
-  //       ) ;
+  //       const mappedRoutines = data.map((item: any) => ({
+  //         id: item.routineId,
+  //         title: item.content,
+  //         routineType: item.routineType,
+  //       }));
 
-  //       // 응답 루틴 저장
-  //       setShowRecommendation(false);     // 기본 추천 아님
+  //       console.log("🔍 매핑된 루틴 데이터:", mappedRoutines);
 
-  //     } else {
-  //       console.log("루틴 없음,추천 루틴 모달 표시");
-  //       setEmotionRoutines([]);           // 루틴 없음
-  //       setShowRecommendation(true);      // 기본 추천 보여주기
+  //       setTriggeredRoutines(prev => {
+  //         const existingIds = prev.map(r => r.id);
+  //         const newRoutines = mappedRoutines.filter(r => !existingIds.includes(r.id));
+  //         return [...prev, ...newRoutines];
+  //       });
   //     }
-  //   }catch(err){
-  //     console.error("루틴 불러오기 실패:",err);
-  //     setEmotionRoutines([]);
-  //     setShowRecommendation(true);
+  //   } catch (err) {
+  //     console.error("루틴 불러오기 실패:", err);
   //   }
-  //   // const hasRoutines = allRoutines.some((r) => r.routineType === emotionKey);
-  //   // setShowRecommendation(!hasRoutines);
   // };
 
-  // Routine.tsx 내
+    // Routine.tsx 내
   const handleFolderClick = (emotionTitle: string) => {
-    const emotionKey = emotionTitle as RoutineItem["routineType"];
-    console.log("🔥 폴더 클릭됨 (테스트)", emotionKey);
+  const emotionKey = emotionTitle as RoutineItem["routineType"];
+  console.log("🔥 폴더 클릭됨 (테스트)", emotionKey);
 
-    setSelectedEmotion(null);
-    setShowRecommendation(false);
+  setSelectedEmotion(null);
+  setShowRecommendation(false);
+  
+  // setSelectedEmotion(emotionKey);
+  // setShowRecommendation(true); // 무조건 추천루틴 모달 뜨게 고정
 
-    // setSelectedEmotion(emotionKey);
-    // setShowRecommendation(true); // 무조건 추천루틴 모달 뜨게 고정
-
-    // 2단계: 약간의 딜레이 후 다시 설정
-    setTimeout(() => {
-      setSelectedEmotion(emotionKey);
-      setShowRecommendation(true); // 무조건 추천 뜨게
-    }, 0); // 또는 10~50ms
-  };
+   // 2단계: 약간의 딜레이 후 다시 설정
+   setTimeout(() => {
+    setSelectedEmotion(emotionKey);
+    setShowRecommendation(true); // 무조건 추천 뜨게
+  }, 0); // 또는 10~50ms
+};
 
   //추천 루틴 추가
   const handleRecommendedAdd = (title: string) => {
@@ -171,39 +167,58 @@ const Routine = () => {
       </div>
 
       {/* 루틴 리스트 */}
-      {triggeredRoutines.length === 0 ? (
-        <div className="flex items-center justify-center px-7 min-h-[230px]">
-          <p className="text-sm text-gray-500 text-center">아직 선별된 루틴이 없어요.</p>
-        </div>
-      ) : (
-        <PersonalizedRoutineList
-          routines={triggeredRoutines.map(r => ({
-            id: r.id,
-            title: r.title,
-            onAdd: () => handleAddRoutine(r.title),
-          }))}
-        />
-      )}
+      {(() => {
+        // 선택된 필터에 따라 루틴 필터링
+        const filteredRoutines = selectedFilter
+          ? triggeredRoutines.filter(r => {
+              // 매핑된 데이터와 원본 데이터 모두 처리
+              const routineType = r.routineType || (r as any).routineType;
+              return routineType === selectedFilter;
+            })
+          : [];
 
-      <BottomPopup
-        isOpen={!!selectedEmotion}
-        onClose={() => {
-          setSelectedEmotion(null);
-          setShowRecommendation(false);
-        }}
-        heightOption={{ heightPixel: 500 }}
-      >
-        {selectedEmotion && showRecommendation && (
-          <RecommendedRoutinePopup
-            emotion={selectedEmotion}
-            onAdd={handleRecommendedAdd}
-            onClose={() => {
-              setSelectedEmotion(null);
-              setShowRecommendation(false);
-            }}
-          />
-        )}
-      </BottomPopup>
+        // 표시용 데이터로 변환 (원본 데이터도 처리)
+        const displayRoutines = filteredRoutines.map(r => ({
+          id: r.id || (r as any).routineId,
+          title: r.title || (r as any).content,
+          onAdd: () => handleAddRoutine(r.title || (r as any).content),
+        }));
+
+        console.log("🔍 전체 루틴:", triggeredRoutines);
+        console.log("🔍 선택된 필터:", selectedFilter);
+        console.log("🔍 필터링된 루틴:", filteredRoutines);
+
+        return displayRoutines.length === 0 ? (
+          <div className="flex items-center justify-center px-7 min-h-[230px]">
+            <p className="text-sm text-gray-500 text-center">
+              {selectedFilter ? "해당 감정의 루틴이 없어요." : "감정을 선택해주세요."}
+            </p>
+          </div>
+        ) : (
+          <PersonalizedRoutineList routines={displayRoutines} />
+        );
+      })()}
+
+<BottomPopup
+  isOpen={!!selectedEmotion}
+  onClose={() => {
+    setSelectedEmotion(null);
+    setShowRecommendation(false);
+  }}
+  heightOption={{ heightPixel: 700 }}
+>
+  {selectedEmotion && showRecommendation && (
+    <RecommendedRoutinePopup
+      emotion={selectedEmotion}
+      onAdd={handleRecommendedAdd}
+      onClose={() => {
+        setSelectedEmotion(null);
+        setShowRecommendation(false);
+        
+      }}
+    />
+  )}
+</BottomPopup>
     </div>
   );
 };

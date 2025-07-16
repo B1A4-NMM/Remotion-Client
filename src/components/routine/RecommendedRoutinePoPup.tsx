@@ -32,6 +32,8 @@ export default function RecommendedRoutinePopup({
     onClose();
   };
 
+  console.log("🎯 RecommendedRoutinePopup 렌더링됨:", { emotion });
+
   return (
     <>
       <style>{`

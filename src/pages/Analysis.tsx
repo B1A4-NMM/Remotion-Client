@@ -11,7 +11,7 @@ import Title from "@/components/analysis/Title";
 const Analysis=()=>{
 
     return(
-      <div className="pl-3 pr-3">
+      <div className="pl-3 pr-3   text-foreground min-h-screen">
         <Title name={"심층 분석"} isBackActive={false}/>
         <StrengthGraph
             userName="user Name"/>

@@ -11,9 +11,9 @@ const components: {
   Component: React.ComponentType<CardComponentProps>;
   bgColor: string;
 }[] = [
-  { Component: MentalHealthCard, bgColor: "bg-gray-700" },
-  { Component: StrengthCard, bgColor: "bg-gray-600" },
-  { Component: EmotionCard, bgColor: "bg-gray-500" },
+  { Component: MentalHealthCard, bgColor: "bg-card" },
+  { Component: StrengthCard, bgColor: "bg-card" },
+  { Component: EmotionCard, bgColor: "bg-card" },
   // { Component: AchievementCard, bgColor: "bg-blue-100" },
 ];
 

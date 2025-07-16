@@ -13,8 +13,8 @@ const SOCIAL_AUTH_URL = {
 };
 export default function Login() {
   return (
-    <div className=" min-h-screen h-full flex flex-col justify-center items-center px-4">
-      <h1 className="text-2xl font-bold mb-6 text-black text-left">
+    <div className="min-h-screen h-full flex flex-col justify-center items-center px-4   text-foreground">
+      <h1 className="text-2xl font-bold mb-6 text-foreground text-left">
         하루를 기록하면 <br />
         내일이 달라지는 다이어리
       </h1>

@@ -237,7 +237,7 @@ const Diary = () => {
 
   return (
     <>
-      <div className="relative flex flex-col h-full border">
+      <div className="relative flex flex-col h-full border   text-foreground">
         <DiaryTitle selectedDate={selectedDate} onCalendarClick={handleCalendarClick} />
 
         {/* 달력 컴포넌트 */}

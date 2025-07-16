@@ -79,8 +79,7 @@ export default function CalendarPage() {
   return (
     <div
       ref={containerRef}
-      className="flex flex-col h-screen overflow-hidden"
-      style={{ backgroundColor: "#FAF6F4" }}
+      className="flex flex-col h-screen overflow-hidden   text-foreground"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}

@@ -169,7 +169,7 @@ const BrainEmotionMap: React.FC<BrainEmotionMapProps> = ({ activityAnalysis }) =
   }
 
   return (
-    <div className="mb-6">
+    <div className="mb-6 mt-16">
       <h2 className="text-xl font-semibold text-black mb-4 px-4">오늘, 내가 나에게 느낀 감정들</h2>
 
       <div className="rounded-2xl shadow-lg p-6 bg-white">

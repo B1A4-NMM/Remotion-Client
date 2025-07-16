@@ -153,7 +153,7 @@ const Result: React.FC = () => {
       {/* ✅ Header - 원래 위치 유지 */}
       <ResultHeader writtenDate={finalDiaryContent.writtenDate || ""} />
 
-      <div style={{ marginTop: "11vh" }}>
+      <div>
         {/* ✅ Emotion Summary */}
         <EmotionSummary diaryContent={finalDiaryContent} />
 

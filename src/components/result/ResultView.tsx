@@ -9,6 +9,11 @@ import Todos from "./Todo";
 import WarningTestBox from "../WariningTestBox";
 import TestModal from "../TestModal";
 import PeopleCard from "../home/PeopleCard";
+import IntensityChart from "./IntensityChart";
+import BrainEmotionMap from "./BrainEmotionMap";
+import TodoPreviewCard from "./TodoPreviewCard";
+import ConflictAnalysisCard from "./ConflictAnalysisCard";
+import RoutineRecommendCard from "./RoutineRecommendCard";
 
 interface ResultViewProps {
   diaryContent: any | null;
@@ -48,6 +53,32 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent }) => {
 
   const todos = diaryContent?.analysis?.todos ?? [];
 
+  // reflection에서 todo 데이터 추출
+  const reflectionTodos = diaryContent?.analysis?.reflection?.todo ?? [];
+
+  // recommendRoutine 데이터 추출
+  const recommendRoutines = diaryContent?.recommendRoutine ?? [];
+
+  // problem 데이터 추출 (모든 activity의 problem을 수집하고 null 체크)
+  const allProblems = activityAnalysis.flatMap((activity: any) => activity.problem || []);
+
+  // problem 중 하나라도 null 값이 있는지 확인
+  const hasValidProblems = allProblems.some(
+    (problem: any) =>
+      problem &&
+      problem.situation &&
+      problem.approach &&
+      problem.outcome &&
+      problem.conflict_response_code &&
+      problem.situation !== "None" &&
+      problem.approach !== "None" &&
+      problem.outcome !== "None" &&
+      problem.conflict_response_code !== "None"
+  );
+
+  // beforeDiaryScores 데이터 추출
+  const beforeDiaryScores = diaryContent?.beforeDiaryScores?.scores ?? [];
+
   const convertWarningToTestType = (warning: "stress" | "anxiety" | "depression") => {
     switch (warning) {
       case "anxiety":
@@ -62,7 +93,40 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent }) => {
   // Pass peopleCardsData to PeopleCard
   return (
     <>
+      <IntensityChart scores={beforeDiaryScores} />
       <PeopleCard data={peopleCardsData} />
+      <BrainEmotionMap activityAnalysis={activityAnalysis} />
+
+      {hasValidProblems && (
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold text-gray-800 mt-[60px] mb-[20px] px-4">
+            마음 사건 리포트
+          </h2>
+          <div className="px-4">
+            <ConflictAnalysisCard conflicts={allProblems} />
+          </div>
+        </div>
+      )}
+
+      {recommendRoutines && recommendRoutines.content && (
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold text-gray-800 mt-[60px] mb-[20px] px-4">
+            나만의 감정 회복 루틴
+          </h2>
+          <div className="px-4">
+            <RoutineRecommendCard routines={[recommendRoutines]} />
+          </div>
+        </div>
+      )}
+
+      {reflectionTodos.length > 0 && (
+        <div className=" mb-6">
+          {/* <h2 className="text-xl font-semibold text-gray-800 mt-[60px] mb-[20px]  px-4">
+            오늘의 작은 실천
+          </h2> */}
+          <TodoPreviewCard todos={reflectionTodos} />
+        </div>
+      )}
       <motion.div
         ref={contentRef}
         drag="y"

@@ -25,7 +25,7 @@ const Title = () => {
     <div className="w-full px-5 pt-8">
 
       {/* 메인 헤더 */}
-      <div className="flex items-center justify-between px-4 py-3">
+      <div className="flex items-center justify-between mb-5">
         <h1 className="text-3xl font-bold text-gray-900 ml-2">추천</h1>
       </div>
 

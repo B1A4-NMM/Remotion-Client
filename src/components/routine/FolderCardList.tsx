@@ -1,11 +1,16 @@
 import FolderCard from "@/components/routine/FolderCard";
-import React,{ useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import gloomyFolder from "@/assets/img/gloomy.svg";
 import angryFolder from "@/assets/img/angry.svg";
 import tenseFolder from "@/assets/img/tense.svg";
 
+interface FolderCardListProps {
 
-const FolderCardList = () => {
+    onFolderClick: (emotionTitle: string) => void;
+}
+
+
+const FolderCardList = ( { onFolderClick } : FolderCardListProps) => {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
@@ -38,6 +43,9 @@ const FolderCardList = () => {
       // 모바일 터치 기본 동작 허용 + 중단 방지 X
       e.stopPropagation();
     };
+
+    
+
 
     useEffect(() => {
         const container = scrollRef.current; 
@@ -72,54 +80,57 @@ const FolderCardList = () => {
   
     const folderData = [
       {
+        emotionKey : "depression",
         title: "우울 루틴",
         subtitle: "우울할 땐\n이렇게 해보는게 어때요?",
         imageSrc: gloomyFolder,
       },
       {
-        title: "분노 루틴",
-        subtitle: "화가 날 땐\n이렇게 해보는게 어때요?",
+        emotionKey: "anxiety",
+        title: "불안 루틴",
+        subtitle: "불안 할 땐\n이렇게 해보는게 어때요?",
         imageSrc: angryFolder,
       },
       {
-        title: "긴장 루틴",
-        subtitle: "긴장될 땐\n이렇게 해보는게 어때요?",
+        emotionKey: "stress",
+        title: "스트레스 루틴",
+        subtitle: "스트레스 받을 땐\n이렇게 해보는게 어때요?",
         imageSrc: tenseFolder,
       },
     ];
-  
-    return (
-      <div className="overflow-x-auto pb-[30px] relative">
-        {/* 카드 리스트
-            srcollbar-hide가 아니라
-            hide-scrollbar => 우리가 app.css에 추가한
-            클래스 기준으로 
-        */}
-        <div
-          ref={scrollRef}
-          className="flex space-x-4 px-[18px] overflow-x-auto hide-scrollbar cursor-grab active:cursor-grabbing"
-          onMouseDown={handleMouseDown}
-          onTouchStart={handleTouchStart}
-          style={{ scrollBehavior: isDragging ? "auto" : "smooth" }}
-        >
-          {folderData.map((folder, idx) => (
-            <FolderCard key={idx} {...folder} />
-          ))}
-        </div>
 
-        {/* 하단 동그란 인디케이터 */}
-        <div className="absolute left-1/2 bottom-[12px] transform -translate-x-1/2 flex gap-2">
-        {folderData.map((_, i) => (
+    return (
+        <div className="overflow-x-auto pb-[30px] relative">
           <div
-            key={i}
-            className={`w-2 h-2 rounded-full transition-all duration-200 ${
-              currentIndex === i ? "bg-black" : "bg-gray-300"
-            }`}
-          />
-        ))}
+            ref={scrollRef}
+            className="flex space-x-4 px-[18px] overflow-x-auto hide-scrollbar cursor-grab active:cursor-grabbing"
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+            style={{ scrollBehavior: isDragging ? "auto" : "smooth" }}
+          >
+            {folderData.map((folder, idx) => (
+              <FolderCard
+                key={idx}
+                {...folder}
+                onClick={() => onFolderClick(folder.emotionKey)}
+              />
+            ))}
+          </div>
+    
+          {/* 하단 인디케이터 */}
+          <div className="absolute left-1/2 bottom-[12px] transform -translate-x-1/2 flex gap-2">
+            {folderData.map((_, i) => (
+              <div
+                key={i}
+                className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                  currentIndex === i ? "bg-black" : "bg-gray-300"
+                }`}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-    );
+      ); 
+   
   };
   
   export default FolderCardList;

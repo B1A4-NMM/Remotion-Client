@@ -1,21 +1,23 @@
 import { useLocation, Outlet } from "react-router-dom";
+import { useBottomPopupStore } from "./store/useBottomPopupStore";
 import BottomNavigation from "./components/BottomNavigation";
 import { Toaster } from "sonner";
 
 // 하단 네비게이션을 숨길 경로 목록
-const HIDE_NAV_PATHS = ["/signup", "/login", "/diary/", "/video"];
+const HIDE_NAV_PATHS = ["/signup", "/login", "/diary", "/video"];
 
 export default function Layout() {
   const location = useLocation();
+  const isPopupOpen = useBottomPopupStore(state => state.isOpen);
 
   // 현재 경로가 네비게이션을 숨겨야 하는 경로에 포함되지 않는 경우만 보여줌
-  // 경로가 숨겨야 하는 경로로 시작하는지 확인
-  const shouldShowNav = !HIDE_NAV_PATHS.some(path => location.pathname.startsWith(path));
+  const shouldShowNav =
+    !HIDE_NAV_PATHS.some(path => location.pathname.startsWith(path)) && !isPopupOpen;
 
   return (
-    <div className="w-full min-h-[100dvh] flex justify-center bg-[#FAF6F4] font-pretendard">
+    <div className="w-full min-h-[100dvh] flex justify-center bg-[black] font-pretendard pb-[84]">
       <div className="w-full max-w-[414px] flex flex-col relative bg-[#FAF6F4] text-black min-h-[100dvh]">
-        <main className="flex-1 h-full bg-[#FAF6F4] pb-[84px]">
+        <main className={`flex-1 h-full bg-[#FAF6F4] ${shouldShowNav ? "pb-[84px]" : ""}`}>
           <Outlet />
           <Toaster
             position="top-center"

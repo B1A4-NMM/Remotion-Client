@@ -10,6 +10,7 @@ import EmotionSummary from "../components/result/EmotionSummary";
 import ResultToggle from "../components/result/ResultToggle";
 import DiaryView from "../components/result/DiaryView";
 import ResultView from "../components/result/ResultView";
+import ActivityEmotionCard from "../components/result/ActivityEmotionCard";
 
 import "../styles/resultCard.css";
 import "../styles/App.css";
@@ -143,7 +144,7 @@ const Result: React.FC = () => {
   return (
     <div
       className={`
-        result-container px-4 h-screen
+        result-container px-4 h-screen pb-[84px]
         ${isTouchDevice ? "overflow-y-auto scrollbar-hide touch-scroll" : "overflow-y-auto"}
         ${isScrolling ? "scrolling" : ""}
       `}
@@ -156,7 +157,7 @@ const Result: React.FC = () => {
       {/* ✅ Header - 원래 위치 유지 */}
       <ResultHeader writtenDate={finalDiaryContent.writtenDate || ""} />
 
-      <div className="mt-[200px]">
+      <div>
         {/* ✅ Emotion Summary */}
         <EmotionSummary diaryContent={finalDiaryContent} />
 

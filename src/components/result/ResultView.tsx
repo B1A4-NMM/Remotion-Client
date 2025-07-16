@@ -127,7 +127,7 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent }) => {
           <TodoPreviewCard todos={reflectionTodos} />
         </div>
       )}
-      <motion.div
+      {/* <motion.div
         ref={contentRef}
         drag="y"
         dragConstraints={calculateConstraints()}
@@ -141,8 +141,8 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent }) => {
         }}
       >
         {/* <ActivityCardSlider data={activityAnalysis} /> */}
-        <Todos todos={todos} />
-      </motion.div>
+      {/* <Todos todos={todos} /> */}
+      {/* </motion.div> */}
 
       {testType && (
         <TestModal

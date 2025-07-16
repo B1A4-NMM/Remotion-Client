@@ -15,7 +15,7 @@ export default function Layout() {
     !HIDE_NAV_PATHS.some(path => location.pathname.startsWith(path)) && !isPopupOpen;
 
   return (
-    <div className="w-full min-h-[100dvh] flex justify-center bg-[black] font-pretendard">
+    <div className="w-full min-h-[100dvh] flex justify-center bg-[black] font-pretendard pb-[84]">
       <div className="w-full max-w-[414px] flex flex-col relative bg-[#FAF6F4] text-black min-h-[100dvh]">
         <main className={`flex-1 h-full bg-[#FAF6F4] ${shouldShowNav ? "pb-[84px]" : ""}`}>
           <Outlet />

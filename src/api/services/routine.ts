@@ -12,7 +12,8 @@ export const getTriggerRoutine = async () => {
       Authorization: `Bearer ${token}`,
     },
   });
-
+  
+  
   return response.data;
 };
 

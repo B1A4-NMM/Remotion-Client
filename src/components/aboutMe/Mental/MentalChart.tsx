@@ -18,6 +18,7 @@ interface MentalChartProps {
     intensity: number;
     count: number;
   }[];
+  limit?: number;
 }
 
 const chartConfig: Record<MentalType, { label: string; color: string }> = {
@@ -40,11 +41,13 @@ const CustomLabel = (props: any) => {
   );
 };
 
-const MentalChart = ({ type, data }: MentalChartProps) => {
+const MentalChart = ({ type, data, limit }: MentalChartProps) => {
   const config = chartConfig[type];
 
+  const processedData = limit ? data.slice(-limit) : data;
+
   // API 데이터 매핑: { date, intensity } → { date, value }
-  const chartData = data.map(item => ({
+  const chartData = processedData.map(item => ({
     date: item.date,
     value: item.intensity,
   }));

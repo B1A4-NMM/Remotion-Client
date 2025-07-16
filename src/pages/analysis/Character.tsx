@@ -11,7 +11,7 @@ const combination: Record<string, { harmony: string; description_h: string; disH
     disHarmony: "코브라",
     description_d: "호랑이의 직진성과 코브라의 회피적이고 시기심 많은 성향은 자주 충돌합니다.",
   },
-  "토끼": {
+  "새": {
     harmony: "나무늘보",
     description_h: "나무늘보의 느긋한 안정감은 토끼의 불안을 부드럽게 감싸줍니다.",
     disHarmony: "독수리",
@@ -42,7 +42,7 @@ const combination: Record<string, { harmony: string; description_h: string; disH
     description_d: "둘 다 먼저 다가가지 않기에 정적만 길어지며 외로움이 심화됩니다.",
   },
   "나무늘보": {
-    harmony: "토끼",
+    harmony: "새",
     description_h: "토끼의 감정 기복을 느긋한 속도로 따뜻하게 받아줍니다.",
     disHarmony: "독수리",
     description_d: "독수리의 재촉과 속도감은 나무늘보를 더 위축시키고 무기력하게 만듭니다.",
@@ -80,7 +80,7 @@ const combination: Record<string, { harmony: string; description_h: string; disH
   "고래": {
     harmony: "개구리",
     description_h: "고요한 내면과 점진적인 성장을 중시하는 둘은 말없이 깊이 연결됩니다.",
-    disHarmony: "토끼",
+    disHarmony: "새",
     description_d: "고래는 변화를 싫어하고, 토끼는 감정의 요동을 멈추기 어려워 충돌합니다.",
   },
   "거북이": {

@@ -39,24 +39,25 @@ const StrengthGraph: React.FC<StrengthGraphProps> = ({
   const now = dayjs();
   const currentYear = now.year();
   const currentMonth = now.month() + 1; // dayjs month는 0부터 시작하므로 +1
-
+  
   // 지난 달 정보  
   const lastMonthDate = now.subtract(1, 'month');
   const lastYear = lastMonthDate.year();
   const lastMonth = lastMonthDate.month() + 1;
+
 
   // API 호출
   const { 
     data: currentData, 
     isLoading: currentLoading, 
     error: currentError 
-  } = useGetStrengthPeriod(token, currentYear.toString(), currentMonth.toString());
+  } = useGetStrengthPeriod(token, "2024", "09");
 
   const { 
     data: lastData, 
     isLoading: lastLoading, 
     error: lastError 
-  } = useGetStrengthPeriod(token, lastYear.toString(), lastMonth.toString());
+  } = useGetStrengthPeriod(token, "2024", "08");
 
 
   // 로딩 상태 체크
@@ -80,9 +81,14 @@ const StrengthGraph: React.FC<StrengthGraphProps> = ({
   const displayToApi = (displayLabel: string) =>
     Object.entries(API_TO_DISPLAY_LABEL_MAP).find(([, d]) => d === displayLabel)?.[0] || "";
 
-  const detailData: DetailStrength | null =
-    selectedCategory && data?.detailCount
-      ? (data.detailCount[displayToApi(selectedCategory)] ?? null)
+  const lastDetailData: DetailStrength | null =
+    selectedCategory && lastData?.detailCount
+      ? (lastData.detailCount[displayToApi(selectedCategory)] ?? null)
+      : null;
+
+  const currentDetailData: DetailStrength | null =
+    selectedCategory && currentData?.detailCount
+      ? (currentData.detailCount[displayToApi(selectedCategory)] ?? null)
       : null;
 
   return (
@@ -106,7 +112,7 @@ const StrengthGraph: React.FC<StrengthGraphProps> = ({
           {currentError && <p className="text-red-400">에러 발생: {`${currentError}`}</p>}
           
           {/* ✅ 데이터 존재 여부 확인 추가 */}
-          {currentData && lastData && (
+          { (currentData || lastData) && (
             <RadarChart
               lastTypeCount={lastData.typeCount}
               currentTypeCount={currentData.typeCount}

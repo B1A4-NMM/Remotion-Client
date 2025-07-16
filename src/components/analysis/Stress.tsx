@@ -2,6 +2,7 @@ import { ChevronRight } from "lucide-react";
 import MentalChart from "../aboutMe/Mental/MentalChart";
 import { useMentalData } from "./../../api/queries/aboutme/useMentalData";
 import { useNavigate } from "react-router-dom";
+import LoadingAnimation from "../Loading";
 
 
 const Stress=()=>{
@@ -10,7 +11,8 @@ const Stress=()=>{
     const onClickHandler=()=>{
         navigator("/analysis/Stress");
     }
-    const { data } = useMentalData("스트레스", 4); // 최근 3일치
+    const { data, isLoading } = useMentalData("스트레스", 365); 
+
     return(
         <div className="w-full mt-5 " >
             {/* 메인 컨테이너 */}
@@ -27,7 +29,11 @@ const Stress=()=>{
                 <hr className="mr-5 ml-5"/>
                 <div className="h-44 content-end">
                     <div className="h-fit">
-                        <MentalChart type={"스트레스"} data={data?.date ?? []} />
+                    {isLoading? (
+                        <LoadingAnimation />
+                        ) : (
+                        <MentalChart type={"스트레스"} data={data.date} limit={4} />
+                        )}
                     </div>
                 </div>
             </div>

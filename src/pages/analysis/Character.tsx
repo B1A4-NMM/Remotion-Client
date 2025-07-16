@@ -127,24 +127,25 @@ const Character=()=>{
                 name="캐릭터"
                 isBackActive={true}
             />
-            <div className="bg-white rounded-3xl mb-4">
-                <div className="text-xl font-bold p-3"> 당신의 현재 캐릭터는 </div>
-                <AnimalCard
-                    animalType={animal?.character}/>
+            <div className="pl-3 pr-3">
 
+              <div className="bg-white rounded-3xl mb-4">
+                  <div className="text-xl font-bold p-3"> 당신의 현재 캐릭터는 </div>
+                  <AnimalCard
+                      animalType={animal?.character}/>
+
+              </div>
+
+              <div className="text-2xl font-bold pt-10 pb-3">다른 동물들과의 궁합</div>
+              <div className="grid grid-cols-2 gap-3">
+                  <AnimalCard
+                      animalType={harmony}
+                      script={description_h}/>
+                  <AnimalCard
+                      animalType={disHarmony}
+                      script={description_d}/>
+              </div>
             </div>
-
-            <div className="text-2xl font-bold pt-10 pb-3">다른 동물들과의 궁합</div>
-            <div className="grid grid-cols-2 gap-3">
-                <AnimalCard
-                    animalType={harmony}
-                    script={description_h}/>
-                <AnimalCard
-                    animalType={disHarmony}
-                    script={description_d}/>
-            </div>
-
-            
         </div>
     )
 

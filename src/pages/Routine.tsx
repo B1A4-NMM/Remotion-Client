@@ -66,40 +66,58 @@ const Routine = () => {
     setAllRoutines(prev => prev.filter(r => r.id !== id));
   };
 
-  const handleFolderClick = async (emotionTitle: string) => {
-    const emotionKey = emotionTitle as RoutineItem["routineType"];
+  // const handleFolderClick = async (emotionTitle: string) => {
+  //   const emotionKey = emotionTitle as RoutineItem["routineType"];
 
-    console.log("🔥 Folder 클릭됨", emotionKey);
+  //   console.log("🔥 Folder 클릭됨", emotionKey);
 
-    // 상태를 한 번에 설정하여 동기화 문제 방지
+  //   // 상태를 한 번에 설정하여 동기화 문제 방지
+  //   setSelectedEmotion(emotionKey);
+  //   setShowRecommendation(true);
+
+  //   console.log("🔥 모달 상태 설정 완료:", { emotionKey });
+
+  //   // API 호출 (백그라운드)
+  //   try {
+  //     const data = await getRoutineByType(emotionKey);
+
+  //     if (data && data.length > 0) {
+  //       const mappedRoutines = data.map((item: any) => ({
+  //         id: item.routineId,
+  //         title: item.content,
+  //         routineType: item.routineType,
+  //       }));
+
+  //       console.log("🔍 매핑된 루틴 데이터:", mappedRoutines);
+
+  //       setTriggeredRoutines(prev => {
+  //         const existingIds = prev.map(r => r.id);
+  //         const newRoutines = mappedRoutines.filter(r => !existingIds.includes(r.id));
+  //         return [...prev, ...newRoutines];
+  //       });
+  //     }
+  //   } catch (err) {
+  //     console.error("루틴 불러오기 실패:", err);
+  //   }
+  // };
+
+    // Routine.tsx 내
+  const handleFolderClick = (emotionTitle: string) => {
+  const emotionKey = emotionTitle as RoutineItem["routineType"];
+  console.log("🔥 폴더 클릭됨 (테스트)", emotionKey);
+
+  setSelectedEmotion(null);
+  setShowRecommendation(false);
+  
+  // setSelectedEmotion(emotionKey);
+  // setShowRecommendation(true); // 무조건 추천루틴 모달 뜨게 고정
+
+   // 2단계: 약간의 딜레이 후 다시 설정
+   setTimeout(() => {
     setSelectedEmotion(emotionKey);
-    setShowRecommendation(true);
-
-    console.log("🔥 모달 상태 설정 완료:", { emotionKey });
-
-    // API 호출 (백그라운드)
-    try {
-      const data = await getRoutineByType(emotionKey);
-
-      if (data && data.length > 0) {
-        const mappedRoutines = data.map((item: any) => ({
-          id: item.routineId,
-          title: item.content,
-          routineType: item.routineType,
-        }));
-
-        console.log("🔍 매핑된 루틴 데이터:", mappedRoutines);
-
-        setTriggeredRoutines(prev => {
-          const existingIds = prev.map(r => r.id);
-          const newRoutines = mappedRoutines.filter(r => !existingIds.includes(r.id));
-          return [...prev, ...newRoutines];
-        });
-      }
-    } catch (err) {
-      console.error("루틴 불러오기 실패:", err);
-    }
-  };
+    setShowRecommendation(true); // 무조건 추천 뜨게
+  }, 0); // 또는 10~50ms
+};
 
   //추천 루틴 추가
   const handleRecommendedAdd = (title: string) => {
@@ -181,36 +199,26 @@ const Routine = () => {
         );
       })()}
 
-      <BottomPopup
-        isOpen={!!selectedEmotion && showRecommendation}
-        onClose={() => {
-          console.log("🚪 모달 닫기 버튼 클릭됨");
-          setSelectedEmotion(null);
-          setShowRecommendation(false);
-        }}
-        heightOption={{ heightPixel: 450 }}
-      >
-        {(() => {
-          console.log("🔍 모달 렌더링 상태:", {
-            selectedEmotion,
-            showRecommendation,
-            shouldShow: selectedEmotion && showRecommendation,
-          });
-          return null;
-        })()}
-
-        {selectedEmotion && showRecommendation && (
-          <RecommendedRoutinePopup
-            emotion={selectedEmotion}
-            onAdd={handleRecommendedAdd}
-            onClose={() => {
-              console.log("🚪 RecommendedRoutinePopup 닫기 버튼 클릭됨");
-              setSelectedEmotion(null);
-              setShowRecommendation(false);
-            }}
-          />
-        )}
-      </BottomPopup>
+<BottomPopup
+  isOpen={!!selectedEmotion}
+  onClose={() => {
+    setSelectedEmotion(null);
+    setShowRecommendation(false);
+  }}
+  heightOption={{ heightPixel: 700 }}
+>
+  {selectedEmotion && showRecommendation && (
+    <RecommendedRoutinePopup
+      emotion={selectedEmotion}
+      onAdd={handleRecommendedAdd}
+      onClose={() => {
+        setSelectedEmotion(null);
+        setShowRecommendation(false);
+        
+      }}
+    />
+  )}
+</BottomPopup>
     </div>
   );
 };

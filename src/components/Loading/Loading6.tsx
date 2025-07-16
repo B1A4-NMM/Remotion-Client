@@ -20,8 +20,8 @@ const phrases: string[] = [
 ];
 
 const COLORS = ["#82e79f", "#fcbcba", "#f8e76c", "#70cfe4"]; // green, red, yellow, blue
-const MAIN_TEXT_COLOR = "#22223B";
-const MAIN_BG_COLOR = "#FAF6F4";
+// const MAIN_TEXT_COLOR = "#22223B";
+// const MAIN_BG_COLOR = "#FAF6F4";
 
 // ✅ 타입 명시
 const shuffleArray = (array: string[]): string[] => {
@@ -95,7 +95,7 @@ const Loading6: React.FC = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: MAIN_BG_COLOR,
+        background: " ",
       }}
     >
       <div
@@ -126,7 +126,7 @@ const Loading6: React.FC = () => {
                 const y = 40 + i * 70;
                 return (
                   <React.Fragment key={i}>
-                    <text x="50" y={y} fontSize="17" fontFamily="Arial" fill={MAIN_TEXT_COLOR}>
+                    <text x="50" y={y} fontSize="17" fontFamily="Arial" fill="text-foreground">
                       {phrase}
                     </text>
                     <g transform={`translate(10 ${y - 20}) scale(.9)`}>
@@ -174,7 +174,7 @@ const Loading6: React.FC = () => {
           right: 0,
           display: "flex",
           justifyContent: "center",
-          color: MAIN_TEXT_COLOR,
+          color: "text-foreground",
         }}
       >
         <div id="logo" style={{ marginRight: 8 }}></div>

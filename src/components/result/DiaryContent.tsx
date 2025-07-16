@@ -11,7 +11,7 @@ const DiaryContent: React.FC<DiaryContentProps> = ({ content }) => {
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-lg ">
-      <p className="whitespace-pre-wrap text-gray-800 leading-relaxed">
+      <p className="whitespace-pre-wrap text-foreground leading-relaxed">
         {content}
       </p>
     </div>

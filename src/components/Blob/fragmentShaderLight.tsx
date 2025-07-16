@@ -1,4 +1,4 @@
-const fragmentShader = `
+const fragmentShaderLight = `
 uniform float u_intensity;
 uniform float u_time;
 uniform vec3 u_color1;
@@ -77,4 +77,4 @@ void main() {
 `;
 
 
-export default fragmentShader;
+export default fragmentShaderLight;

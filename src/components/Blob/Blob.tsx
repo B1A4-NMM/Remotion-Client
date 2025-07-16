@@ -2,9 +2,12 @@ import React, { useRef, useMemo, useState, useEffect, useCallback } from "react"
 import { Mesh, Vector3 } from "three";
 import { useFrame } from "@react-three/fiber";
 
+
 import vertexShader from "./vertexShader";
-import fragmentShader from "./fragmentShader";
+import fragmentShaderLight from "./fragmentShaderLight";
+import fragmentShaderDark from "./fragmentShaderDark";
 import { baseColors, mapEmotionToColor } from "../../constants/emotionColors";
+import { useTheme } from "../theme-provider";
 
 // 타입 정의
 export type ColorKey = "gray" | "gray1" | "gray2" | "blue" | "green" | "red" | "yellow";
@@ -21,6 +24,11 @@ interface BlobProps {
 const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
   const mesh = useRef<Mesh>(null);
   const [emotions, setEmotions] = useState<Emotion[]>([]);
+  const { theme } = useTheme();
+  
+  const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  const frag= isDark? fragmentShaderDark : fragmentShaderLight;
 
   // 컴포넌트 언마운트 시 리소스 정리
   useEffect(() => {
@@ -225,7 +233,7 @@ const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
       <icosahedronGeometry args={[2.4, 17]} />
       <shaderMaterial
         vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
+        fragmentShader={frag}
         uniforms={uniforms.current}
       />
     </mesh>

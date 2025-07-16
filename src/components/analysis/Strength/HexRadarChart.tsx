@@ -340,7 +340,7 @@ const RadarChart = ({ lastTypeCount, currentTypeCount, onSelectCategory }: Radar
         .attr("text-anchor", "middle")
         .attr("dominant-baseline", "middle")
         .style("font-size", "16px")
-        .style("fill", "#999")
+        .style("fill", "#9b9b9b")
         .text("데이터가 없습니다");
     }
 

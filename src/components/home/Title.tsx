@@ -1,6 +1,7 @@
 import React from "react";
 import HomeBar from "./HomeBar";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../theme-provider";
 interface TitleProps {
   continuousWritingDate: number;
   emotionCountByMonth: number;
@@ -17,18 +18,39 @@ const Title: React.FC<TitleProps> = ({
   setSelectedTab,
 }) => {
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
   return (
     <>
       <div className="w-full ">
         {/* 메인 헤더 */}
         <div className="flex items-center justify-between px-4 py-8 ">
-          <h1 className="text-3xl font-bold text-gray-900 ">하루 기록</h1>
+          <h1 className="text-3xl font-bold text-foreground">하루 기록</h1>
 
           {/* 액션 버튼들 */}
           <div className="flex items-center gap-2">
+            {/* 다크모드 토글 버튼 */}
+            <button
+              className="p-2 rounded-full   text-foreground border border-border hover:bg-secondary focus:ring-2 focus:ring-primary transition-colors box-shadow shadow-xl"
+              aria-label="다크모드 전환"
+              onClick={() => setTheme(isDark ? "light" : "dark")}
+            >
+              {isDark ? (
+                // 라이트모드(태양) 아이콘
+                <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="2" />
+                  <path stroke="currentColor" strokeWidth="2" d="M12 1v2m0 18v2m11-11h-2M3 12H1m16.95 7.07l-1.41-1.41M6.34 6.34L4.93 4.93m12.02 0l-1.41 1.41M6.34 17.66l-1.41 1.41" />
+                </svg>
+              ) : (
+                // 다크모드(달) 아이콘
+                <svg className="w-5 h-5 text-gray-800 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke="currentColor" strokeWidth="2" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" />
+                </svg>
+              )}
+            </button>
             {/* 검색 버튼 */}
             <button
-              className="p-2 rounded-full bg-white transition-colors box-shadow shadow-xl"
+              className="p-2 rounded-full   text-foreground border border-border hover:bg-secondary focus:ring-2 focus:ring-primary transition-colors box-shadow shadow-xl"
               aria-label="검색"
               onClick={() => navigate("/search")}
             >
@@ -49,7 +71,7 @@ const Title: React.FC<TitleProps> = ({
 
             {/* 위치 버튼 */}
             <button
-              className="p-2 rounded-full bg-white transition-colors box-shadow shadow-xl"
+              className="p-2 rounded-full   text-foreground border border-border hover:bg-secondary focus:ring-2 focus:ring-primary transition-colors box-shadow shadow-xl"
               aria-label="위치"
               onClick={() => setSelectedTab("location")}
             >
@@ -76,7 +98,7 @@ const Title: React.FC<TitleProps> = ({
 
             {/* 메뉴 버튼 */}
             <button
-              className="p-2 rounded-full bg-white transition-colors box-shadow shadow-xl"
+              className="p-2 rounded-full   text-foreground border border-border hover:bg-secondary focus:ring-2 focus:ring-primary transition-colors box-shadow shadow-xl"
               aria-label="메뉴"
               onClick={() => setSelectedTab("menu")}
             >

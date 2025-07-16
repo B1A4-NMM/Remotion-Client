@@ -53,7 +53,7 @@ const RecommendHomeCard = () => {
           <line x1="15" y1="5" x2="5" y2="15" stroke="currentColor" strokeLinecap="round" />
         </svg>
       </button>
-      <CardContent className="p-6 flex flex-col items-center justify-center min-h-[130px] bg-[#fdf6ef] rounded-xl ">
+      <CardContent className="p-6 flex flex-col items-center justify-center min-h-[130px]   rounded-xl ">
         {loading ? (
           <div className="flex items-center gap-2 animate-pulse text-gray-400 text-sm">
             <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -76,7 +76,7 @@ const RecommendHomeCard = () => {
             <span className="text-sm text-gray-500 mb-2">
               🕊️ 오늘 하루, 당신의 마음은 어땠나요?
             </span>
-            <span className="text-center text-[16px] text-gray-700 font-normal whitespace-pre-line leading-relaxed tracking-wide">
+            <span className="text-center text-[16px] text-gray-800 font-normal whitespace-pre-line leading-relaxed tracking-wide">
               {recommend?.comment ||
                 "오늘도 고생 많았어요.\n마음 한 켠에 남은 감정을 천천히 꺼내볼까요?"}
             </span>

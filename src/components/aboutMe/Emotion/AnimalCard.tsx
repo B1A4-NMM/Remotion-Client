@@ -137,7 +137,7 @@ const AnimalCard = ({ animalType, script=""} : {animalType:string, script:string
           <h2 className="text-xl font-bold text-center mb-4 text-gray-800 leading-tight">
             {currentAnimal.name}
           </h2>
-          <p className="text-bg text-gray-600 leading-relaxed text-justify">
+          <p className="text-bg text-gray-800 leading-relaxed text-justify">
             {script ? script : currentAnimal.description}
           </p>
         </div>

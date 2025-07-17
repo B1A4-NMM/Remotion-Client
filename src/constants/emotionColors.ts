@@ -3,16 +3,17 @@
 export type ColorKey = "gray" | "gray1" | "gray2" | "blue" | "green" | "red" | "yellow";
 
 export const baseColors: Record<ColorKey, string> = {
-  green: "#23db91",
-  red: "#fc1111",
-  yellow: "#f2e52a",
-  blue: "#1c90d8",
-  gray: "#E1E1E1",
-  gray1: "#E1E1E1",
-  gray2: "#E1E1E1",
+  green: "#31f301",
+  red: "#fc0707",
+  yellow: "#fdd301",
+  blue: "#116ffc",
+  gray: "#707070",
+  gray1: "#707070",
+  gray2: "#707070",
 } as const;
 
 export const mapEmotionToColor = (emotion: string): ColorKey => {
+  
   const highEnergyPleasant = new Set([
     "행복",
     "기쁨",
@@ -85,5 +86,5 @@ export const mapEmotionToColor = (emotion: string): ColorKey => {
   if (highEnergyUnpleasant.has(emotion)) return "red";
   if (lowEnergyUnpleasant.has(emotion)) return "blue";
   if (lowEnergyPleasant.has(emotion)) return "green";
-  return "gray1";
+  return "gray";
 };

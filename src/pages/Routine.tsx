@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { usePostRoutineByType } from "@/api/queries/routine/usePostRoutineByType";
+import { useGetRoutineByType } from "@/api/queries/routine/useGetRoutineByType";
 
 import Title from "@/components/recommend/Title";
 import FolderCardList from "@/components/routine/FolderCardList";
@@ -17,7 +19,9 @@ export interface RoutineItem {
 }
 
 const Routine = () => {
+
   const queryClient = useQueryClient();
+  const postRoutineMutation = usePostRoutineByType();
 
   const [triggeredRoutines, setTriggeredRoutines] = useState<RoutineItem[]>([]);
   const [selectedEmotion, setSelectedEmotion] = useState<RoutineItem["routineType"] | null>(null);
@@ -28,6 +32,7 @@ const Routine = () => {
   const [allRoutines, setAllRoutines] = useState<RoutineItem[]>([]);
   const [emotionRoutines, setEmotionRoutines] = useState<RoutineItem[]>([]);
 
+  const [fetchedRoutines, setFetchedRoutines ] = useState<RoutineItem[]>([]);
   // // ✅ ✅ ✅ 이 부분 추가해봐! (Routine 컴포넌트 안에서만)
   // useEffect(() => {
   //   setTimeout(() => {
@@ -66,65 +71,91 @@ const Routine = () => {
     setAllRoutines(prev => prev.filter(r => r.id !== id));
   };
 
-  // const handleFolderClick = async (emotionTitle: string) => {
-  //   const emotionKey = emotionTitle as RoutineItem["routineType"];
-
-  //   console.log("🔥 Folder 클릭됨", emotionKey);
-
-  //   // 상태를 한 번에 설정하여 동기화 문제 방지
-  //   setSelectedEmotion(emotionKey);
-  //   setShowRecommendation(true);
-
-  //   console.log("🔥 모달 상태 설정 완료:", { emotionKey });
-
-  //   // API 호출 (백그라운드)
-  //   try {
-  //     const data = await getRoutineByType(emotionKey);
-
-  //     if (data && data.length > 0) {
-  //       const mappedRoutines = data.map((item: any) => ({
-  //         id: item.routineId,
-  //         title: item.content,
-  //         routineType: item.routineType,
-  //       }));
-
-  //       console.log("🔍 매핑된 루틴 데이터:", mappedRoutines);
-
-  //       setTriggeredRoutines(prev => {
-  //         const existingIds = prev.map(r => r.id);
-  //         const newRoutines = mappedRoutines.filter(r => !existingIds.includes(r.id));
-  //         return [...prev, ...newRoutines];
-  //       });
-  //     }
-  //   } catch (err) {
-  //     console.error("루틴 불러오기 실패:", err);
-  //   }
-  // };
-
-    // Routine.tsx 내
-  const handleFolderClick = (emotionTitle: string) => {
-  const emotionKey = emotionTitle as RoutineItem["routineType"];
-  console.log("🔥 폴더 클릭됨 (테스트)", emotionKey);
-
-  setSelectedEmotion(null);
-  setShowRecommendation(false);
   
-  // setSelectedEmotion(emotionKey);
-  // setShowRecommendation(true); // 무조건 추천루틴 모달 뜨게 고정
+//   // 강제 바텀시트 모달 하드코딩 
+//   const handleFolderClick = (emotionTitle: string) => {
+//   const emotionKey = emotionTitle as RoutineItem["routineType"];
+//   console.log("🔥 폴더 클릭됨 (테스트)", emotionKey);
 
-   // 2단계: 약간의 딜레이 후 다시 설정
-   setTimeout(() => {
-    setSelectedEmotion(emotionKey);
-    setShowRecommendation(true); // 무조건 추천 뜨게
-  }, 0); // 또는 10~50ms
-};
+//   setSelectedEmotion(null);
+//   setSelectedFilter(null);
+//   setShowRecommendation(false);
+  
+//   // setSelectedEmotion(emotionKey);
+//   // setShowRecommendation(true); // 무조건 추천루틴 모달 뜨게 고정
+
+//    // 2단계: 약간의 딜레이 후 다시 설정
+//    setTimeout(() => {
+//     setSelectedEmotion(emotionKey);
+//     setSelectedFilter(emotionKey);
+//     setShowRecommendation(true); // 무조건 추천 뜨게
+//   }, 0); // 또는 10~50ms
+// };
+  
+  
+  const handleFolderClick =async(emotionTitle : string) => {
+    const emotionKey =emotionTitle as RoutineItem["routineType"];
+    console.log("폴더 클릭됨",emotionKey);
+
+    // 상태 초기화
+    setSelectedEmotion(null);
+    setSelectedFilter(null);
+    setShowRecommendation(false);
+     
+    // Step 1: 먼저 상태 초기화 반영 시간을 줌
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    try {
+      // Step 2: GET 요청
+      const { data } = await useGetRoutineByType(emotionKey).refetch();
+      console.log("서버 응답:", data);
+  
+      if (data && data.length > 0) {
+        // 루틴 데이터가 있으면 매핑하여 추가
+        const mappedRoutines = data.map((item: any) => ({
+          id: item.routineId,
+          title: item.content,
+          routineType: item.routineType,
+        }));
+  
+        setTriggeredRoutines(prev => {
+          const existingIds = prev.map(r => r.id);
+          const newRoutines = mappedRoutines.filter(r => !existingIds.includes(r.id));
+          return [...prev, ...newRoutines];
+        });
+  
+        // 상태 반영
+        setSelectedEmotion(emotionKey);
+        setSelectedFilter(emotionKey);
+      } else {
+        // 루틴이 없다면 추천 루틴 모달 띄우기
+        console.log("추천 루틴 모달 열기");
+        setSelectedEmotion(emotionKey);
+        setSelectedFilter(emotionKey);
+        setShowRecommendation(true);
+      }
+    } catch (err) {
+      console.error("루틴 요청 실패", err);
+      setSelectedEmotion(emotionKey);
+      setSelectedFilter(emotionKey);
+      setShowRecommendation(true); // 예외 상황에서도 추천 열기
+    } 
+  };
 
   //추천 루틴 추가
-  const handleRecommendedAdd = (title: string) => {
+  const handleRecommendedAdd = (content: string) => {
     if (!selectedEmotion) return;
+
+    // 1. 서버에 POST
+    postRoutineMutation.mutate({
+      type: selectedEmotion,
+      content, // string말고 content
+    });
+
+    // 2.프론트 임시 루틴에도 추가
     const newRoutine: RoutineItem = {
       id: Date.now(),
-      title,
+      title: content,
       routineType: selectedEmotion,
     };
     setAllRoutines(prev => [...prev, newRoutine]);
@@ -199,7 +230,7 @@ const Routine = () => {
         );
       })()}
 
-<BottomPopup
+{/* <BottomPopup
   isOpen={!!selectedEmotion}
   onClose={() => {
     setSelectedEmotion(null);
@@ -218,7 +249,29 @@ const Routine = () => {
       }}
     />
   )}
-</BottomPopup>
+</BottomPopup> */}
+  {selectedEmotion && (
+  <BottomPopup
+    isOpen={true}
+    onClose={() => {
+      setSelectedEmotion(null);
+      setShowRecommendation(false);
+    }}
+    heightOption={{ heightPixel: 700 }}
+  >
+    {showRecommendation && (
+      <RecommendedRoutinePopup
+        emotion={selectedEmotion}
+        onAdd={handleRecommendedAdd}
+        onClose={() => {
+          setSelectedEmotion(null);
+          setShowRecommendation(false);
+        }}
+      />
+    )}
+  </BottomPopup>
+  )}
+
     </div>
   );
 };

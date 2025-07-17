@@ -24,11 +24,11 @@ export const getRoutineByType = async (type: RoutineType): Promise<Routine[]> =>
   return response.data;
 };
 
-export const postRoutineByType = async (type: RoutineType, title: string): Promise<Routine> => {
+export const postRoutineByType = async (type: RoutineType, content: string): Promise<Routine> => {
   const token = localStorage.getItem("accessToken");
   const response = await axios.post(
     `${BASE_URL}/routine/${type}`,
-    { title },
+    { content },
     {
       headers: { Authorization: `Bearer ${token}` },
     }

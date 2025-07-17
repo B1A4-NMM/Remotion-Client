@@ -7,6 +7,7 @@ import DiaryActionModal from "./DiaryActionModal";
 import dayjs from "dayjs";
 import { useDeleteDiary } from "../../api/queries/home/useDeleteDiary";
 import { useNavigate } from "react-router-dom";
+import VirtualizedBlobCard from "../Blob/VirtualizedBlobCard";
 
 interface Diary {
   id: number;
@@ -74,9 +75,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             >
               <div className="flex gap-4 items-center rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] mb-4 py-[14px] px-[20px]">
                 <div className="w-[70px] h-[70px] flex items-center justify-center rounded-full overflow-hidden">
-                  <Canvas className="w-full h-full">
-                    <Blob diaryContent={{ emotions: mappedDiary.emotions }} />
-                  </Canvas>
+                  <VirtualizedBlobCard
+                    key={mappedDiary.id}
+                    diaryContent={{ emotions: mappedDiary.emotions }}
+                    index={index} />
                 </div>
                 <div className="flex-1 min-w-0">
                   {/* 감정 요약 */}
@@ -172,9 +174,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                         : "감정 없음"}
                     </div>
                     <div className="w-full h-full max-w-[120px] max-h-[120px] flex items-center justify-center rounded-full overflow-hidden mx-auto">
-                      <Canvas className="w-full h-full">
-                        <Blob diaryContent={{ emotions: mappedDiary.emotions }} />
-                      </Canvas>
+                      <VirtualizedBlobCard
+                        key={mappedDiary.id}
+                        diaryContent={{ emotions: mappedDiary.emotions }}
+                        index={index} />
                     </div>
                     {/* 대상 요약 (아래) */}
                     <div className="text-xs text-[#85848F] text-center">
@@ -264,9 +267,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                         : "감정 없음"}
                     </div>
                     <div className="w-full h-full max-w-[120px] max-h-[120px] flex items-center justify-center rounded-full overflow-hidden mx-auto">
-                      <Canvas className="w-full h-full">
-                        <Blob diaryContent={{ emotions: mappedDiary.emotions }} />
-                      </Canvas>
+                      <VirtualizedBlobCard
+                        key={mappedDiary.id}
+                        diaryContent={{ emotions: mappedDiary.emotions }}
+                        index={index} />
                     </div>
                     {/* 대상 요약 (아래) */}
                     <div className="text-xs text-[#85848F] text-center">
@@ -350,9 +354,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                         : "감정 없음"}
                     </div>
                     <div className="w-full h-full max-w-[120px] max-h-[120px] flex items-center justify-center rounded-full overflow-hidden mx-auto">
-                      <Canvas className="w-full h-full">
-                        <Blob diaryContent={{ emotions: mappedDiary.emotions }} />
-                      </Canvas>
+                      <VirtualizedBlobCard
+                        key={mappedDiary.id}
+                        diaryContent={{ emotions: mappedDiary.emotions }}
+                        index={index} />
                     </div>
                     {/* 대상 요약 (아래) */}
                     <div className="text-xs text-[#85848F] text-center">
@@ -442,9 +447,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                         : "감정 없음"}
                     </div>
                     <div className="w-full h-full max-w-[120px] max-h-[120px] flex items-center justify-center rounded-full overflow-hidden mx-auto">
-                      <Canvas className="w-full h-full">
-                        <Blob diaryContent={{ emotions: mappedDiary.emotions }} />
-                      </Canvas>
+                      <VirtualizedBlobCard
+                        key={mappedDiary.id}
+                        diaryContent={{ emotions: mappedDiary.emotions }}
+                        index={index} />
                     </div>
                     {/* 대상 요약 (아래) */}
                     <div className="text-xs text-[#85848F] text-center">

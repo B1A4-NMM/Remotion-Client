@@ -14,4 +14,11 @@ export interface BaseRoutine {
   export interface Routine extends BaseRoutine {
     routineType: RoutineType;
   }
+
+  export interface RoutineItem {
+    id: number;
+    content: string;
+    routineType: RoutineType;
+  }
+  
   

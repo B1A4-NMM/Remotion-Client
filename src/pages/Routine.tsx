@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+
 import { usePostRoutineByType } from "@/api/queries/routine/usePostRoutineByType";
 import { useGetRoutineByType } from "@/api/queries/routine/useGetRoutineByType";
 
@@ -9,38 +10,30 @@ import BottomPopup from "@/components/routine/BottomPopup";
 import RoutineModalContent from "@/components/routine/RoutineModalContent";
 import PersonalizedRoutineList from "@/components/routine/PersonalizedRoutineList";
 import RecommendedRoutinePopup from "@/components/routine/RecommendedRoutinePoPup";
-import { getTriggerRoutine, getRoutineByType } from "@/api/services/routine";
-import { RoutineType } from "@/types/routine";
+import { getTriggerRoutine } from "@/api/services/routine";
+import { RoutineItem } from "@/types/routine";
+import { useDeleteRoutineById } from "@/api/queries/routine/useDeleteRoutineById";
 
-export interface RoutineItem {
-  id: number;
-  title: string;
-  routineType: RoutineType;
-}
 
 const Routine = () => {
 
   const queryClient = useQueryClient();
   const postRoutineMutation = usePostRoutineByType();
+  const deleteRoutineMutation =useDeleteRoutineById();
 
   const [triggeredRoutines, setTriggeredRoutines] = useState<RoutineItem[]>([]);
   const [selectedEmotion, setSelectedEmotion] = useState<RoutineItem["routineType"] | null>(null);
+  
+  const [selectedRoutines, setSelectedRoutines] =useState<RoutineItem[]>([]); 
   const [selectedFilter, setSelectedFilter] = useState<RoutineItem["routineType"] | null>(null);
   const [showRecommendation, setShowRecommendation] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-  const [allRoutines, setAllRoutines] = useState<RoutineItem[]>([]);
-  const [emotionRoutines, setEmotionRoutines] = useState<RoutineItem[]>([]);
+  const [setAllRoutines] = useState<RoutineItem[]>([]);
+  
 
-  const [fetchedRoutines, setFetchedRoutines ] = useState<RoutineItem[]>([]);
-  // // ✅ ✅ ✅ 이 부분 추가해봐! (Routine 컴포넌트 안에서만)
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     console.log("🔥 강제 테스트: 우울 루틴 모달 열기");
-  //     setSelectedEmotion("depression");
-  //     setShowRecommendation(true);
-  //   }, 1000);
-  // }, []);
+  const [fetchedRoutines] = useState<RoutineItem[]>([]);
+  
 
   // 서버에서 Trigger 루틴 조회
   useEffect(() => {
@@ -56,20 +49,31 @@ const Routine = () => {
     fetchData();
   }, []);
 
-  // 루틴 추가 핸들러
-  const handleAddRoutine = (title: string) => {
-    if (!selectedFilter) return;
-    const newRoutine: RoutineItem = {
-      id: Date.now(),
-      title,
-      routineType: selectedFilter,
-    };
-    setAllRoutines(prev => [...prev, newRoutine]);
+ 
+
+  const handleAddRoutine = async(content: string) => {
+    if(!selectedEmotion) return;
+
+    try{
+      await postRoutineMutation.mutateAsync({
+        type:selectedEmotion,
+        content:content,
+      });
+      await refetchRoutine();
+      } catch(err){
+        console.error("루틴 추가 실패", err);
+      }
   };
 
-  const handleDeleteRoutine = (id: number) => {
-    setAllRoutines(prev => prev.filter(r => r.id !== id));
-  };
+  const handleDeleteRoutine =async(id: number) => {
+    try{
+          await deleteRoutineMutation.mutateAsync(id);
+          await refetchRoutine();
+        }catch(err){
+          console.error("루틴 삭제 실패",err);
+    }
+  }
+  
 
   
 //   // 강제 바텀시트 모달 하드코딩 
@@ -91,56 +95,58 @@ const Routine = () => {
 //     setShowRecommendation(true); // 무조건 추천 뜨게
 //   }, 0); // 또는 10~50ms
 // };
-  
-  
-  const handleFolderClick =async(emotionTitle : string) => {
-    const emotionKey =emotionTitle as RoutineItem["routineType"];
-    console.log("폴더 클릭됨",emotionKey);
+
+  const {
+    data: fetchedData,
+    refetch: refetchRoutine,
+  } = useGetRoutineByType(selectedEmotion || "depression", { enabled:false });
+   
+
+  //폴더 클릭시 루틴 get
+  const handleFolderClick =async ( emotionTitle : string) => {
+    const emotionKey = emotionTitle as RoutineItem["routineType"];
+    console.log("폴더 클릭됨" , emotionKey);
 
     // 상태 초기화
     setSelectedEmotion(null);
     setSelectedFilter(null);
     setShowRecommendation(false);
-     
-    // Step 1: 먼저 상태 초기화 반영 시간을 줌
-    await new Promise(resolve => setTimeout(resolve, 0));
 
-    try {
-      // Step 2: GET 요청
-      const { data } = await useGetRoutineByType(emotionKey).refetch();
-      console.log("서버 응답:", data);
+
+    //상태 반영 시간 주기
+    await new Promise(resolve => setTimeout(resolve,0));
   
-      if (data && data.length > 0) {
-        // 루틴 데이터가 있으면 매핑하여 추가
-        const mappedRoutines = data.map((item: any) => ({
-          id: item.routineId,
-          title: item.content,
-          routineType: item.routineType,
-        }));
+    //상태 반영 => useEffect에서 fetch 처리 
+    setSelectedEmotion(emotionKey); 
+  }
+
+  useEffect(() => {
+    const fetchRoutine = async () => {
+      if(!selectedEmotion) return;
+
+      try {
+        const result = await refetchRoutine();
+        const newData =result.data;
+
+        console.log("서버 응답:", newData);
   
-        setTriggeredRoutines(prev => {
-          const existingIds = prev.map(r => r.id);
-          const newRoutines = mappedRoutines.filter(r => !existingIds.includes(r.id));
-          return [...prev, ...newRoutines];
-        });
-  
-        // 상태 반영
-        setSelectedEmotion(emotionKey);
-        setSelectedFilter(emotionKey);
-      } else {
-        // 루틴이 없다면 추천 루틴 모달 띄우기
-        console.log("추천 루틴 모달 열기");
-        setSelectedEmotion(emotionKey);
-        setSelectedFilter(emotionKey);
+        if (newData && newData.length > 0) {
+          setSelectedRoutines(newData);
+          setShowRecommendation(false);
+        }else{
+          setSelectedRoutines([]);
+          setShowRecommendation(true);
+        }
+      }catch(err) {
+        console.error("루틴 요청 실패", err);
+        setSelectedRoutines([]);
         setShowRecommendation(true);
-      }
-    } catch (err) {
-      console.error("루틴 요청 실패", err);
-      setSelectedEmotion(emotionKey);
-      setSelectedFilter(emotionKey);
-      setShowRecommendation(true); // 예외 상황에서도 추천 열기
-    } 
-  };
+      }  
+    };
+    fetchRoutine();
+  }, [selectedEmotion]);
+  
+  
 
   //추천 루틴 추가
   const handleRecommendedAdd = (content: string) => {
@@ -152,14 +158,7 @@ const Routine = () => {
       content, // string말고 content
     });
 
-    // 2.프론트 임시 루틴에도 추가
-    const newRoutine: RoutineItem = {
-      id: Date.now(),
-      title: content,
-      routineType: selectedEmotion,
-    };
-    setAllRoutines(prev => [...prev, newRoutine]);
-    setShowRecommendation(false);
+    
   };
 
   return (
@@ -211,8 +210,8 @@ const Routine = () => {
         // 표시용 데이터로 변환 (원본 데이터도 처리)
         const displayRoutines = filteredRoutines.map(r => ({
           id: r.id || (r as any).routineId,
-          title: r.title || (r as any).content,
-          onAdd: () => handleAddRoutine(r.title || (r as any).content),
+          content: r.content || (r as any).content,
+          onAdd: () => handleAddRoutine(r.content || (r as any).content),
         }));
 
         console.log("🔍 전체 루틴:", triggeredRoutines);
@@ -252,14 +251,14 @@ const Routine = () => {
 </BottomPopup> */}
   {selectedEmotion && (
   <BottomPopup
-    isOpen={true}
+    isOpen={!!selectedEmotion}
     onClose={() => {
       setSelectedEmotion(null);
       setShowRecommendation(false);
     }}
     heightOption={{ heightPixel: 700 }}
   >
-    {showRecommendation && (
+    {showRecommendation ? (
       <RecommendedRoutinePopup
         emotion={selectedEmotion}
         onAdd={handleRecommendedAdd}
@@ -268,7 +267,18 @@ const Routine = () => {
           setShowRecommendation(false);
         }}
       />
-    )}
+    ) : fetchedData &&  fetchedData.length > 0 ? (
+      <RoutineModalContent
+        emotion={selectedEmotion}
+        routines={selectedRoutines}
+        onAdd={handleAddRoutine}
+        onDelete={handleDeleteRoutine}
+        onClose={() => {
+          setSelectedEmotion(null);
+          setShowRecommendation(false);
+        }}
+      />
+    ) : null}
   </BottomPopup>
   )}
 

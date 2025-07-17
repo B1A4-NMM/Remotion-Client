@@ -35,3 +35,10 @@ export const postRoutineByType = async (type: RoutineType, content: string): Pro
   );
   return response.data;
 };
+
+export const deleteRoutineById =async (id :number): Promise<void> => {
+  const token = localStorage.getItem("accessToken");
+  await axios.delete(`${BASE_URL}/routine/${id}`,{
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}

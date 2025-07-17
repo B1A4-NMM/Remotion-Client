@@ -10,9 +10,10 @@ import BottomPopup from "@/components/routine/BottomPopup";
 import RoutineModalContent from "@/components/routine/RoutineModalContent";
 import PersonalizedRoutineList from "@/components/routine/PersonalizedRoutineList";
 import RecommendedRoutinePopup from "@/components/routine/RecommendedRoutinePoPup";
-import { getTriggerRoutine } from "@/api/services/routine";
+import { getTriggerRoutine,getRoutineByType } from "@/api/services/routine";
 import { RoutineItem } from "@/types/routine";
 import { useDeleteRoutineById } from "@/api/queries/routine/useDeleteRoutineById";
+import { R } from "node_modules/framer-motion/dist/types.d-D0HXPxHm";
 
 
 const Routine = () => {
@@ -50,7 +51,11 @@ const Routine = () => {
   }, []);
 
  
-
+  const {
+    data: fetchedData,
+    refetch: refetchRoutine,
+  } = useGetRoutineByType(selectedEmotion || "depression", { enabled: false });
+  
   const handleAddRoutine = async(content: string) => {
     if(!selectedEmotion) return;
 
@@ -73,78 +78,52 @@ const Routine = () => {
           console.error("루틴 삭제 실패",err);
     }
   }
-  
-
-  
-//   // 강제 바텀시트 모달 하드코딩 
-//   const handleFolderClick = (emotionTitle: string) => {
-//   const emotionKey = emotionTitle as RoutineItem["routineType"];
-//   console.log("🔥 폴더 클릭됨 (테스트)", emotionKey);
-
-//   setSelectedEmotion(null);
-//   setSelectedFilter(null);
-//   setShowRecommendation(false);
-  
-//   // setSelectedEmotion(emotionKey);
-//   // setShowRecommendation(true); // 무조건 추천루틴 모달 뜨게 고정
-
-//    // 2단계: 약간의 딜레이 후 다시 설정
-//    setTimeout(() => {
-//     setSelectedEmotion(emotionKey);
-//     setSelectedFilter(emotionKey);
-//     setShowRecommendation(true); // 무조건 추천 뜨게
-//   }, 0); // 또는 10~50ms
-// };
-
-  const {
-    data: fetchedData,
-    refetch: refetchRoutine,
-  } = useGetRoutineByType(selectedEmotion || "depression", { enabled:false });
-   
-
-  //폴더 클릭시 루틴 get
-  const handleFolderClick =async ( emotionTitle : string) => {
-    const emotionKey = emotionTitle as RoutineItem["routineType"];
-    console.log("폴더 클릭됨" , emotionKey);
-
-    // 상태 초기화
-    setSelectedEmotion(null);
-    setSelectedFilter(null);
-    setShowRecommendation(false);
 
 
-    //상태 반영 시간 주기
-    await new Promise(resolve => setTimeout(resolve,0));
-  
-    //상태 반영 => useEffect에서 fetch 처리 
-    setSelectedEmotion(emotionKey); 
+  const handleFolderClick = async (emotionTitle: string) => {
+  const emotionKey = emotionTitle as RoutineItem["routineType"];
+  console.log("🔥 폴더 클릭됨", emotionKey);
+
+  // 초기화
+  setIsPopupOpen(false);
+  setSelectedEmotion(null);
+  setSelectedRoutines([]);
+  setShowRecommendation(false);
+
+  try {
+    const routines = await getRoutineByType(emotionKey);
+
+    const normalized: RoutineItem[] = routines.map((item: any) => ({
+      id: item.routineId,
+      content: item.content,
+      routineType:item.routineType
+    }))
+
+    setSelectedEmotion(emotionKey);
+
+    if (routines && routines.length > 0) {
+      setSelectedRoutines(normalized);
+      setShowRecommendation(false);
+    } else {
+      setShowRecommendation(true);
+    }
+
+    setIsPopupOpen(true);
+  } catch (err) {
+    console.error("루틴 요청 실패", err);
+    setSelectedEmotion(emotionKey);
+    setSelectedRoutines([]);
+    setShowRecommendation(true);
+    setIsPopupOpen(true);
   }
+};
 
-  useEffect(() => {
-    const fetchRoutine = async () => {
-      if(!selectedEmotion) return;
 
-      try {
-        const result = await refetchRoutine();
-        const newData =result.data;
 
-        console.log("서버 응답:", newData);
-  
-        if (newData && newData.length > 0) {
-          setSelectedRoutines(newData);
-          setShowRecommendation(false);
-        }else{
-          setSelectedRoutines([]);
-          setShowRecommendation(true);
-        }
-      }catch(err) {
-        console.error("루틴 요청 실패", err);
-        setSelectedRoutines([]);
-        setShowRecommendation(true);
-      }  
-    };
-    fetchRoutine();
-  }, [selectedEmotion]);
+
+
+
+
   
   
 
@@ -189,7 +168,7 @@ const Routine = () => {
               {
                 depression: "우울",
                 stress: "스트레스",
-                anxiety: "분노",
+                anxiety: "불안",
               }[type]
             }
           </button>
@@ -229,29 +208,10 @@ const Routine = () => {
         );
       })()}
 
-{/* <BottomPopup
-  isOpen={!!selectedEmotion}
-  onClose={() => {
-    setSelectedEmotion(null);
-    setShowRecommendation(false);
-  }}
-  heightOption={{ heightPixel: 700 }}
->
-  {selectedEmotion && showRecommendation && (
-    <RecommendedRoutinePopup
-      emotion={selectedEmotion}
-      onAdd={handleRecommendedAdd}
-      onClose={() => {
-        setSelectedEmotion(null);
-        setShowRecommendation(false);
-        
-      }}
-    />
-  )}
-</BottomPopup> */}
+
   {selectedEmotion && (
   <BottomPopup
-    isOpen={!!selectedEmotion}
+    isOpen={isPopupOpen}
     onClose={() => {
       setSelectedEmotion(null);
       setShowRecommendation(false);
@@ -267,7 +227,7 @@ const Routine = () => {
           setShowRecommendation(false);
         }}
       />
-    ) : fetchedData &&  fetchedData.length > 0 ? (
+    ) : (
       <RoutineModalContent
         emotion={selectedEmotion}
         routines={selectedRoutines}
@@ -278,7 +238,7 @@ const Routine = () => {
           setShowRecommendation(false);
         }}
       />
-    ) : null}
+    )}
   </BottomPopup>
   )}
 

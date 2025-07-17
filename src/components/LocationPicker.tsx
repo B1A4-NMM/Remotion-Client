@@ -1,13 +1,8 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogClose,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Loader } from "@googlemaps/js-api-loader";
 import { useState, useEffect, useRef } from "react";
-import { X, Check } from "lucide-react";
+import { X, Check, MapPin } from "lucide-react";
 
 interface LocationPickerProps {
   open: boolean;
@@ -20,13 +15,21 @@ interface LocationPreviewProps {
   onEdit?: () => void;
 }
 
+interface LocationOption {
+  id: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+  distance: number;
+}
+
 const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps) => {
   const [mapInitialized, setMapInitialized] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(
+    null
+  );
   const mapRef = useRef<HTMLDivElement>(null);
-  const markerRef = useRef<google.maps.Marker | null>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  
 
   useEffect(() => {
     if (!open) return;
@@ -47,112 +50,85 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
             return;
           }
 
-          // 위치 권한 요청
-          navigator.geolocation.getCurrentPosition(
-            position => {
-              const { latitude, longitude } = position.coords;
-              const map = new window.google.maps.Map(mapRef.current!, {
-                center: { lat: latitude, lng: longitude },
-                zoom: 15,
-                mapTypeControl: false,
-                streetViewControl: false,
-                fullscreenControl: false,
-              });
+          try {
+            // 위치 권한 요청
+            navigator.geolocation.getCurrentPosition(
+              position => {
+                const { latitude, longitude } = position.coords;
+                const currentLocation = { lat: latitude, lng: longitude };
 
-              mapInstanceRef.current = map;
+                const map = new window.google.maps.Map(mapRef.current!, {
+                  center: currentLocation,
+                  zoom: 15,
+                  mapTypeControl: false,
+                  streetViewControl: false,
+                  fullscreenControl: false,
+                });
 
-              // 📍 지도 클릭 시 선택 마커 생성 또는 이동
-              map.addListener("click", (e: google.maps.MapMouseEvent) => {
-                const lat = e.latLng?.lat();
-                const lng = e.latLng?.lng();
+                mapInstanceRef.current = map;
+                setSelectedLocation(currentLocation);
+                setMapInitialized(true);
 
-                if (lat !== undefined && lng !== undefined) {
-                  console.log("📍 클릭한 위치:", { lat, lng });
-                  setSelectedLocation({ lat, lng }); // 위치 선택 상태만 저장 (아직 부모에게 전달하지 않음)
-
-                  const position = { lat, lng };
-
-                  if (markerRef.current) {
-                    markerRef.current.setPosition(position);
-                  } else {
-                    markerRef.current = new window.google.maps.Marker({
-                      position,
-                      map,
-                      icon: {
-                        url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-                        scaledSize: new window.google.maps.Size(40, 40),
-                      },
-                      title: "선택한 위치",
-                      animation: window.google.maps.Animation.DROP,
-                    });
+                // 지도 중심이 바뀔 때마다 중심 좌표를 저장
+                map.addListener("center_changed", () => {
+                  const center = map.getCenter();
+                  if (center) {
+                    setSelectedLocation({ lat: center.lat(), lng: center.lng() });
                   }
+                });
+              },
+              error => {
+                console.warn("위치 정보 가져오기 실패. 기본 위치로 지도 초기화", error);
+                const fallbackLatLng = { lat: 37.5665, lng: 126.978 }; // 서울 시청
 
-                  map.panTo(position);
-                }
-              });
+                const map = new window.google.maps.Map(mapRef.current!, {
+                  center: fallbackLatLng,
+                  zoom: 13,
+                  mapTypeControl: false,
+                  streetViewControl: false,
+                  fullscreenControl: false,
+                });
 
-              setMapInitialized(true);
-            },
-            error => {
-              console.warn("위치 정보 가져오기 실패. 기본 위치로 지도 초기화", error);
-              const fallbackLatLng = { lat: 37.5665, lng: 126.978 };
-              const map = new window.google.maps.Map(mapRef.current!, {
-                center: fallbackLatLng,
-                zoom: 13,
-                mapTypeControl: false,
-                streetViewControl: false,
-                fullscreenControl: false,
-              });
+                mapInstanceRef.current = map;
+                setSelectedLocation(fallbackLatLng);
+                setMapInitialized(true);
 
-              mapInstanceRef.current = map;
-
-              map.addListener("click", (e: google.maps.MapMouseEvent) => {
-                const lat = e.latLng?.lat();
-                const lng = e.latLng?.lng();
-
-                if (lat !== undefined && lng !== undefined) {
-                  console.log("📍 클릭한 위치:", { lat, lng });
-                  setSelectedLocation({ lat, lng });
-
-                  const position = { lat, lng };
-
-                  if (markerRef.current) {
-                    markerRef.current.setPosition(position);
-                  } else {
-                    markerRef.current = new window.google.maps.Marker({
-                      position,
-                      map,
-                      icon: {
-                        url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-                        scaledSize: new window.google.maps.Size(40, 40),
-                      },
-                      title: "선택한 위치",
-                      animation: window.google.maps.Animation.DROP,
-                    });
+                map.addListener("center_changed", () => {
+                  const center = map.getCenter();
+                  if (center) {
+                    setSelectedLocation({ lat: center.lat(), lng: center.lng() });
                   }
-
-                  map.panTo(position);
-                }
-              });
-
-              setMapInitialized(true);
-            }
-          );
+                });
+              }
+            );
+          } catch (error) {
+            console.error("지도 초기화 중 에러 발생:", error);
+          }
         })
         .catch(err => {
           console.error("❌ Google Maps 로딩 실패:", err);
         });
     }, 100);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      // 지도 정리 시 에러 방지
+      try {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current = null;
+        }
+      } catch (error) {
+        console.warn("지도 정리 중 에러:", error);
+      }
+    };
   }, [open, mapInitialized]);
 
   // 확인 버튼 클릭 핸들러
   const handleConfirm = () => {
     if (selectedLocation) {
-      onLocationSelect({ 
-        latitude: selectedLocation.lat, 
-        longitude: selectedLocation.lng 
+      onLocationSelect({
+        latitude: selectedLocation.lat,
+        longitude: selectedLocation.lng,
       });
       handleClose();
     }
@@ -160,14 +136,18 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
 
   // 모달이 닫힐 때 상태 초기화
   const handleClose = () => {
+    try {
+      // 지도 정리 시 에러 방지
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current = null;
+      }
+    } catch (error) {
+      console.warn("지도 정리 중 에러:", error);
+    }
+
     onClose();
     setMapInitialized(false);
     setSelectedLocation(null);
-    if (markerRef.current) {
-      markerRef.current.setMap(null);
-    }
-    markerRef.current = null;
-    mapInstanceRef.current = null;
   };
 
   return (
@@ -179,12 +159,12 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
         }
       }}
     >
-      <DialogContent className="w-full max-w-md h-[70vh] p-0 rounded-t-2xl overflow-hidden">
+      <DialogContent className="w-full max-w-md h-[70vh] p-0 rounded-t-2xl overflow-visible bg-gray-900 dark:bg-white">
         <DialogTitle className="sr-only">위치 선택</DialogTitle>
 
         {/* X 버튼 */}
-        <DialogClose 
-          className="absolute top-2 right-2 z-20 text-white bg-black/50 rounded-full p-1 hover:bg-black/70"
+        <DialogClose
+          className="absolute top-2 right-2 z-50 text-black dark:text-white bg-[#FFFFFF] dark:bg-[#2a1c31] rounded-full p-1  transition-colors"
           onClick={handleClose}
         >
           <X className="w-5 h-5" />
@@ -192,26 +172,26 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
         </DialogClose>
 
         {/* 지도 영역 */}
-        <div ref={mapRef} className="w-full h-full bg-gray-100 relative z-10" id="map-container" />
+        <div className="w-full h-full bg-gray-100 relative" id="map-container" ref={mapRef} />
+        {/* 지도 위에 겹치는 툴팁 */}
+        <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999]">
+          <MapPin className="w-10 h-10 text-[#2a1c31] stroke-[#2a1c31] stroke-2 fill-transparent drop-shadow-lg" />
+        </div>
 
         {/* 하단 컨트롤 영역 */}
-        <div className="absolute bottom-4 left-4 right-4 z-20 space-y-2">
+        <div className="absolute bottom-4 left-4 right-4 z-20 space-y-3">
           {/* 안내 메시지 */}
-          <div className="bg-black/70 text-white text-sm p-2 rounded">
-            {selectedLocation 
-              ? `✅ 위치 선택됨 (${selectedLocation.lat.toFixed(4)}, ${selectedLocation.lng.toFixed(4)})` 
-              : "📍 지도를 클릭하여 위치를 선택하세요"
-            }
+          <div className="bg-black/30 dark:bg-black/70 text-black dark:text-white text-sm p-2 rounded backdrop-blur-sm text-center">
+            지도를 움직여 위치를 선택해보세요
           </div>
-          
+
           {/* 확인 버튼 */}
           {selectedLocation && (
             <Button
               onClick={handleConfirm}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2"
+              className="w-full bg-[#f9f0eb]/80 hover:bg-gray-100 dark:bg-[#2a1c31] dark:hover:bg-[#1a0c21] text-black dark:text-white flex items-center justify-center gap-2 transition-colors"
             >
-              <Check className="w-4 h-4" />
-              확인
+              <Check className="w-4 h-4" />이 위치로 선택
             </Button>
           )}
         </div>
@@ -221,7 +201,7 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
 };
 
 const LocationPreview = ({ location }: LocationPreviewProps) => {
-  const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${location.latitude},${location.longitude}&zoom=15&size=300x200&markers=color:red%7C${location.latitude},${location.longitude}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
+  const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${location.latitude},${location.longitude}&zoom=15&size=300x200&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
 
   return (
     <div className="border rounded-lg overflow-hidden bg-white shadow-sm">
@@ -230,15 +210,18 @@ const LocationPreview = ({ location }: LocationPreviewProps) => {
           src={staticMapUrl}
           alt="선택된 위치"
           className="w-full h-48 object-cover"
-          onError={(e) => {
+          onError={e => {
             console.error("지도 이미지 로딩 실패");
             (e.target as HTMLImageElement).src = "/placeholder-map.png"; // fallback 이미지
           }}
         />
-        
+        {/* 커스텀 툴팁 추가 */}
+        <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+          <MapPin className="w-8 h-8 text-[#2a1c31] stroke-[#2a1c31] stroke-2 fill-transparent drop-shadow-lg" />
+        </div>
       </div>
     </div>
   );
 };
 
-export {LocationPicker, LocationPreview};
+export { LocationPicker, LocationPreview };

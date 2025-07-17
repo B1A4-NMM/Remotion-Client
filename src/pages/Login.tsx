@@ -4,14 +4,47 @@ import google from "./../assets/img/google.svg";
 import { Canvas } from "@react-three/fiber";
 import SimpleBlob from "@/components/Blob/Simple/SimpleBlob";
 import { demoLogin } from "@/api/services/auth";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+
 const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
-const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI || "http://localhost:5173"
+const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI || "http://localhost:5173";
 
 const SOCIAL_AUTH_URL = {
   kakao: `${BASE_URL}/auth/kakao`,
   google: `${BASE_URL}/auth/google`,
 };
+
 export default function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleDemoLogin = async () => {
+    try {
+      const res = await demoLogin();
+      console.log(res);
+
+      const token = res.accessToken;
+
+      if (token) {
+        // 로그인 성공 시 인증 상태 업데이트
+        login(token, {
+          id: 1, // 데모 사용자 ID
+          email: "demo@example.com",
+          name: "데모 사용자",
+        });
+
+        // 홈 페이지로 리다이렉트
+        navigate("/", { replace: true });
+      } else {
+        alert("토큰을 받아오지 못했습니다.");
+      }
+    } catch (e) {
+      alert("데모 로그인 실패");
+      console.error(e);
+    }
+  };
+
   return (
     <div className="min-h-screen h-full flex flex-col justify-center items-center px-4   text-foreground">
       <h1 className="text-2xl font-bold mb-6 text-foreground text-left">
@@ -29,7 +62,12 @@ export default function Login() {
       {/* 소셜 로그인 버튼 */}
       <div className="flex flex-col gap-3 w-full max-w-xs">
         <Button
-          onClick={() => (window.location.href = SOCIAL_AUTH_URL.kakao+`?state=${REDIRECT_URI}`)}
+          onClick={() => {
+            const kakaoUrl = SOCIAL_AUTH_URL.kakao + `?state=${REDIRECT_URI}`;
+            alert(`카카오 로그인 URL: ${kakaoUrl}`);
+            console.log("카카오 로그인 URL:", kakaoUrl);
+            window.location.href = kakaoUrl;
+          }}
           className="h-[48px] bg-white text-black hover:bg-[#ffe812] rounded-full justify-center items-center gap-3 px-4 py-2"
         >
           <img src={kakao} alt="Kakao Icon" className="w-5 h-5" />
@@ -37,7 +75,7 @@ export default function Login() {
         </Button>
 
         <Button
-          onClick={() => (window.location.href = SOCIAL_AUTH_URL.google+`?state=${REDIRECT_URI}`)}
+          onClick={() => (window.location.href = SOCIAL_AUTH_URL.google + `?state=${REDIRECT_URI}`)}
           className="h-[48px] bg-white text-black hover:bg-gray-200 rounded-full justify-center items-center gap-3 px-4 py-2"
         >
           <img src={google} alt="Google Icon" className="w-5 h-5" />
@@ -45,24 +83,7 @@ export default function Login() {
         </Button>
 
         <Button
-          onClick={async () => {
-            try {
-              const res = await demoLogin();
-              console.log(res);
-              // 응답 구조에 따라 token 추출 (예: res.token)
-              const token = res.accessToken;
-              console.log(token);
-              if (token) {
-                localStorage.setItem("accessToken", token);
-                window.location.href = "/";
-              } else {
-                alert("토큰을 받아오지 못했습니다.");
-                console.log(token);
-              }
-            } catch (e) {
-              alert("데모 로그인 실패");
-            }
-          }}
+          onClick={handleDemoLogin}
           className="h-[48px] bg-white text-black hover:bg-gray-200 rounded-full justify-center items-center gap-3 px-4 py-2"
         >
           <span>하루뒤 둘러보기</span>

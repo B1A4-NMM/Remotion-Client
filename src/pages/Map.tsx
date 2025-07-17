@@ -7,7 +7,7 @@ interface MarkerData {
   imageUrl?: string;
   text?: string;
 }
-import { useGetMapData } from "./../api/map/useGetMapData";
+import { useGetMapData } from "../api/queries/map/useGetMapData";
 
 // API 응답 타입
 interface ApiMarkerData {

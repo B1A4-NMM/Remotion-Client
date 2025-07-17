@@ -1,3 +1,5 @@
+// Light Mode Dew
+
 const fragmentShaderLight = `
 uniform float u_intensity;
 uniform float u_time;

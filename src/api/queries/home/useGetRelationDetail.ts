@@ -1,15 +1,15 @@
 // src/api/queries/relation/useGetRelationDetail.ts
 import { useQuery } from "@tanstack/react-query";
-import { getRelationDetail } from "@/api/services/relationDetail"
-import type { RelationData } from "../types/relation";
+import { getRelationDetail } from "@/api/services/relationDetail";
+import type { DiaryResponse } from "../../types";
 
-export const useGetRelationDetail = (token: string, id: string) => {
-  return useQuery<RelationData>({
-    queryKey: ["relationDetail", id, token],
+export const useGetRelationDetail = (id: string) => {
+  return useQuery<DiaryResponse>({
+    queryKey: ["relationDetail", id],
     queryFn: () => {
-      return getRelationDetail(token, id);
+      return getRelationDetail(id);
     },
-    enabled: !!token && !!id, // token과 id가 있을 때 호출
+    enabled: !!id,
     staleTime: 1000 * 60 * 5,
   });
 };

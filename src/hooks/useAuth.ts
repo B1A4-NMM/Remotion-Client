@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUserStore } from "../store/userStore";
 
 interface User {
   id: number;
@@ -8,77 +9,60 @@ interface User {
 }
 
 export const useAuth = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const navigate = useNavigate();
+  const {
+    user,
+    isAuthenticated,
+    isLoading,
+    token,
+    login,
+    logout,
+    setLoading,
+    setToken,
+    validateToken,
+  } = useUserStore();
 
-  // 토큰 유효성 검사 - 원래 방식대로 단순화
-  const validateToken = async (token: string): Promise<boolean> => {
-    // 토큰이 있으면 유효하다고 간주 (원래 방식)
-    if (token) {
-      // 사용자 정보는 기본값으로 설정
-      setUser({
-        id: 1,
-        email: "user@example.com",
-        name: "사용자",
-      });
-      setIsAuthenticated(true);
-      return true;
-    }
-    return false;
-  };
-
-  // 로그인
-  const login = (token: string, userData: User) => {
-    localStorage.setItem("accessToken", token);
-    setUser(userData);
-    setIsAuthenticated(true);
-  };
-
-  // 로그아웃
-  const logout = () => {
-    localStorage.removeItem("accessToken");
-    setUser(null);
-    setIsAuthenticated(false);
-    navigate("/login");
-  };
-
-  // 초기 인증 상태 확인
+  // 앱 시작 시 토큰 확인 (페이지 로드/새로고침 시 한 번만)
   useEffect(() => {
     const initializeAuth = async () => {
-      const token = localStorage.getItem("accessToken");
+      const storedToken = localStorage.getItem("accessToken");
 
-      if (token) {
-        const isValid = await validateToken(token);
+      if (storedToken) {
+        setToken(storedToken);
+        const isValid = await validateToken(storedToken);
         if (!isValid) {
-          navigate("/login");
+          // 토큰이 유효하지 않으면 이미 logout()이 호출됨
+          return;
         }
       } else {
         // 토큰이 없으면 로그인 페이지로
         if (window.location.pathname !== "/login") {
-          navigate("/login");
+          window.location.href = "/login";
         }
       }
 
-      setIsLoading(false);
+      setLoading(false);
     };
 
     initializeAuth();
-  }, [navigate]);
+  }, [setToken, validateToken, setLoading]);
 
   // 토큰 만료 체크 (5분마다)
   useEffect(() => {
     const checkTokenExpiry = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (token) {
-        await validateToken(token);
+      const storedToken = localStorage.getItem("accessToken");
+      if (storedToken) {
+        await validateToken(storedToken);
       }
     };
 
-    const interval = setInterval(checkTokenExpiry, 5 * 60 * 1000); // 5분
-    return () => clearInterval(interval);
-  }, []);
+    // 페이지 포커스 시에만 체크 (사용자가 탭을 다시 열 때)
+    const handleFocus = () => {
+      checkTokenExpiry();
+    };
+
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [validateToken]);
 
   return {
     user,

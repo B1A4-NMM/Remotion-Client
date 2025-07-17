@@ -6,7 +6,7 @@ export const useGetDiaryDate = (token: string, date: string) => {
   return useQuery({
     queryKey: ["diaryDate", date, token],
     queryFn: () => getDiaryDate(token, date),
-    enabled: !!token && !!date, 
+    enabled: !!token && !!date,
     refetchOnWindowFocus: false,
   });
 };

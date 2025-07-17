@@ -101,23 +101,23 @@ const Routine = () => {
   //   }
   // };
 
-    // Routine.tsx 내
+  // Routine.tsx 내
   const handleFolderClick = (emotionTitle: string) => {
-  const emotionKey = emotionTitle as RoutineItem["routineType"];
-  console.log("🔥 폴더 클릭됨 (테스트)", emotionKey);
+    const emotionKey = emotionTitle as RoutineItem["routineType"];
+    console.log("🔥 폴더 클릭됨 (테스트)", emotionKey);
 
-  setSelectedEmotion(null);
-  setShowRecommendation(false);
-  
-  // setSelectedEmotion(emotionKey);
-  // setShowRecommendation(true); // 무조건 추천루틴 모달 뜨게 고정
+    setSelectedEmotion(null);
+    setShowRecommendation(false);
 
-   // 2단계: 약간의 딜레이 후 다시 설정
-   setTimeout(() => {
-    setSelectedEmotion(emotionKey);
-    setShowRecommendation(true); // 무조건 추천 뜨게
-  }, 0); // 또는 10~50ms
-};
+    // setSelectedEmotion(emotionKey);
+    // setShowRecommendation(true); // 무조건 추천루틴 모달 뜨게 고정
+
+    // 2단계: 약간의 딜레이 후 다시 설정
+    setTimeout(() => {
+      setSelectedEmotion(emotionKey);
+      setShowRecommendation(true); // 무조건 추천 뜨게
+    }, 0); // 또는 10~50ms
+  };
 
   //추천 루틴 추가
   const handleRecommendedAdd = (title: string) => {
@@ -199,26 +199,25 @@ const Routine = () => {
         );
       })()}
 
-<BottomPopup
-  isOpen={!!selectedEmotion}
-  onClose={() => {
-    setSelectedEmotion(null);
-    setShowRecommendation(false);
-  }}
-  heightOption={{ heightPixel: 700 }}
->
-  {selectedEmotion && showRecommendation && (
-    <RecommendedRoutinePopup
-      emotion={selectedEmotion}
-      onAdd={handleRecommendedAdd}
-      onClose={() => {
-        setSelectedEmotion(null);
-        setShowRecommendation(false);
-        
-      }}
-    />
-  )}
-</BottomPopup>
+      <BottomPopup
+        isOpen={!!selectedEmotion}
+        onClose={() => {
+          setSelectedEmotion(null);
+          setShowRecommendation(false);
+        }}
+        heightOption={{ heightPixel: 700 }}
+      >
+        {selectedEmotion && showRecommendation && (
+          <RecommendedRoutinePopup
+            emotion={selectedEmotion}
+            onAdd={handleRecommendedAdd}
+            onClose={() => {
+              setSelectedEmotion(null);
+              setShowRecommendation(false);
+            }}
+          />
+        )}
+      </BottomPopup>
     </div>
   );
 };

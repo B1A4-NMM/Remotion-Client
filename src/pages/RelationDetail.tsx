@@ -10,8 +10,7 @@ import Blob from "@/components/Blob/Blob";
 
 const RelationDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const token = localStorage.getItem("accessToken") || "";
-  const { data, isLoading } = useGetRelationDetail(token, id || "");
+  const { data, isLoading } = useGetRelationDetail(id || "");
   const userName = "사용자";
 
   // 데이터 분석 함수들

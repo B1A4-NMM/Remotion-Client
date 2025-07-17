@@ -1,31 +1,56 @@
-import React, { createContext, useContext, ReactNode } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 interface AuthContextType {
-  user: any;
-  isLoading: boolean;
   isAuthenticated: boolean;
-  login: (token: string, userData: any) => void;
+  login: (token: string) => void;
   logout: () => void;
-  validateToken: (token: string) => Promise<boolean>;
+  token: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const auth = useAuth();
+  const [token, setToken] = useState<string | null>(localStorage.getItem("accessToken"));
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!token);
 
-  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
-};
+  const login = (newToken: string) => {
+    localStorage.setItem("accessToken", newToken);
+    setToken(newToken);
+    setIsAuthenticated(true);
+  };
 
-export const useAuthContext = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuthContext must be used within an AuthProvider");
-  }
-  return context;
+  const logout = () => {
+    localStorage.removeItem("accessToken");
+    setToken(null);
+    setIsAuthenticated(false);
+  };
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("accessToken");
+    if (storedToken) {
+      setToken(storedToken);
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const value = {
+    isAuthenticated,
+    login,
+    logout,
+    token,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

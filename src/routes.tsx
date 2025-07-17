@@ -22,6 +22,8 @@ import Relation from "./pages/Relation";
 import RelationDetail from "./pages/RelationDetail";
 
 import Calendar from "./pages/Calendar";
+import NotFound from "./pages/NotFound";
+import Mypage from "./pages/Mypage";
 
 export const routes = [
   {
@@ -168,5 +170,17 @@ export const routes = [
         <Character />
       </ProtectedRoute>
     ),
+  },
+  {
+    path: "/mypage",
+    element: (
+      <ProtectedRoute>
+        <Mypage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ];

@@ -24,6 +24,5 @@ export const getMentalData = async (
     },
   });
 
-
   return response.data;
 };

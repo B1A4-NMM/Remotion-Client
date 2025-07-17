@@ -1,7 +1,7 @@
 import React, { useRef, useMemo, useState, useEffect, useCallback } from "react";
 import { Mesh, Vector3 } from "three";
 import { useFrame } from "@react-three/fiber";
-
+import WebGLContextPool from "./WebGLContextPool";
 
 import vertexShader from "./vertexShader";
 import fragmentShaderLight from "./fragmentShaderLight";
@@ -10,7 +10,7 @@ import { baseColors, mapEmotionToColor } from "../../constants/emotionColors";
 import { useTheme } from "../theme-provider";
 
 // 타입 정의
-export type ColorKey = "gray" | "gray1" | "gray2" | "blue" | "green" | "red" | "yellow";
+export type ColorKey = "gray" | "gray2" | "blue" | "green" | "red" | "yellow";
 
 interface Emotion {
   color: ColorKey;
@@ -21,56 +21,32 @@ interface BlobProps {
   diaryContent?: any;
 }
 
-const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
+const Blob: React.FC<BlobProps> = ({ diaryContent, id, onContextLost }) => {
   const mesh = useRef<Mesh>(null);
   const [emotions, setEmotions] = useState<Emotion[]>([]);
+  const [isActive, setIsActive] = useState(false);
+  const contextPool = WebGLContextPool.getInstance();
+  
   const { theme } = useTheme();
   
   const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   const frag= isDark? fragmentShaderDark : fragmentShaderLight;
 
-  // 컴포넌트 언마운트 시 리소스 정리
+  // 컴포넌트 마운트 시 컨텍스트 요청
   useEffect(() => {
+    const canRender = contextPool.requestContext(id);
+    setIsActive(canRender);
+    
+    if (!canRender) {
+      onContextLost?.();
+    }
+
     return () => {
-      if (mesh.current) {
-        // Geometry 정리
-        mesh.current.geometry.dispose();
-
-        // Material 정리
-        if (mesh.current.material) {
-          if (Array.isArray(mesh.current.material)) {
-            mesh.current.material.forEach(mat => mat.dispose());
-          } else {
-            mesh.current.material.dispose();
-          }
-        }
-
-        // Uniform 정리
-        if (!Array.isArray(mesh.current.material) && mesh.current.material?.uniforms) {
-          Object.values(mesh.current.material.uniforms).forEach((uniform: any) => {
-            if (uniform.value && typeof uniform.value.dispose === "function") {
-              uniform.value.dispose();
-            }
-          });
-        }
-      }
+      contextPool.releaseContext(id);
     };
-  }, []);
-
-  // diaryContent 변경 시에도 리소스 정리
-  useEffect(() => {
-    return () => {
-      if (mesh.current?.material) {
-        if (Array.isArray(mesh.current.material)) {
-          mesh.current.material.forEach(mat => mat.dispose());
-        } else {
-          mesh.current.material.dispose();
-        }
-      }
-    };
-  }, [diaryContent]);
-
+  }, [id]);
+  
   // 1. 함수들을 useCallback으로 메모이제이션
   const hexToRgb = useCallback((hex: string): [number, number, number] => {
     const r = parseInt(hex.slice(1, 3), 16) / 255;
@@ -81,55 +57,15 @@ const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
 
   const processDiaryContentEmotions = useCallback((content: any): Emotion[] => {
     if (!content) {
-      return [{ color: "gray1" as ColorKey, intensity: 1 }];
+      return [{ color: "gray" as ColorKey, intensity: 1 }];
     }
 
     const allEmotions: { type: string; intensity: number }[] = [];
 
-    // selfEmotion 처리
-    if (content.selfEmotion && Array.isArray(content.selfEmotion)) {
-      content.selfEmotion.forEach((emotion: any) => {
-        if (emotion && emotion.emotionType) {
-          allEmotions.push({
-            type: emotion.emotionType,
-            intensity: emotion.intensity || emotion.emotionIntensity || 5,
-          });
-        }
-      });
-    }
-
-    // stateEmotion 처리
-    if (content.stateEmotion && Array.isArray(content.stateEmotion)) {
-      content.stateEmotion.forEach((emotion: any) => {
-        if (emotion && emotion.emotionType) {
-          allEmotions.push({
-            type: emotion.emotionType,
-            intensity: emotion.intensity || emotion.emotionIntensity || 5,
-          });
-        }
-      });
-    }
-
-    // people 처리
-    if (content.people && Array.isArray(content.people)) {
-      content.people.forEach((person: any) => {
-        if (person.feel && Array.isArray(person.feel)) {
-          person.feel.forEach((emotion: any) => {
-            if (emotion && emotion.emotionType) {
-              allEmotions.push({
-                type: emotion.emotionType,
-                intensity: emotion.intensity || emotion.emotionIntensity || 5,
-              });
-            }
-          });
-        }
-      });
-    }
-
     // emotions 배열 지원 추가
     if (content.emotions && Array.isArray(content.emotions)) {
       content.emotions.forEach((emotion: any) => {
-        if (emotion && emotion.emotion) {
+        if (emotion && emotion.emotion  && emotion.emotion!='무난') {
           allEmotions.push({
             type: emotion.emotion,
             intensity: emotion.intensity || 5,
@@ -138,8 +74,10 @@ const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
       });
     }
 
+
+
     if (allEmotions.length === 0) {
-      return [{ color: "gray1" as ColorKey, intensity: 1 }];
+      return [{ color: "gray" as ColorKey, intensity: 1 }];
     }
 
     const colorMap = new Map<ColorKey, number>();
@@ -148,11 +86,15 @@ const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
       colorMap.set(color, (colorMap.get(color) || 0) + intensity);
     });
 
+
+
     if (colorMap.size > 1) {
-      colorMap.delete("gray1");
+      colorMap.delete("gray");
       colorMap.delete("gray2");
     }
 
+    console.log(colorMap);
+    
     const totalColorIntensity = [...colorMap.values()].reduce((sum, val) => sum + val, 0);
 
     return [...colorMap.entries()]
@@ -166,7 +108,7 @@ const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
   // 2. 색상 계산 수정
   const emotionColors = useMemo(() => {
     if (emotions.length === 0) {
-      const grayRgb = hexToRgb(baseColors.gray1);
+      const grayRgb = hexToRgb(baseColors.gray);
       return {
         color1: grayRgb,
         color2: grayRgb,
@@ -227,6 +169,10 @@ const Blob: React.FC<BlobProps> = ({ diaryContent }) => {
     uniforms.current.u_time.value = t;
     uniforms.current.u_intensity.value = 0.2 + 0.1 * Math.sin(t * 0.4);
   });
+
+  if(!isActive){
+    return null;
+  }
 
   return (
     <mesh ref={mesh} scale={1.0} position={[0, 0, 0]}>

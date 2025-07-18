@@ -4,6 +4,9 @@ import { useUpdateTodo } from "@/api/queries/todo/useUpdateTodo";
 import { useDeleteTodo } from "@/api/queries/todo/useDeleteTodo";
 import { useTodoStore } from "@/store/todoStore";
 import { useState } from "react";
+import BottomPopup from "@/components/routine/BottomPopup";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal, MoreVertical } from "lucide-react";
 
 export default function TodoItem({ todo }) {
   // const toggleTodo = useTodoStore((state) => state.toggleTodo);
@@ -14,6 +17,7 @@ export default function TodoItem({ todo }) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(todo.title);
   const [isComposing, setIsComposing] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const commitEdit = () => {
     const trimmed = value.trim();
@@ -40,6 +44,12 @@ export default function TodoItem({ todo }) {
       setValue(todo.title);
       setEditing(false);
     }
+  };
+
+  const handleDelete = () => {
+    setTodos(prev => prev.filter(t => t.id !== todo.id));
+    deleteTodo(todo.id);
+    setSheetOpen(false);
   };
 
   return (
@@ -82,6 +92,26 @@ export default function TodoItem({ todo }) {
             {todo.title}
           </span>
         )}
+        <button
+          type="button"
+          onClick={() => setSheetOpen(true)}
+          className="ml-auto p-1 text-gray-500 hover:text-gray-700"
+        >
+          <MoreHorizontal className="w-4 h-4" />
+        </button>
+        <BottomPopup
+          isOpen={sheetOpen}
+          onClose={() => setSheetOpen(false)}
+          heightOption={{ wrapChildren: true }}
+        >
+          <div className="flex flex-col gap-3 w-full">
+            <Button onClick={handleDelete} className="w-full">
+              삭제하기
+            </Button>
+            <Button className="w-full">날짜 변경하기</Button>
+            <Button className="w-full">반복 설정하기</Button>
+          </div>
+        </BottomPopup>
     </li>
   );
 }

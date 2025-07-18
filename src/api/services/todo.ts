@@ -16,25 +16,31 @@ export interface ApiTodo {
 
 // ✅ 목록: from/to 유지
 export const getTodos = async (from: string, to: string) => {
-  console.log("📤 getTodos called with:", { from, to });
-
+  if (import.meta.env.DEV) {
+    console.log("📤 getTodos called with:", { from, to });
+  }
   const response = await api.get<{ todos: ApiTodo[] }>("/todos", {
     params: { from, to },
   });
 
-  console.log("📥 getTodos response.data:", response.data);
-
+  if (import.meta.env.DEV) {
+    console.log("📥 getTodos response.data:", response.data);
+  }
   return response.data.todos;
 };
 
 // ✅ 생성
 export const createTodo = async ({ title }: { title: string }) => {
   try {
-    console.log("✨ createTodo called with:", { title });
+    if (import.meta.env.DEV) {
+      console.log("✨ createTodo called with:", { title });
+    }
 
     const response = await api.post<ApiTodo>("/todos", { title });
 
-    console.log("✨ createTodo response.data:", response.data);
+    if (import.meta.env.DEV) {
+      console.log("✨ createTodo response.data:", response.data);
+    }
 
     return response.data;
   } catch (error) {
@@ -46,11 +52,14 @@ export const createTodo = async ({ title }: { title: string }) => {
 // ✅ 수정 (필드 업데이트)
 export const updateTodo = async (id: number, data: Partial<Omit<ApiTodo, "id">>) => {
   try {
-    console.log("🐛 updateTodo called with:", { id, data });
-
+    if (import.meta.env.DEV) {
+      console.log("🐛 updateTodo called with:", { id, data });
+    }
     const response = await api.patch<ApiTodo>(`/todos/${id}`, data);
 
-    console.log("🐛 updateTodo response.data:", response.data);
+    if (import.meta.env.DEV) {
+      console.log("🐛 updateTodo response.data:", response.data);
+    }
 
     return response.data;
   } catch (error) {
@@ -61,10 +70,14 @@ export const updateTodo = async (id: number, data: Partial<Omit<ApiTodo, "id">>)
 
 // ✅ 삭제
 export const deleteTodo = async (id: number) => {
-  console.log("🗑️ deleteTodo called with:", { id });
-
+  if (import.meta.env.DEV) {
+    console.log("🗑️ deleteTodo called with:", { id });
+  }
   const response = await api.delete(`/todos/${id}`);
 
-  console.log("🗑️ deleteTodo response.data:", response.data);
+  if (import.meta.env.DEV) {
+    console.log("🗑️ deleteTodo response.data:", response.data);
+  }
+
   return response.data;
 };

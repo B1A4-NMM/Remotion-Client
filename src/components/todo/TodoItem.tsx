@@ -3,14 +3,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useUpdateTodo } from "@/api/queries/todo/useUpdateTodo";
 import { useDeleteTodo } from "@/api/queries/todo/useDeleteTodo";
 import { useTodoStore } from "@/store/todoStore";
+import type { Todo } from "@/store/todoStore";
 import { useState } from "react";
 import BottomPopup from "@/components/routine/BottomPopup";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, MoreVertical } from "lucide-react";
 
-export default function TodoItem({ todo }) {
-  // const toggleTodo = useTodoStore((state) => state.toggleTodo);
-  // const { mutate } = useToggleTodo();
+interface TodoItemProps {
+  todo: Todo;
+}
+
+export default function TodoItem({ todo }: TodoItemProps) {
   const { mutate: updateTodo } = useUpdateTodo();
   const { mutate: deleteTodo } = useDeleteTodo();
   const setTodos = useTodoStore(state => state.setTodos);

@@ -3,13 +3,13 @@
 export type ColorKey = "gray" | "gray1" | "gray2" | "blue" | "green" | "red" | "yellow";
 
 export const baseColors: Record<ColorKey, string> = {
-  green: "#31f301",
-  red: "#fc0707",
-  yellow: "#fdd301",
-  blue: "#116ffc",
-  gray: "#707070",
-  gray1: "#707070",
-  gray2: "#707070",
+  green: "#72C9A3",
+  red: "#F36B6B",
+  yellow: "#FFD47A",
+  blue: "#7DA7E3",
+  gray: "#DADADA",
+  gray1: "#DADADA",
+  gray2: "#DADADA",
 } as const;
 
 export const mapEmotionToColor = (emotion: string): ColorKey => {

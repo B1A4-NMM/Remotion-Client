@@ -1,9 +1,9 @@
 .buttonContainer {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   width: calc(100% - 20px); /* 화면 너비에 맞게 조정, 좌우 10px 여백 */
-  max-width: 300px; /* 최대 너비 제한으로 overflow 방지 */
+  max-width: 400px; /* 최대 너비 제한으로 overflow 방지 */
   margin: 0 auto; /* 중앙 정렬 */
   border-radius: 9999px;
   background: #ffffff;

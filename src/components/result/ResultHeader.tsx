@@ -22,9 +22,7 @@ const ResultHeader: React.FC<ResultHeaderProps> = ({ writtenDate }) => {
     <div className="sticky mb-8 z-10 top-0 flex justify-center  ">
       <div className="w-full max-w-md mx-4">
         {/* ✅ 메인 헤더 */}
-        <div
-          className="flex items-start justify-between px-4 pt-6 pb-4  "
-        >
+        <div className="flex items-start justify-between px-4 pt-6 pb-4  ">
           {/* 기존 내용 */}
           <div className="flex flex-col">
             <span className="text-sm text-foreground mt-1">

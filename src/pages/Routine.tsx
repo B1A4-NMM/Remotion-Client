@@ -24,7 +24,9 @@ const Routine = () => {
   const [selectedEmotion, setSelectedEmotion] = useState<RoutineItem["routineType"] | null>(null);
 
   const [selectedRoutines, setSelectedRoutines] = useState<RoutineItem[]>([]);
-  const [selectedFilter, setSelectedFilter] = useState<RoutineItem["routineType"]>("depression");
+  const [selectedFilter, setSelectedFilter] = useState<RoutineItem["routineType"] | null>(
+    "depression"
+  );
   const [showRecommendation, setShowRecommendation] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
@@ -174,9 +176,9 @@ const Routine = () => {
           onAdd: () => handleAddRoutine(r.content || (r as any).content),
         }));
 
-        console.log("🔍 전체 루틴:", triggeredRoutines);
-        console.log("🔍 선택된 필터:", selectedFilter);
-        console.log("🔍 필터링된 루틴:", filteredRoutines);
+        // console.log("🔍 전체 루틴:", triggeredRoutines);
+        // console.log("🔍 선택된 필터:", selectedFilter);
+        // console.log("🔍 필터링된 루틴:", filteredRoutines);
 
         return displayRoutines.length === 0 ? (
           <div className="flex items-center justify-center px-7 min-h-[230px]">

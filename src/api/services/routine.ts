@@ -6,7 +6,7 @@ const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
 
 export const getTriggerRoutine = async () => {
   const response = await api.get("/routine/trigger");
-  console.log("trigger", response);
+  // console.log("trigger", response);
   return response.data;
 };
 

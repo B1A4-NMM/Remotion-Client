@@ -78,6 +78,9 @@ const Result: React.FC = () => {
   const view = params.get("view") === "analysis" ? "analysis" : "record";
   const { validateAccess } = useDiaryOwnership();
 
+  const [shouldFade, setShouldFade] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
   const {
     data: diaryContent,
     isLoading,
@@ -131,13 +134,24 @@ const Result: React.FC = () => {
     };
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen text-white">
-        일기 내용 로딩 중...
-      </div>
-    );
-  }
+  useEffect(() => {
+    // 페이드 효과 여부 확인
+    const fadeFlag = sessionStorage.getItem("shouldFadeFromLoading");
+
+    if (fadeFlag === "true") {
+      setShouldFade(true);
+      // 플래그 제거
+      sessionStorage.removeItem("shouldFadeFromLoading");
+
+      // 페이드 인 효과 시작
+      setTimeout(() => {
+        setIsVisible(true);
+      }, 2000);
+    } else {
+      // 페이드 효과 없이 즉시 표시
+      setIsVisible(true);
+    }
+  }, []);
 
   if (isError) {
     return (
@@ -151,6 +165,7 @@ const Result: React.FC = () => {
       </div>
     );
   }
+  console.log(id);
 
   const finalDiaryContent = diaryContent || sampleDiary;
 
@@ -158,7 +173,11 @@ const Result: React.FC = () => {
 
   return (
     <div
-      className={`result-container px-4 h-screen   text-foreground ${isTouchDevice ? "overflow-y-auto scrollbar-hide touch-scroll" : "overflow-y-auto"} ${isScrolling ? "scrolling" : ""}`}
+      className={`result-container px-4 h-screen text-foreground transition-opacity duration-1000 ${
+        shouldFade ? "fade-transition" : ""
+      } ${isTouchDevice ? "overflow-y-auto scrollbar-hide touch-scroll" : "overflow-y-auto"} ${
+        isScrolling ? "scrolling" : ""
+      }`}
       style={{
         WebkitOverflowScrolling: isTouchDevice ? "touch" : "auto",
         scrollBehavior: "smooth",
@@ -179,7 +198,7 @@ const Result: React.FC = () => {
         {view === "record" ? (
           <DiaryView diaryContent={finalDiaryContent} />
         ) : (
-          <ResultView diaryContent={finalDiaryContent} />
+          <ResultView diaryContent={finalDiaryContent} isLoading={isLoading} />
         )}
       </div>
     </div>

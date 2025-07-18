@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Bookmark, BookMarked, X } from "lucide-react";
+import { Bookmark, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
@@ -19,11 +19,9 @@ const ResultHeader: React.FC<ResultHeaderProps> = ({ writtenDate }) => {
   dayjs.locale("ko");
 
   return (
-    <div className="sticky mb-8 z-10 top-0 flex justify-center  ">
-      <div className="w-full max-w-md mx-4">
-        {/* ✅ 메인 헤더 */}
-        <div className="flex items-start justify-between px-4 pt-6 pb-4  ">
-          {/* 기존 내용 */}
+    <div className="sticky mb-8 z-10 top-0 w-full bg-[#F5F5F5]/80 backdrop-blur-md rounded-b-3xl">
+      <div className="w-full">
+        <div className="flex items-start justify-between px-4 pt-6 pb-4 w-full">
           <div className="flex flex-col">
             <span className="text-sm text-foreground mt-1">
               {dayjs(writtenDate).format("YYYY년 M월 D일")}
@@ -33,7 +31,7 @@ const ResultHeader: React.FC<ResultHeaderProps> = ({ writtenDate }) => {
 
           <div className="flex items-center gap-2">
             <button
-              className="p-2 rounded-full   shadow transition-colors"
+              className="p-2 rounded-full shadow transition-colors"
               aria-label="북마크"
               onClick={handleBookmark}
             >
@@ -48,7 +46,7 @@ const ResultHeader: React.FC<ResultHeaderProps> = ({ writtenDate }) => {
 
             <button
               onClick={() => navigate("/")}
-              className="p-2 rounded-full   shadow transition-colors"
+              className="p-2 rounded-full shadow transition-colors"
               aria-label="닫기"
             >
               <X className="w-5 h-5 text-foreground" />

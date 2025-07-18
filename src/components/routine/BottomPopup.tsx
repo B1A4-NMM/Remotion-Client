@@ -17,7 +17,7 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
   const [isInDOM, setIsInDOM] = useState(false);
 
   const bodyOverflowRef = useRef<string>(document.body.style.overflow);
-  const topRef =useRef<string>(document.body.style.top);
+  const topRef = useRef<string>(document.body.style.top);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const { heightPixel: _heightPixel, wrapChildren } = heightOption || {};
@@ -25,7 +25,6 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
     ? Math.max(contentRef.current?.offsetHeight || 0, 400) // 최소 400px 보장
     : _heightPixel || window.innerHeight / 2;
 
-  
   const [springProps, api] = useSpring(() => ({
     height: "0px",
     config: { tension: 300, friction: 30 },
@@ -46,7 +45,6 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
   const handleContentClick = useCallback((e: React.MouseEvent) => e.stopPropagation(), []);
 
   useEffect(() => {
-    
     // console.log("🔄 isOpen 변화 감지:", { isOpen, currentIsInDOM: isInDOM });
 
     if (isOpen) {
@@ -62,7 +60,6 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
       api.start({ height: "0px" });
     }
   }, [isOpen, api]);
-
 
   useEffect(() => {
     // console.log("🎭 애니메이션 제어:" );
@@ -83,13 +80,9 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
     };
   }, []);
 
-
   return isInDOM ? (
     <>
-      <div
-        className="absolute inset-0 bg-black bg-opacity-30 z-40"
-        onClick={handleOverlayClick}
-      />
+      <div className="absolute inset-0 bg-black bg-opacity-30 z-40" onClick={handleOverlayClick} />
       <animated.div
         style={{
           ...springProps,
@@ -98,11 +91,12 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
         className="absolute bottom-0 left-0 w-full z-50 bg-white rounded-t-2xl overflow-y-auto shadow-xl"
         onClick={handleContentClick}
       >
-        <div ref={contentRef} className="p-6">{children}</div>
+        <div ref={contentRef} className="p-6">
+          {children}
+        </div>
       </animated.div>
     </>
   ) : null;
-
 };
 
 export default BottomPopup;

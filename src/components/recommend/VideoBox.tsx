@@ -1,11 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Play } from "lucide-react";
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useGetVideo } from "../../api/queries/action/useGetVideo";
 import type { VideoType } from "../../types/video";
 import { useTheme } from "../theme-provider";
-
 
 const SAMPLE_DATA: VideoType[] = [
   {
@@ -55,8 +54,6 @@ const YouTubeBoard: React.FC<YouTubeBoardProps> = ({}) => {
     theme === "dark" ||
     (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
-  
-
   // ✅ useEffect를 항상 같은 순서로 호출
   useEffect(() => {
     const handleGlobalMouseMove = (e: MouseEvent) => {
@@ -103,7 +100,12 @@ const YouTubeBoard: React.FC<YouTubeBoardProps> = ({}) => {
     if (isLoading) return [];
     if (isError) return SAMPLE_DATA;
     if (data && Array.isArray(data?.videoId) && data?.videoId.length > 0) {
-      return data.videoId;
+      // API 응답을 VideoType 형태로 변환
+      return data.videoId.map(videoId => ({
+        videoId,
+        emotion: "",
+        message: "",
+      }));
     }
     return SAMPLE_DATA;
   };
@@ -207,70 +209,73 @@ const YouTubeBoard: React.FC<YouTubeBoardProps> = ({}) => {
           onTouchStart={handleTouchStart}
         >
           <div className="flex space-x-4 p-4 shadow-xl">
-            {videoList.map(video => (  // ✅ 매개변수 이름을 video로 변경
-              <div
-              key={video.videoId}
-              className={`
+            {videoList.map(
+              (
+                video // ✅ 매개변수 이름을 video로 변경
+              ) => (
+                <div
+                  key={video.videoId}
+                  className={`
                 flex-shrink-0 min-w-[300px]
-                ${isDark ? 'bg-[#FAF6F4]' : 'bg-[#272727]'}
+                ${isDark ? "bg-[#FAF6F4]" : "bg-[#272727]"}
                 rounded-3xl shadow-md overflow-hidden snap-center
               `}
-            >
-                <div className="relative">
-                  <img
-                    src={getThumbnailUrl(video.videoId)}  // ✅ video.videoId 사용
-                    className="w-full h-[169px] object-cover rounded-3xl p-2"
-                    alt={"Video thumbnail"}
-                  />
-                  <div
-                    onClick={() => handleVideoClick(video.videoId)}  // ✅ video.videoId 사용
-                    className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity"
-                  >
-                    <Play className="w-12 h-12 text-white" />
+                >
+                  <div className="relative">
+                    <img
+                      src={getThumbnailUrl(video.videoId)} // ✅ video.videoId 사용
+                      className="w-full h-[169px] object-cover rounded-3xl p-2"
+                      alt={"Video thumbnail"}
+                    />
+                    <div
+                      onClick={() => handleVideoClick(video.videoId)} // ✅ video.videoId 사용
+                      className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity"
+                    >
+                      <Play className="w-12 h-12 text-white" />
+                    </div>
                   </div>
-                </div>
-  
-                <div className="p-2 flex justify-between pl-3 pr-3">
-                  <div className="flex justify-start gap-3">
+
+                  <div className="p-2 flex justify-between pl-3 pr-3">
+                    <div className="flex justify-start gap-3">
+                      <svg
+                        width="26"
+                        height="26"
+                        viewBox="0 0 26 26"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <circle cx="13" cy="13" r="13" fill={isDark ? "#272727" : "#FAF6F4"} />
+                      </svg>
+                    </div>
                     <svg
-                      width="26"
-                      height="26"
-                      viewBox="0 0 26 26"
+                      width="4"
+                      height="14"
+                      viewBox="0 0 4 14"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
                     >
-                      <circle cx="13" cy="13" r="13" fill={isDark ? "#272727" : "#FAF6F4"} />
+                      <path
+                        d="M2.00024 3.5C1.17162 3.5 0.5 2.82876 0.5 2C0.5 1.17173 1.17162 0.5 2.00024 0.5C2.82838 0.5 3.5 1.17173 3.5 2C3.5 2.82876 2.82838 3.5 2.00024 3.5"
+                        fill={isDark ? "black" : "white"}
+                      />
+                      <path
+                        d="M1.99976 8.5C1.17162 8.5 0.5 7.82876 0.5 7C0.5 6.17173 1.17162 5.5 1.99976 5.5C2.82838 5.5 3.5 6.17173 3.5 7C3.5 7.82876 2.82838 8.5 1.99976 8.5"
+                        fill={isDark ? "black" : "white"}
+                      />
+                      <path
+                        d="M1.99976 13.5C1.17162 13.5 0.5 12.8288 0.5 12C0.5 11.1717 1.17162 10.5 1.99976 10.5C2.82838 10.5 3.5 11.1717 3.5 12C3.5 12.8288 2.82838 13.5 1.99976 13.5"
+                        fill={isDark ? "black" : "white"}
+                      />
                     </svg>
                   </div>
-                  <svg
-                    width="4"
-                    height="14"
-                    viewBox="0 0 4 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M2.00024 3.5C1.17162 3.5 0.5 2.82876 0.5 2C0.5 1.17173 1.17162 0.5 2.00024 0.5C2.82838 0.5 3.5 1.17173 3.5 2C3.5 2.82876 2.82838 3.5 2.00024 3.5"
-                      fill={isDark ? "black" : "white"}
-                    />
-                    <path
-                      d="M1.99976 8.5C1.17162 8.5 0.5 7.82876 0.5 7C0.5 6.17173 1.17162 5.5 1.99976 5.5C2.82838 5.5 3.5 6.17173 3.5 7C3.5 7.82876 2.82838 8.5 1.99976 8.5"
-                      fill={isDark ? "black" : "white"}
-                    />
-                    <path
-                      d="M1.99976 13.5C1.17162 13.5 0.5 12.8288 0.5 12C0.5 11.1717 1.17162 10.5 1.99976 10.5C2.82838 10.5 3.5 11.1717 3.5 12C3.5 12.8288 2.82838 13.5 1.99976 13.5"
-                      fill={isDark ? "black" : "white"}
-                    />
-                  </svg>
                 </div>
-              </div>
-            ))}
+              )
+            )}
           </div>
         </motion.div>
       </div>
     );
   }
-  
 };
 
 export default YouTubeBoard;

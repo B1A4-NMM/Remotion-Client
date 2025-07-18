@@ -19,7 +19,6 @@ import RelationDetail from "./pages/RelationDetail";
 import Notifications from "./pages/notifications";
 
 import Calendar from "./pages/Calendar";
-import NotFound from "./pages/NotFound";
 import Mypage from "./pages/Mypage";
 import Negative from "./pages/analysis/Negative";
 import Positive from "./pages/analysis/Positive";
@@ -172,7 +171,11 @@ export const routes = [
   },
   {
     path: "*",
-    element: <NotFound />,
+    element: (
+      <ProtectedRoute>
+        <Home />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/notifications",

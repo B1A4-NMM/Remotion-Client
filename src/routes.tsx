@@ -7,8 +7,6 @@ import Diary from "./pages/Diary";
 import SearchPage from "./pages/SearchPage";
 import Result from "./pages/Result";
 import Loading6 from "./components/Loading/Loading6";
-import Loading7 from "./components/Loading/Loading7";
-import LoadingDiaryAnalysis from "./pages/LoadingDiaryAnalysis";
 
 import Video from "./pages/Video";
 import Routine from "./pages/Routine";
@@ -29,6 +27,8 @@ import Mypage from "./pages/Mypage";
 import Vitality from "./pages/analysis/Vitality";
 import Stable from "./pages/analysis/Stable";
 import RelationBond from "./pages/analysis/RelationBond";
+import Negative from "./pages/analysis/Negative";
+import Positive from "./pages/analysis/Positive";
 
 export const routes = [
   {
@@ -145,7 +145,7 @@ export const routes = [
     ),
   },
   {
-    path: "/analysis/stress",
+    path: "/analysis/스트레스",
     element: (
       <ProtectedRoute>
         <Stress />
@@ -153,7 +153,7 @@ export const routes = [
     ),
   },
   {
-    path: "/analysis/anxiety",
+    path: "/analysis/불안",
     element: (
       <ProtectedRoute>
         <Anxiety />
@@ -161,7 +161,7 @@ export const routes = [
     ),
   },
   {
-    path: "/analysis/depress",
+    path: "/analysis/우울",
     element: (
       <ProtectedRoute>
         <Depress />
@@ -177,7 +177,7 @@ export const routes = [
     ),
   },
   {
-    path: "/analysis/vitality",
+    path: "/analysis/활력",
     element: (
       <ProtectedRoute>
         <Vitality />
@@ -185,7 +185,7 @@ export const routes = [
     ),
   },
   {
-    path: "/analysis/stable",
+    path: "/analysis/안정",
     element: (
       <ProtectedRoute>
         <Stable />
@@ -193,10 +193,26 @@ export const routes = [
     ),
   },
   {
-    path: "/analysis/relationbond",
+    path: "/analysis/유대",
     element: (
       <ProtectedRoute>
         <RelationBond />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/analysis/부정",
+    element: (
+      <ProtectedRoute>
+        <Negative />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/analysis/긍정",
+    element: (
+      <ProtectedRoute>
+        <Positive />
       </ProtectedRoute>
     ),
   },

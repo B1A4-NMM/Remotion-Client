@@ -6,7 +6,7 @@ export const useGetEmotionAnalysis = (token: string) => {
   return useQuery({
     queryKey: ["EmotionAnalysis", token],
     queryFn: () => getEmotionAnalysis(token),
-    enabled: !!token ,
+    enabled: !!token,
     staleTime: 1000 * 60 * 5,
   });
 };

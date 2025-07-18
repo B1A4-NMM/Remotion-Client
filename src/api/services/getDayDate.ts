@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../axios";
 
 /**
  * 특정 일기 ID 기준으로 감정 데이터 조회
@@ -8,18 +8,12 @@ import axios from "axios";
  * @returns 감정 통계 데이터
  */
 export const getDayDate = async (id: string, period: number) => {
-  const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
-  const token = localStorage.getItem("accessToken");
-
   console.log("📊 걍 데이터 요청 중...");
   console.log("📝 id:", id);
   console.log("📅 period:", period);
 
-  const response = await axios.get(`${BASE_URL}/diary/date/emotion/${id}`, {
+  const response = await api.get(`/diary/date/emotion/${id}`, {
     params: { period },
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
     paramsSerializer: params => {
       const usp = new URLSearchParams();
       Object.entries(params).forEach(([key, value]) => {

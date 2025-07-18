@@ -30,6 +30,14 @@ const EmotionalGraph = () => {
   const previousTimestampRef = useRef<number>(0);
   const { data: relationData } = useGetRelation();
 
+  // 데이터 구조 확인을 위한 로그 추가
+  useEffect(() => {
+    if (relationData) {
+      console.log("📊 Relation API 데이터:", relationData);
+      console.log("📋 relations 배열:", relationData?.relations?.relations);
+    }
+  }, [relationData]);
+
   const dpr = window.devicePixelRatio || 1;
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
 
@@ -123,8 +131,33 @@ const EmotionalGraph = () => {
 
     if (clickedNode) {
       const id = clickedNode.diaryId || clickedNode.id;
-      console.log("🟢 클릭된 노드:", { id, label: clickedNode.label });
-      navigate(`/relation/${id}`);
+      console.log("🟢 클릭된 노드:", {
+        id,
+        label: clickedNode.label,
+        diaryId: clickedNode.diaryId,
+        nodeId: clickedNode.id,
+        fullNode: clickedNode,
+      });
+
+      // ID 타입과 값 상세 확인
+      console.log("🔍 ID 상세 정보:", {
+        id: id,
+        type: typeof id,
+        isNumber: typeof id === "number",
+        isString: typeof id === "string",
+        length: typeof id === "string" ? id.length : "N/A",
+        isNaN: typeof id === "string" ? isNaN(Number(id)) : "N/A",
+      });
+
+      // 숫자 ID인지 확인하고 전달
+      if (typeof id === "number" || (typeof id === "string" && !isNaN(Number(id)))) {
+        console.log("✅ 유효한 ID로 네비게이션:", id);
+        navigate(`/relation/${id}`);
+      } else {
+        console.warn("⚠️ 유효하지 않은 ID:", id);
+        // 기본값 사용
+        navigate(`/relation/1`);
+      }
     } else {
       console.log("⚪️ 노드와 일치하는 클릭 없음");
     }

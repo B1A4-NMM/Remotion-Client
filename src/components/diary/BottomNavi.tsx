@@ -1,3 +1,5 @@
+import { useState, useEffect, useRef } from "react";
+
 interface BottomNaviProps {
   onMicClick: () => void;
   onLocationClick: () => void;
@@ -19,9 +21,157 @@ const BottomNavi = ({
   isLocationActive,
   isSaveEnabled, // 저장 버튼 활성화 상태
 }: BottomNaviProps) => {
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const rafRef = useRef<number | null>(null);
+
+  // 부드러운 키보드 높이 업데이트
+  const updateKeyboardHeight = (newHeight: number) => {
+    setIsTransitioning(true);
+
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+    }
+
+    rafRef.current = requestAnimationFrame(() => {
+      setKeyboardHeight(newHeight);
+      setTimeout(() => setIsTransitioning(false), 100);
+    });
+  };
+
+  useEffect(() => {
+    let initialHeight = window.innerHeight;
+    let timeoutId: NodeJS.Timeout;
+
+    // Visual Viewport API를 사용한 키보드 감지 (스무스 처리)
+    const handleViewportChange = () => {
+      if (window.visualViewport) {
+        const viewportHeight = window.visualViewport.height;
+        const windowHeight = window.innerHeight;
+        const newKeyboardHeight = Math.max(0, windowHeight - viewportHeight);
+
+        // 최소 임계값 설정 (작은 변화 무시)
+        const threshold = 10;
+        if (Math.abs(newKeyboardHeight - keyboardHeight) > threshold) {
+          console.log("🎹 키보드 높이 (Visual Viewport):", {
+            newKeyboardHeight,
+            previousHeight: keyboardHeight,
+            viewportHeight,
+            windowHeight,
+            isKeyboardOpen: newKeyboardHeight > 50,
+          });
+
+          updateKeyboardHeight(newKeyboardHeight);
+        }
+      }
+    };
+
+    // 스크롤 이벤트는 디바운싱 처리
+    const handleViewportScroll = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        handleViewportChange();
+      }, 16);
+    };
+
+    // Fallback: window resize + focusin/focusout 이벤트
+    const handleWindowResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        const currentHeight = window.innerHeight;
+        const heightDiff = Math.max(0, initialHeight - currentHeight);
+
+        console.log("🎹 키보드 높이 (Window Resize):", {
+          heightDiff,
+          initialHeight,
+          currentHeight,
+          isKeyboardOpen: heightDiff > 150,
+        });
+
+        setKeyboardHeight(heightDiff > 150 ? heightDiff : 0);
+      }, 16); // 50ms → 16ms (60fps에 맞춤)
+    };
+
+    // Input focus 이벤트로 키보드 감지 (스마트 감지)
+    const handleFocusIn = (event: FocusEvent) => {
+      const target = event.target as HTMLElement;
+      const isTextInput = target.tagName === "INPUT" || target.tagName === "TEXTAREA";
+
+      if (isTextInput) {
+        console.log("🎯 텍스트 입력 포커스 됨:", target.tagName);
+        setIsTransitioning(true);
+
+        // 스테이지별 감지 시도
+        const attemptDetection = (attempt: number) => {
+          if (attempt > 5) return; // 최대 5번 시도
+
+          setTimeout(() => {
+            if (window.visualViewport) {
+              handleViewportChange();
+            } else {
+              handleWindowResize();
+            }
+            attemptDetection(attempt + 1);
+          }, attempt * 100); // 점진적으로 늘어나는 간격
+        };
+
+        attemptDetection(1);
+      }
+    };
+
+    const handleFocusOut = (event: FocusEvent) => {
+      const target = event.target as HTMLElement;
+      const isTextInput = target.tagName === "INPUT" || target.tagName === "TEXTAREA";
+
+      if (isTextInput) {
+        console.log("🎯 텍스트 입력 포커스 해제됨");
+        setTimeout(() => {
+          updateKeyboardHeight(0);
+        }, 150);
+      }
+    };
+
+    // 이벤트 리스너 등록
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", handleViewportChange); // 즉시 처리
+      window.visualViewport.addEventListener("scroll", handleViewportScroll); // 디바운싱 처리
+    }
+
+    window.addEventListener("resize", handleWindowResize);
+    document.addEventListener("focusin", handleFocusIn);
+    document.addEventListener("focusout", handleFocusOut);
+
+    // 정리
+    return () => {
+      clearTimeout(timeoutId);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", handleViewportChange);
+        window.visualViewport.removeEventListener("scroll", handleViewportScroll);
+      }
+      window.removeEventListener("resize", handleWindowResize);
+      document.removeEventListener("focusin", handleFocusIn);
+      document.removeEventListener("focusout", handleFocusOut);
+    };
+  }, []);
   return (
     <div
-      className={`fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[414px] h-[84px] z-50 flex justify-center transition-transform duration-300 ease-in-out`}
+      className={`fixed left-1/2 w-full max-w-[414px] h-[84px] z-50 flex justify-center ${
+        isTransitioning
+          ? "transition-all duration-150 ease-out"
+          : "transition-all duration-75 ease-linear"
+      }`}
+      style={{
+        bottom: `max(${Math.max(0, keyboardHeight)}px, env(keyboard-inset-height, 0px))`, // 키보드 높이에서 50px 빼기
+
+        transform: `translateX(-50%) ${keyboardHeight > 0 ? "translateY(10px)" : ""}`, // -10px → 10px로 변경 (아래로)
+        // 추가 보장: 최소한 화면에 보이도록
+        position: "fixed",
+        zIndex: 9999,
+      }}
+      data-keyboard-height={keyboardHeight}
     >
       {/* ✅ SVG는 절대 그대로 유지 */}
       <svg
@@ -95,7 +245,7 @@ const BottomNavi = ({
       </svg>
 
       {/* ✅ 클릭 영역을 정확한 아이콘 위치에 덧씌우기 */}
-      <div className="absolute inset-0 flex justify-center items-end pr-20 pb-7">
+      <div className="absolute bottom-0 left-0 right-0 flex justify-center items-center pr-20">
         {/* 마이크 아이콘 버튼 */}
         <button
           className="w-[50px] h-[50px] rounded-full transition-all"

@@ -154,13 +154,19 @@ const Home = () => {
       />
       {selectedTab === "menu" && (
         <>
-          <RecommendHomeCard />
-          <DiaryCards
-            diaries={infiniteDiaries}
-            onDeleteDiary={handleDeleteDiary}
-            onToggleBookmark={handleToggleBookmark}
-            lastItemRef={lastDiaryRef}
-          />
+          {homeData?.item?.diaries && homeData.item.diaries.length > 0 ? (
+            <>
+              <RecommendHomeCard />
+              <DiaryCards
+                diaries={infiniteDiaries}
+                onDeleteDiary={handleDeleteDiary}
+                onToggleBookmark={handleToggleBookmark}
+                lastItemRef={lastDiaryRef}
+              />
+            </>
+          ) : (
+            <Index className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+          )}
         </>
       )}
       {selectedTab === "location" && (
@@ -170,7 +176,6 @@ const Home = () => {
           totalDiaryCount={totalDiaryCount}
         />
       )}
-      {/* <Index className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" /> */}
     </div>
   );
 };

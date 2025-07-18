@@ -24,11 +24,7 @@ import RelationDetail from "./pages/RelationDetail";
 import Calendar from "./pages/Calendar";
 import NotFound from "./pages/NotFound";
 import Mypage from "./pages/Mypage";
-import Vitality from "./pages/analysis/Vitality";
-import Stable from "./pages/analysis/Stable";
-import RelationBond from "./pages/analysis/RelationBond";
-import Negative from "./pages/analysis/Negative";
-import Positive from "./pages/analysis/Positive";
+// import Todos from "./pages/Todos";
 
 export const routes = [
   {
@@ -55,6 +51,14 @@ export const routes = [
       </ProtectedRoute>
     ),
   },
+  // {
+  //   path: "/todos",
+  //   element: (
+  //     <ProtectedRoute>
+  //       <Todos />
+  //     </ProtectedRoute>
+  //   ),
+  // },
   {
     path: "/relation",
     element: (

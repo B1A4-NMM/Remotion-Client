@@ -1,14 +1,8 @@
 import EmotionalGraph from "@/pages/Relation";
-import { ChevronRight, ChevronDown } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const RelationGraph = () => {
-    const navigate = useNavigate();
-
-    const handleRelationGraph = () => {
-        navigate("/relation");
-    };
-    
     return (
         <div className="w-full mt-5">
             <div className="rounded-3xl shadow-xl bg-white">
@@ -16,9 +10,9 @@ const RelationGraph = () => {
                     <h1 className="text-lg font-bold text-gray-900">
                         관계 그래프
                     </h1>
-                    <button onClick={handleRelationGraph}>
+                    <Link to="/relation">
                         <ChevronRight className="text-gray-400 cursor-pointer hover:text-gray-600" />
-                    </button>
+                    </Link>
                 </div>
                 <hr className="mr-5 ml-5 mb-2"/>
                 

@@ -5,14 +5,12 @@ import EmotionCards from "@/components/analysis/EmotionCards";
 import RelationGraph from "@/components/analysis/RealationGraph";
 import StrengthGraph from "@/components/analysis/StrengthGraph";
 import Stress from "@/components/analysis/Stress";
-import Title from "@/components/analysis/Title";
 
 
 const Analysis=()=>{
 
     return(
       <div className="pl-3 pr-3   text-foreground min-h-screen">
-        <Title name={"심층 분석"} isBackActive={false}/>
         <StrengthGraph
             userName="user Name"/>
 

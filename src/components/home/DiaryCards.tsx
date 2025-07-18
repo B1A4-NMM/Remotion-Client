@@ -7,7 +7,6 @@ import DiaryActionModal from "./DiaryActionModal";
 import dayjs from "dayjs";
 import { useDeleteDiary } from "../../api/queries/home/useDeleteDiary";
 import { useNavigate } from "react-router-dom";
-import { MapPin } from "lucide-react";
 import VirtualizedBlobCard from "../Blob/VirtualizedBlobCard";
 
 interface Diary {
@@ -79,8 +78,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                   <VirtualizedBlobCard
                     key={mappedDiary.id}
                     diaryContent={{ emotions: mappedDiary.emotions }}
-                    index={index}
-                  />
+                    index={index} />
                 </div>
                 <div className="flex-1 min-w-0">
                   {/* 감정 요약 */}
@@ -179,8 +177,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                       <VirtualizedBlobCard
                         key={mappedDiary.id}
                         diaryContent={{ emotions: mappedDiary.emotions }}
-                        index={index}
-                      />
+                        index={index} />
                     </div>
                     {/* 대상 요약 (아래) */}
                     <div className="text-xs text-[#85848F] text-center">
@@ -198,18 +195,12 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                     className="rounded-lg object-cover w-full h-full"
                     style={{ aspectRatio: "1 / 1" }}
                   />
-                  <div className="relative w-full h-full">
-                    <img
-                      src={`https://maps.googleapis.com/maps/api/staticmap?center=${mappedDiary.map?.lat},${mappedDiary.map?.lng}&zoom=15&size=200x200&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
-                      alt="map-preview"
-                      className="rounded-lg object-cover w-full h-full"
-                      style={{ aspectRatio: "1 / 1" }}
-                    />
-                    {/* 커스텀 툴팁 */}
-                    <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                      <MapPin className="w-6 h-6 text-[#2a1c31] stroke-[#2a1c31] stroke-2 fill-transparent drop-shadow-lg" />
-                    </div>
-                  </div>
+                  <img
+                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${mappedDiary.map?.lat},${mappedDiary.map?.lng}&zoom=15&size=200x200&markers=color:red%7C${mappedDiary.map?.lat},${mappedDiary.map?.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
+                    alt="map-preview"
+                    className="rounded-lg object-cover w-full h-full"
+                    style={{ aspectRatio: "1 / 1" }}
+                  />
                 </div>
               </div>
               {/* 본문/날짜/아이콘 등 기존과 동일하게... */}
@@ -279,8 +270,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                       <VirtualizedBlobCard
                         key={mappedDiary.id}
                         diaryContent={{ emotions: mappedDiary.emotions }}
-                        index={index}
-                      />
+                        index={index} />
                     </div>
                     {/* 대상 요약 (아래) */}
                     <div className="text-xs text-[#85848F] text-center">
@@ -291,17 +281,13 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                   </div>
                 </div>
                 {/* 지도만 */}
-                <div className="col-span-2 h-full flex items-center relative">
+                <div className="col-span-2 h-full flex items-center">
                   <img
-                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${mappedDiary.map?.lat},${mappedDiary.map?.lng}&zoom=15&size=200x200&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
+                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${mappedDiary.map?.lat},${mappedDiary.map?.lng}&zoom=15&size=200x200&markers=color:red%7C${mappedDiary.map?.lat},${mappedDiary.map?.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
                     alt="map-preview"
                     className="rounded-lg object-cover w-full h-full"
                     style={{ aspectRatio: "2 / 1" }}
                   />
-                  {/* 커스텀 툴팁 */}
-                  <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                    <MapPin className="w-6 h-6 text-[#2a1c31] stroke-[#2a1c31] stroke-2 fill-transparent drop-shadow-lg" />
-                  </div>
                 </div>
               </div>
               {/* 본문/날짜/아이콘 등 기존과 동일하게... */}
@@ -371,8 +357,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                       <VirtualizedBlobCard
                         key={mappedDiary.id}
                         diaryContent={{ emotions: mappedDiary.emotions }}
-                        index={index}
-                      />
+                        index={index} />
                     </div>
                     {/* 대상 요약 (아래) */}
                     <div className="text-xs text-[#85848F] text-center">
@@ -465,8 +450,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                       <VirtualizedBlobCard
                         key={mappedDiary.id}
                         diaryContent={{ emotions: mappedDiary.emotions }}
-                        index={index}
-                      />
+                        index={index} />
                     </div>
                     {/* 대상 요약 (아래) */}
                     <div className="text-xs text-[#85848F] text-center">

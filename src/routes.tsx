@@ -7,8 +7,6 @@ import Diary from "./pages/Diary";
 import SearchPage from "./pages/SearchPage";
 import Result from "./pages/Result";
 import Loading6 from "./components/Loading/Loading6";
-import Loading7 from "./components/Loading/Loading7";
-import LoadingDiaryAnalysis from "./pages/LoadingDiaryAnalysis";
 
 import Video from "./pages/Video";
 import Routine from "./pages/Routine";
@@ -16,10 +14,6 @@ import Contents from "./pages/Contents";
 
 import Analysis from "./pages/Analysis";
 import Strength from "./pages/analysis/Strength";
-import Stress from "./pages/analysis/Stress";
-import Anxiety from "./pages/analysis/Anxiety";
-import Depress from "./pages/analysis/Depress";
-import Character from "./pages/analysis/Character";
 import Relation from "./pages/Relation";
 import RelationDetail from "./pages/RelationDetail";
 import Notifications from "./pages/notifications";
@@ -27,6 +21,8 @@ import Notifications from "./pages/notifications";
 import Calendar from "./pages/Calendar";
 import NotFound from "./pages/NotFound";
 import Mypage from "./pages/Mypage";
+import Negative from "./pages/analysis/Negative";
+import Positive from "./pages/analysis/Positive";
 
 export const routes = [
   {
@@ -53,6 +49,14 @@ export const routes = [
       </ProtectedRoute>
     ),
   },
+  // {
+  //   path: "/todos",
+  //   element: (
+  //     <ProtectedRoute>
+  //       <Todos />
+  //     </ProtectedRoute>
+  //   ),
+  // },
   {
     path: "/relation",
     element: (
@@ -143,34 +147,18 @@ export const routes = [
     ),
   },
   {
-    path: "/analysis/stress",
+    path: "/analysis/부정",
     element: (
       <ProtectedRoute>
-        <Stress />
+        <Negative />
       </ProtectedRoute>
     ),
   },
   {
-    path: "/analysis/anxiety",
+    path: "/analysis/긍정",
     element: (
       <ProtectedRoute>
-        <Anxiety />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/analysis/depress",
-    element: (
-      <ProtectedRoute>
-        <Depress />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/analysis/character",
-    element: (
-      <ProtectedRoute>
-        <Character />
+        <Positive />
       </ProtectedRoute>
     ),
   },

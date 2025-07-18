@@ -2,6 +2,8 @@ import { useState } from "react";
 // import { useTodoStore } from "@/store/todoStore";
 import { useCreateTodo } from "@/api/queries/todo/useCreateTodo";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useTheme } from "../theme-provider";
+
 
 /**
  * ✅ 한글 IME(조합형 입력기) 트러블슈팅 요약:
@@ -13,6 +15,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 export default function TodoInputRow() {
     // const addTodo = useTodoStore((state) => state.addTodo);
     const { mutate } = useCreateTodo();
+    const { theme } = useTheme();
+    const isDark =
+        theme === "dark" ||
+        (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
     const [value, setValue] = useState("");
     const [isComposing, setIsComposing] = useState(false);  // ✅ IME 조합 중 상태 관리
 
@@ -28,8 +34,13 @@ export default function TodoInputRow() {
     return (
         <li className="flex items-center gap-3">
             {/* 비어있는 체크박스 자리 */}
-            <Checkbox disabled className="flex-shrink-0 opacity-50 border border-white bg-transparent" />
-
+            <Checkbox
+                disabled
+                className={
+                    `flex-shrink-0 opacity-50 border ${isDark ? 'border-white' : 'border-black'} bg-transparent`
+                }
+            />
+            
             {/* 인라인 input */}
             <input
                 type="text"

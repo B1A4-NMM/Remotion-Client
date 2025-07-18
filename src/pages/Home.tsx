@@ -56,7 +56,7 @@ const Home = () => {
 
   const [selectedDate, setSelectedDate] = useState<Date>(dayjs().toDate());
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [selectedTab, setSelectedTab] = useState<"menu" | "location" | "search">("menu");
+  const [selectedTab, setSelectedTab] = useState<"list" | "map" | "search">("list");
 
   const handleDateSelect = useCallback((date: Date) => {
     const selected = dayjs(date);
@@ -136,6 +136,12 @@ const Home = () => {
   const continuousWritingDate = homeData?.item?.continuousWritingDate ?? 0;
   const diaries = homeData?.item?.diaries?.map(mapApiDiaryToDiaryCard) || [];
 
+  // useEffect(() => {
+  //   if (!homeLoading && diaries.length === 0) {
+  //     setSelectedTab("map");
+  //   }
+  // }, [homeLoading, diaries]);
+
   // 데이터 확인용 console.log
 
   const todayDiary = todayData ? todayData : null;
@@ -149,7 +155,7 @@ const Home = () => {
         selectedTab={selectedTab}
         setSelectedTab={setSelectedTab}
       />
-      {selectedTab === "menu" && (
+      {selectedTab === "list" && (
         <>
           {homeData?.item?.diaries && homeData.item.diaries.length > 0 ? (
             <>
@@ -166,7 +172,7 @@ const Home = () => {
           )}
         </>
       )}
-      {selectedTab === "location" && (
+      {selectedTab === "map" && (
         <Map
           continuousWritingDate={continuousWritingDate}
           emotionCountByMonth={emotionCountByMonth}

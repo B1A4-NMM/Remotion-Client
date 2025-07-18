@@ -173,7 +173,7 @@ const Result: React.FC = () => {
 
   return (
     <div
-      className={`result-container px-4 h-screen text-foreground transition-opacity duration-1000 ${
+      className={`result-container  h-screen text-foreground transition-opacity duration-1000 ${
         shouldFade ? "fade-transition" : ""
       } ${isTouchDevice ? "overflow-y-auto scrollbar-hide touch-scroll" : "overflow-y-auto"} ${
         isScrolling ? "scrolling" : ""

@@ -30,8 +30,6 @@ const Routine = () => {
   const [showRecommendation, setShowRecommendation] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-  const [fetchedRoutines] = useState<RoutineItem[]>([]);
-
   // 서버에서 Trigger 루틴 조회
   useEffect(() => {
     const fetchData = async () => {

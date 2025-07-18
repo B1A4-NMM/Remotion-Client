@@ -1,7 +1,8 @@
 "use client";
 
 import { addDays, startOfWeek, format, addWeeks, subWeeks } from "date-fns";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import clsx from "clsx";
 
 interface WeeklyCalendarProps {
   selectedDate: Date;
@@ -22,6 +23,13 @@ export default function WeeklyCalendar({
 
   const goPrevWeek = () => setCurrentWeekStart(subWeeks(currentWeekStart, 1));
   const goNextWeek = () => setCurrentWeekStart(addWeeks(currentWeekStart, 1));
+
+  useEffect(() => {
+    const weekEnd = addDays(currentWeekStart, 7);
+    if (selectedDate < currentWeekStart || selectedDate >= weekEnd) {
+      setCurrentWeekStart(startOfWeek(selectedDate, { weekStartsOn: 0 }));
+    }
+  }, [selectedDate, currentWeekStart]);
 
   return (
     <div className="flex flex-col px-4">
@@ -55,11 +63,11 @@ export default function WeeklyCalendar({
 
                   {/* 날짜: 오늘은 핑크 배경/흰글씨, 선택된 날짜는 light gray */}
                   <span
-                    className={`
-                      mt-1 px-2 py-1 rounded-full
-                      ${isTodaySelected ? "bg-pink-500 text-white" : ""}
-                      ${!isToday && isSelected ? "bg-gray-200 text-black" : ""}
-                    `}
+                    className={clsx(
+                      "mt-1 px-2 py-1 rounded-full",
+                      isTodaySelected && "bg-pink-500 text-white",
+                      !isToday && isSelected && "bg-gray-200 text-black"
+                    )}
                   >
                     {day.getDate()}
                   </span>

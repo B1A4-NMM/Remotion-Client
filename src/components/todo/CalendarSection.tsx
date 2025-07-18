@@ -4,7 +4,7 @@ import { useState } from "react";
 import WeeklyCalendar from "./WeeklyCalendar";
 import MonthlyCalendar from "./MonthlyCalendar";
 import { addWeeks, subWeeks, addMonths, subMonths } from "date-fns";
-import { useSelectedDate } from "@/store/calendarStore";
+import { useSelectedDate } from "@/hooks/useSelectedDate";
 
 export default function CalendarSection() {
   const [view, setView] = useState<"week" | "month">("week");

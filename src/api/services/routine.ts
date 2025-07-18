@@ -15,8 +15,8 @@ export const getRoutineByType = async (type: RoutineType): Promise<Routine[]> =>
   return response.data;
 };
 
-export const postRoutineByType = async (type: RoutineType, title: string): Promise<Routine> => {
-  const response = await api.post(`/routine/${type}`, { title });
+export const postRoutineByType = async (type: RoutineType, content: string): Promise<Routine> => {
+  const response = await api.post(`/routine/${type}`, { content });
   return response.data;
 };
 

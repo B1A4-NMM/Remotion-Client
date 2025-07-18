@@ -18,7 +18,7 @@ export default function TodoItem({ todo }: TodoItemProps) {
   const { mutate: deleteTodo } = useDeleteTodo();
   const setTodos = useTodoStore(state => state.setTodos);
   const [editing, setEditing] = useState(false);
-  const [value, setValue] = useState(todo.title);
+  const [value, setValue] = useState(todo.content);
   const [isComposing, setIsComposing] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
 
@@ -30,12 +30,12 @@ export default function TodoItem({ todo }: TodoItemProps) {
       return;
     }
 
-    if (trimmed === todo.title) return;
+    if (trimmed === todo.content) return;
 
     setTodos(prev =>
-      prev.map(t => (t.id === todo.id ? { ...t, title: trimmed } : t))
+      prev.map(t => (t.id === todo.id ? { ...t, content: trimmed } : t))
     );
-    updateTodo({ id: todo.id, data: { title: trimmed } });
+    updateTodo({ id: todo.id, data: { content: trimmed } });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -44,7 +44,7 @@ export default function TodoItem({ todo }: TodoItemProps) {
       commitEdit();
     } else if (e.key === "Escape") {
       e.preventDefault();
-      setValue(todo.title);
+      setValue(todo.content);
       setEditing(false);
     }
   };
@@ -57,22 +57,16 @@ export default function TodoItem({ todo }: TodoItemProps) {
 
   return (
     <li className="flex items-center gap-3">
-        {/* ✅ shadcn Checkbox 사용 & isCompleted 상태 연동 */}
+        {/* ✅ isComplete 상태 연동 */}
         <Checkbox
-            checked={todo.isCompleted}
+            checked={todo.isComplete}
             onCheckedChange={(checked) => {
               const complete = Boolean(checked);
               setTodos(prev => prev.map(t =>
-                t.id === todo.id ? { ...t, isCompleted: complete } : t
+                t.id === todo.id ? { ...t, isComplete: complete } : t
               ));
-              updateTodo({ id: todo.id, data: { isCompleted: complete } });
+              updateTodo({ id: todo.id, data: { isComplete: complete } });
             }}
-
-            // className={`flex-shrink-0
-            //     ${todo.isCompleted
-            //       ? "bg-white text-black border-white peer-checked:bg-white peer-checked:text-black"
-            //       : "border border-white bg-transparent text-white hover:border-blue-400 focus:ring-blue-400"
-            // }`}
         />
 
         {/* ✅ 완료 시 텍스트 회색 처리 및 클릭 시 인라인 편집 */}
@@ -89,10 +83,10 @@ export default function TodoItem({ todo }: TodoItemProps) {
           />
         ) : (
           <span
-            className={todo.isCompleted ? "text-gray-400" : ""}
+            className={todo.isComplete ? "text-gray-400" : ""}
             onClick={() => setEditing(true)}
           >
-            {todo.title}
+            {todo.content}
           </span>
         )}
         <button

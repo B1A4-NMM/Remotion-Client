@@ -17,7 +17,7 @@ export const useCreateTodo = () => {
     // Optimistic update: 로컬 스토어에 먼저 추가 → 사용자 UX 좋음
     onMutate: async newTodo => {
       const tempId = Date.now();
-      const optimisticTodo = { ...newTodo, id: tempId, isCompleted: false };
+      const optimisticTodo = { ...newTodo, id: tempId, isComplete: false };
       setTodos(prev => [...prev, optimisticTodo]);
       return { tempId };
     },

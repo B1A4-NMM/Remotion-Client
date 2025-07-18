@@ -2,20 +2,14 @@
 // from과 to 파라미터를 받아 [\"todos\", from, to] 키로 캐싱
 
 import { useQuery } from "@tanstack/react-query";
-import { getTodos } from "@/api/services/todo";
+import { getTodosByDate } from "@/api/services/todo";
 import { useTodoStore } from "@/store/todoStore";
 
-export const useTodos = (from?: string, to?: string) => {
-  const now = new Date();
-  const defaultFrom =
-    from ?? new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
-  const defaultTo =
-    to ?? new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
-
+export const useTodos = (date: string) => {
   return useQuery({
-    queryKey: ["todos", defaultFrom, defaultTo],
-    queryFn: () => getTodos(defaultFrom, defaultTo),
-    onSuccess: (data) => {
+    queryKey: ["todos", date],
+    queryFn: () => getTodosByDate(date),
+    onSuccess: data => {
       const { setTodos } = useTodoStore.getState();
       setTodos(data);
     },

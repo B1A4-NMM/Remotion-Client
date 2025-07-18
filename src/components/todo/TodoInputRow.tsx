@@ -1,6 +1,6 @@
 import { useState } from "react";
-// import { useTodoStore } from "@/store/todoStore";
 import { useCreateTodo } from "@/api/queries/todo/useCreateTodo";
+import { useSelectedDate } from "@/hooks/useSelectedDate";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTheme } from "../theme-provider";
 
@@ -13,8 +13,8 @@ import { useTheme } from "../theme-provider";
  */
 
 export default function TodoInputRow() {
-    // const addTodo = useTodoStore((state) => state.addTodo);
     const { mutate } = useCreateTodo();
+    const { selectedDate } = useSelectedDate();
     const { theme } = useTheme();
     const isDark =
         theme === "dark" ||
@@ -26,7 +26,7 @@ export default function TodoInputRow() {
         // ✅ 조합 중에는 Enter 키를 무시해야 한글 입력이 정상 처리됨
         if (e.key === "Enter" && !isComposing && value.trim()) {
             e.preventDefault();     // ✅ preventDefault()는 <form> 구조에서 Enter 시 submit 방지 역할
-            mutate({ title: value.trim() });
+            mutate({ content: value.trim(), date: selectedDate.toISOString().slice(0, 10) });
             setValue("");           // 인풋 초기화
         }
     };

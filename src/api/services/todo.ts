@@ -4,39 +4,58 @@ import api from "../axios";
 
 export interface ApiTodo {
   id: number;
-  title: string;
-  isCompleted: boolean;
-  date: string | null;
-  isRepeat: boolean;
-  repeatRule: string | null;
-  repeatEndDate: string | null;
-  createdAt: string;
-  updatedAt: string;
+  content: string;
+  isComplete: boolean;
+  date: string;
+  // isRepeat: boolean;
+  // repeatRule: string | null;
+  // repeatEndDate: string | null;
+  // createdAt: string;
+  // updatedAt: string;
 }
 
 // ✅ 목록: from/to 유지
-export const getTodos = async (from: string, to: string) => {
+export const getMonthlyStatus = async (year: string, month: string) => {
   if (import.meta.env.DEV) {
-    console.log("📤 getTodos called with:", { from, to });
+    console.log("📤 getMonthlyStatus called with:", { year, month });
   }
-  const response = await api.get<{ todos: ApiTodo[] }>("/todos", {
-    params: { from, to },
+  const response = await api.get<Array<{
+    date: string;
+    todoTotalCount: number;
+    completedCount: number;
+    isAllCompleted: boolean;
+  }>>("/todos/calendar", {
+    params: { year, month },
   });
 
   if (import.meta.env.DEV) {
-    console.log("📥 getTodos response.data:", response.data);
+    console.log("📥 getMonthlyStatus response.data:", response.data);
   }
-  return response.data.todos;
+  return response.data;
+};
+
+export const getTodosByDate = async (date: string) => {
+  if (import.meta.env.DEV) {
+    console.log("📤 getTodosByDate called with:", { date });
+  }
+  const response = await api.get<ApiTodo[]>("/todos/calendar/date", {
+    params: { date },
+  });
+
+  if (import.meta.env.DEV) {
+    console.log("📥 getTodosByDate response.data:", response.data);
+  }
+  return response.data;
 };
 
 // ✅ 생성
-export const createTodo = async ({ title }: { title: string }) => {
+export const createTodo = async ({ content, date }: { content: string; date: string }) => {
   try {
     if (import.meta.env.DEV) {
-      console.log("✨ createTodo called with:", { title });
+      console.log("✨ createTodo called with:", { content, date });
     }
 
-    const response = await api.post<ApiTodo>("/todos", { title });
+    const response = await api.post<ApiTodo>("/todos/calendar", { content, date });
 
     if (import.meta.env.DEV) {
       console.log("✨ createTodo response.data:", response.data);
@@ -55,7 +74,7 @@ export const updateTodo = async (id: number, data: Partial<Omit<ApiTodo, "id">>)
     if (import.meta.env.DEV) {
       console.log("🐛 updateTodo called with:", { id, data });
     }
-    const response = await api.patch<ApiTodo>(`/todos/${id}`, data);
+    const response = await api.patch<ApiTodo>(`/todos/calendar/${id}`, data);
 
     if (import.meta.env.DEV) {
       console.log("🐛 updateTodo response.data:", response.data);
@@ -73,7 +92,7 @@ export const deleteTodo = async (id: number) => {
   if (import.meta.env.DEV) {
     console.log("🗑️ deleteTodo called with:", { id });
   }
-  const response = await api.delete(`/todos/${id}`);
+  const response = await api.delete(`/todos/calendar/${id}`);
 
   if (import.meta.env.DEV) {
     console.log("🗑️ deleteTodo response.data:", response.data);

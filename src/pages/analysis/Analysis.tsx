@@ -13,7 +13,7 @@ const Analysis = () => {
       <div className="grid grid-cols-3 gap-4 grid-rows-2 mb-8">
         <Stress />
         <Anxiety />
-        <Depress />
+        <Depress />!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         <Vitality />
         <Stable />
         <RelationBond />

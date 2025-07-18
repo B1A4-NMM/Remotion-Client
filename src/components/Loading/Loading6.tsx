@@ -19,11 +19,8 @@ const phrases: string[] = [
   "조금만 기다려 주세요, 마음을 다듬는 중이에요",
 ];
 
-const COLORS = ["#82e79f", "#fcbcba", "#f8e76c", "#70cfe4"]; // green, red, yellow, blue
-// const MAIN_TEXT_COLOR = "#22223B";
-// const MAIN_BG_COLOR = "#FAF6F4";
+const COLORS = ["#82e79f", "#fcbcba", "#f8e76c", "#70cfe4"];
 
-// ✅ 타입 명시
 const shuffleArray = (array: string[]): string[] => {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -33,11 +30,11 @@ const shuffleArray = (array: string[]): string[] => {
 };
 
 const easeInOut = (t: number): number => {
-  const period = 200;
-  return (Math.sin(t / period + 100) + 1) / 2;
+  const period = 500;
+  const amplitude = 3.0;
+  return (Math.sin(t / period + 100) + 1) / 2 * amplitude;
 };
 
-// ✅ 체크 아이콘 타입 정의
 interface CheckRef {
   circle: SVGCircleElement | null;
   check: SVGPolygonElement | null;
@@ -47,38 +44,49 @@ const Loading6: React.FC = () => {
   const phrasesRef = useRef<SVGGElement | null>(null);
   const checksRef = useRef<CheckRef[]>([]);
   const colorMapRef = useRef<string[]>([]);
-  const shuffledPhrases = useRef<string[]>(shuffleArray([...phrases]));
+  // 문구를 2배로 복제하여 자연스러운 무한 반복
+  const doubledPhrases = useRef<string[]>([...shuffleArray([...phrases]), ...shuffleArray([...phrases])]);
 
   useEffect(() => {
-    colorMapRef.current = shuffledPhrases.current.map(() => {
+    colorMapRef.current = doubledPhrases.current.map(() => {
       const randIdx = Math.floor(Math.random() * COLORS.length);
       return COLORS[randIdx];
     });
 
     const upwardGroup = phrasesRef.current;
     let currentY = 0;
-    const verticalSpacing = 70;
-    const startTime = new Date().getTime();
+    const verticalSpacing = 100;
+    const totalHeight = verticalSpacing * (doubledPhrases.current.length - 1);
+    const centerY = 90; // SVG 중앙 기준값 (height 190, y=90~100)
 
     const animate = () => {
       const now = new Date().getTime();
       if (!upwardGroup) return;
 
       upwardGroup.setAttribute("transform", `translate(0 ${currentY})`);
-      currentY -= 1.35 * easeInOut(now);
+      const baseSpeed = 0.15;
+      const easingValue = easeInOut(now);
+      currentY -= baseSpeed * easingValue;
 
+      // 무한 반복: 끝에 도달하면 처음으로 다시 시작
+      if (currentY <= -totalHeight / 2) {
+        currentY = 0;
+      }
+
+      // 체크 애니메이션: 문구가 중앙에 도달할 때만 체크
       checksRef.current.forEach((check, i) => {
-        const boundary = -i * verticalSpacing + verticalSpacing + 50;
-        if (currentY < boundary) {
-          const alpha = Math.max(Math.min(1 - (currentY - boundary + 15) / 30, 1), 0);
-          if (check.circle) check.circle.setAttribute("fill", `rgba(255,255,255,${alpha})`);
-          if (check.check) check.check.setAttribute("fill", `rgba(130,231,159,${alpha})`); // example: fade in green
+        const phraseY = 40 + i * 50 + currentY;
+        // 중앙(90~110) 근처에 오면 체크 fade-in, 아니면 fade-out
+        const distToCenter = Math.abs(phraseY - centerY +40);
+        let alpha = 0;
+        if (distToCenter < 100) {
+          alpha = 1 - distToCenter / 20; // 0~1
         }
+        if (check.circle) check.circle.setAttribute("fill", `rgba(255,255,255,${alpha})`);
+        if (check.check) check.check.setAttribute("fill", `rgba(130,231,159,${alpha})`);
       });
 
-      if (now - startTime < 30000 && currentY > -710) {
-        requestAnimationFrame(animate);
-      }
+      requestAnimationFrame(animate);
     };
 
     animate();
@@ -102,7 +110,7 @@ const Loading6: React.FC = () => {
         style={{
           display: "flex",
           flexDirection: "column",
-          height: 290,
+          height: 190,
           width: 400,
           overflow: "hidden",
         }}
@@ -122,11 +130,11 @@ const Loading6: React.FC = () => {
 
           <g style={{ mask: "url(#mask)" }}>
             <g ref={phrasesRef}>
-              {shuffledPhrases.current.map((phrase, i) => {
-                const y = 40 + i * 70;
+              {doubledPhrases.current.map((phrase, i) => {
+                const y = 40 + i * 50;
                 return (
                   <React.Fragment key={i}>
-                    <text x="50" y={y} fontSize="17" fontFamily="Arial" fill="text-foreground">
+                    <text x="50" y={y} fontSize="12" fontFamily="Arial" fill="text-foreground">
                       {phrase}
                     </text>
                     <g transform={`translate(10 ${y - 20}) scale(.9)`}>

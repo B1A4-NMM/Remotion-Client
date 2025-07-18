@@ -9,15 +9,14 @@ import { baseColors } from "@/constants/emotionColors";
 const LoadingBlob = () => {
     const mesh = useRef<Mesh>(null);
     
-    const [animationProgress, setAnimationProgress] = useState(0);
     const [animationStartTime, setAnimationStartTime] = useState<number | null>(null);
     const [targetColors, setTargetColors] = useState<number[][]>([]);
+    const [currentPhase, setCurrentPhase] = useState<'toColor' | 'toWhite'>('toColor');
     
     // uniforms 생성 (처음에는 완전히 흰색)
     const uniforms = useMemo(() => ({
         u_time: { value: 1.0 },
         u_intensity: { value: 0.4 },
-        // 처음에는 모든 색상을 흰색으로 설정
         u_color1: { value: [1, 1, 1] },
         u_color2: { value: [1, 1, 1] },
         u_color3: { value: [1, 1, 1] },
@@ -26,10 +25,9 @@ const LoadingBlob = () => {
         u_colorIntensity3: { value: 0.0 },
     }), []);
 
-    // 컴포넌트 마운트 시 목표 색상만 설정
-    useEffect(() => {
+    // 랜덤 색상 생성 함수
+    const generateRandomColors = () => {
         const availableColors = [
-            // emotionColors.ts의 색상 값 사용
             [
                 parseInt(baseColors.red.slice(1, 3), 16) / 255,
                 parseInt(baseColors.red.slice(3, 5), 16) / 255,
@@ -53,8 +51,12 @@ const LoadingBlob = () => {
         ];
         const colorCount = Math.floor(Math.random() * 3) + 1;
         const shuffled = [...availableColors].sort(() => Math.random() - 0.5);
-        const selected = shuffled.slice(0, colorCount);
-        setTargetColors(selected);
+        return shuffled.slice(0, colorCount);
+    };
+
+    // 컴포넌트 마운트 시 초기 설정
+    useEffect(() => {
+        setTargetColors(generateRandomColors());
         setAnimationStartTime(Date.now());
     }, []);
 
@@ -66,49 +68,56 @@ const LoadingBlob = () => {
 
         if (animationStartTime) {
             const elapsed = Date.now() - animationStartTime;
-            const animationDuration = 10000;
-            const progress = Math.min(elapsed / animationDuration, 1);
+            const phaseDuration = 4000; // 각 단계별 4초
+            const progress = Math.min(elapsed / phaseDuration, 1);
             
-            setAnimationProgress(progress);
-            
-            
-            // 애니메이션 진행에 따라 색상과 강도 업데이트
-            if (progress > 0) {
-                // 색상을 점진적으로 적용
-                const colorCount = targetColors.length;
-                
-                // 색상 설정 (진행률에 따라 흰색에서 목표 색상으로)
+            // 단계 완료 시 다음 단계로 전환
+            if (progress >= 1) {
+                if (currentPhase === 'toColor') {
+                    setCurrentPhase('toWhite');
+                } else {
+                    setCurrentPhase('toColor');
+                    // 흰색으로 돌아갈 때 새로운 랜덤 색상 선택
+                    setTargetColors(generateRandomColors());
+                }
+                setAnimationStartTime(Date.now());
+                return;
+            }
+
+            const colorCount = targetColors.length;
+            const easedProgress = easeInOut(progress);
+
+            if (currentPhase === 'toColor') {
+                // 흰색에서 색상으로 변화
                 if (colorCount > 0) {
                     const color1 = targetColors[0];
                     uniforms.u_color1.value = [
-                        1 - progress + progress * color1[0],
-                        1 - progress + progress * color1[1],
-                        1 - progress + progress * color1[2]
+                        1 - easedProgress + easedProgress * color1[0],
+                        1 - easedProgress + easedProgress * color1[1],
+                        1 - easedProgress + easedProgress * color1[2]
                     ];
                 }
                 
                 if (colorCount > 1) {
                     const color2 = targetColors[1];
                     uniforms.u_color2.value = [
-                        1 - progress + progress * color2[0],
-                        1 - progress + progress * color2[1],
-                        1 - progress + progress * color2[2]
+                        1 - easedProgress + easedProgress * color2[0],
+                        1 - easedProgress + easedProgress * color2[1],
+                        1 - easedProgress + easedProgress * color2[2]
                     ];
                 }
                 
                 if (colorCount > 2) {
                     const color3 = targetColors[2];
                     uniforms.u_color3.value = [
-                        1 - progress + progress * color3[0],
-                        1 - progress + progress * color3[1],
-                        1 - progress + progress * color3[2]
+                        1 - easedProgress + easedProgress * color3[0],
+                        1 - easedProgress + easedProgress * color3[1],
+                        1 - easedProgress + easedProgress * color3[2]
                     ];
                 }
-                
-                // 강도 설정 (더 강하게)
-                const easedProgress = easeInOut(progress);
-                const baseIntensity = easedProgress * 1.5; // 강도 증가
-                
+
+                // 강도 증가
+                const baseIntensity = easedProgress * 1.5;
                 if (colorCount === 1) {
                     uniforms.u_colorIntensity1.value = baseIntensity;
                 } else if (colorCount === 2) {
@@ -119,7 +128,47 @@ const LoadingBlob = () => {
                     uniforms.u_colorIntensity2.value = baseIntensity * 0.5;
                     uniforms.u_colorIntensity3.value = baseIntensity * 0.5;
                 }
+            } else {
+                // 색상에서 흰색으로 변화
+                if (colorCount > 0) {
+                    const color1 = targetColors[0];
+                    uniforms.u_color1.value = [
+                        color1[0] + easedProgress * (1 - color1[0]),
+                        color1[1] + easedProgress * (1 - color1[1]),
+                        color1[2] + easedProgress * (1 - color1[2])
+                    ];
+                }
                 
+                if (colorCount > 1) {
+                    const color2 = targetColors[1];
+                    uniforms.u_color2.value = [
+                        color2[0] + easedProgress * (1 - color2[0]),
+                        color2[1] + easedProgress * (1 - color2[1]),
+                        color2[2] + easedProgress * (1 - color2[2])
+                    ];
+                }
+                
+                if (colorCount > 2) {
+                    const color3 = targetColors[2];
+                    uniforms.u_color3.value = [
+                        color3[0] + easedProgress * (1 - color3[0]),
+                        color3[1] + easedProgress * (1 - color3[1]),
+                        color3[2] + easedProgress * (1 - color3[2])
+                    ];
+                }
+
+                // 강도 감소
+                const baseIntensity = (1 - easedProgress) * 1.5;
+                if (colorCount === 1) {
+                    uniforms.u_colorIntensity1.value = baseIntensity;
+                } else if (colorCount === 2) {
+                    uniforms.u_colorIntensity1.value = baseIntensity * 0.6;
+                    uniforms.u_colorIntensity2.value = baseIntensity * 0.6;
+                } else if (colorCount === 3) {
+                    uniforms.u_colorIntensity1.value = baseIntensity * 0.5;
+                    uniforms.u_colorIntensity2.value = baseIntensity * 0.5;
+                    uniforms.u_colorIntensity3.value = baseIntensity * 0.5;
+                }
             }
         }
     });

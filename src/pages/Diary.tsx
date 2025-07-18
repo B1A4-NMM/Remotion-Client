@@ -208,6 +208,7 @@ const Diary = () => {
     };
     
     setSubmittedDiary(diaryContent);
+    sessionStorage.setItem('shouldFadeFromLoading', 'true');
 
     const formData = new FormData();
 
@@ -254,7 +255,7 @@ const Diary = () => {
   }
 
   // if (isSubmitting) return <Loading6 key={Date.now()} />;
-  if (isSubmitting)  return <Loading7 key={Date.now()} diary={submittedDiary.content} />;
+  if (isSubmitting)  return <Loading7 key={Date.now()}/>;
 
   return (
     <>

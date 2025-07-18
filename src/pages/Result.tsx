@@ -74,6 +74,9 @@ const Result: React.FC = () => {
   const params = new URLSearchParams(location.search);
   const view = params.get("view") === "analysis" ? "analysis" : "record";
 
+  const [shouldFade, setShouldFade] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
   const {
     data: diaryContent,
     isLoading,
@@ -116,6 +119,26 @@ const Result: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    // 페이드 효과 여부 확인
+    const fadeFlag = sessionStorage.getItem('shouldFadeFromLoading');
+    
+    if (fadeFlag === 'true') {
+      setShouldFade(true);
+      // 플래그 제거
+      sessionStorage.removeItem('shouldFadeFromLoading');
+      
+      // 페이드 인 효과 시작
+      setTimeout(() => {
+        setIsVisible(true);
+      }, 2000);
+    } else {
+      // 페이드 효과 없이 즉시 표시
+      setIsVisible(true);
+    }
+  }, []);
+
+
   if (isError) {
     return (
       <div className="flex justify-center items-center min-h-screen text-white text-center">
@@ -135,7 +158,11 @@ const Result: React.FC = () => {
 
   return (
     <div
-      className={`result-container px-4 h-screen   text-foreground ${isTouchDevice ? "overflow-y-auto scrollbar-hide touch-scroll" : "overflow-y-auto"} ${isScrolling ? "scrolling" : ""}`}
+      className={`result-container px-4 h-screen text-foreground transition-opacity duration-1000 ${
+        shouldFade ? 'fade-transition' : ''
+      } ${isTouchDevice ? "overflow-y-auto scrollbar-hide touch-scroll" : "overflow-y-auto"} ${
+        isScrolling ? "scrolling" : ""
+      }`}
       style={{
         WebkitOverflowScrolling: isTouchDevice ? "touch" : "auto",
         scrollBehavior: "smooth",
@@ -164,3 +191,13 @@ const Result: React.FC = () => {
 };
 
 export default Result;
+
+/* CSS (글로벌 또는 모듈에 추가)
+.animate-fade-in {
+  animation: fade-in 1s ease;
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+*/

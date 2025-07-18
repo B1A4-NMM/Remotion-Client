@@ -137,7 +137,7 @@ const Routine = () => {
         <h1 className="text-xl font-bold">하루뒤가 선별한 루틴</h1>
       </div>
       <div className="flex gap-3 px-7 mt-2 mb-4">
-        {(["depression", "stress", "anxiety"] as RoutineItem["routineType"][]).map(type => (
+        {(["depression", "anxiety", "stress"] as RoutineItem["routineType"][]).map(type => (
           <button
             key={type}
             className={`px-4 py-1 rounded-full border text-sm ${
@@ -148,8 +148,8 @@ const Routine = () => {
             {
               {
                 depression: "우울",
-                stress: "스트레스",
                 anxiety: "불안",
+                stress: "스트레스",
               }[type]
             }
           </button>

@@ -10,6 +10,6 @@ export const getDiaryContent = async (id: string): Promise<DiaryResponse> => {
 
 export const getDiaryContentResult = async (id: string): Promise<DiaryResponse> => {
   const response = await api.get(`/diary/json/${id}`);
-  // console.log(response.data);
+  console.log("임구철 돼지", response.data);
   return response.data;
 };

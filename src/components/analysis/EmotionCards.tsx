@@ -51,7 +51,7 @@ const RelationCard = ({ data }: CardProps) => {
         <div className="p-5">
           <div className="grid grid-cols-3 grid-rows-2 gap-5">
             {processedData.slice(0, 6).map((item, index) => (
-              <div key={index} className="flex items-end gap-3">
+              <div key={`relation-${item.emotion}-${index}`} className="flex items-end gap-3">
                 <div className="grid grid-rows-1 w-15 h-15 ">
                   <span className="text-gl text-gray-700">{item.emotion}</span>
 
@@ -85,7 +85,7 @@ const SelfCard = ({ data }: CardProps) => {
         <div className="p-5">
           <div className="grid grid-cols-3 grid-rows-2 gap-5">
             {processedData.slice(0, 6).map((item, index) => (
-              <div key={index} className="flex items-end gap-3">
+              <div key={`self-${item.emotion}-${index}`} className="flex items-end gap-3">
                 <div className="grid grid-rows-1 w-15 h-15 ">
                   <span className="text-gl text-gray-700">{item.emotion}</span>
 
@@ -119,7 +119,7 @@ const StateCard = ({ data }: CardProps) => {
         <div className="p-5">
           <div className="grid grid-cols-3 grid-rows-2 gap-5">
             {processedData.slice(0, 6).map((item, index) => (
-              <div key={index} className="flex items-end gap-3">
+              <div key={`state-${item.emotion}-${index}`} className="flex items-end gap-3">
                 <div className="grid grid-rows-1 w-15 h-15 ">
                   <span className="text-gl text-gray-700">{item.emotion}</span>
 

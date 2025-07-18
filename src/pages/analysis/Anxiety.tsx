@@ -5,6 +5,7 @@ import PeopleSection from "@/components/aboutMe/Mental/PeopleSection";
 import Stress from "@/components/analysis/Stress";
 import Depress from "@/components/analysis/Depress";
 import Title from "@/components/analysis/Title";
+import EmotionSummaryCard from "@/components/analysis/EmotionSummaryCard";
 
 const Anxiety=()=>{
     const {data}= useMentalData("불안", 365) //최근 
@@ -21,7 +22,8 @@ const Anxiety=()=>{
                     <div className="text-xl font-bold p-3"> 일자별 불안 수치</div>
                     <MentalChart
                         type="불안"
-                        data={data?.date??[]}/>
+                        data={data?.date??[]}
+                        limit={10}/>
 
                 </div>
 
@@ -33,10 +35,10 @@ const Anxiety=()=>{
                 </div>
 
 
-                <div className="text-2xl font-bold pt-10">다른 심리 상태 둘러보기</div>
+                <div className="text-2xl font-bold pt-10 mb-3">다른 심리 상태 둘러보기</div>
                 <div className="grid grid-cols-2 gap-3">
-                    <Stress/>
-                    <Depress/>                
+                    <EmotionSummaryCard type={"스트레스"} color={"red"}/>
+                    <EmotionSummaryCard type={"우울"} color={"red"}/>
                 </div>
             </div>
 

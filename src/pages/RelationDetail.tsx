@@ -169,17 +169,17 @@ const RelationDetail = () => {
 
           <div className="grid grid-cols-3 gap-4 text-center">
             <div className="bg-gray-50 rounded-xl p-4">
-              <div className="text-2xl font-bold text-gray-900">{analysis.totalDiaries}</div>
+              <div className="text-2xl font-bold text-gray-600">{analysis.totalDiaries}</div>
               <div className="text-sm text-gray-600">함께한 순간</div>
             </div>
             <div className="bg-gray-50 rounded-xl p-4">
-              <div className="text-2xl font-bold text-gray-900">
+              <div className="text-2xl font-bold text-gray-600">
                 {analysis.topActivities.length}
               </div>
               <div className="text-sm text-gray-600">공유한 활동</div>
             </div>
             <div className="bg-gray-50 rounded-xl p-4">
-              <div className="text-2xl font-bold text-gray-900">
+              <div className="text-2xl font-bold text-gray-600">
                 {Math.round(analysis.meetingFrequency)}
               </div>
               <div className="text-sm text-gray-600">월 평균 만남</div>
@@ -209,7 +209,7 @@ const RelationDetail = () => {
                   <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center mr-3">
                     <span className="text-white font-bold text-sm">{index + 1}</span>
                   </div>
-                  <span className="font-medium text-gray-900">{activity}</span>
+                  <span className="font-medium text-gray-600">{activity}</span>
                 </div>
                 <span className="text-gray-600">{count}번</span>
               </div>

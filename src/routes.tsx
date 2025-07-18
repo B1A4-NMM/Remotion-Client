@@ -7,8 +7,6 @@ import Diary from "./pages/Diary";
 import SearchPage from "./pages/SearchPage";
 import Result from "./pages/Result";
 import Loading6 from "./components/Loading/Loading6";
-import Loading7 from "./components/Loading/Loading7";
-import LoadingDiaryAnalysis from "./pages/LoadingDiaryAnalysis";
 
 import Video from "./pages/Video";
 import Routine from "./pages/Routine";
@@ -16,12 +14,9 @@ import Contents from "./pages/Contents";
 
 import Analysis from "./pages/Analysis";
 import Strength from "./pages/analysis/Strength";
-import Stress from "./pages/analysis/Stress";
-import Anxiety from "./pages/analysis/Anxiety";
-import Depress from "./pages/analysis/Depress";
-import Character from "./pages/analysis/Character";
 import Relation from "./pages/Relation";
 import RelationDetail from "./pages/RelationDetail";
+import Notifications from "./pages/notifications";
 
 import Todos from "./pages/Todos";
 import NotFound from "./pages/NotFound";
@@ -142,38 +137,6 @@ export const routes = [
     ),
   },
   {
-    path: "/analysis/stress",
-    element: (
-      <ProtectedRoute>
-        <Stress />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/analysis/anxiety",
-    element: (
-      <ProtectedRoute>
-        <Anxiety />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/analysis/depress",
-    element: (
-      <ProtectedRoute>
-        <Depress />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/analysis/character",
-    element: (
-      <ProtectedRoute>
-        <Character />
-      </ProtectedRoute>
-    ),
-  },
-  {
     path: "/mypage",
     element: (
       <ProtectedRoute>
@@ -183,6 +146,18 @@ export const routes = [
   },
   {
     path: "*",
-    element: <NotFound />,
+    element: (
+      <ProtectedRoute>
+        <Home />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/notifications",
+    element: (
+      <ProtectedRoute>
+        <Notifications />
+      </ProtectedRoute>
+    ),
   },
 ];

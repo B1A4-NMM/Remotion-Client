@@ -89,6 +89,15 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
   // beforeDiaryScores 데이터 추출
   const beforeDiaryScores = diaryContent?.beforeDiaryScores?.scores ?? [];
 
+  // diaryId 추출
+  const diaryId = diaryContent?.id;
+
+  // beforeDiaryScores 데이터 콘솔에 출력
+  console.log("beforeDiaryScores 데이터:", beforeDiaryScores);
+  console.log("beforeDiaryScores 길이:", beforeDiaryScores.length);
+  console.log("diaryContent?.beforeDiaryScores:", diaryContent?.beforeDiaryScores);
+  console.log("diaryId:", diaryId);
+
   const convertWarningToTestType = (warning: "stress" | "anxiety" | "depression") => {
     switch (warning) {
       case "anxiety":
@@ -120,8 +129,7 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
 
   // Pass peopleCardsData to PeopleCard
   return (
-    <>
-      <IntensityChart scores={beforeDiaryScores} />
+    <div className="px-4">
       <PeopleCard data={peopleCardsData} />
       <BrainEmotionMap activityAnalysis={activityAnalysis} />
 
@@ -130,12 +138,11 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
           <h2 className="text-xl font-semibold text-gray-800 mt-[60px] mb-[20px] px-4">
             마음 사건 리포트
           </h2>
-          <div className="px-4">
-            <ConflictAnalysisCard conflicts={allProblems} />
-          </div>
+
+          <ConflictAnalysisCard conflicts={allProblems} />
         </div>
       )}
-
+      <IntensityChart scores={beforeDiaryScores} diaryId={diaryId} />
       {recommendRoutines && recommendRoutines.content && (
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-gray-800 mt-[60px] mb-[20px] px-4">
@@ -179,7 +186,7 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
           onFinish={score => console.log(`${testType} 점수:`, score)}
         />
       )}
-    </>
+    </div>
   );
 };
 

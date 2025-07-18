@@ -1,6 +1,5 @@
 // Home.tsx
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useGetDiaryContent } from "../api/queries/home/useGetDiary";
+import React, { useState, useRef, useCallback } from "react";
 import { useGetDiaryDate } from "../api/queries/home/useGetDiaryDate";
 import { useGetHomeData } from "../api/queries/home/useGetHome";
 import DiaryCards from "../components/home/DiaryCards";
@@ -8,12 +7,10 @@ import Title from "../components/home/Title";
 import Index from "../components/home/Index";
 import { useNavigate } from "react-router-dom";
 import Map from "./Map";
-
-import { Canvas } from "@react-three/fiber";
+import HomeBar from "@/components/home/HomeBar";
 
 import "../styles/homeCard.css";
 import dayjs from "dayjs";
-import Blob from "../components/Blob/Blob";
 import { useDeleteDiary } from "../api/queries/home/useDeleteDiary";
 import { useInfiniteDiaries } from "../api/queries/home/useInfiniteDiaries";
 import { useQueryClient } from "@tanstack/react-query";
@@ -77,9 +74,8 @@ const Home = () => {
   const patchBookmark = usePatchDiaryBookmark();
 
   const handleDeleteDiary = (diaryId: number) => {
-    const token = localStorage.getItem("accessToken") || "";
     deleteDiaryMutation.mutate(
-      { token, diaryId: String(diaryId) },
+      { diaryId: String(diaryId) },
       {
         onSuccess: () => {
           // useInfiniteDiaries의 query key와 동일하게 맞춤
@@ -147,38 +143,47 @@ const Home = () => {
   const todayDiary = todayData ? todayData : null;
 
   return (
-    <div className="flex flex-col px-4 text-foreground min-h-screen">
-      <Title
-        emotionCountByMonth={emotionCountByMonth}
-        totalDiaryCount={totalDiaryCount}
-        continuousWritingDate={continuousWritingDate}
-        selectedTab={selectedTab}
-        setSelectedTab={setSelectedTab}
-      />
-      {selectedTab === "list" && (
-        <>
-          {homeData?.item?.diaries && homeData.item.diaries.length > 0 ? (
-            <>
-              <RecommendHomeCard />
-              <DiaryCards
-                diaries={infiniteDiaries}
-                onDeleteDiary={handleDeleteDiary}
-                onToggleBookmark={handleToggleBookmark}
-                lastItemRef={lastDiaryRef}
-              />
-            </>
-          ) : (
-            <Index className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-          )}
-        </>
-      )}
-      {selectedTab === "map" && (
-        <Map
-          continuousWritingDate={continuousWritingDate}
+    <div className="flex flex-col  text-foreground min-h-screen">
+      <div className="sticky top-0 z-50  rounded-b-2xl bg-[#F5F5F5] pb-8">
+        <Title
           emotionCountByMonth={emotionCountByMonth}
           totalDiaryCount={totalDiaryCount}
+          continuousWritingDate={continuousWritingDate}
+          selectedTab={selectedTab}
+          setSelectedTab={setSelectedTab}
         />
-      )}
+      </div>
+      <HomeBar
+        continuousWritingDate={continuousWritingDate}
+        emotionCountByMonth={emotionCountByMonth}
+        totalDiaryCount={totalDiaryCount}
+      />{" "}
+      <div className="mx-4">
+        {selectedTab === "list" && (
+          <>
+            {homeData?.item?.diaries && homeData.item.diaries.length > 0 ? (
+              <>
+                <RecommendHomeCard />
+                <DiaryCards
+                  diaries={infiniteDiaries}
+                  onDeleteDiary={handleDeleteDiary}
+                  onToggleBookmark={handleToggleBookmark}
+                  lastItemRef={lastDiaryRef}
+                />
+              </>
+            ) : (
+              <Index className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+            )}
+          </>
+        )}
+        {selectedTab === "map" && (
+          <Map
+            continuousWritingDate={continuousWritingDate}
+            emotionCountByMonth={emotionCountByMonth}
+            totalDiaryCount={totalDiaryCount}
+          />
+        )}
+      </div>
     </div>
   );
 };

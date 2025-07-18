@@ -1,7 +1,7 @@
 import api from "../axios";
 
 export const getMentalData = async (
-  emotion: "스트레스" | "불안" | "우울",
+  emotion: "스트레스" | "불안" | "우울" | "활력" | "안정" | "유대",
   period: string | number
 ) => {
   const response = await api.get("/emotion", {

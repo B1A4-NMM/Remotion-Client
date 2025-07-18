@@ -30,8 +30,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   // 역할 기반 접근 제어 (필요한 경우)
-  if (allowedRoles.length > 0 && user && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/unauthorized" replace />;
+  if (allowedRoles.length > 0 && user && !allowedRoles.includes((user as any).role)) {
+    return <Navigate to="/" replace />;
   }
 
   // 이미 로그인한 사용자가 로그인 페이지에 접근하려는 경우

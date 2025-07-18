@@ -125,10 +125,7 @@ const Home = () => {
     data?.pages.flatMap(page => page.item.diaries.map(mapApiDiaryToDiaryCard)) ?? [];
 
   // API 호출 시 string 변환
-  const { data: todayData, isLoading } = useGetDiaryDate(
-    token,
-    dayjs(selectedDate).format("YYYY-MM-DD")
-  );
+  const { data: todayData, isLoading } = useGetDiaryDate(dayjs(selectedDate).format("YYYY-MM-DD"));
 
   // 새로운 Home API 호출
   const { data: homeData, isLoading: homeLoading, error: homeError } = useGetHomeData(token);

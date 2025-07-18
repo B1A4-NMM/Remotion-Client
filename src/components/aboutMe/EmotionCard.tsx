@@ -62,7 +62,7 @@ const EmotionCard = () => {
     fetchCharacter();
   }, [token, BASE_URL]);
 
-  const { data: EmotionAnalysis } = useGetEmotionAnalysis(token);
+  const { data: EmotionAnalysis } = useGetEmotionAnalysis();
 
   // console.log("EmotionAnalysis", EmotionAnalysis);
 
@@ -72,7 +72,7 @@ const EmotionCard = () => {
   return (
     <div>
       <div>
-        <AnimalCard animalType={animalType} />
+        <AnimalCard animalType={animalType?.character || "unknown"} script="" />
       </div>
 
       {/* 감정 차트 추가 */}

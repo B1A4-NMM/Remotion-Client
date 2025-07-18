@@ -48,13 +48,13 @@ const StrengthGraph: React.FC<StrengthGraphProps> = ({ userName = "User Name" })
     data: currentData,
     isLoading: currentLoading,
     error: currentError,
-  } = useGetStrengthPeriod(token, "2024", "09");
+  } = useGetStrengthPeriod("2024", "09");
 
   const {
     data: lastData,
     isLoading: lastLoading,
     error: lastError,
-  } = useGetStrengthPeriod(token, "2024", "08");
+  } = useGetStrengthPeriod("2024", "08");
 
   // 로딩 상태 체크
   if (currentLoading || lastLoading) {
@@ -105,7 +105,7 @@ const StrengthGraph: React.FC<StrengthGraphProps> = ({ userName = "User Name" })
           {currentError && <p className="text-red-400">에러 발생: {`${currentError}`}</p>}
 
           {/* ✅ 데이터 존재 여부 확인 추가 */}
-          {(currentData || lastData) && (
+          {currentData && lastData && (
             <RadarChart
               lastTypeCount={lastData.typeCount}
               currentTypeCount={currentData.typeCount}

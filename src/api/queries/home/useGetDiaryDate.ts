@@ -2,11 +2,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { getDiaryDate } from "../../services/diaryDate";
 
-export const useGetDiaryDate = (token: string, date: string) => {
+export const useGetDiaryDate = (date: string) => {
   return useQuery({
-    queryKey: ["diaryDate", date, token],
-    queryFn: () => getDiaryDate(token, date),
-    enabled: !!token && !!date,
+    queryKey: ["diaryDate", date],
+    queryFn: () => getDiaryDate(date),
+    enabled: !!date,
     refetchOnWindowFocus: false,
   });
 };

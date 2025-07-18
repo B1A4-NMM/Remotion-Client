@@ -24,6 +24,9 @@ api.interceptors.response.use(
       // 토큰 만료 또는 무효
       localStorage.removeItem("accessToken");
       window.location.href = "/login";
+    }else if (error.response?.status >= 500) {
+      console.error('Server Error:', error.response.data);
+      // 500 오류에 대한 추가 처리 로직
     }
     return Promise.reject(error);
   }

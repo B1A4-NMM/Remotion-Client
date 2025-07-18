@@ -17,9 +17,19 @@ import RoutineRecommendCard from "./RoutineRecommendCard";
 
 interface ResultViewProps {
   diaryContent: any | null;
+  isLoading?: boolean;
 }
 
-const ResultView: React.FC<ResultViewProps> = ({ diaryContent }) => {
+const SkeletonBlock = ({ className = "" }) => (
+  <motion.div
+    className={`bg-gray-200 rounded-lg animate-pulse ${className}`}
+    initial={{ opacity: 0.5 }}
+    animate={{ opacity: 1 }}
+    transition={{ repeat: Infinity, duration: 1, repeatType: "reverse" }}
+  />
+);
+
+const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
   const [scrollY, setScrollY] = useState(0);
   const [testType, setTestType] = useState<"stress" | "anxiety" | "depression" | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -89,6 +99,24 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent }) => {
         return "stress";
     }
   };
+
+  if (isLoading) {
+    // 스켈레톤 로딩 UI
+    return (
+      <div className="space-y-8 p-6">
+        {/* 감정 차트 자리 */}
+        <SkeletonBlock className="w-full h-32 mb-4" />
+        {/* 카드 자리 */}
+        <div className="flex space-x-4">
+          <SkeletonBlock className="flex-1 h-40" />
+          <SkeletonBlock className="flex-1 h-40" />
+        </div>
+        {/* 텍스트 자리 */}
+        <SkeletonBlock className="w-2/3 h-6 mt-8" />
+        <SkeletonBlock className="w-1/2 h-6" />
+      </div>
+    );
+  }
 
   // Pass peopleCardsData to PeopleCard
   return (

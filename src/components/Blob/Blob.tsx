@@ -93,7 +93,6 @@ const Blob: React.FC<BlobProps> = ({ diaryContent, id, onContextLost }) => {
       colorMap.delete("gray2");
     }
 
-    console.log(colorMap);
     
     const totalColorIntensity = [...colorMap.values()].reduce((sum, val) => sum + val, 0);
 

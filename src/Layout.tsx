@@ -6,7 +6,7 @@ import AnimatedOutlet from "./components/AnimatedOutlet";
 import Title from "./components/analysis/Title";
 
 // 하단 네비게이션을 숨길 경로 목록
-const HIDE_NAV_PATHS = ["/signup", "/login", "/diary", "/video"];
+const HIDE_NAV_PATHS = ["/signup", "/login", "/diary", "/video", "/result", "/loading7"];
 const SHOW_TITLE_PATHS = ["/analysis", "/relation"];
 
 export default function Layout() {

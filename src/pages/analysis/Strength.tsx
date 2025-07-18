@@ -39,13 +39,13 @@ const Strength = () => {
     data: currentData,
     isLoading: currentLoading,
     error: currentError,
-  } = useGetStrengthPeriod(token, "2024", "09");
+  } = useGetStrengthPeriod("2024", "09");
 
   const {
     data: lastData,
     isLoading: lastLoading,
     error: lastError,
-  } = useGetStrengthPeriod(token, "2024", "08");
+  } = useGetStrengthPeriod("2024", "08");
 
   // 로딩 상태 체크
   if (currentLoading || lastLoading) {
@@ -74,7 +74,7 @@ const Strength = () => {
 
   return (
     <div className="mb-10">
-      <Title name={"Strength"} isBackActive={true} />
+      <Title name={"Strength"} isBackActive={true} back="/analysis" />
       <div className="pl-3 pr-3">
         <div className="text-gray-400 text-right mb-6">
           <p>
@@ -89,11 +89,13 @@ const Strength = () => {
         </div>
 
         <div className="bg-white rounded-3xl shadow-xl mb-4">
-          <RadarChart
-            lastTypeCount={lastData.typeCount}
-            currentTypeCount={currentData.typeCount}
-            onSelectCategory={setSelectedCategory}
-          />
+          {lastData && currentData && (
+            <RadarChart
+              lastTypeCount={lastData.typeCount}
+              currentTypeCount={currentData.typeCount}
+              onSelectCategory={setSelectedCategory}
+            />
+          )}
         </div>
         <div className="bg-white rounded-3xl shadow-xl p-4 flex justify-start left-0">
           {lastdetailData || (currentdetailData && selectedCategory) ? (

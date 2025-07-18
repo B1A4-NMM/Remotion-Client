@@ -1,15 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
+import type { DetailStrength } from "@/types/strength";
 
 type StrengthBarChartProps = {
-  lastData: {
-    detailCount: Record<string, Record<string, number>>;
-    typeCount: Record<string, number>;
-  };
-  currentData: {
-    detailCount: Record<string, Record<string, number>>;
-    typeCount: Record<string, number>;
-  };
+  lastData: DetailStrength | null;
+  currentData: DetailStrength | null;
   selectedCategory: string | null;
 };
 
@@ -34,6 +29,11 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
   const detailKeys = CATEGORY_GROUPS[category] || [];
 
   console.log("currentData:", currentData);
+
+  // null 체크
+  if (!lastData || !currentData) {
+    return <div>데이터가 없습니다.</div>;
+  }
 
   // 컨테이너 크기 감지
   useEffect(() => {

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useTodos } from "@/api/queries/todo/useTodos";
 import CalendarSection from "../components/calendar/CalendarSection";
 import TodoSection from "../components/todo/TodoSection";
+import Title from "@/components/recommend/Title";
 
 export default function CalendarPage() {
   useTodos(); // 📌 할 일 데이터 패칭
@@ -84,6 +85,7 @@ export default function CalendarPage() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
+      <Title />
       {/* 📅 상단 Calendar */}
       <section
         className="transition-[flex-basis] duration-200 ease-in-out px-4 pt-4 pb-2 overflow-hidden"

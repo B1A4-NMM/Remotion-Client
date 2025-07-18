@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 
 import { useGetDiaryContentResult } from "../api/queries/home/useGetDiary";
 import { useGetMemberSummary } from "../api/queries/result/useGetmemSummary";
+import { useDiaryOwnership } from "../hooks/useDiaryOwnership";
 
 import ResultHeader from "../components/result/ResultHeader";
 import EmotionSummary from "../components/result/EmotionSummary";
@@ -19,6 +20,7 @@ import PeopleCard from "@/components/home/PeopleCard";
 // ✅ 안전한 샘플 데이터
 const sampleDiary = {
   id: 102,
+  userId: 1, // 소유자 ID 추가
   writtenDate: "2025-07-14",
   photoPath: [],
   audioPath: null,
@@ -71,8 +73,10 @@ const Result: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const token = localStorage.getItem("accessToken") || "";
   const location = useLocation();
+  const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
   const view = params.get("view") === "analysis" ? "analysis" : "record";
+  const { validateAccess } = useDiaryOwnership();
 
   const {
     data: diaryContent,
@@ -90,6 +94,17 @@ const Result: React.FC = () => {
 
     checkTouchDevice();
   }, []);
+
+  // 일기 소유권 확인
+  useEffect(() => {
+    if (diaryContent && !isLoading) {
+      const hasAccess = validateAccess(diaryContent);
+      if (!hasAccess) {
+        // 권한이 없으면 홈으로 리다이렉트
+        return;
+      }
+    }
+  }, [diaryContent, isLoading, validateAccess]);
 
   // 스크롤 상태 감지 (선택사항)
   useEffect(() => {

@@ -6,13 +6,17 @@ import google from "./../assets/img/google.svg";
 import { Canvas } from "@react-three/fiber";
 import SimpleBlob from "@/components/Blob/Simple/SimpleBlob";
 import { demoLogin } from "@/api/services/auth";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+
 const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
-const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI || "http://localhost:5173"
+const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI || "http://localhost:5173";
 
 const SOCIAL_AUTH_URL = {
   kakao: `${BASE_URL}/auth/kakao`,
   google: `${BASE_URL}/auth/google`,
 };
+
 export default function Login() {
   const [sheetOpen, setSheetOpen] = useState(false);
 
@@ -22,7 +26,7 @@ export default function Login() {
   const handleGoogle = () =>
     (window.location.href = SOCIAL_AUTH_URL.google + `?state=${REDIRECT_URI}`);
 
-  const handleDemo = async ( id: "traveler" | "lee" | "harry" | "demo") => {
+  const handleDemo = async (id: "traveler" | "lee" | "harry" | "demo") => {
     try {
       const res = await demoLogin(id);
       const token = res.accessToken;
@@ -34,6 +38,7 @@ export default function Login() {
       }
     } catch (e) {
       alert("데모 로그인 실패");
+      console.error(e);
     }
   };
 
@@ -61,7 +66,7 @@ export default function Login() {
         </Button>
 
         <Button
-          onClick={handleGoogle}
+          onClick={() => (window.location.href = SOCIAL_AUTH_URL.google + `?state=${REDIRECT_URI}`)}
           className="h-[48px] bg-white text-black hover:bg-gray-200 rounded-full justify-center items-center gap-3 px-4 py-2"
         >
           <img src={google} alt="Google Icon" className="w-5 h-5" />
@@ -111,7 +116,6 @@ export default function Login() {
           </Button>
         </div>
       </BottomPopup>
-
     </div>
   );
 }

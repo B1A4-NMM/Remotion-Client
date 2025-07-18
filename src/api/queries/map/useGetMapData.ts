@@ -1,6 +1,6 @@
 // src/api/queries/map/useGetMapData.ts
 import { useQuery } from "@tanstack/react-query";
-import { getMapData } from "./../services/getMapData";
+import { getMapData } from "../../services/getMapData";
 
 export const useGetMapData = () => {
   return useQuery({

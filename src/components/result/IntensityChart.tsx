@@ -137,11 +137,7 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores }) => {
       <h2 className="text-xl font-semibold text-gray-800 mb-4 px-4">오늘에 닿은 감정의 선</h2>
       <div className="rounded-2xl shadow-lg p-4" style={{ backgroundColor: "#FFFFFF" }}>
         <div className="overflow-x-auto">
-          <svg
-            width={chartWidth}
-            height={topPadding + chartHeight + bottomPadding}
-            className="mx-auto"
-          >
+          <svg width={chartWidth} height={topPadding + chartHeight + bottomPadding}>
             {/* 그라데이션 정의 */}
             <defs>
               <linearGradient id="positiveGradient" x1="0%" y1="0%" x2="0%" y2="100%">

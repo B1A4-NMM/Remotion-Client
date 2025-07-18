@@ -19,7 +19,9 @@ const Title: React.FC<TitleProps> = ({
 }) => {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
-  const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
   return (
     <>
       <div className="w-full ">
@@ -29,7 +31,7 @@ const Title: React.FC<TitleProps> = ({
 
           {/* 액션 버튼들 */}
           <div className="flex items-center gap-2">
-            {/* 다크모드 토글 버튼 */}
+            {/* 다크모드 토글 버튼
             <button
               className="p-2 rounded-full   text-foreground border border-border hover:bg-secondary focus:ring-2 focus:ring-primary transition-colors box-shadow shadow-xl"
               aria-label="다크모드 전환"
@@ -47,7 +49,7 @@ const Title: React.FC<TitleProps> = ({
                   <path stroke="currentColor" strokeWidth="2" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" />
                 </svg>
               )}
-            </button>
+            </button> */}
             {/* 검색 버튼 */}
             <button
               className="p-2 rounded-full   text-foreground border border-border hover:bg-secondary focus:ring-2 focus:ring-primary transition-colors box-shadow shadow-xl"

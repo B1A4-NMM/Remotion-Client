@@ -2,14 +2,15 @@ import React, { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { useTodoStore } from "@/store/todoStore";
 import { getMonthDates, nextMonth, prevMonth, formatDate } from "@/utils/date";
-import { format, startOfMonth } from "date-fns";
+import { format, startOfMonth, isToday } from "date-fns";
+import clsx from "clsx";
 
 interface MonthlyCalendarProps {
   selectedDate: Date;
-  onSelect: (date: Date) => void;
+  setSelectedDate: (date: Date) => void;
 }
 
-export default function MonthlyCalendar({ selectedDate, onSelect }: MonthlyCalendarProps) {
+export default function MonthlyCalendar({ selectedDate, setSelectedDate }: MonthlyCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(selectedDate));
   const todos = useTodoStore(state => state.todos);
 
@@ -29,13 +30,21 @@ export default function MonthlyCalendar({ selectedDate, onSelect }: MonthlyCalen
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-4 py-2">
-        <button onClick={handlePrev} className="p-1 text-gray-500">
+        <button
+          onClick={handlePrev}
+          aria-label="이전 달"
+          className="p-1 text-gray-500 hover:text-black"
+        >
           <ChevronLeft className="w-4 h-4" />
         </button>
         <span className="font-semibold text-sm">
           {format(currentMonth, "yyyy.MM")}
         </span>
-        <button onClick={handleNext} className="p-1 text-gray-500">
+        <button
+          onClick={handleNext}
+          aria-label="다음 달"
+          className="p-1 text-gray-500 hover:text-black"
+        >
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
@@ -43,19 +52,24 @@ export default function MonthlyCalendar({ selectedDate, onSelect }: MonthlyCalen
         {monthDates.map(date => {
           const done = checkAllDone(date);
           const selected = isSelected(date);
+          const today = isToday(date);
+
           return (
             <button
               key={formatDate(date)}
-              onClick={() => onSelect(date)}
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm transition-colors ${
-                done
-                  ? "bg-black text-white"
-                  : selected
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-900 hover:bg-gray-300"
-              }`}
+              onClick={() => setSelectedDate(date)}
+              aria-label={`날짜 ${format(date, "yyyy-MM-dd")}`}
+              className={clsx(
+                "w-8 h-8 rounded-full flex items-center justify-center text-sm transition-colors relative",
+                {
+                  "bg-black text-white": done,
+                  "bg-blue-500 text-white": !done && selected,
+                  "bg-gray-200 text-gray-900 hover:bg-gray-300": !done && !selected,
+                  "ring-2 ring-gray-400": today, // ✅ 오늘 표시
+                }
+              )}
             >
-              {done ? <Check className="w-4 h-4" /> : date.getDate()}
+              {done ? <Check className="w-4 h-4" /> : format(date, "d")}
             </button>
           );
         })}

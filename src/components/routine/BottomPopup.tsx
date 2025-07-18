@@ -47,10 +47,10 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
 
   useEffect(() => {
     
-    console.log("🔄 isOpen 변화 감지:", { isOpen, currentIsInDOM: isInDOM });
+    // console.log("🔄 isOpen 변화 감지:", { isOpen, currentIsInDOM: isInDOM });
 
     if (isOpen) {
-      console.log("✅ 모달 열기 ");
+      // console.log("✅ 모달 열기 ");
       setIsInDOM(true);
       const currY = window.scrollY || 0;
       bodyOverflowRef.current = document.body.style.overflow;
@@ -58,19 +58,19 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
       document.body.style.overflow = "hidden";
       document.body.style.top = `-${currY}px`;
     } else {
-      console.log("❌ 모달 닫기 ");
+      // console.log("❌ 모달 닫기 ");
       api.start({ height: "0px" });
     }
   }, [isOpen, api]);
 
 
   useEffect(() => {
-    console.log("🎭 애니메이션 제어:" );
+    // console.log("🎭 애니메이션 제어:" );
     if (isInDOM) {
-      console.log(`🎭 애니메이션 시작: ${heightPixel}px로 확장`);
+      // console.log(`🎭 애니메이션 시작: ${heightPixel}px로 확장`);
       api.start({ height: `${heightPixel}px` });
     } else {
-      console.log("🎭 DOM에서 제거됨: body 스타일 복원");
+      // console.log("🎭 DOM에서 제거됨: body 스타일 복원");
       document.body.style.overflow = bodyOverflowRef.current;
       document.body.style.top = topRef.current;
     }

@@ -26,6 +26,7 @@ import RelationDetail from "./pages/RelationDetail";
 import Calendar from "./pages/Calendar";
 import NotFound from "./pages/NotFound";
 import Mypage from "./pages/Mypage";
+// import Todos from "./pages/Todos";
 
 export const routes = [
   {
@@ -52,6 +53,14 @@ export const routes = [
       </ProtectedRoute>
     ),
   },
+  // {
+  //   path: "/todos",
+  //   element: (
+  //     <ProtectedRoute>
+  //       <Todos />
+  //     </ProtectedRoute>
+  //   ),
+  // },
   {
     path: "/relation",
     element: (

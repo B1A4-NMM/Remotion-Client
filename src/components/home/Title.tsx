@@ -6,8 +6,8 @@ interface TitleProps {
   continuousWritingDate: number;
   emotionCountByMonth: number;
   totalDiaryCount: number;
-  selectedTab: "menu" | "location" | "search";
-  setSelectedTab: (tab: "menu" | "location" | "search") => void;
+  selectedTab: "list" | "map" | "search";
+  setSelectedTab: (tab: "list" | "map" | "search") => void;
 }
 
 const Title: React.FC<TitleProps> = ({
@@ -51,11 +51,11 @@ const Title: React.FC<TitleProps> = ({
               )}
             </button> */}
           
-            {/* 메뉴 버튼 */}
+            {/* 리스트 버튼 */}
             <button
               className="p-2 rounded-full   text-foreground border border-border hover:bg-secondary focus:ring-2 focus:ring-primary transition-colors box-shadow shadow-xl"
-              aria-label="메뉴"
-              onClick={() => setSelectedTab("menu")}
+              aria-label="리스트"
+              onClick={() => setSelectedTab("list")}
             >
               <svg
                 width="22"
@@ -63,7 +63,7 @@ const Title: React.FC<TitleProps> = ({
                 viewBox="0 0 22 22"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className={selectedTab === "menu" ? "text-black" : "text-gray-400"}
+                className={selectedTab === "list" ? "text-black" : "text-gray-400"}
               >
                 <path
                   fillRule="evenodd"
@@ -90,10 +90,10 @@ const Title: React.FC<TitleProps> = ({
             <button
               className="p-2 rounded-full   text-foreground border border-border hover:bg-secondary focus:ring-2 focus:ring-primary transition-colors box-shadow shadow-xl"
               aria-label="위치"
-              onClick={() => setSelectedTab("location")}
+              onClick={() => setSelectedTab("map")}
             >
               <svg
-                className={`w-5 h-5 ${selectedTab === "location" ? "text-black" : "text-gray-400"}`}
+                className={`w-5 h-5 ${selectedTab === "map" ? "text-black" : "text-gray-400"}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

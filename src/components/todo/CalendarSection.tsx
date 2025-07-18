@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import WeeklyCalendar from "./WeeklyCalendar";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
+import MonthlyCalendar from "./MonthlyCalendar";
+
 
 export default function CalendarSection() {
   const [view, setView] = useState<"week" | "month">("week");
@@ -40,16 +40,10 @@ export default function CalendarSection() {
       )}
 
       {view === "month" && (
-        <div className="h-full w-full">
-          <Calendar
-            tileContent={null}
-            formatDay={(_, date) => String(date.getDate())}
-            value={selectedDate}
-            onChange={value => setSelectedDate(value as Date)}
-            view="month"
-            className="react-calendar rounded-lg p-2 h-full"
-          />
-        </div>
+        <MonthlyCalendar
+        selectedDate={selectedDate}
+        onSelect={setSelectedDate}
+      />
       )}
     </div>
   );

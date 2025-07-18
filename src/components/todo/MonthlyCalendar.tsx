@@ -1,9 +1,15 @@
-import React, { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Check } from "lucide-react";
-import { useTodoStore } from "@/store/todoStore";
-import { getMonthDates, nextMonth, prevMonth, formatDate } from "@/utils/date";
-import { format, startOfMonth, isToday } from "date-fns";
-import { useSelectedDate } from "@/hooks/useSelectedDate";
+"use client";
+
+import {
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  addDays,
+  isSameDay,
+  isSameMonth,
+  getDay,
+} from "date-fns";
 import clsx from "clsx";
 
 interface MonthlyCalendarProps {
@@ -11,70 +17,99 @@ interface MonthlyCalendarProps {
   setSelectedDate: (date: Date) => void;
 }
 
-export default function MonthlyCalendar({ selectedDate, setSelectedDate }: MonthlyCalendarProps) {
-  const [currentMonth, setCurrentMonth] = useState(startOfMonth(selectedDate));
-  const todos = useTodoStore(state => state.todos);
+const WEEKDAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
-  const monthDates = useMemo(() => getMonthDates(currentMonth), [currentMonth]);
+export default function MonthlyCalendar({
+  selectedDate,
+  setSelectedDate,
+}: MonthlyCalendarProps) {
+  const today = new Date();
 
-  const checkAllDone = (date: Date) => {
-    const key = formatDate(date);
-    const dayTodos = todos.filter(t => t.date === key);
-    return dayTodos.length > 0 && dayTodos.every(t => t.isCompleted);
-  };
+  const start = startOfWeek(startOfMonth(selectedDate), { weekStartsOn: 1 });
+  const end = endOfWeek(endOfMonth(selectedDate), { weekStartsOn: 1 });
 
-  const isSelected = (date: Date) => formatDate(date) === formatDate(selectedDate);
-
-  const handlePrev = () => setCurrentMonth(prevMonth(currentMonth));
-  const handleNext = () => setCurrentMonth(nextMonth(currentMonth));
+  const days = [];
+  let current = start;
+  while (current <= end) {
+    days.push(current);
+    current = addDays(current, 1);
+  }
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-4 py-2">
-        <button
-          onClick={handlePrev}
-          aria-label="이전 달"
-          className="p-1 text-gray-500 hover:text-black"
+    <div className="grid grid-cols-7 gap-y-1 pb-4">
+      {/* 요일 헤더 */}
+      {WEEKDAYS.map((day, idx) => (
+        <div
+          key={day}
+          className="text-[12px] font-medium text-center"
+          style={{
+            color:
+              idx === 6
+                ? "#F36B6B"
+                : idx === 5
+                ? "#7DA7E3"
+                : "#999999",
+          }}
         >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
-        <span className="font-semibold text-sm">
-          {format(currentMonth, "yyyy.MM")}
-        </span>
-        <button
-          onClick={handleNext}
-          aria-label="다음 달"
-          className="p-1 text-gray-500 hover:text-black"
-        >
-          <ChevronRight className="w-4 h-4" />
-        </button>
-      </div>
-      <div className="grid grid-cols-7 gap-2 px-4 pb-4">
-        {monthDates.map(date => {
-          const done = checkAllDone(date);
-          const selected = isSelected(date);
-          const today = isToday(date);
+          {day}
+        </div>
+      ))}
 
-          return (
-            <button
-              key={formatDate(date)}
-              onClick={() => setSelectedDate(date)}
-              aria-label={`날짜 ${format(date, "yyyy-MM-dd")}`}
+      {/* 날짜 셀 */}
+      {days.map((day) => {
+        const isToday = isSameDay(day, today);
+        const isSelected = isSameDay(day, selectedDate);
+        const inMonth = isSameMonth(day, selectedDate);
+        const weekday = getDay(day); // 0: SUN ~ 6: SAT
+
+        const dateColor =
+          weekday === 0
+            ? "#F36B6B"
+            : weekday === 6
+            ? "#7DA7E3"
+            : "black";
+
+        const finalColor =
+          (isToday || isSelected) && weekday !== 0 && weekday !== 6
+            ? "white"
+            : dateColor;
+
+        const bgClass = isToday && isSelected
+          ? "bg-black"
+          : isSelected
+          ? "bg-black"
+          : isToday
+          ? "bg-[#DADADA]"
+          : "";
+
+        return (
+          <div
+            key={day.toISOString()}
+            onClick={() => setSelectedDate(day)}
+            className="flex flex-col items-center cursor-pointer"
+          >
+            {/* 완료 체크박스 자리 */}
+            <div className="w-5 h-6 rounded-full bg-[#D9D9D9] my-1" />
+
+            {/* 날짜 */}
+            <span
               className={clsx(
-                "w-8 h-8 rounded-full flex items-center justify-center text-sm transition-colors relative",
+                "w-5 h-5 flex items-center justify-center rounded-full text-xs",
                 {
-                  "bg-black text-white": done,
-                  "bg-blue-500 text-white": !done && selected,
-                  "bg-gray-200 text-gray-900 hover:bg-gray-300": !done && !selected,
-                  "ring-2 ring-gray-400": today, // ✅ 오늘 표시
-                }
+                  "font-bold": isToday || isSelected,
+                },
+                bgClass
               )}
+              style={{
+                color: finalColor,
+                opacity: inMonth ? 1 : 0.3,
+              }}
             >
-              {done ? <Check className="w-4 h-4" /> : format(date, "d")}
-            </button>
-          );
-        })}
-      </div>
+              {day.getDate()}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import WeeklyCalendar from "./WeeklyCalendar";
 import MonthlyCalendar from "./MonthlyCalendar";
-import { addWeeks, subWeeks, addMonths, subMonths } from "date-fns";
+import { addWeeks, subWeeks, addMonths, subMonths, format } from "date-fns";
 import { useSelectedDate } from "@/hooks/useSelectedDate";
 
 export default function CalendarSection() {
@@ -11,42 +11,53 @@ export default function CalendarSection() {
   const { selectedDate, setSelectedDate } = useSelectedDate();
 
   const goPrev = () => {
-    if (view === "week") {
-      setSelectedDate(subWeeks(selectedDate, 1));
-    } else {
-      setSelectedDate(subMonths(selectedDate, 1));
-    }
+    setSelectedDate(
+      view === "week" ? subWeeks(selectedDate, 1) : subMonths(selectedDate, 1)
+    );
   };
 
   const goNext = () => {
-    if (view === "week") {
-      setSelectedDate(addWeeks(selectedDate, 1));
-    } else {
-      setSelectedDate(addMonths(selectedDate, 1));
-    }
+    setSelectedDate(
+      view === "week" ? addWeeks(selectedDate, 1) : addMonths(selectedDate, 1)
+    );
   };
+
   return (
-    <div className="flex flex-col h-full">
-      {/* Navigation and toggle */}
-      <div className="flex items-center justify-between px-4 mt-4 mb-4 text-lg font-bold">
-        <button onClick={goPrev} className="text-gray-400">&lt;</button>
-        <button
-          onClick={() => setView(view === "week" ? "month" : "week")}
-          className="px-4 py-1 border rounded-full"
-        >
-          {view === "week" ? "월간" : "주간"}
-        </button>
-        <button onClick={goNext} className="text-gray-400">&gt;</button>
+    <div className="flex flex-col h-full px-6">
+      {/* ✅ 상단 Navigation */}
+      <div className="flex justify-between items-center mt-6 mb-6">
+        {/* 좌측: 년월 */}
+        <div className="text-lg font-semibold">
+          {format(selectedDate, "yyyy년 M월")}
+        </div>
+
+        {/* 우측: < > 주 월 */}
+        <div className="flex items-center space-x-2 text-sm">
+          <button onClick={goPrev} className="text-gray-400 font-bold">
+            &lt;
+          </button>
+          <button onClick={goNext} className="text-gray-400 font-bold">
+            &gt;
+          </button>
+          <span className="font-bold text-black">
+            {view === "week" ? "주" : "월"}
+          </span>
+          <button
+            onClick={() => setView(view === "week" ? "month" : "week")}
+            className="text-gray-400 font-bold"
+          >
+            {view === "week" ? "월" : "주"}
+          </button>
+        </div>
       </div>
 
-      {view === "week" && (
+      {/* ✅ Calendar 영역 */}
+      {view === "week" ? (
         <WeeklyCalendar
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
-        />      
-      )}
-
-      {view === "month" && (
+        />
+      ) : (
         <MonthlyCalendar
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}

@@ -1,20 +1,31 @@
 "use client";
 
-import { addDays, startOfWeek, format, addWeeks, subWeeks } from "date-fns";
+import {
+  addDays,
+  startOfWeek,
+  format,
+  addWeeks,
+  subWeeks,
+  getDay,
+} from "date-fns";
 import { useState, useEffect } from "react";
 import clsx from "clsx";
 
 interface WeeklyCalendarProps {
   selectedDate: Date;
   setSelectedDate: (date: Date) => void;
+  onSwitchToMonthly?: () => void;
 }
+
+const WEEKDAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
 export default function WeeklyCalendar({
   selectedDate,
   setSelectedDate,
+  onSwitchToMonthly,
 }: WeeklyCalendarProps) {
   const [currentWeekStart, setCurrentWeekStart] = useState(
-    startOfWeek(selectedDate, { weekStartsOn: 0 })
+    startOfWeek(selectedDate, { weekStartsOn: 1 })
   );
 
   const days = Array.from({ length: 7 }, (_, i) =>
@@ -27,57 +38,80 @@ export default function WeeklyCalendar({
   useEffect(() => {
     const weekEnd = addDays(currentWeekStart, 7);
     if (selectedDate < currentWeekStart || selectedDate >= weekEnd) {
-      setCurrentWeekStart(startOfWeek(selectedDate, { weekStartsOn: 0 }));
+      setCurrentWeekStart(startOfWeek(selectedDate, { weekStartsOn: 1 }));
     }
   }, [selectedDate, currentWeekStart]);
 
+  const isSameDate = (d1: Date, d2: Date) =>
+    d1.toDateString() === d2.toDateString();
+
   return (
-    <div className="flex flex-col px-4">
-      {/* Weekly 바 */}
-      <div className="flex items-center justify-between">
-        <button onClick={goPrevWeek} className="text-gray-400">&lt;</button>
+    <div className="flex flex-col">
+      {/* 요일 헤더 */}
+      <div className="flex justify-between mb-1">
+        {WEEKDAYS.map((day, idx) => (
+          <span
+            key={day}
+            className="text-[12px] font-medium text-center flex-1"
+            style={{
+              color:
+                idx === 6
+                  ? "#F36B6B"
+                  : idx === 5
+                  ? "#7DA7E3"
+                  : "#999999",
+            }}
+          >
+            {day}
+          </span>
+        ))}
+      </div>
 
-        <div className="flex-1 overflow-x-auto no-scrollbar">
-          <div className="flex w-full justify-between">
-            {days.map((day) => {
-              const isToday =
-                day.toDateString() === new Date().toDateString();
-              const isSelected =
-                day.toDateString() === selectedDate.toDateString();
+      {/* 날짜 셀 */}
+      <div className="flex w-full justify-between">
+        {days.map((day) => {
+          const isToday = isSameDate(day, new Date());
+          const isSelected = isSameDate(day, selectedDate);
+          const weekday = getDay(day);
 
-              // 오늘이면 선택 상태와 상관없이 '오늘' 스타일 우선
-              const isTodaySelected = isToday;
+          const dateColor =
+            weekday === 0
+              ? "#F36B6B"
+              : weekday === 6
+              ? "#7DA7E3"
+              : "black";
 
-              return (
-                <div
-                  key={day.toISOString()}
-                  onClick={() => setSelectedDate(day)}
-                  className="flex flex-col items-center cursor-pointer flex-1"
-                >
-                  {/* 요일: 한 글자 */}
-                  <span
-                    className={`text-sm ${isToday ? "text-pink-500 font-bold" : "text-gray-400"}`}
-                  >
-                    {format(day, "EEEEE")}
-                  </span>
+          const finalDateColor =
+            (isToday || isSelected) && weekday !== 0 && weekday !== 6
+              ? "white"
+              : dateColor;
 
-                  {/* 날짜: 오늘은 핑크 배경/흰글씨, 선택된 날짜는 light gray */}
-                  <span
-                    className={clsx(
-                      "mt-1 px-2 py-1 rounded-full",
-                      isTodaySelected && "bg-pink-500 text-white",
-                      !isToday && isSelected && "bg-gray-200 text-black"
-                    )}
-                  >
-                    {day.getDate()}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+          return (
+            <div
+              key={day.toISOString()}
+              onClick={() => setSelectedDate(day)}
+              className="flex flex-col items-center cursor-pointer flex-1"
+            >
+              {/* 완료 표시용 박스 */}
+              <div className="w-5 h-6 rounded-full bg-[#D9D9D9] my-1" />
 
-        <button onClick={goNextWeek} className="text-gray-400">&gt;</button>
+              {/* 날짜 원 */}
+              <span
+                className={clsx(
+                  "w-5 h-5 flex items-center justify-center rounded-full text-xs",
+                  {
+                    "font-bold": isToday || isSelected,
+                    "bg-black": isSelected,
+                    "bg-[#DADADA]": isToday && !isSelected,
+                  }
+                )}
+                style={{ color: finalDateColor }}
+              >
+                {day.getDate()}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

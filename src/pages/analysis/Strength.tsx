@@ -35,18 +35,17 @@ const Strength = () => {
   const lastMonth = lastMonthDate.month() + 1;
 
   // API 호출
-  const { 
-     data: currentData, 
-     isLoading: currentLoading, 
-     error: currentError 
-   } = useGetStrengthPeriod(token, "2024", "09");
- 
-   const { 
-     data: lastData, 
-     isLoading: lastLoading, 
-     error: lastError 
-   } = useGetStrengthPeriod(token, "2024", "08");
- 
+  const {
+    data: currentData,
+    isLoading: currentLoading,
+    error: currentError,
+  } = useGetStrengthPeriod(token, "2024", "09");
+
+  const {
+    data: lastData,
+    isLoading: lastLoading,
+    error: lastError,
+  } = useGetStrengthPeriod(token, "2024", "08");
 
   // 로딩 상태 체크
   if (currentLoading || lastLoading) {
@@ -84,8 +83,8 @@ const Strength = () => {
           </p>
           <p>
             {" "}
-            VIA 강점은 타고난 재능뿐만 아니라 노력으로 개발된 역량까지 포함하며, 6가지 핵심 덕목 아래
-            24가지 성격 강점으로 분류됩니다.{" "}
+            VIA 강점은 타고난 재능뿐만 아니라 노력으로 개발된 역량까지 포함하며, 6가지 핵심 덕목
+            아래 24가지 성격 강점으로 분류됩니다.{" "}
           </p>
         </div>
 

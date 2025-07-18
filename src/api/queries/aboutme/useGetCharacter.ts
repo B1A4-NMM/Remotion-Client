@@ -1,6 +1,6 @@
 // api/queries/diary/useGetCharacter.ts
 import { useQuery } from "@tanstack/react-query";
-import { getCharacter } from '@/api/services/character'
+import { getCharacter } from "@/api/services/character";
 
 export const useGetCharacter = (token: string) => {
   return useQuery({

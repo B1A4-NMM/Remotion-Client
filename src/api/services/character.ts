@@ -1,17 +1,10 @@
 // api/services/character.ts
-import axios from "axios";
+import api from "../axios";
 import type { Character } from "../../types/diary";
 
-export const getCharacter = async (token: string): Promise<Character> => {
-  const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
+export const getCharacter = async (): Promise<Character> => {
   try {
-    const response = await axios.get(`${BASE_URL}/member/character`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
+    const response = await api.get("/member/character");
     return response.data;
   } catch (err) {
     throw err;

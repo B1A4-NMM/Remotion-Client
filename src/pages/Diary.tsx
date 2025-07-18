@@ -259,7 +259,7 @@ const Diary = () => {
 
   return (
     <>
-      <div className="relative flex flex-col h-full border   text-foreground">
+      <div className="relative flex flex-col h-full border">
         <DiaryTitle selectedDate={selectedDate} onCalendarClick={handleCalendarClick} />
 
         {/* 달력 컴포넌트 */}
@@ -291,7 +291,7 @@ const Diary = () => {
               onFocus={() => setInputFocused(true)}
               onBlur={() => setInputFocused(false)}
               placeholder="오늘은 무슨 일이 있으셨나요? 100자 이상으로 작성 해 주세요."
-              className="resize-none flex-1 w-full min-h-[200px] max-h-none overflow-y-auto"
+              className="resize-none flex-1 w-full min-h-[200px] max-h-none overflow-y-auto border-none outline-none focus:border-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0"
             />
             <div className="flex-shrink-0 mt-2">
               {errors.content && (
@@ -313,18 +313,16 @@ const Diary = () => {
           />
         </form>
 
-        {!inputFocused && (
-          <BottomNavi
-            onMicClick={handleMicClick}
-            onLocationClick={handleLocationClick}
-            onImageClick={handleImageClick}
-            onSaveClick={handleSaveClick} // 저장 버튼 핸들러 추가
-            isListening={listening}
-            isPhotoActive={isPhotoActive}
-            isLocationActive={isLocationActive}
-            isSaveEnabled={contentLength >= 100} // 저장 버튼 활성화 조건
-          />
-        )}
+        <BottomNavi
+          onMicClick={handleMicClick}
+          onLocationClick={handleLocationClick}
+          onImageClick={handleImageClick}
+          onSaveClick={handleSaveClick} // 저장 버튼 핸들러 추가
+          isListening={listening}
+          isPhotoActive={isPhotoActive}
+          isLocationActive={isLocationActive}
+          isSaveEnabled={contentLength >= 100} // 저장 버튼 활성화 조건
+        />
       </div>
 
       {showLocationPicker && (

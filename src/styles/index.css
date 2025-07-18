@@ -58,20 +58,19 @@
     --chart-4: 43 74% 36%;
     --chart-5: 27 87% 37%;
   }
-  
 
- /* 카드 반투명 배경 및 그림자 효과 */
-.dark .bg-white,
-.dark .bg-white\/80,
-.dark .bg-white\/10,
-.dark .bg-white\/5 {
-  background: rgba(255,255,255,0.15) !important;
-  color: #fff !important;
-  backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.18);
-  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.25);
-  border-radius: 20px;
-}
+  /* 카드 반투명 배경 및 그림자 효과 */
+  .dark .bg-white,
+  .dark .bg-white\/80,
+  .dark .bg-white\/10,
+  .dark .bg-white\/5 {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #fff !important;
+    backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+  }
   /* 텍스트 색상 일괄 조정 */
   .dark .text-black,
   .dark .text-gray-800,
@@ -80,9 +79,9 @@
     color: #f5f5f5 !important;
   }
   /* 아이콘 및 요소 색상 대비 조정 */
-.dark .icon {
-  filter: brightness(1.2);
-}
+  .dark .icon {
+    filter: brightness(1.2);
+  }
 }
 
 @layer base {
@@ -90,10 +89,10 @@
     @apply border-border;
   }
   body {
-    @apply   text-foreground;
+    @apply text-foreground;
   }
   .dark body {
-    background: linear-gradient(to bottom, #29222B 0%, #4A3550 100%) !important;
+    background: linear-gradient(to bottom, #29222b 0%, #4a3550 100%) !important;
     color: #f5f5f5;
   }
 }

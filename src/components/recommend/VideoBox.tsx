@@ -44,7 +44,8 @@ const YouTubeBoard: React.FC<YouTubeBoardProps> = ({}) => {
   const lastX = useRef<number>(0);
 
   const token = localStorage.getItem("accessToken") ?? "";
-  const { data, isLoading, isError } = useGetVideo(token, 100);
+  const { data, isLoading, isError } = useGetVideo(token, 10);
+
 
   const navigate = useNavigate();
 

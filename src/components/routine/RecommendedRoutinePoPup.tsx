@@ -5,7 +5,7 @@ import { usePostRoutineByType } from "@/api/queries/routine/usePostRoutineByType
 
 interface RecommendedRoutinePopupProps {
     emotion: RoutineType;
-    onAdd: (title: string) => void;
+    onAdd: (content: string) => void;
     onClose:() => void;
   }
   
@@ -23,7 +23,7 @@ interface RecommendedRoutinePopupProps {
   
     const { mutate: postRoutine } = usePostRoutineByType();
   
-    const handleClick = (title: string) => {
+    const handleClick = (content: string) => {
       // postRoutine(
       //   { type:emotion,title },
       //   {
@@ -33,7 +33,7 @@ interface RecommendedRoutinePopupProps {
       //     },
       //   }
       // );
-      onAdd(title);
+      onAdd(content);
     };
 
     //바텀시트를 닫을 때 invalidate 처리
@@ -55,13 +55,13 @@ interface RecommendedRoutinePopupProps {
         
         {RECOMMENDED_ROUTINES[emotion] ?(
           <ul className="space-y-2">
-          {RECOMMENDED_ROUTINES[emotion].map((title, index) => (
+          {RECOMMENDED_ROUTINES[emotion].map((content, index) => (
             <li
               key={index}
               className="cursor-pointer border border-gray-300 rounded px-3 py-2 hover:bg-gray-100"
-              onClick={() => handleClick(title)}
+              onClick={() => handleClick(content)}
             >
-              {title}
+              {content}
             </li>
           ))}
         </ul>

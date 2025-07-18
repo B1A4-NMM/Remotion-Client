@@ -14,10 +14,6 @@ import Contents from "./pages/Contents";
 
 import Analysis from "./pages/Analysis";
 import Strength from "./pages/analysis/Strength";
-import Stress from "./pages/analysis/Stress";
-import Anxiety from "./pages/analysis/Anxiety";
-import Depress from "./pages/analysis/Depress";
-import Character from "./pages/analysis/Character";
 import Relation from "./pages/Relation";
 import RelationDetail from "./pages/RelationDetail";
 
@@ -146,62 +142,6 @@ export const routes = [
     element: (
       <ProtectedRoute>
         <Strength />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/analysis/스트레스",
-    element: (
-      <ProtectedRoute>
-        <Stress />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/analysis/불안",
-    element: (
-      <ProtectedRoute>
-        <Anxiety />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/analysis/우울",
-    element: (
-      <ProtectedRoute>
-        <Depress />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/analysis/character",
-    element: (
-      <ProtectedRoute>
-        <Character />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/analysis/활력",
-    element: (
-      <ProtectedRoute>
-        <Vitality />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/analysis/안정",
-    element: (
-      <ProtectedRoute>
-        <Stable />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/analysis/유대",
-    element: (
-      <ProtectedRoute>
-        <RelationBond />
       </ProtectedRoute>
     ),
   },

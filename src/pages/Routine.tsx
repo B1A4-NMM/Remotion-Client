@@ -57,6 +57,15 @@ const Routine = () => {
         type: selectedEmotion,
         content: content,
       });
+
+      const updated = await getRoutineByType(selectedEmotion);
+      const normalized = updated.map(item => ({
+        id: item.routineId,
+        content: item.content,
+        routineType: item.routineType,
+      }));
+      
+      setSelectedRoutines(normalized);
       await refetchRoutine();
     } catch (err) {
       console.error("루틴 추가 실패", err);
@@ -71,6 +80,8 @@ const Routine = () => {
       console.error("루틴 삭제 실패", err);
     }
   };
+  
+  
 
   const handleFolderClick = async (emotionTitle: string) => {
     const emotionKey = emotionTitle as RoutineItem["routineType"];
@@ -137,7 +148,7 @@ const Routine = () => {
         <h1 className="text-xl font-bold">하루뒤가 선별한 루틴</h1>
       </div>
       <div className="flex gap-3 px-7 mt-2 mb-4">
-        {(["depression", "stress", "anxiety"] as RoutineItem["routineType"][]).map(type => (
+        {(["depression", "anxiety", "stress"] as RoutineItem["routineType"][]).map(type => (
           <button
             key={type}
             className={`px-4 py-1 rounded-full border text-sm ${
@@ -148,8 +159,8 @@ const Routine = () => {
             {
               {
                 depression: "우울",
-                stress: "스트레스",
                 anxiety: "불안",
+                stress: "스트레스",
               }[type]
             }
           </button>

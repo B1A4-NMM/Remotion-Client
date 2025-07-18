@@ -6,6 +6,8 @@ import Diary from "./pages/Diary";
 import SearchPage from "./pages/SearchPage";
 import Result from "./pages/Result";
 import Loading6 from "./components/Loading/Loading6";
+import Loading7 from "./components/Loading/Loading7";
+import LoadingDiaryAnalysis from "./pages/LoadingDiaryAnalysis";
 
 import Video from "./pages/Video";
 import Routine from "./pages/Routine";
@@ -42,4 +44,5 @@ export const routes = [
   { path: "/analysis/anxiety", element: <Anxiety /> },
   { path: "/analysis/depress", element: <Depress /> },
   { path: "/analysis/character", element: <Character /> },
+  { path: "/loading7", element: <Loading7 /> },
 ];

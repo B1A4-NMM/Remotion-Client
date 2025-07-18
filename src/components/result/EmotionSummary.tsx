@@ -1,11 +1,14 @@
 // src/components/result/EmotionSummary.tsx
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import Blob from "../Blob/Blob";
+import SimpleBlob from "../Blob/Simple/SimpleBlob";
+import LoadingBlob from "../Blob/Loading/LodingBlob";
 
 interface EmotionSummaryProps {
   diaryContent: any;
+  isLoading: boolean;
 }
 
 // 감정과 강도를 매핑하는 함수 (중복 감정 합산)
@@ -95,7 +98,20 @@ const extractTargets = (diaryContent: any) => {
   return Array.from(targetSet);
 };
 
-const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
+const EMOTION_LOADING_TEXTS = [
+  "오늘 어떤 감정들을 느꼈는지 살펴보는 중이에요.",
+  "빨간색은 부정적인 감정이 강하게 들었다는 의미에요.",
+  "파란색은 부정적인 감정이 약하게 들었을 때 나타나요.",
+  "초록색은 긍정적인 감정이 강하게 들었다는 의미에요.",
+  "노란색은 오늘 하루를 좋은 기분으로 보냈다는 의미에요.",
+];
+const TARGET_LOADING_TEXTS = [
+  "오늘은 어떤 사람들과 함께였을까요?",
+  "감정의 흐름을 따라가고 있습니다...",
+  "오늘의 특별한 순간을 포착 중..."
+];
+
+const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent, isLoading=false }) => {
   const emotions = mapEmotionsWithIntensity(diaryContent);
   const targets = extractTargets(diaryContent);
 
@@ -103,23 +119,52 @@ const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
   const mainEmotions = emotions.map(item => item.emotion).join(", ");
   const targetNames = targets.join(", ");
 
+  // 로딩 문구 인덱스
+  const [emotionIdx, setEmotionIdx] = useState(0);
+  const [targetIdx, setTargetIdx] = useState(0);
+  useEffect(() => {
+    if (!isLoading) return;
+    const emotionTimer = setInterval(() => {
+      setEmotionIdx(idx => (idx + 1) % EMOTION_LOADING_TEXTS.length);
+    }, 3500);
+    const targetTimer = setInterval(() => {
+      setTargetIdx(idx => (idx + 1) % TARGET_LOADING_TEXTS.length);
+    }, 3500);
+    return () => {
+      clearInterval(emotionTimer);
+      clearInterval(targetTimer);
+    };
+  }, [isLoading]);
+
   return (
     <div className="flex flex-col items-center text-center space-y-2 mb-4 ">
       <p className="text-sm text-gray-500">하루의 감정</p>
       <div>
-        <Canvas camera={{ position: [0, 0, 10], fov: 30 }}>
-          <Blob diaryContent={{ emotions }} />
+        {isLoading?(
+        <Canvas camera={{ position: [0, 0, 8], fov: 30 }}>
+          <LoadingBlob />
         </Canvas>
+        ):(
+          <Canvas camera={{ position: [0, 0, 10], fov: 30 }}>
+            <Blob diaryContent={{ emotions }} />
+          </Canvas>
+        )}
       </div>
 
-      {mainEmotions && (
+      {mainEmotions && !isLoading ?(
         <p className="text-xl font-bold text-gray-900 line-clamp-2 leading-relaxed m-8">
           {mainEmotions}
         </p>
+      ):(
+        <p className="text-xl font-bold text-gray-900 line-clamp-2 leading-relaxed m-8 animate-pulse animate-fade-in">
+          {EMOTION_LOADING_TEXTS[emotionIdx]}
+        </p>
       )}
 
-      {targetNames && (
+      {targetNames && !isLoading? (
         <p className="text-base text-gray-500 line-clamp-2 leading-relaxed m-7">{targetNames}</p>
+      ):(
+        <p className="text-base text-gray-500 line-clamp-2 leading-relaxed m-7 animate-pulse animate-fade-in">{TARGET_LOADING_TEXTS[targetIdx]}</p>
       )}
     </div>
   );

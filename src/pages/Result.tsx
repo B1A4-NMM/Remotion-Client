@@ -116,14 +116,6 @@ const Result: React.FC = () => {
     };
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen text-white">
-        일기 내용 로딩 중...
-      </div>
-    );
-  }
-
   if (isError) {
     return (
       <div className="flex justify-center items-center min-h-screen text-white text-center">
@@ -155,7 +147,7 @@ const Result: React.FC = () => {
 
       <div>
         {/* ✅ Emotion Summary */}
-        <EmotionSummary diaryContent={finalDiaryContent} />
+        <EmotionSummary diaryContent={finalDiaryContent} isLoading={isLoading} />
 
         {/* ✅ Toggle */}
         <ResultToggle view={view} />
@@ -164,7 +156,7 @@ const Result: React.FC = () => {
         {view === "record" ? (
           <DiaryView diaryContent={finalDiaryContent} />
         ) : (
-          <ResultView diaryContent={finalDiaryContent} />
+          <ResultView diaryContent={finalDiaryContent} isLoading={isLoading} />
         )}
       </div>
     </div>

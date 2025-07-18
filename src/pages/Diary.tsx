@@ -16,6 +16,7 @@ import DiaryTitle from "@/components/diary/DiaryTitle";
 import BottomNavi from "@/components/diary/BottomNavi";
 import MonthlyCalendar from "@/components/diary/MontlyCalendar";
 import { toast } from "sonner";
+import Loading7 from "@/components/Loading/Loading7";
 
 const Diary = () => {
   const { date } = useParams();
@@ -36,6 +37,7 @@ const Diary = () => {
     handleSubmit,
     reset,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm();
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -45,6 +47,9 @@ const Diary = () => {
 
   // 글자 수 상태 추가
   const [contentLength, setContentLength] = useState(0);
+
+  // 제출된 일기 내용 상태 추가
+  const [submittedDiary, setSubmittedDiary] = useState<any>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -64,6 +69,7 @@ const Diary = () => {
       setIsSubmitting(false);
       setAnimatedText("");
       setContentLength(0); // 글자 수 리셋
+      setSubmittedDiary(prev => prev ? { ...prev, isAnalysisDone: true } : null); // 분석 완료 신호
     },
   });
 
@@ -195,6 +201,14 @@ const Diary = () => {
   };
 
   const onSubmit = (data: any) => {
+    // 제출된 일기 내용 저장
+    const diaryContent = {
+      content: data.content || "",
+      writtenDate: date || dayjs().format("YYYY-MM-DD"),
+    };
+    
+    setSubmittedDiary(diaryContent);
+
     const formData = new FormData();
 
     formData.append("content", data.content);
@@ -229,11 +243,18 @@ const Diary = () => {
     mutate(formData);
   };
 
+  useEffect(() => {
+    if (isSubmitting && submittedDiary?.isAnalysisDone) {
+      navigate(`/result/${date}`, { state: { diaryContent: submittedDiary } });
+    }
+  }, [isSubmitting, submittedDiary, navigate, date]);
+
   if (!browserSupportsSpeechRecognition) {
     return <p>⚠️ 브라우저가 음성 인식을 지원하지 않습니다.</p>;
   }
 
-  if (isSubmitting) return <Loading6 key={Date.now()} />;
+  // if (isSubmitting) return <Loading6 key={Date.now()} />;
+  if (isSubmitting)  return <Loading7 key={Date.now()} diary={submittedDiary.content} />;
 
   return (
     <>

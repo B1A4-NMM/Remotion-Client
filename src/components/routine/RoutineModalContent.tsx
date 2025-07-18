@@ -44,12 +44,27 @@ const RoutineModalContent = ({
       ) : (
         routines.map((routine) => (
           <div
-            key={routine.id}
-            className="flex justify-between items-center bg-gray-100 px-4 py-2 rounded-lg mb-2"
-          >
-            <span className="text-sm">{routine.content}</span>
-            <button onClick={() => onDelete(routine.id)}>delete</button>
-          </div>
+      key={routine.id}
+      className="
+      flex justify-between items-center 
+      border px-4 py-3 rounded-xl mb-2 
+      transition
+      text-sm
+      dark:border-white/30 border-gray-300 
+      dark:text-white text-black 
+      dark:bg-white/10 bg-white 
+      dark:hover:bg-white/20 hover:bg-gray-100
+      backdrop-blur-sm
+      "
+    >
+      <span className="text-sm">{routine.content}</span>
+      <button
+        onClick={() => onDelete(routine.id)}
+        className="text-xs dark:text-red-300 dark:hover:text-red-500 text-red-600 hover:text-red-800"
+      >
+      delete
+    </button>
+  </div>
         ))
       )}
 
@@ -59,11 +74,24 @@ const RoutineModalContent = ({
           value={newRoutine}
           onChange={(e) => setNewRoutine(e.target.value)}
           placeholder="루틴 추가하기"
-          className="flex-1 border rounded px-3 py-2 text-sm"
+          className="
+          flex-1 px-3 py-2 text-sm rounded
+        border border-gray-300 bg-white text-black
+        placeholder-gray-400
+        dark:border-white/30 dark:bg-white/10 dark:text-white
+        dark:placeholder-white/60
+        backdrop-blur-sm
+          "
         />
         <button
           onClick={handleAdd}
-          className="bg-black text-white hover:bg-gray-800 px-4 py-2 rounded hover:scale-105 transition-transform"
+          className="
+          px-4 py-2 rounded
+        bg-black text-white hover:bg-gray-800
+        dark:bg-white/20 dark:hover:bg-white/30
+        dark:text-white
+        hover:scale-105 transition-transform
+          "
         >
           추가
         </button>

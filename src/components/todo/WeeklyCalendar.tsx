@@ -59,7 +59,7 @@ export default function WeeklyCalendar({
                   ? "#F36B6B"
                   : idx === 5
                   ? "#7DA7E3"
-                  : "#999999",
+                  : "black",
             }}
           >
             {day}
@@ -79,7 +79,7 @@ export default function WeeklyCalendar({
               ? "#F36B6B"
               : weekday === 6
               ? "#7DA7E3"
-              : "black";
+              : "#656565";
 
           const finalDateColor =
             (isToday || isSelected) && weekday !== 0 && weekday !== 6

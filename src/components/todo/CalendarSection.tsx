@@ -23,15 +23,13 @@ export default function CalendarSection() {
   };
 
   return (
-    <div className="flex flex-col h-full px-6">
-      {/* ✅ 상단 Navigation */}
-      <div className="flex justify-between items-center mt-6 mb-6">
-        {/* 좌측: 년월 */}
+    <div className="flex flex-col px-2 sm:px-4">
+      {/* 상단 Navigation */}
+      <div className="flex justify-between items-center mt-4 mb-6">
         <div className="text-lg font-semibold">
           {format(selectedDate, "yyyy년 M월")}
         </div>
 
-        {/* 우측: < > 주 월 */}
         <div className="flex items-center space-x-2 text-sm">
           <button onClick={goPrev} className="text-gray-400 font-bold">
             &lt;
@@ -51,7 +49,7 @@ export default function CalendarSection() {
         </div>
       </div>
 
-      {/* ✅ Calendar 영역 */}
+      {/* Calendar */}
       {view === "week" ? (
         <WeeklyCalendar
           selectedDate={selectedDate}

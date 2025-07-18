@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { useTodoStore } from "@/store/todoStore";
 import { getMonthDates, nextMonth, prevMonth, formatDate } from "@/utils/date";
 import { format, startOfMonth, isToday } from "date-fns";
+import { useSelectedDate } from "@/hooks/useSelectedDate";
 import clsx from "clsx";
 
 interface MonthlyCalendarProps {

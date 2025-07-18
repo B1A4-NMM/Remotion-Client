@@ -1,6 +1,5 @@
 // Home.tsx
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useGetDiaryContent } from "../api/queries/home/useGetDiary";
+import React, { useState, useRef, useCallback } from "react";
 import { useGetDiaryDate } from "../api/queries/home/useGetDiaryDate";
 import { useGetHomeData } from "../api/queries/home/useGetHome";
 import DiaryCards from "../components/home/DiaryCards";
@@ -9,11 +8,9 @@ import Index from "../components/home/Index";
 import { useNavigate } from "react-router-dom";
 import Map from "./Map";
 import HomeBar from "@/components/home/HomeBar";
-import { Canvas } from "@react-three/fiber";
 
 import "../styles/homeCard.css";
 import dayjs from "dayjs";
-import Blob from "../components/Blob/Blob";
 import { useDeleteDiary } from "../api/queries/home/useDeleteDiary";
 import { useInfiniteDiaries } from "../api/queries/home/useInfiniteDiaries";
 import { useQueryClient } from "@tanstack/react-query";
@@ -56,7 +53,7 @@ const Home = () => {
 
   const [selectedDate, setSelectedDate] = useState<Date>(dayjs().toDate());
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [selectedTab, setSelectedTab] = useState<"menu" | "location" | "search">("menu");
+  const [selectedTab, setSelectedTab] = useState<"list" | "map" | "search">("list");
 
   const handleDateSelect = useCallback((date: Date) => {
     const selected = dayjs(date);
@@ -135,6 +132,12 @@ const Home = () => {
   const continuousWritingDate = homeData?.item?.continuousWritingDate ?? 0;
   const diaries = homeData?.item?.diaries?.map(mapApiDiaryToDiaryCard) || [];
 
+  // useEffect(() => {
+  //   if (!homeLoading && diaries.length === 0) {
+  //     setSelectedTab("map");
+  //   }
+  // }, [homeLoading, diaries]);
+
   // 데이터 확인용 console.log
 
   const todayDiary = todayData ? todayData : null;
@@ -156,7 +159,7 @@ const Home = () => {
         totalDiaryCount={totalDiaryCount}
       />{" "}
       <div className="mx-4">
-        {selectedTab === "menu" && (
+        {selectedTab === "list" && (
           <>
             {homeData?.item?.diaries && homeData.item.diaries.length > 0 ? (
               <>
@@ -173,7 +176,7 @@ const Home = () => {
             )}
           </>
         )}
-        {selectedTab === "location" && (
+        {selectedTab === "map" && (
           <Map
             continuousWritingDate={continuousWritingDate}
             emotionCountByMonth={emotionCountByMonth}

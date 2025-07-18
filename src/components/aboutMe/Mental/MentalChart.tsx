@@ -8,8 +8,7 @@ import {
 } from "recharts";
 import { ChartContainer } from "../../ui/chart";
 
-type MentalType = "스트레스" | "불안" | "우울";
-
+type MentalType = "스트레스" | "불안" | "우울" | "활력" | "안정" | "유대" ;
 interface MentalChartProps {
   type: MentalType;
   data: {
@@ -25,6 +24,9 @@ const chartConfig: Record<MentalType, { label: string; color: string }> = {
   스트레스: { label: "스트레스", color: "#3b82f6" }, // 파란색
   불안: { label: "불안", color: "#8b5cf6" }, // 보라색
   우울: { label: "우울", color: "#f97316" }, // 주황색
+  활력: { label: "활력", color: "#f97316" },
+  안정: { label: "안정", color: "#f97316" },
+  유대: { label: "유대", color: "#f97316" },
 };
 
 const formatDateToMD = (dateStr: string) => {

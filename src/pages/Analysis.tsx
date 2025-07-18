@@ -10,20 +10,17 @@ import Stress from "@/components/analysis/Stress";
 const Analysis=()=>{
 
     return(
-      <div className="pl-3 pr-3   text-foreground min-h-screen">
-        <StrengthGraph
-            userName="user Name"/>
+      <div className="pl-3 pr-3 text-foreground min-h-screen">
 
         <div className="grid grid-cols-2 gap-2 grid-rows-2 h-100" >
 
             <Stress />
             <Anxiety/>
             <Depress/>
-            <Character/>
         </div>
-        <RelationGraph/>
-        <EmotionCards/>
 
+        <StrengthGraph
+            userName="user Name"/>
 
       </div>  
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-type MentalType = "스트레스" | "불안" | "우울";
+type MentalType = "스트레스" | "불안" | "우울" | "활력" | "안정" | "유대" ;
 
 interface ActivitySectionProps {
   type: MentalType;

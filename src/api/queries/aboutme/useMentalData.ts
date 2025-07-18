@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getMentalData } from "./../../services/mentalService";
 
 // MentalType 타입은 공통으로 정의되어 있다고 가정
-type MentalType = "스트레스" | "불안" | "우울";
+type MentalType = "스트레스" | "불안" | "우울" | "활력" | "안정" | "유대";
 
 // 응답 데이터 타입 정의
 interface MentalDataResponse {

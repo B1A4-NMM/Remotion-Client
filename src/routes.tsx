@@ -26,6 +26,9 @@ import RelationDetail from "./pages/RelationDetail";
 import Calendar from "./pages/Calendar";
 import NotFound from "./pages/NotFound";
 import Mypage from "./pages/Mypage";
+import Vitality from "./pages/analysis/Vitality";
+import Stable from "./pages/analysis/Stable";
+import RelationBond from "./pages/analysis/RelationBond";
 
 export const routes = [
   {
@@ -170,6 +173,30 @@ export const routes = [
     element: (
       <ProtectedRoute>
         <Character />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/analysis/vitality",
+    element: (
+      <ProtectedRoute>
+        <Vitality />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/analysis/stable",
+    element: (
+      <ProtectedRoute>
+        <Stable />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/analysis/relationbond",
+    element: (
+      <ProtectedRoute>
+        <RelationBond />
       </ProtectedRoute>
     ),
   },

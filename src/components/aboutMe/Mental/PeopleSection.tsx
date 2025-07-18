@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { PersonStanding } from "lucide-react";
 
-type MentalType = "스트레스" | "불안" | "우울";
+type MentalType = "스트레스" | "불안" | "우울" | "활력" | "안정" | "유대" ;
 
 interface PeopleSectionProps {
   type: MentalType;
@@ -22,6 +22,9 @@ const barColorMap: Record<PeopleSectionProps["type"], string> = {
   스트레스: "#00bcd4",
   불안: "#8e24aa",
   우울: "#ef6c00",
+  활력: "#ef6c00",
+  안정: "#ef6c00",
+  유대: "#ef6c00",
 };
 
 const PeopleSection = ({ type, data }: PeopleSectionProps) => {

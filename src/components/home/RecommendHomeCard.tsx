@@ -34,7 +34,7 @@ const RecommendHomeCard = () => {
   if (!visible) return null;
 
   return (
-    <Card className="w-full max-w-md mx-auto my-4 bg-white/80  rounded-2xl border border-gray-200 relative">
+    <Card className="w-full max-w-md mx-auto mb-4 bg-white/80  rounded-2xl border border-gray-200 relative">
       {/* X 닫기 버튼 */}
       <button
         className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors"

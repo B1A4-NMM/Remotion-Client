@@ -8,7 +8,7 @@ import Title from "../components/home/Title";
 import Index from "../components/home/Index";
 import { useNavigate } from "react-router-dom";
 import Map from "./Map";
-
+import HomeBar from "@/components/home/HomeBar";
 import { Canvas } from "@react-three/fiber";
 
 import "../styles/homeCard.css";
@@ -77,9 +77,8 @@ const Home = () => {
   const patchBookmark = usePatchDiaryBookmark();
 
   const handleDeleteDiary = (diaryId: number) => {
-    const token = localStorage.getItem("accessToken") || "";
     deleteDiaryMutation.mutate(
-      { token, diaryId: String(diaryId) },
+      { diaryId: String(diaryId) },
       {
         onSuccess: () => {
           // useInfiniteDiaries의 query key와 동일하게 맞춤
@@ -141,38 +140,47 @@ const Home = () => {
   const todayDiary = todayData ? todayData : null;
 
   return (
-    <div className="flex flex-col px-4 text-foreground min-h-screen">
-      <Title
-        emotionCountByMonth={emotionCountByMonth}
-        totalDiaryCount={totalDiaryCount}
-        continuousWritingDate={continuousWritingDate}
-        selectedTab={selectedTab}
-        setSelectedTab={setSelectedTab}
-      />
-      {selectedTab === "menu" && (
-        <>
-          {homeData?.item?.diaries && homeData.item.diaries.length > 0 ? (
-            <>
-              <RecommendHomeCard />
-              <DiaryCards
-                diaries={infiniteDiaries}
-                onDeleteDiary={handleDeleteDiary}
-                onToggleBookmark={handleToggleBookmark}
-                lastItemRef={lastDiaryRef}
-              />
-            </>
-          ) : (
-            <Index className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-          )}
-        </>
-      )}
-      {selectedTab === "location" && (
-        <Map
-          continuousWritingDate={continuousWritingDate}
+    <div className="flex flex-col  text-foreground min-h-screen">
+      <div className="sticky top-0 z-50  rounded-b-2xl bg-[#F5F5F5] pb-8">
+        <Title
           emotionCountByMonth={emotionCountByMonth}
           totalDiaryCount={totalDiaryCount}
+          continuousWritingDate={continuousWritingDate}
+          selectedTab={selectedTab}
+          setSelectedTab={setSelectedTab}
         />
-      )}
+      </div>
+      <HomeBar
+        continuousWritingDate={continuousWritingDate}
+        emotionCountByMonth={emotionCountByMonth}
+        totalDiaryCount={totalDiaryCount}
+      />{" "}
+      <div className="mx-4">
+        {selectedTab === "menu" && (
+          <>
+            {homeData?.item?.diaries && homeData.item.diaries.length > 0 ? (
+              <>
+                <RecommendHomeCard />
+                <DiaryCards
+                  diaries={infiniteDiaries}
+                  onDeleteDiary={handleDeleteDiary}
+                  onToggleBookmark={handleToggleBookmark}
+                  lastItemRef={lastDiaryRef}
+                />
+              </>
+            ) : (
+              <Index className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+            )}
+          </>
+        )}
+        {selectedTab === "location" && (
+          <Map
+            continuousWritingDate={continuousWritingDate}
+            emotionCountByMonth={emotionCountByMonth}
+            totalDiaryCount={totalDiaryCount}
+          />
+        )}
+      </div>
     </div>
   );
 };

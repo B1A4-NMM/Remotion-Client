@@ -8,15 +8,14 @@ interface IntensityScore {
 
 interface IntensityChartProps {
   scores: IntensityScore[];
+  diaryId?: number;
 }
 
-const IntensityChart: React.FC<IntensityChartProps> = ({ scores }) => {
+const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
   if (!scores || scores.length === 0) return null;
 
   // diaryId 기준으로 내림차순 정렬 후 최근 5개만 선택
-  const processedScores = scores
-    .sort((a, b) => b.diaryId - a.diaryId) // diaryId 큰 순서로 정렬
-    .slice(0, 5); // 상위 5개 선택
+  const processedScores = [...scores].reverse(); // 원본 배열을 복사한 후 거꾸로 정렬
 
   // 데이터 분석
   const positiveScores = processedScores.filter(s => s.intensitySum > 0);
@@ -32,31 +31,58 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores }) => {
   const maxValue = Math.max(...processedScores.map(s => Math.abs(s.intensitySum)));
   const scaleFactor = 0.8; // 스케일을 크게 해서 그래프가 적당한 크기로 보이게
   const chartHeight = 160;
-  const topPadding = 60; // 위쪽 툴팁 공간
-  const bottomPadding = 60; // 아래쪽 툴팁 공간
+
+  // 툴팁 높이를 고려한 동적 패딩 계산
+  const tooltipHeight = 50; // 툴팁 높이
+  const tooltipMargin = 20; // 툴팁 여백
+
+  // 데이터의 최대/최소값에 따라 패딩 조정
+  const hasHighValues = maxValue > 80; // 높은 값이 있으면 더 많은 공간 필요
+
+  const topPadding = hasHighValues ? 100 : 80; // 위쪽 툴팁 공간 (동적 조정)
+  const bottomPadding = hasHighValues ? 100 : 80; // 아래쪽 툴팁 공간 (동적 조정)
 
   // 적응적 중심선 위치 계산
+  // 0의 위치를 직접 조절하는 함수
   const calculateAdaptiveCenterY = () => {
-    const positiveThreshold = 70; // 양수 임계치
-    const negativeThreshold = -70; // 음수 임계치
+    // 기본 중심선 위치
+    const baseCenterY = topPadding + chartHeight / 2;
 
-    if (maxPositive > positiveThreshold && Math.abs(maxNegative) < positiveThreshold / 2) {
-      // 양수가 크고 음수가 작으면 중심선을 아래로
-      const shift = Math.min(70, (maxPositive - positiveThreshold) * 0.5);
-      return topPadding + chartHeight / 2 + shift;
-    } else if (maxNegative < negativeThreshold && maxPositive < Math.abs(negativeThreshold) / 2) {
-      // 음수가 크고 양수가 작으면 중심선을 위로
-      const shift = Math.min(70, (Math.abs(maxNegative) - Math.abs(negativeThreshold)) * 0.3);
-      return topPadding + chartHeight / 2 - shift;
+    // intensitySum 값에 따른 manualOffset 계산
+    const maxIntensity = Math.max(...processedScores.map(s => s.intensitySum));
+    const minIntensity = Math.min(...processedScores.map(s => s.intensitySum));
+
+    let manualOffset = 0; // 기본값 (가운데)
+
+    const hasHighPositive = maxIntensity >= 30;
+    const hasLowNegative = minIntensity <= -30;
+
+    if (hasHighPositive && hasLowNegative) {
+      // 둘 다 있으면 가운데
+      manualOffset = 0;
+    } else if (hasHighPositive) {
+      // 50 이상만 있으면 +30 (아래로)
+      manualOffset = 60;
+    } else if (hasLowNegative) {
+      // -50 미만만 있으면 -30 (위로)
+      manualOffset = -60;
+    } else {
+      // 둘 다 없으면 가운데
+      manualOffset = 0;
     }
 
-    // 기본적으로는 가운데
-    return topPadding + chartHeight / 2;
+    return baseCenterY + manualOffset;
   };
 
   const centerY = calculateAdaptiveCenterY();
-  const chartWidth = Math.max(350, processedScores.length * 50);
-  const padding = 20;
+
+  // 데이터 개수에 따른 동적 너비 계산
+  const minWidth = 352; // 적절한 최소 너비
+  const dataPointWidth = 70; // 적절한 데이터 포인트 너비
+  const chartWidth = Math.max(minWidth, processedScores.length * dataPointWidth);
+
+  // 패딩도 데이터 개수에 따라 조정
+  const padding = processedScores.length > 5 ? 35 : 25; // 적절한 패딩
 
   // 값을 Y 좌표로 변환하는 함수
   const getY = (value: number) => {
@@ -67,6 +93,10 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores }) => {
 
   // X 좌표 계산
   const getX = (index: number) => {
+    if (processedScores.length === 1) {
+      // 데이터가 하나일 때는 가운데에 위치
+      return chartWidth / 2;
+    }
     return padding + (index * (chartWidth - 2 * padding)) / (processedScores.length - 1);
   };
 
@@ -134,7 +164,7 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores }) => {
 
   return (
     <div className="mb-6">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4 px-4">오늘에 닿은 감정의 선</h2>
+      <h2 className="text-xl font-semibold text-gray-800 mb-4 px-4">감정 타임라인</h2>
       <div className="rounded-2xl shadow-lg p-4" style={{ backgroundColor: "#FFFFFF" }}>
         <div className="overflow-x-auto">
           <svg width={chartWidth} height={topPadding + chartHeight + bottomPadding}>
@@ -183,6 +213,57 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores }) => {
               0
             </text>
 
+            {/* 긍정/부정 뱃지 */}
+            <g>
+              {/* 긍정 뱃지 (왼쪽 위) */}
+              <rect
+                x={padding - 10}
+                y={topPadding - 60}
+                width="35"
+                height="30"
+                rx="15"
+                ry="15"
+                fill="#a5dfc1"
+                stroke="#a5dfc1"
+                strokeWidth="1"
+              />
+              <text
+                x={padding + 8}
+                y={topPadding - 40}
+                textAnchor="middle"
+                fontSize="12"
+                fill="white"
+                fontWeight="600"
+                fontFamily="system-ui, -apple-system, BlinkMacSystemFont, sans-serif"
+              >
+                긍정
+              </text>
+
+              {/* 부정 뱃지 (왼쪽 아래) */}
+              <rect
+                x={padding - 15}
+                y={topPadding + chartHeight + 30}
+                width="40"
+                height="30"
+                rx="15"
+                ry="15"
+                fill="rgba(252, 165, 165, 0.9)"
+                stroke="rgba(252, 165, 165, 1)"
+                strokeWidth="1"
+              />
+              <text
+                x={padding + 5}
+                y={topPadding + chartHeight + 49}
+                textAnchor="middle"
+                fontSize="12"
+                fill="white"
+                fontWeight="600"
+                fontFamily="system-ui, -apple-system, BlinkMacSystemFont, sans-serif"
+              >
+                부정
+              </text>
+            </g>
+
             {/* 양수 영역 채우기 (연한 초록) */}
             <path d={createSmoothAreaPath(true)} fill="url(#positiveGradient)" stroke="none" />
 
@@ -205,7 +286,7 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores }) => {
               const x = getX(index);
               const y = getY(score.intensitySum);
               const isPositive = score.intensitySum >= 0;
-              const tooltipY = isPositive ? y - 25 : y + 35; // 양수면 위에, 음수면 아래에 툴팁
+              const isCurrentDiary = diaryId && score.diaryId === diaryId;
 
               return (
                 <g key={score.diaryId}>
@@ -213,24 +294,25 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores }) => {
                   <circle
                     cx={x}
                     cy={y}
-                    r="6"
+                    r={isCurrentDiary ? "9" : "6"}
                     fill={
                       score.intensitySum >= 0
                         ? "rgba(134, 239, 172, 0.3)"
                         : "rgba(252, 165, 165, 0.3)"
                     }
-                    className="animate-pulse"
+                    className={isCurrentDiary ? "animate-pulse" : "animate-pulse"}
                   />
 
                   {/* 메인 포인트 */}
                   <circle
                     cx={x}
                     cy={y}
-                    r="3"
+                    r={isCurrentDiary ? "4" : "3"}
                     fill="white"
                     stroke={score.intensitySum >= 0 ? "#86EFAC" : "#FCA5A5"}
-                    strokeWidth="2"
+                    strokeWidth={isCurrentDiary ? "3" : "2"}
                     filter="url(#softShadow)"
+                    className={isCurrentDiary ? "animate-pulse" : ""}
                   />
 
                   {/* 예쁜 툴팁 */}
@@ -238,14 +320,14 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores }) => {
                     {/* 툴팁 배경 (둥근 모서리 + 그림자) */}
                     <rect
                       x={x - 22}
-                      y={isPositive ? y - 50 : y + 20}
+                      y={isPositive ? y - 70 : y + 30}
                       width="44"
                       height="24"
                       rx="12"
                       ry="12"
-                      fill="rgba(255, 255, 255, 0.98)"
-                      stroke="rgba(0, 0, 0, 0.08)"
-                      strokeWidth="1"
+                      fill={isCurrentDiary ? "#e4e4e4" : "rgba(255, 255, 255, 0.98)"}
+                      stroke={isCurrentDiary ? "rgba(0, 0, 0, 0.08)" : "rgba(0, 0, 0, 0.08)"}
+                      strokeWidth={isCurrentDiary ? "2" : "1"}
                       filter="url(#softShadow)"
                     />
 
@@ -253,26 +335,26 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores }) => {
                     <path
                       d={
                         isPositive
-                          ? `M ${x - 6} ${y - 26} L ${x} ${y - 16} L ${x + 6} ${y - 26} Z`
-                          : `M ${x - 6} ${y + 44} L ${x} ${y + 34} L ${x + 6} ${y + 44} Z`
+                          ? `M ${x - 5} ${y - 45} L ${x} ${y - 38} L ${x + 5} ${y - 45} Z`
+                          : `M ${x - 5} ${y + 29} L ${x} ${y + 22} L ${x + 5} ${y + 29} Z`
                       }
-                      fill="rgba(255, 255, 255, 0.98)"
-                      stroke="rgba(0, 0, 0, 0.08)"
-                      strokeWidth="1"
+                      fill={isCurrentDiary ? "#e4e4e4" : "rgba(255, 255, 255, 0.98)"}
+                      stroke={isCurrentDiary ? "rgba(0, 0, 0, 0.12)" : "rgba(0, 0, 0, 0.12)"}
+                      strokeWidth={isCurrentDiary ? "1.5" : "1"}
                       filter="url(#softShadow)"
                     />
 
                     {/* 날짜 텍스트 */}
                     <text
                       x={x}
-                      y={isPositive ? y - 32 : y + 38}
+                      y={isPositive ? y - 52 : y + 48}
                       textAnchor="middle"
                       fontSize="12"
-                      fill="rgba(51, 65, 85, 0.9)"
+                      fill={isCurrentDiary ? "rgba(51, 65, 85, 0.9)" : "rgba(51, 65, 85, 0.9)"}
                       fontWeight="600"
                       fontFamily="system-ui, -apple-system, BlinkMacSystemFont, sans-serif"
                     >
-                      {score.writtenDate.slice(5).replace("-", "/")}
+                      {isCurrentDiary ? "현재" : score.writtenDate.slice(5).replace("-", "/")}
                     </text>
                   </g>
                 </g>

@@ -80,7 +80,7 @@ export default function Mypage() {
   const socialInfo = getSocialInfo(socialType);
 
   return (
-    <div className="min-h-screen p-6 text-foreground bg-background">
+    <div className="min-h-screen p-6 text-foreground ">
       <div className="max-w-md mx-auto">
         {/* 헤더 */}
         <div className="mb-8">

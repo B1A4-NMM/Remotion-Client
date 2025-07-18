@@ -7,13 +7,14 @@ export const useDeleteDiary = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ token, diaryId }: { token: string; diaryId: string }) =>
-      deleteDiary(token, diaryId),
+    mutationFn: ({ diaryId }: { diaryId: string }) => deleteDiary(diaryId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["todayDiary"] });
-      queryClient.invalidateQueries({ queryKey: ["diaryContent"] });
-      queryClient.invalidateQueries({ queryKey: ["diaryDate"] });
+      // 실제 사용하는 쿼리 키들로 무효화
+      queryClient.invalidateQueries({ queryKey: ["diaries"] });
       queryClient.invalidateQueries({ queryKey: ["homeData"] });
+      queryClient.invalidateQueries({ queryKey: ["todayDiary"] });
+      queryClient.invalidateQueries({ queryKey: ["diaryDate"] });
+      queryClient.invalidateQueries({ queryKey: ["infiniteDiaries"] });
       toast.success("일기가 성공적으로 삭제되었습니다.", {
         description: "홈 화면으로 돌아갑니다.",
         duration: 3000,

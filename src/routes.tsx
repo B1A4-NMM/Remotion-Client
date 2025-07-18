@@ -8,7 +8,6 @@ import SearchPage from "./pages/SearchPage";
 import Result from "./pages/Result";
 import Loading6 from "./components/Loading/Loading6";
 import Loading7 from "./components/Loading/Loading7";
-import LoadingDiaryAnalysis from "./pages/LoadingDiaryAnalysis";
 
 import Video from "./pages/Video";
 import Routine from "./pages/Routine";
@@ -24,7 +23,6 @@ import Relation from "./pages/Relation";
 import RelationDetail from "./pages/RelationDetail";
 
 import Calendar from "./pages/Calendar";
-import NotFound from "./pages/NotFound";
 import Mypage from "./pages/Mypage";
 
 export const routes = [
@@ -183,6 +181,10 @@ export const routes = [
   },
   {
     path: "*",
-    element: <NotFound />,
+    element: (
+      <ProtectedRoute>
+        <Home />
+      </ProtectedRoute>
+    ),
   },
 ];

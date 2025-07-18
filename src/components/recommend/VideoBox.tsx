@@ -93,7 +93,12 @@ const YouTubeBoard: React.FC<YouTubeBoardProps> = ({}) => {
     if (isLoading) return [];
     if (isError) return SAMPLE_DATA;
     if (data && Array.isArray(data?.videoId) && data?.videoId.length > 0) {
-      return data.videoId;
+      // API 응답을 VideoType 형태로 변환
+      return data.videoId.map(videoId => ({
+        videoId,
+        emotion: "",
+        message: "",
+      }));
     }
     return SAMPLE_DATA;
   };
@@ -197,19 +202,19 @@ const YouTubeBoard: React.FC<YouTubeBoardProps> = ({}) => {
           onTouchStart={handleTouchStart}
         >
           <div className="flex space-x-4 p-4 shadow-xl">
-            {videoList.map(videoId => (
+            {videoList.map(video => (
               <div
-                key={videoId}
+                key={video.videoId}
                 className="flex-shrink-0 min-w-[300px] bg-black rounded-3xl shadow-md overflow-hidden snap-center"
               >
                 <div className="relative">
                   <img
-                    src={getThumbnailUrl(videoId)}
+                    src={getThumbnailUrl(video.videoId)}
                     className="w-full h-[169px] object-cover rounded-3xl p-2"
                     alt={"Video thumbnail"}
                   />
                   <div
-                    onClick={() => handleVideoClick(videoId)}
+                    onClick={() => handleVideoClick(video.videoId)}
                     className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity"
                   >
                     <Play className="w-12 h-12 text-white" />

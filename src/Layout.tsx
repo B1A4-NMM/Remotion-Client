@@ -17,12 +17,12 @@ export default function Layout() {
   const shouldShowNav =
     !HIDE_NAV_PATHS.some(path => location.pathname.startsWith(path)) && !isPopupOpen;
 
-  const shouldShowTitle = SHOW_TITLE_PATHS.some(path => location.pathname.startsWith(path));
+  const shouldShowTitle = SHOW_TITLE_PATHS.includes(location.pathname);
 
   return (
     <div className="w-full min-h-[100dvh] flex justify-center bg-[black] font-pretendard">
       <div className="w-full max-w-[414px] flex flex-col relative bg-[#FAF6F4] dark:bg-gradient-to-b dark:from-[#181718] dark:to-[#4A3551] dark:text-white min-h-[100dvh]">
-        {shouldShowTitle && <Title name={"심층 분석"} isBackActive={false} />}
+        {shouldShowTitle && <Title name={"감정 분석"} isBackActive={false} />}
         <main className={`flex-1 h-full ${shouldShowNav ? "pb-[84px]" : ""}`}>
           <AnimatedOutlet />
           <Toaster

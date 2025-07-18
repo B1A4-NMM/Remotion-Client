@@ -1,17 +1,13 @@
 // RoutineModalContent.tsx
 import { useState } from "react";
+import { RoutineItem } from "@/types/routine";
 
 
-type RoutineItem = {
-  id: number;
-  title: string;
-  routineType: string;
-};
 
 interface RoutineModalContentProps {
   emotion: string;
   routines: RoutineItem[];
-  onAdd: (title: string) => void;
+  onAdd: (content: string) => void;
   onDelete: (id: number) => void;
   onClose: () => void;
 }
@@ -51,8 +47,8 @@ const RoutineModalContent = ({
             key={routine.id}
             className="flex justify-between items-center bg-gray-100 px-4 py-2 rounded-lg mb-2"
           >
-            <span className="text-sm">{routine.title}</span>
-            <button onClick={() => onDelete(routine.id)}>🗑️</button>
+            <span className="text-sm">{routine.content}</span>
+            <button onClick={() => onDelete(routine.id)}>delete</button>
           </div>
         ))
       )}

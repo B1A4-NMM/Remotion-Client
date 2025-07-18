@@ -19,8 +19,8 @@ const ResultToggle: React.FC<ResultToggleProps> = ({ view }) => {
   };
 
   return (
-    <div className="flex justify-center gap-2 mb-10 mt-10">
-      <div className="buttonContainer w-fit font-semibold text-[14px]">
+    <div className="flex justify-center mb-8 mt-8">
+      <div className="buttonContainer w-fit">
         <button
           className={`button ${view === "record" ? "active" : ""}`}
           onClick={() => handleTabClick("record")}

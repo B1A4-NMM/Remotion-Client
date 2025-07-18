@@ -136,13 +136,13 @@ const Result: React.FC = () => {
 
   useEffect(() => {
     // 페이드 효과 여부 확인
-    const fadeFlag = sessionStorage.getItem('shouldFadeFromLoading');
-    
-    if (fadeFlag === 'true') {
+    const fadeFlag = sessionStorage.getItem("shouldFadeFromLoading");
+
+    if (fadeFlag === "true") {
       setShouldFade(true);
       // 플래그 제거
-      sessionStorage.removeItem('shouldFadeFromLoading');
-      
+      sessionStorage.removeItem("shouldFadeFromLoading");
+
       // 페이드 인 효과 시작
       setTimeout(() => {
         setIsVisible(true);
@@ -152,7 +152,6 @@ const Result: React.FC = () => {
       setIsVisible(true);
     }
   }, []);
-
 
   if (isError) {
     return (
@@ -175,7 +174,7 @@ const Result: React.FC = () => {
   return (
     <div
       className={`result-container px-4 h-screen text-foreground transition-opacity duration-1000 ${
-        shouldFade ? 'fade-transition' : ''
+        shouldFade ? "fade-transition" : ""
       } ${isTouchDevice ? "overflow-y-auto scrollbar-hide touch-scroll" : "overflow-y-auto"} ${
         isScrolling ? "scrolling" : ""
       }`}

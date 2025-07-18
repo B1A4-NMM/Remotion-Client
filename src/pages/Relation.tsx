@@ -326,6 +326,7 @@ const EmotionalGraph = () => {
 
   return (
     <div ref={containerRef} className="w-full h-screen overflow-hidden relative">
+
       <motion.div
         drag
         onClick={() => console.log("✅ Clicked!")}

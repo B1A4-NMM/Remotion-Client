@@ -30,10 +30,8 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
-
   const category = selectedCategory || "지혜";
   const detailKeys = CATEGORY_GROUPS[category] || [];
-
 
   console.log("currentData:", currentData);
 
@@ -47,56 +45,56 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
     };
 
     updateSize();
-    window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
   }, []);
 
   useEffect(() => {
     const svg = d3.select(ref.current);
     svg.selectAll("*").remove();
-  
+
     if (detailKeys.length === 0 || containerSize.width <= 0 || containerSize.height <= 0) {
       return;
     }
-  
+
     // 컨테이너 크기에 맞춰 동적 조정
     const containerWidth = Math.max(containerSize.width, 300);
     const containerHeight = Math.max(containerSize.height - 50, 200);
-  
+
     const itemCount = detailKeys.length;
     const availableWidth = containerWidth - 60;
     const groupWidth = Math.min(80, Math.max(50, availableWidth / itemCount));
     const barWidth = Math.min(30, Math.max(15, groupWidth * 0.35));
     const barGap = Math.min(6, Math.max(2, groupWidth * 0.1));
     const groupGap = Math.max(10, (availableWidth - itemCount * groupWidth) / (itemCount - 1));
-    
+
     const totalWidth = itemCount * groupWidth + (itemCount - 1) * groupGap;
     const offsetX = (containerWidth - totalWidth) / 2;
-  
+
     const width = containerWidth;
     const height = containerHeight;
-  
+
     // barHeightRatio를 forEach 밖으로 이동
     const maxBarHeight = Math.max(100, height - 100);
     const barHeightRatio = Math.max(10, Math.min(25, maxBarHeight / 8));
-  
+
     svg.attr("width", width).attr("height", height);
-  
+
     // 각 세부 분류에 대해 막대 생성
     detailKeys.forEach((key, i) => {
       const lastValue = Math.max(0, (lastData && lastData[key]) || 0);
       const currentValue = Math.max(0, (currentData && currentData[key]) || 0);
-  
+
       const groupX = offsetX + i * (groupWidth + groupGap);
-  
+
       // 막대 높이 계산 (음수 방지)
       const lastBarHeight = Math.max(0, Math.min(lastValue * barHeightRatio, maxBarHeight));
       const currentBarHeight = Math.max(0, Math.min(currentValue * barHeightRatio, maxBarHeight));
-  
+
       // 저번 달 데이터 막대
       const lastBarX = groupX;
       const lastBarY = Math.max(20, height - lastBarHeight - 60);
-  
+
       svg
         .append("rect")
         .attr("x", lastBarX)
@@ -110,11 +108,11 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
         .delay(i * 100)
         .attr("y", lastBarY)
         .attr("height", lastBarHeight);
-  
+
       // 이번 달 데이터 막대
       const currentBarX = groupX + barWidth + barGap;
       const currentBarY = Math.max(20, height - currentBarHeight - 60);
-  
+
       svg
         .append("rect")
         .attr("x", currentBarX)
@@ -128,11 +126,11 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
         .delay(i * 100 + 150)
         .attr("y", currentBarY)
         .attr("height", currentBarHeight);
-  
+
       // 수치 표시
       const lastTextY = Math.max(15, lastBarY - 8);
       const currentTextY = Math.max(15, currentBarY - 8);
-  
+
       svg
         .append("text")
         .attr("x", lastBarX + barWidth / 2)
@@ -147,7 +145,7 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
         .duration(300)
         .delay(i * 100 + 800)
         .style("opacity", 1);
-  
+
       svg
         .append("text")
         .attr("x", currentBarX + barWidth / 2)
@@ -162,7 +160,7 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
         .duration(300)
         .delay(i * 100 + 950)
         .style("opacity", 1);
-  
+
       // 라벨
       svg
         .append("text")
@@ -174,11 +172,11 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
         .style("font-weight", "500")
         .text(key);
     });
-  
+
     // 범례 추가
     const legendGroup = svg.append("g").attr("class", "legend");
     const legendX = Math.max(20, width - 140);
-  
+
     legendGroup
       .append("rect")
       .attr("x", legendX)
@@ -187,7 +185,7 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
       .attr("height", 14)
       .attr("fill", LAST_COLOR)
       .attr("rx", 2);
-  
+
     legendGroup
       .append("text")
       .attr("x", legendX + 20)
@@ -196,7 +194,7 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
       .style("font-size", "12px")
       .style("font-weight", "500")
       .text("저번 달");
-  
+
     legendGroup
       .append("rect")
       .attr("x", legendX + 70)
@@ -205,7 +203,7 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
       .attr("height", 14)
       .attr("fill", CURRENT_COLOR)
       .attr("rx", 2);
-  
+
     legendGroup
       .append("text")
       .attr("x", legendX + 90)
@@ -214,10 +212,10 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
       .style("font-size", "12px")
       .style("font-weight", "500")
       .text("이번 달");
-  
+
     // 격자 라인 추가 (이제 barHeightRatio에 접근 가능)
     const gridGroup = svg.append("g").attr("class", "grid");
-  
+
     for (let i = 1; i <= 8; i++) {
       const y = height - 60 - i * barHeightRatio;
       if (y > 20) {
@@ -233,8 +231,6 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
       }
     }
   }, [lastData, currentData, selectedCategory, category, detailKeys, containerSize]);
-  
-  
 
   return (
     <div ref={containerRef} className="w-full h-full relative">

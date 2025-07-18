@@ -5,7 +5,7 @@ import { usePostRoutineByType } from "@/api/queries/routine/usePostRoutineByType
 
 interface RecommendedRoutinePopupProps {
     emotion: RoutineType;
-    onAdd: (title: string) => void;
+    onAdd: (content: string) => void;
     onClose:() => void;
   }
   
@@ -23,7 +23,7 @@ interface RecommendedRoutinePopupProps {
   
     const { mutate: postRoutine } = usePostRoutineByType();
   
-    const handleClick = (title: string) => {
+    const handleClick = (content: string) => {
       // postRoutine(
       //   { type:emotion,title },
       //   {
@@ -33,7 +33,7 @@ interface RecommendedRoutinePopupProps {
       //     },
       //   }
       // );
-      onAdd(title);
+      onAdd(content);
     };
 
     //바텀시트를 닫을 때 invalidate 처리
@@ -46,22 +46,22 @@ interface RecommendedRoutinePopupProps {
       <div className="p-5">
          <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-bold mb-2">{emotion} 루틴 추천</h2>
-        <button onClick={handleClose} className="text-sm text-gray-500">
+        <button onClick={handleClose} className="text-gray-500 text-sm hover:text-black border border-gray-300 rounded px-3 py-1">
           닫기
         </button>
         </div>
 
-        <p className="text-sm text-gray-600 mb-3">아직 루틴이 없어요. 이런 것부터 시작해보는 건 어때요?</p>
+        <p className="text-sm text-gray-600 mb-3 dark:text-white">아직 루틴이 없어요. 이런 것부터 시작해보는 건 어때요?</p>
         
         {RECOMMENDED_ROUTINES[emotion] ?(
           <ul className="space-y-2">
-          {RECOMMENDED_ROUTINES[emotion].map((title, index) => (
+          {RECOMMENDED_ROUTINES[emotion].map((content, index) => (
             <li
               key={index}
               className="cursor-pointer border border-gray-300 rounded px-3 py-2 hover:bg-gray-100"
-              onClick={() => handleClick(title)}
+              onClick={() => handleClick(content)}
             >
-              {title}
+              {content}
             </li>
           ))}
         </ul>

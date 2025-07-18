@@ -7,8 +7,8 @@ export const usePostRoutineByType = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ type, title }: { type: RoutineType; title: string }) =>
-      postRoutineByType(type, title),
+    mutationFn: ({ type, content }: { type: RoutineType; content: string }) =>
+      postRoutineByType(type, content),
 
     onSuccess: (_, variables) => {
       // 추가 성공 후 해당 type의 루틴 쿼리 무효화

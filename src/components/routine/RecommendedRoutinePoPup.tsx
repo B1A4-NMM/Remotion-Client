@@ -46,12 +46,12 @@ interface RecommendedRoutinePopupProps {
       <div className="p-5">
          <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-bold mb-2">{emotion} 루틴 추천</h2>
-        <button onClick={handleClose} className="text-sm text-gray-500">
+        <button onClick={handleClose} className="text-gray-500 text-sm hover:text-black border border-gray-300 rounded px-3 py-1">
           닫기
         </button>
         </div>
 
-        <p className="text-sm text-gray-600 mb-3">아직 루틴이 없어요. 이런 것부터 시작해보는 건 어때요?</p>
+        <p className="text-sm text-gray-600 mb-3 dark:text-white">아직 루틴이 없어요. 이런 것부터 시작해보는 건 어때요?</p>
         
         {RECOMMENDED_ROUTINES[emotion] ?(
           <ul className="space-y-2">

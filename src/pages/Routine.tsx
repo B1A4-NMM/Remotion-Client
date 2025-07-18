@@ -26,11 +26,9 @@ const Routine = () => {
   const [selectedEmotion, setSelectedEmotion] = useState<RoutineItem["routineType"] | null>(null);
   
   const [selectedRoutines, setSelectedRoutines] =useState<RoutineItem[]>([]); 
-  const [selectedFilter, setSelectedFilter] = useState<RoutineItem["routineType"] | null>(null);
+  const [selectedFilter, setSelectedFilter] = useState<RoutineItem["routineType"]>("depression");
   const [showRecommendation, setShowRecommendation] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-
-  const [setAllRoutines] = useState<RoutineItem[]>([]);
   
 
   const [fetchedRoutines] = useState<RoutineItem[]>([]);

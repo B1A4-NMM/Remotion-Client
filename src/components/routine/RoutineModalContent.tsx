@@ -46,7 +46,7 @@ const RoutineModalContent = ({
   </div>
 
   {/* ✅ 루틴 리스트만 스크롤되게 분리 */}
-  <div className="flex-1 overflow-y-auto pr-1">
+  
     {routines.length === 0 ? (
       <p className="text-sm text-gray-400 dark:text-white/50">
         아직 추가된 루틴이 없어요.
@@ -75,7 +75,6 @@ const RoutineModalContent = ({
         </div>
       ))
     )}
-  </div>
 
   {/* ✅ 항상 하단에 고정되는 추가 입력창 */}
   <div className="flex mt-4 gap-2 pt-2 border-t border-gray-300 dark:border-white/20">

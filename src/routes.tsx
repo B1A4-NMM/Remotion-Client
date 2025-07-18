@@ -22,6 +22,7 @@ import Depress from "./pages/analysis/Depress";
 import Character from "./pages/analysis/Character";
 import Relation from "./pages/Relation";
 import RelationDetail from "./pages/RelationDetail";
+import Notifications from "./pages/notifications";
 
 import Calendar from "./pages/Calendar";
 import NotFound from "./pages/NotFound";
@@ -184,5 +185,13 @@ export const routes = [
   {
     path: "*",
     element: <NotFound />,
+  },
+  {
+    path: "/notifications",
+    element: (
+      <ProtectedRoute>
+        <Notifications />
+      </ProtectedRoute>
+    ),
   },
 ];

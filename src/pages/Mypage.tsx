@@ -1,6 +1,7 @@
 import React from "react";
 import { useUserStore } from "@/store/userStore";
 import { useTheme } from "@/components/theme-provider";
+import NotificationPreview from "@/components/notification/NotificationPreview";
 import { useGetAuthTest } from "@/api/queries/auth/useGetAuthTest";
 import kakao from "@/assets/img/kakao.svg";
 import google from "@/assets/img/google.svg";
@@ -86,6 +87,9 @@ export default function Mypage() {
         <div className="mb-8">
           <h1 className="text-2xl font-bold mb-2">마이페이지</h1>
         </div>
+
+        {/* 알림 5개 미리보기 카드*/}
+        <NotificationPreview/>
 
         {/* 계정 정보 카드 */}
         <div className="bg-card rounded-2xl shadow-lg p-6 mb-6 border">

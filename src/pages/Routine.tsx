@@ -59,6 +59,15 @@ const Routine = () => {
         type: selectedEmotion,
         content: content,
       });
+
+      const updated = await getRoutineByType(selectedEmotion);
+      const normalized = updated.map(item => ({
+        id: item.routineId,
+        content: item.content,
+        routineType: item.routineType,
+      }));
+      
+      setSelectedRoutines(normalized);
       await refetchRoutine();
     } catch (err) {
       console.error("루틴 추가 실패", err);
@@ -73,6 +82,8 @@ const Routine = () => {
       console.error("루틴 삭제 실패", err);
     }
   };
+  
+  
 
   const handleFolderClick = async (emotionTitle: string) => {
     const emotionKey = emotionTitle as RoutineItem["routineType"];

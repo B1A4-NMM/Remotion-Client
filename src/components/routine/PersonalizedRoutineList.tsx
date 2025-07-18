@@ -1,6 +1,7 @@
 import React, { useState,useEffect } from "react";
 import { usePatchRoutineById } from "@/api/queries/routine/usePatchRoutineById"
 import { precisionFixed } from "d3";
+import { useNavigate } from "react-router-dom";
 
 interface RoutineItem {
   id: number;
@@ -13,6 +14,7 @@ interface Props {
 }
 
 const PersonalizedRoutineList = ({ routines }: Props) => {
+  const navigate = useNavigate();
   const [ localRoutines, setLocalRoutines ] = useState<RoutineItem[]>(routines);
   const { mutate } = usePatchRoutineById();
 
@@ -23,6 +25,9 @@ const PersonalizedRoutineList = ({ routines }: Props) => {
         setLocalRoutines((prev) =>
         prev.filter((item) => item.id !== routine.id )
         );
+        
+        //루틴 추가 후 리다이렉트
+        navigate("/routine");
       }
     });
   }

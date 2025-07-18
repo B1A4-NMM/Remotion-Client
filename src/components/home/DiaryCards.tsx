@@ -7,11 +7,8 @@ import DiaryActionModal from "./DiaryActionModal";
 import dayjs from "dayjs";
 import { useDeleteDiary } from "../../api/queries/home/useDeleteDiary";
 import { useNavigate } from "react-router-dom";
-<<<<<<< HEAD
 import { MapPin } from "lucide-react";
-=======
 import VirtualizedBlobCard from "../Blob/VirtualizedBlobCard";
->>>>>>> 04e38e86f0b0846d58ce0b34af0bfb01dec34f50
 
 interface Diary {
   id: number;
@@ -82,7 +79,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                   <VirtualizedBlobCard
                     key={mappedDiary.id}
                     diaryContent={{ emotions: mappedDiary.emotions }}
-                    index={index} />
+                    index={index}
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   {/* 감정 요약 */}
@@ -181,7 +179,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                       <VirtualizedBlobCard
                         key={mappedDiary.id}
                         diaryContent={{ emotions: mappedDiary.emotions }}
-                        index={index} />
+                        index={index}
+                      />
                     </div>
                     {/* 대상 요약 (아래) */}
                     <div className="text-xs text-[#85848F] text-center">
@@ -280,7 +279,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                       <VirtualizedBlobCard
                         key={mappedDiary.id}
                         diaryContent={{ emotions: mappedDiary.emotions }}
-                        index={index} />
+                        index={index}
+                      />
                     </div>
                     {/* 대상 요약 (아래) */}
                     <div className="text-xs text-[#85848F] text-center">
@@ -371,7 +371,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                       <VirtualizedBlobCard
                         key={mappedDiary.id}
                         diaryContent={{ emotions: mappedDiary.emotions }}
-                        index={index} />
+                        index={index}
+                      />
                     </div>
                     {/* 대상 요약 (아래) */}
                     <div className="text-xs text-[#85848F] text-center">
@@ -464,7 +465,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                       <VirtualizedBlobCard
                         key={mappedDiary.id}
                         diaryContent={{ emotions: mappedDiary.emotions }}
-                        index={index} />
+                        index={index}
+                      />
                     </div>
                     {/* 대상 요약 (아래) */}
                     <div className="text-xs text-[#85848F] text-center">

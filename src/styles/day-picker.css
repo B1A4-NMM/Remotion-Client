@@ -24,6 +24,13 @@
   color: black;
 }
 
+/* ensure SVG navigation icons are black */
+.rdp-nav_button svg {
+  color: black;
+  fill: currentColor;
+  stroke: currentColor;
+}
+
 .rdp-head_cell {
   color: black;
 }

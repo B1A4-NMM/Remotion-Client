@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import BottomPopup from "@/components/routine/BottomPopup";
+import BottomPopup from "@/components/BottomPopup";
 import kakao from "./../assets/img/kakao.svg";
 import google from "./../assets/img/google.svg";
 import { Canvas } from "@react-three/fiber";

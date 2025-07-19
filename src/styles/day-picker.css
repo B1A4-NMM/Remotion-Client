@@ -19,3 +19,26 @@
 .rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
   background-color: hsl(var(--accent)) !important;
 }
+
+.rdp-nav_button {
+  color: black;
+}
+
+/* ensure SVG navigation icons are black */
+.rdp-nav_button svg {
+  color: black;
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+.rdp-head_cell {
+  color: black;
+}
+
+.rdp-head_cell:nth-child(6) {
+  color: #7DA7E3;
+}
+
+.rdp-head_cell:nth-child(7) {
+  color: #F36B6B;
+}

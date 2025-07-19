@@ -6,7 +6,7 @@ import { useGetRoutineByType } from "@/api/queries/routine/useGetRoutineByType";
 
 import Title from "@/components/recommend/Title";
 import FolderCardList from "@/components/routine/FolderCardList";
-import BottomPopup from "@/components/routine/BottomPopup";
+import BottomPopup from "@/components/BottomPopup";
 import RoutineModalContent from "@/components/routine/RoutineModalContent";
 import PersonalizedRoutineList from "@/components/routine/PersonalizedRoutineList";
 import RecommendedRoutinePopup from "@/components/routine/RecommendedRoutinePoPup";
@@ -64,7 +64,7 @@ const Routine = () => {
         content: item.content,
         routineType: item.routineType,
       }));
-      
+
       setSelectedRoutines(normalized);
       await refetchRoutine();
     } catch (err) {
@@ -80,8 +80,6 @@ const Routine = () => {
       console.error("루틴 삭제 실패", err);
     }
   };
-  
-  
 
   const handleFolderClick = async (emotionTitle: string) => {
     const emotionKey = emotionTitle as RoutineItem["routineType"];

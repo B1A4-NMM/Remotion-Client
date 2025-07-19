@@ -39,7 +39,7 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
   }));
 
   const handleOverlayClick = useCallback(() => {
-    // onClose(); // 임시로 비활성화
+    onClose();
   }, [onClose]);
 
   const handleContentClick = useCallback((e: React.MouseEvent) => e.stopPropagation(), []);
@@ -82,13 +82,13 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
 
   return isInDOM ? (
     <>
-      <div className="absolute inset-0 bg-black bg-opacity-30 z-40" onClick={handleOverlayClick} />
+      <div className="absolute inset-0 bg-black bg-opacity-30 z-[99]" onClick={handleOverlayClick} />
       <animated.div
         style={{
           ...springProps,
           display: "block",
         }}
-        className="absolute bottom-0 left-0 w-full z-50 bg-white rounded-t-2xl overflow-y-auto shadow-xl"
+        className="absolute bottom-0 left-0 w-full z-[100] bg-white rounded-t-2xl overflow-y-auto shadow-xl"
         onClick={handleContentClick}
       >
         <div ref={contentRef} className="p-6">

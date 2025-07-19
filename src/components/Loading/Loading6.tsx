@@ -81,7 +81,7 @@ const Loading6: React.FC = () => {
 
       // 체크 애니메이션: 화면 영역 안에 있을 때만 체크 표시
       checksRef.current.forEach((check, i) => {
-        const phraseY = 100 + i * 40 + currentY;
+        const phraseY = 40 + i * 70 + currentY;
         
         // 화면 영역(0~containerHeight) 안에 있는지 확인
         const isInViewport = phraseY >= 0 && phraseY <= containerHeight;

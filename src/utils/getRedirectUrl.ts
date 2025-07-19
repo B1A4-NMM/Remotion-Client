@@ -2,17 +2,18 @@ import { Notification } from "@/types/notification";
 
 //해시 테이블 기반 Map (Record) 구조
 
-const redirectStrategies : Record<
+export const redirectStrategies : Record<
     Notification["type"],
     (noti: Notification) => string
     > = {
-        routine_added: () => "/routine",
-        todo_incomplete: (noti) => 
+        ROUTINE: () => "/routine",
+        TODO: (noti) => 
             `/calendar?date=${noti.targetDate}`,
-        recap_diary: (noti) =>
-            `/diary/${noti.targetDate}`,
-        character_changed : () => "analysis/character",
-    };
+        RECAP: (noti) =>
+            `/result/${noti.diaryId}`,
+        CHARACTER : () => "analysis/character",
+        TODAY_COMMENT : () => ""
+};
 
 export const getRedirectUrl = (noti: Notification): string => {
     return redirectStrategies[noti.type]?.(noti) || "/";

@@ -1,3 +1,5 @@
+import { mapEmotionToColor, baseColors } from "@/constants/emotionColors";
+
 export type Node = {
   x: number;
   y: number;
@@ -88,31 +90,38 @@ export const createAnimatedBranches = (
     const targetX = centerX + Math.cos(angle) * distance;
     const targetY = centerY + Math.sin(angle) * distance;
 
-    const emotionColorMap: Record<string, [string, string]> = {
-      감사: ["#ffeaa7", "#fab1a0"], // 따뜻하고 밝은 옐로우-살구
-      존경: ["#f6e58d", "#f9ca24"], // 황금빛 존중
-      신뢰: ["#81ecec", "#00cec9"], // 안정감 있는 민트
-      애정: ["#ffb5e8", "#ff9cee"], // 부드러운 핑크톤
-      친밀: ["#a0e7e5", "#b4f8c8"], // 밝고 부드러운 블루-민트
-      유대: ["#74b9ff", "#a29bfe"], // 믿음 있는 보라-블루
-      사랑: ["#ff7675", "#fd79a8"], // 따뜻한 사랑의 핑크-레드
-      공감: ["#fab1a0", "#ffeaa7"], // 공감의 살구+옐로우
+    // const emotionColorMap: Record<string, [string, string]> = {
+    //   애정: ["#ffb5e8", "#ff9cee"], // 부드러운 핑크톤
+    //   사랑: ["#ff7675", "#fd79a8"], // 따뜻한 사랑의 핑크-레드
 
-      질투: ["#c0eb75", "#badc58"], // 연두빛 복잡함
-      시기: ["#dff9fb", "#7ed6df"], // 차가운 비교
-      분노: ["#ff6b6b", "#c44569"], // 강렬한 레드
-      짜증: ["#fcd5ce", "#f8c8dc"], // 탁한 살구+핑크
-      실망: ["#b2bec3", "#636e72"], // 회색빛 무기력
-      억울: ["#dfe6e9", "#b2bec3"], // 답답한 회색 계열
-      속상: ["#dfe4ea", "#ced6e0"], // 탁한 블루-그레이
-      상처: ["#a29bfe", "#6c5ce7"], // 차가운 퍼플 계열
-      배신감: ["#636e72", "#2d3436"], // 어두운 회색
-      경멸: ["#dcdde1", "#718093"], // 냉소적인 그레이-블루
-      거부감: ["#ffcccc", "#fab1a0"], // 거절의 불쾌감
-      불쾌: ["#c8d6e5", "#8395a7"], // 무채색에 가까운 탁함
-    };
-    const [colorA, colorB] = emotionColorMap[rel.highestEmotion] ?? ["#ccc", "#999"];
+    //   질투: ["#c0eb75", "#badc58"], // 연두빛 복잡함
+    //   시기: ["#dff9fb", "#7ed6df"], // 차가운 비교
+    //   분노: ["#ff6b6b", "#c44569"], // 강렬한 레드
+    //   짜증: ["#fcd5ce", "#f8c8dc"], // 탁한 살구+핑크
+    //   억울: ["#dfe6e9", "#b2bec3"], // 답답한 회색 계열
+    //   상처: ["#a29bfe", "#6c5ce7"], // 차가운 퍼플 계열
+    //   배신감: ["#636e72", "#2d3436"], // 어두운 회색
+    //   경멸: ["#dcdde1", "#718093"], // 냉소적인 그레이-블루
+    //   거부감: ["#ffcccc", "#fab1a0"], // 거절의 불쾌감
+    //   불쾌: ["#c8d6e5", "#8395a7"], // 무채색에 가까운 탁함
+    
+    //   실망: ["#b2bec3", "#636e72"], // 회색빛 무기력
+    //   속상: ["#dfe4ea", "#ced6e0"], // 탁한 블루-그레이
 
+    //   감사: ["#ffeaa7", "#fab1a0"], // 따뜻하고 밝은 옐로우-살구
+    //   존경: ["#f6e58d", "#f9ca24"], // 황금빛 존중
+    //   신뢰: ["#81ecec", "#00cec9"], // 안정감 있는 민트
+    //   친밀: ["#a0e7e5", "#b4f8c8"], // 밝고 부드러운 블루-민트
+    //   유대: ["#74b9ff", "#a29bfe"], // 믿음 있는 보라-블루
+    //   공감: ["#fab1a0", "#ffeaa7"], // 공감의 살구+옐로우
+    // };
+    // const [colorA, colorB] = emotionColorMap[rel.highestEmotion] ?? ["#ccc", "#999"];
+
+    const colorKey = mapEmotionToColor(rel.highestEmotion);
+    const color = baseColors[colorKey] ?? "#ccc";
+    const colorA = color;
+    const colorB = color;
+    
     return {
       from: rootNode,
       toPos: { x: targetX, y: targetY },

@@ -1,11 +1,12 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
 
+import { useQuery } from "@tanstack/react-query";
 import React, { useRef, useEffect, useState } from "react";
 import { motion, useMotionValue } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+
 import type { Node, AnimatedBranch, Edge } from "@/types/emotionalGraph";
 import { useGetRelation } from "../api/queries/relation/useGetRelation";
-import { useNavigate } from "react-router-dom";
 
 import { updatePhysics } from "@/utils/physics";
 import {
@@ -18,84 +19,64 @@ import {
 import { drawEdges, drawAnimatedBranch, drawNodes } from "@/utils/drawing";
 
 const EmotionalGraph = () => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const hasScrolledToMe = useRef(false);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null); // 캔버스 DOM 참조
+  const containerRef = useRef<HTMLDivElement | null>(null); // 캔버스를 감싸는 div 참조
+  const hasScrolledToMe = useRef(false); // "나" 노드로 한 번만 스크롤 이동 여부 체크
 
-  const animationRef = useRef<number>();
-  const nodesRef = useRef<Node[]>([]);
-  const edgesRef = useRef<Edge[]>([]);
-  const animatedBranchesRef = useRef<AnimatedBranch[]>([]);
-  const startTimeRef = useRef<number>(0);
-  const previousTimestampRef = useRef<number>(0);
-  const { data: relationData } = useGetRelation();
+  const animationRef = useRef<number>(); // animation frame ID 저장
+  const nodesRef = useRef<Node[]>([]); // 현재 모든 노드 정보 저장
+  const edgesRef = useRef<Edge[]>([]); // 노드 간 간선 정보 저장
+  const animatedBranchesRef = useRef<AnimatedBranch[]>([]); // 점진적으로 생성될 브랜치(노드)
 
+  const startTimeRef = useRef<number>(0); // 전체 애니메이션 시작 시간
+  const previousTimestampRef = useRef<number>(0); // 프레임 간 시간 차 계산용
 
-  const dpr = window.devicePixelRatio || 1;
-  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
+  const { data: relationData } = useGetRelation(); // 관계 데이터 패칭
 
-  const offsetX = useMotionValue(0);
-  const offsetY = useMotionValue(0);
-  const navigate = useNavigate();
+  const dpr = window.devicePixelRatio || 1; // 디바이스 픽셀 비율
+  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 }); // 캔버스 크기 상태
 
-  // 클릭/드래그 구분용 ref
-  const clickStartRef = useRef<{ x: number; y: number } | null>(null);
+  const offsetX = useMotionValue(0); // 드래그에 따른 X 오프셋
+  const offsetY = useMotionValue(0); // 드래그에 따른 Y 오프셋
 
+  const navigate = useNavigate(); // 페이지 이동용
+
+  const clickStartRef = useRef<{ x: number; y: number } | null>(null); // 클릭/드래그 구분용 좌표 저장
+
+  // 🔹 드래그 시작 시 좌표 저장
   const handleCanvasMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     clickStartRef.current = { x: e.clientX, y: e.clientY };
   };
 
+  // 🔹 드래그 끝났을 때 클릭으로 판단되면 클릭 핸들러 실행
   const handleCanvasMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!clickStartRef.current) return;
     const dx = e.clientX - clickStartRef.current.x;
     const dy = e.clientY - clickStartRef.current.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    // 5px 이하 이동이면 클릭으로 간주
     if (distance < 5) {
       handleCanvasClick(e);
     }
     clickStartRef.current = null;
   };
 
-  // 캔버스 클릭 핸들러: 노드 클릭 시 /relation/{id}로 이동
+  // 🔹 캔버스 클릭 시, 해당 위치의 노드 확인 후 페이지 이동
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
-    if (!canvas) {
-      return;
-    }
+    if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    // 클릭 좌표 (CSS 기준)
     const cssX = e.clientX - rect.left;
     const cssY = e.clientY - rect.top;
-
 
     const offsetXValue = offsetX.get();
     const offsetYValue = offsetY.get();
 
-    if (!nodesRef.current || nodesRef.current.length === 0) {
-      return;
-    }
-
     let clickedNode = null;
 
     for (const node of nodesRef.current) {
-      // 노드는 draw() 함수에서 offsetX/Y를 적용해서 그려짐
-      // draw 함수에서: centerX = width/2 - offsetX.get(), centerY = height/2 - offsetY.get()
-      // 따라서 클릭 좌표도 같은 방식으로 계산해야 함
-
-      const { width, height } = canvasSize;
-
-      // 실제 화면에서 노드가 그려지는 위치
-      const nodeScreenX = node.x;
-      const nodeScreenY = node.y;
-
-      // 클릭 좌표를 노드 좌표계로 변환
-      const adjustedClickX = cssX;
-      const adjustedClickY = cssY;
-
-      const dx = adjustedClickX - nodeScreenX;
-      const dy = adjustedClickY - nodeScreenY;
+      const dx = cssX - node.x;
+      const dy = cssY - node.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (distance <= node.radius) {
@@ -104,24 +85,22 @@ const EmotionalGraph = () => {
       }
     }
 
+    // 클릭된 노드가 있으면 조건에 따라 라우팅
     if (clickedNode) {
       const id = clickedNode.diaryId || clickedNode.id;
 
-      // 숫자 ID인지 확인하고 전달
       if (typeof id === "number" || (typeof id === "string" && !isNaN(Number(id)))) {
         navigate(`/relation/${id}`);
       } else if (clickedNode.label === "나") {
         navigate(`/analysis`);
-      }
-      else{
+      } else {
         console.warn("⚠️ 유효하지 않은 ID:", id);
-        // 기본값 사용
         navigate(`/relation/1`);
       }
-    } else {
     }
   };
 
+  // 🔹 캔버스 렌더링 및 애니메이션 로직
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -138,28 +117,28 @@ const EmotionalGraph = () => {
       canvas.style.width = `${width * 3 + 200}px`;
       canvas.style.height = `${height}px`;
 
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.scale(dpr, dpr);
+      ctx.setTransform(1, 0, 0, 1, 0, 0); // 초기화
+      ctx.scale(dpr, dpr); // 고해상도 대응
       setCanvasSize({ width, height });
     };
 
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
-    const parent = canvas.parentElement;
-    if (!parent) return;
-    const { width, height } = parent.getBoundingClientRect();
+    const { width, height } = canvas.parentElement?.getBoundingClientRect() || { width: 0, height: 0 };
     const centerX = width / 2;
     const centerY = height / 2;
 
+    // 초기화
     nodesRef.current = [];
     edgesRef.current = [];
     animatedBranchesRef.current = [];
 
+    // 루트 노드("나") 생성
     const rootNode = createRootNode(centerX, centerY);
     nodesRef.current.push(rootNode);
 
-    // ✅ 수정: relationData를 기반으로 branches 생성
+    // 브랜치(자식 노드)들 생성
     const relationArray = relationData?.relations?.relations;
     if (Array.isArray(relationArray)) {
       animatedBranchesRef.current = createAnimatedBranches(
@@ -170,31 +149,34 @@ const EmotionalGraph = () => {
       );
     }
 
+    // 메인 draw 루프 (requestAnimationFrame 기반)
     const draw = (timestamp: number) => {
       if (!startTimeRef.current) {
         startTimeRef.current = timestamp;
         previousTimestampRef.current = timestamp;
       }
 
-      const dt = (timestamp - previousTimestampRef.current) / 16;
+      const dt = (timestamp - previousTimestampRef.current) / 16; // 물리 시뮬레이션용 시간 차이
       const elapsed = timestamp - startTimeRef.current;
       previousTimestampRef.current = timestamp;
 
       const { width, height } = canvasSize;
-      ctx.clearRect(0, 0, width, height);
+      ctx.clearRect(0, 0, width, height); // 캔버스 초기화
 
-      if (elapsed < 6000) {
+      // 첫 6초 동안만 물리 시뮬레이션 적용
+      if (elapsed < 1000) {
         updatePhysics(nodesRef.current, edgesRef.current, dt);
       }
 
       const centerX = width / 2 - offsetX.get();
       const centerY = height / 2 - offsetY.get();
 
-      const rootNode = nodesRef.current[0];
-      if (rootNode) updateNodeOpacity(rootNode, elapsed);
+      // 루트 노드 페이드인
+      updateNodeOpacity(nodesRef.current[0], elapsed);
 
       drawEdges(ctx, edgesRef.current);
 
+      // 각 애니메이티드 브랜치 진행
       for (let i = animatedBranchesRef.current.length - 1; i >= 0; i--) {
         const branch = animatedBranchesRef.current[i];
         if (!branch.finished && elapsed >= branch.startTime) {
@@ -202,6 +184,7 @@ const EmotionalGraph = () => {
           branch.progress = Math.min(branchElapsed / branch.duration, 1);
           branch.opacity = Math.min(branchElapsed / (branch.duration * 0.3), 1);
           drawAnimatedBranch(ctx, branch);
+
           if (branch.progress === 1) {
             const newNode = createNodeFromBranch(branch, elapsed);
             nodesRef.current.push(newNode);
@@ -217,6 +200,7 @@ const EmotionalGraph = () => {
         }
       }
 
+      // 마우스 중심 근처의 노드 확대 효과
       nodesRef.current.forEach(node => {
         if (node.label === "나") return;
 
@@ -240,33 +224,34 @@ const EmotionalGraph = () => {
       drawNodes(ctx, nodesRef.current);
       ctx.globalAlpha = 1;
 
-      const smoothScrollTo = (element: HTMLElement, target: number, duration = 1500) => {
-        const start = element.scrollLeft;
-        const change = target - start;
-        const startTime = performance.now();
-
-        const easeInOutQuad = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
-
-        const animateScroll = (currentTime: number) => {
-          const elapsed = currentTime - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          const eased = easeInOutQuad(progress);
-
-          element.scrollLeft = start + change * eased;
-
-          if (progress < 1) {
-            requestAnimationFrame(animateScroll);
-          }
-        };
-
-        requestAnimationFrame(animateScroll);
-      };
-
+      // 최초 진입 시 "나" 노드로 스크롤 이동
       if (!hasScrolledToMe.current) {
         const meNode = nodesRef.current.find(n => n.label === "나");
         const container = containerRef.current;
         if (meNode && container) {
           const targetX = meNode.x - container.clientWidth / 2;
+
+          const smoothScrollTo = (element: HTMLElement, target: number, duration = 1500) => {
+            const start = element.scrollLeft;
+            const change = target - start;
+            const startTime = performance.now();
+
+            const easeInOutQuad = (t: number) =>
+              t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+            const animateScroll = (currentTime: number) => {
+              const elapsed = currentTime - startTime;
+              const progress = Math.min(elapsed / duration, 1);
+              const eased = easeInOutQuad(progress);
+              element.scrollLeft = start + change * eased;
+              if (progress < 1) {
+                requestAnimationFrame(animateScroll);
+              }
+            };
+
+            requestAnimationFrame(animateScroll);
+          };
+
           smoothScrollTo(container, targetX, 1000);
           hasScrolledToMe.current = true;
         }
@@ -285,7 +270,6 @@ const EmotionalGraph = () => {
 
   return (
     <div ref={containerRef} className="w-full h-screen overflow-hidden relative">
-
       <motion.div
         drag
         dragMomentum={false}
@@ -293,7 +277,7 @@ const EmotionalGraph = () => {
         style={{ x: offsetX, y: offsetY }}
         className="w-[300%] h-full relative"
       >
-        {/* canvas는 motion.div 내부에 있어야 같이 움직임 */}
+        {/* 캔버스를 motion.div 안에 넣어야 드래그에 반응 */}
         <canvas
           ref={canvasRef}
           onMouseDown={handleCanvasMouseDown}
@@ -303,7 +287,7 @@ const EmotionalGraph = () => {
             cursor: "pointer",
             borderRadius: 20,
             display: "block",
-            pointerEvents: "auto", // 💡 아주 중요: 이벤트 통과 허용
+            pointerEvents: "auto",
           }}
         />
       </motion.div>

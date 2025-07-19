@@ -1,6 +1,8 @@
 import React from 'react';
+import { useTheme } from './theme-provider';
 
 const LoadingAnimation = () => {
+
   return (
     <div className="flex flex-col items-center justify-start h-full pt-4">
       {/* 원형 회전 애니메이션 */}
@@ -24,7 +26,7 @@ const LoadingAnimation = () => {
       </div>
       
       {/* 로딩 텍스트 */}
-      <span className="text-gray-600 font-medium text-center">
+      <span className="text-gray-800 font-medium text-center">
         데이터를 분석하고 있습니다...
       </span>
     </div>

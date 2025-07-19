@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import type { DetailStrength } from "@/types/strength";
+import { useTheme } from "@/components/theme-provider";
 
 type StrengthBarChartProps = {
   lastData: DetailStrength | null;
@@ -29,6 +30,10 @@ function normalizeValues(values: number[], maxAllowed: number) {
 }
 
 const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthBarChartProps) => {
+  const { theme } = useTheme();
+    const isDark =
+      theme === "dark" ||
+      (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
   const ref = useRef<SVGSVGElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
@@ -174,15 +179,16 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
         .style("opacity", 1);
 
       // 라벨
-      svg
+        svg
         .append("text")
         .attr("x", groupX + groupWidth / 2)
         .attr("y", height - 35)
         .attr("text-anchor", "middle")
-        .attr("fill", "#333")
+        .attr("fill", isDark ? "#ffffff" : "#333")
         .style("font-size", "13px")
         .style("font-weight", "500")
         .text(key);
+    
     });
 
     // 범례 추가
@@ -202,7 +208,7 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
       .append("text")
       .attr("x", legendX + 21)
       .attr("y", 21)
-      .attr("fill", "#333")
+      .attr("fill", isDark ? "#ffffff" : "#333")
       .style("font-size", "12px")
       .style("font-weight", "500")
       .text("저번 달");
@@ -220,7 +226,7 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
       .append("text")
       .attr("x", legendX + 90)
       .attr("y", 21)
-      .attr("fill", "#333")
+      .attr("fill", isDark ? "#ffffff" : "#333")
       .style("font-size", "12px")
       .style("font-weight", "500")
       .text("이번 달");

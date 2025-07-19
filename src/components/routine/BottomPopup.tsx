@@ -15,6 +15,7 @@ type BottomPopupProps = {
 
 const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupProps) => {
   const [isInDOM, setIsInDOM] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(false);
 
   const bodyOverflowRef = useRef<string>(document.body.style.overflow);
   const topRef = useRef<string>(document.body.style.top);
@@ -39,6 +40,7 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
   }));
 
   const handleOverlayClick = useCallback(() => {
+    setShowOverlay(false);
     onClose();
   }, [onClose]);
 
@@ -50,6 +52,7 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
     if (isOpen) {
       // console.log("✅ 모달 열기 ");
       setIsInDOM(true);
+      setShowOverlay(true);
       const currY = window.scrollY || 0;
       bodyOverflowRef.current = document.body.style.overflow;
       topRef.current = document.body.style.top;
@@ -82,8 +85,13 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
 
   return isInDOM ? (
     <>
-      <div className="absolute inset-0 bg-black bg-opacity-30 z-[99]" 
-      onClick={handleOverlayClick} />
+      {showOverlay && (
+        <div
+          className="absolute inset-0 bg-black bg-opacity-30 z-[99]"
+          onClick={handleOverlayClick}
+        />
+      )}
+      
       <animated.div
         style={{
           ...springProps,
@@ -92,6 +100,12 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
         className="absolute bottom-0 left-0 w-full z-[100] bg-white rounded-t-2xl overflow-y-auto shadow-xl"
         onClick={handleContentClick}
       >
+
+        {/* 상단 바 */}
+        <div className="w-full flex justify-center py-2">
+          <div className="w-10 h-1.5 bg-gray-300 rounded-full" />
+        </div>
+
         <div ref={contentRef} className="p-6">
           {children}
         </div>

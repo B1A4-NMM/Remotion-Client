@@ -39,9 +39,6 @@ const Title = ({name, isBackActive=false, back="/analysis"}:{name:string, isBack
                 <div className="flex items-center">
                   <button onClick={onClickHandler} className="flex items-center gap-1">
                     <ChevronLeft className="size-8 text-gray-600"/>
-                    <span className="text-xl">
-                      감정 추이
-                    </span>
                   </button>
                 </div>
                 <h1 

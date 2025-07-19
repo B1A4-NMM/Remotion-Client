@@ -12,8 +12,7 @@ export const baseColors: Record<ColorKey, string> = {
   gray2: "#DADADA",
 } as const;
 
-export const mapEmotionToColor = (emotion: string): ColorKey => {
-  
+export const mapEmotionToColor = (emotion: string): ColorKey => {  
   const highEnergyPleasant = new Set([
     "행복",
     "기쁨",

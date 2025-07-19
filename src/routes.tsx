@@ -6,7 +6,8 @@ import Home from "./pages/Home";
 import Diary from "./pages/Diary";
 import SearchPage from "./pages/SearchPage";
 import Result from "./pages/Result";
-import Loading6 from "./components/Loading/Loading6";
+// import Loading6 from "./components/Loading/Loading6";
+import Loading7 from "./components/Loading/Loading7";
 
 import Video from "./pages/Video";
 import Routine from "./pages/Routine";
@@ -19,8 +20,9 @@ import RelationDetail from "./pages/RelationDetail";
 import Notifications from "./pages/notifications";
 
 import Todos from "./pages/Todos";
-import NotFound from "./pages/NotFound";
 import Mypage from "./pages/Mypage";
+import Negative from "./pages/analysis/Negative";
+import Positive from "./pages/analysis/Positive";
 
 export const routes = [
   {
@@ -87,7 +89,7 @@ export const routes = [
       </ProtectedRoute>
     ),
   },
-  { path: "/loading", element: <Loading6 /> },
+  { path: "/loading7", element: <Loading7 /> },
   {
     path: "/analysis",
     element: (
@@ -133,6 +135,22 @@ export const routes = [
     element: (
       <ProtectedRoute>
         <Strength />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/analysis/부정",
+    element: (
+      <ProtectedRoute>
+        <Negative />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/analysis/긍정",
+    element: (
+      <ProtectedRoute>
+        <Positive />
       </ProtectedRoute>
     ),
   },

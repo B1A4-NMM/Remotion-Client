@@ -4,10 +4,18 @@ import { useFrame } from '@react-three/fiber';
 
 import vertexShader from '../vertexShader';
 import fragmentShaderLight from '../fragmentShaderLight';
+import fragmentShaderDark from '../fragmentShaderDark';
 import { baseColors } from "@/constants/emotionColors";
+import { useTheme } from '@/components/theme-provider';
 
 const LoadingBlob = () => {
     const mesh = useRef<Mesh>(null);
+    const { theme } = useTheme();
+    const isDark =
+      theme === "dark" ||
+      (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+    const frag = isDark? fragmentShaderDark : fragmentShaderLight
     
     const [animationStartTime, setAnimationStartTime] = useState<number | null>(null);
     const [targetColors, setTargetColors] = useState<number[][]>([]);
@@ -201,7 +209,7 @@ const LoadingBlob = () => {
             <icosahedronGeometry args={[2, 16]} />
             <shaderMaterial
                 vertexShader={vertexShader}
-                fragmentShader={fragmentShaderLight}
+                fragmentShader={frag}
                 uniforms={uniforms}
             />
         </mesh>

@@ -9,6 +9,7 @@ import Todos from "./Todo";
 import WarningTestBox from "../WariningTestBox";
 import TestModal from "../TestModal";
 import PeopleCard from "../home/PeopleCard";
+import ActivityAnalysisCard from "../home/ActivityAnalysisCard";
 import IntensityChart from "./IntensityChart";
 import BrainEmotionMap from "./BrainEmotionMap";
 import TodoPreviewCard from "./TodoPreviewCard";
@@ -53,13 +54,31 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
 
   const activityAnalysis = diaryContent?.analysis?.activity_analysis ?? [];
 
-  // 사람별 카드 데이터로 변환
-  const peopleCardsData = activityAnalysis.flatMap((activityItem: any) =>
-    (activityItem.peoples || []).map((person: any) => ({
-      activity: activityItem.activity,
-      person, // 해당 사람 객체 전체 전달
-    }))
-  );
+  // activity_analysis 전체를 ActivityAnalysisCard에 전달
+  const peopleCardsData = {
+    peoples: activityAnalysis.flatMap((activityItem: any) =>
+      (activityItem.peoples || []).map((person: any) => ({
+        name: person.name,
+        feel: person.interactions.emotion.map((emotion: string, index: number) => ({
+          emotionType: emotion,
+          intensity: person.interactions.emotion_intensity[index] || 5,
+        })),
+        count: 1,
+      }))
+    ),
+    selfEmotion: activityAnalysis.flatMap((activityItem: any) =>
+      (activityItem.self_emotions?.emotion || []).map((emotion: string, index: number) => ({
+        emotionType: emotion,
+        intensity: activityItem.self_emotions?.emotion_intensity[index] || 5,
+      }))
+    ),
+    stateEmotion: activityAnalysis.flatMap((activityItem: any) =>
+      (activityItem.state_emotions?.emotion || []).map((emotion: string, index: number) => ({
+        emotionType: emotion,
+        intensity: activityItem.state_emotions?.emotion_intensity[index] || 5,
+      }))
+    ),
+  };
 
   const todos = diaryContent?.analysis?.todos ?? [];
 
@@ -74,16 +93,7 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
 
   // problem 중 하나라도 null 값이 있는지 확인
   const hasValidProblems = allProblems.some(
-    (problem: any) =>
-      problem &&
-      problem.situation &&
-      problem.approach &&
-      problem.outcome &&
-      problem.conflict_response_code &&
-      problem.situation !== "None" &&
-      problem.approach !== "None" &&
-      problem.outcome !== "None" &&
-      problem.conflict_response_code !== "None"
+    (problem: any) => problem && problem.situation && problem.situation !== "None"
   );
 
   // beforeDiaryScores 데이터 추출
@@ -127,16 +137,16 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
     );
   }
 
-  // Pass peopleCardsData to PeopleCard
+  // Pass activityAnalysis to ActivityAnalysisCard
   return (
     <div className="px-4">
-      <PeopleCard data={peopleCardsData} />
-      <BrainEmotionMap activityAnalysis={activityAnalysis} />
+      <ActivityAnalysisCard data={activityAnalysis} />
+      {/* <BrainEmotionMap activityAnalysis={activityAnalysis} /> */}
 
       {hasValidProblems && (
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-gray-800 mt-[60px] mb-[20px] px-4">
-            마음 사건 리포트
+            오늘의 사건 리포트
           </h2>
 
           <ConflictAnalysisCard conflicts={allProblems} />

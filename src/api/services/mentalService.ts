@@ -16,6 +16,7 @@ export const getMentalData = async (
       });
       return usp.toString();
     },
+    timeout: 15000, // 15초 타임아웃 유지
   });
 
   return response.data;

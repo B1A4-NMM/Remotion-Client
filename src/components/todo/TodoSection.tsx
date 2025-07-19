@@ -9,9 +9,6 @@ export default function TodoSection() {
                 <TodoHeader initialTab="할 일" />
                 <TodoList />
             </div>
-            <div>
-                <TodoHeader initialTab="루틴" />
-            </div>
         </section>
     );
 }

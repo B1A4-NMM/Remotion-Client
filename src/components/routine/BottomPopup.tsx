@@ -82,7 +82,8 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
 
   return isInDOM ? (
     <>
-      <div className="absolute inset-0 bg-black bg-opacity-30 z-[99]" onClick={handleOverlayClick} />
+      <div className="absolute inset-0 bg-black bg-opacity-30 z-[99]" 
+      onClick={handleOverlayClick} />
       <animated.div
         style={{
           ...springProps,

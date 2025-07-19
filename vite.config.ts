@@ -16,5 +16,12 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
+    // proxy: {
+    //   '/api': {
+    //     target: process.env.VITE_SOCIAL_AUTH_URL,
+    //     changeOrigin: true,
+    //     rewrite: path => path.replace(/^\/api/, '')
+    //   }
+    // }
   },
 });

@@ -125,7 +125,7 @@ export default function MonthlyCalendar({
                     "w-5 h-6 rounded-full text-[10px] flex items-center justify-center my-1",
                     {
                       "bg-[#F36B6B] dark:bg-[#F36B6B] text-white": done,
-                      "bg-[#D9D9D9] text-black dark:text-black": !done,
+                      "bg-[#D9D9D9] dark:bg-[#656565]": !done,
                     }
                   )}
                 >

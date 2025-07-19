@@ -33,13 +33,13 @@ export default function CalendarSection() {
         </div>
 
         <div className="flex items-center space-x-2 text-sm">
-          <button onClick={goPrev} className="text-gray-400 font-bold">
+          <button onClick={goPrev} className="text-black dark:text-white font-black">
             &lt;
           </button>
-          <button onClick={goNext} className="text-gray-400 font-bold">
+          <button onClick={goNext} className="text-black dark:text-white font-black">
             &gt;
           </button>
-          <span className="font-bold text-black">
+          <span className="font-bold">
             {view === "week" ? "주" : "월"}
           </span>
           <button

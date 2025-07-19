@@ -45,13 +45,13 @@ export default function TodoInputRow() {
             {/* 인라인 input */}
             <input
                 type="text"
-                placeholder="New todo"
+                placeholder="새로운 할 일"
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onCompositionStart={() => setIsComposing(true)}   // ✅ 조합 시작 시 플래그 true
                 onCompositionEnd={() => setIsComposing(false)}    // ✅ 조합 끝나면 false
-                className="w-full bg-transparent outline-none placeholder:text-gray-400"
+                className="w-full bg-transparent outline-none placeholder:text-gray-400 text-black dark:text-white"
             />
         </li>
     );

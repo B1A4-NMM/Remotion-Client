@@ -4,7 +4,8 @@ interface CarouselProps {
   items: React.ReactNode[];
 }
 
-const CARD_WIDTH_PERCENT = 70; // 메인 카드가 더 돋보이도록 조정
+const CARD_WIDTH_PERCENT = 75; // 메인 카드가 더 돋보이도록 조정
+const CARD_WIDTH_PERCENT_SINGLE = 100; // 카드가 1개일 때는 100% 너비
 const GAP_SIZE = 16; // 카드 간 간격 (px)
 
 const Carousel: React.FC<CarouselProps> = ({ items }) => {
@@ -70,8 +71,16 @@ const Carousel: React.FC<CarouselProps> = ({ items }) => {
     isDragging.current = false;
   };
 
+  // 카드 개수에 따른 너비 결정
+  const cardWidthPercent = items.length === 1 ? CARD_WIDTH_PERCENT_SINGLE : CARD_WIDTH_PERCENT;
+
   // 현재 카드를 중앙에 배치하는 transform 계산
   const getTransform = () => {
+    // 카드가 1개일 때는 transform 적용하지 않음
+    if (items.length === 1) {
+      return `translateX(0%)`;
+    }
+
     // 첫 번째 카드일 때는 transform 적용하지 않음
     if (current === 0) {
       return `translateX(0%)`;
@@ -79,12 +88,11 @@ const Carousel: React.FC<CarouselProps> = ({ items }) => {
 
     // 컨테이너 중앙에서 카드의 중앙을 맞추기 위한 계산
     const containerCenter = 50; // 컨테이너의 50% 지점
-    const cardCenter = CARD_WIDTH_PERCENT / 2; // 카드의 중앙점
-    const gapOffset = ((GAP_SIZE / 280) * 100) / 2; // gap을 고려한 오프셋
+    const cardCenter = cardWidthPercent / 2; // 카드의 중앙점
 
     // 각 카드가 컨테이너 중앙에 오도록 계산
     const baseOffset = containerCenter - cardCenter;
-    const cardSpacing = CARD_WIDTH_PERCENT + (GAP_SIZE / 280) * 100;
+    const cardSpacing = cardWidthPercent + (GAP_SIZE / 280) * 100;
 
     return `translateX(${baseOffset - current * cardSpacing}%)`;
   };
@@ -116,9 +124,9 @@ const Carousel: React.FC<CarouselProps> = ({ items }) => {
                 idx === current ? "opacity-100 scale-100" : "opacity-60 scale-95"
               }`}
               style={{
-                width: `${CARD_WIDTH_PERCENT}%`,
-                minWidth: `${CARD_WIDTH_PERCENT}%`,
-                maxWidth: `${CARD_WIDTH_PERCENT}%`,
+                width: `${cardWidthPercent}%`,
+                minWidth: `${cardWidthPercent}%`,
+                maxWidth: `${cardWidthPercent}%`,
               }}
             >
               {item}

@@ -18,6 +18,7 @@ export const useDeleteTodo = () => {
   
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["todos"] });
+        queryClient.invalidateQueries({ queryKey: ["monthlyStatus"] });
     },
   
     onError: (err) => {

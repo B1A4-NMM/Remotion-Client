@@ -40,7 +40,7 @@ const BottomNavi = ({
   };
 
   useEffect(() => {
-    let initialHeight = window.innerHeight;
+    const initialHeight = window.innerHeight;
     let timeoutId: NodeJS.Timeout;
 
     // Visual Viewport API를 사용한 키보드 감지 (스무스 처리)

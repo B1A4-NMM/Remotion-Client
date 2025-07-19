@@ -8,6 +8,7 @@ import Index from "../components/home/Index";
 import { useNavigate } from "react-router-dom";
 import Map from "./Map";
 import HomeBar from "@/components/home/HomeBar";
+import { useTheme } from "@/components/theme-provider";
 
 import "../styles/homeCard.css";
 import dayjs from "dayjs";
@@ -16,7 +17,6 @@ import { useInfiniteDiaries } from "../api/queries/home/useInfiniteDiaries";
 import { useQueryClient } from "@tanstack/react-query";
 import { usePatchDiaryBookmark } from "../api/queries/home/usePatchDiaryBookmark";
 // import RecommendHome from "@/components/home/RecommendHome";
-import RecommendHomeCard from "@/components/home/RecommendHomeCard";
 
 // S3 → http 변환 (실제 CDN 도메인에 맞게 수정 필요)
 const s3ToHttpUrl = (s3Path: string) =>
@@ -50,6 +50,10 @@ function mapApiDiaryToDiaryCard(apiDiary: any) {
 const Home = () => {
   const token = localStorage.getItem("accessToken") || "";
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   const [selectedDate, setSelectedDate] = useState<Date>(dayjs().toDate());
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -144,7 +148,7 @@ const Home = () => {
 
   return (
     <div className="flex flex-col  text-foreground min-h-screen">
-      <div className="sticky top-0 z-50  rounded-b-2xl bg-[#F5F5F5] pb-8">
+      <div className="sticky top-0 z-50  rounded-b-2xl bg-[#F5F5F5] dark:bg-[#181718] dark:text-white pb-8">
         <Title
           emotionCountByMonth={emotionCountByMonth}
           totalDiaryCount={totalDiaryCount}
@@ -163,7 +167,7 @@ const Home = () => {
           <>
             {homeData?.item?.diaries && homeData.item.diaries.length > 0 ? (
               <>
-                <RecommendHomeCard />
+                {/* <RecommendHomeCard /> */}
                 <DiaryCards
                   diaries={infiniteDiaries}
                   onDeleteDiary={handleDeleteDiary}

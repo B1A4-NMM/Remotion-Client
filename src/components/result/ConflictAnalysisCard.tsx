@@ -16,19 +16,14 @@ const ConflictAnalysisCard: React.FC<ConflictAnalysisCardProps> = ({
   conflicts,
   title = "마음 사건 리포트",
 }) => {
-  // None이 아닌 갈등만 필터링
+  // situation만 있어도 렌더링되도록 수정
   const validConflicts = conflicts.filter(
-    conflict =>
-      conflict.situation !== "None" &&
-      conflict.approach !== "None" &&
-      conflict.outcome !== "None" &&
-      conflict.conflict_response_code !== "None"
+    conflict => conflict.situation && conflict.situation !== "None"
   );
 
   if (validConflicts.length === 0) {
     return null;
   }
-
   const getResponseTypeDisplay = (code: string) => {
     const responseTypes: { [key: string]: string } = {
       회피형: "조용히 들어주는",
@@ -40,10 +35,56 @@ const ConflictAnalysisCard: React.FC<ConflictAnalysisCardProps> = ({
     return responseTypes[code] || code;
   };
 
-  const getConflictTemplate = (conflict: ConflictData) => {
-    const responseDisplay = getResponseTypeDisplay(conflict.conflict_response_code);
+  const isValid = (value?: string | null) => !!value && value.toLowerCase?.() !== "none";
 
-    return `${conflict.situation} 상황에서, 나는 ${responseDisplay} 방식으로 대응했고, 그 결과 ${conflict.outcome}했어요. 그 선택은 신중한 판단이었고, 나는 ${conflict.conflict_response_code} 방식으로 갈등에 반응했어요.`;
+  const getConflictTemplate = (conflict: ConflictData) => {
+    const { situation, approach, conflict_response_code } = conflict;
+
+    if (!isValid(situation)) return null; // situation은 필수
+
+    const outcome = isValid(conflict.outcome) ? conflict.outcome : null;
+    const responseDisplay = isValid(conflict_response_code)
+      ? getResponseTypeDisplay(conflict_response_code!)
+      : null;
+
+    const validApproach = isValid(approach) ? approach : null;
+
+    const hasApproach = !!validApproach;
+    const hasResponse = !!responseDisplay;
+    const hasOutcome = !!outcome;
+
+    // ✅ 3개 모두 있는 경우
+    if (hasApproach && hasResponse && hasOutcome) {
+      return `${situation} 상황에서 ${responseDisplay} 방식으로 대응했어요. '${validApproach}'라는 접근을 통해 ${outcome}했고, 이는 ${conflict.conflict_response_code} 스타일의 갈등 해결 방식이었어요.`;
+    }
+
+    // ✅ 2개 조합
+    if (hasResponse && hasOutcome && !hasApproach) {
+      return `${situation} 상황에서, 나는 ${responseDisplay} 방식으로 대응했고, 그 결과 ${outcome}했어요.`;
+    }
+
+    if (hasResponse && hasApproach && !hasOutcome) {
+      return `${situation} 상황에서, 나는 ${responseDisplay} 방식으로 대응했고, '${validApproach}'라는 접근을 택했어요.`;
+    }
+
+    if (hasOutcome && hasApproach && !hasResponse) {
+      return `${situation} 상황에서, 나는 '${validApproach}'라는 선택을 했고, 그 결과 ${outcome}했어요.`;
+    }
+
+    // ✅ 1개만 있는 경우
+    if (hasResponse && !hasOutcome && !hasApproach) {
+      return `${situation} 상황에서, 나는 ${responseDisplay} 방식으로 대응했어요.`;
+    }
+
+    if (hasOutcome && !hasResponse && !hasApproach) {
+      return `${situation} 상황에서, 그 결과 ${outcome}하게 되었어요.`;
+    }
+
+    if (hasApproach && !hasResponse && !hasOutcome) {
+      return `${situation} 상황에서, 나는 '${validApproach}'라는 선택을 했어요.`;
+    }
+
+    return null; // 전혀 정보가 없으면 출력 안 함
   };
 
   const renderHighlightedText = (text: string, conflict: ConflictData) => {
@@ -58,20 +99,24 @@ const ConflictAnalysisCard: React.FC<ConflictAnalysisCardProps> = ({
         className: "bg-yellow-200 px-1 rounded",
       },
       { text: conflict.outcome, className: "bg-green-200 px-1 rounded" },
-      { text: conflict.conflict_response_code, className: "bg-purple-200 px-1 rounded" },
+      { text: conflict.approach, className: "bg-purple-200 px-1 rounded" },
+      // 원본 conflict_response_code도 추가 (변환된 텍스트와 함께)
+      { text: conflict.conflict_response_code, className: "bg-orange-200 px-1 rounded" },
     ];
 
     // 텍스트에서 키워드 위치 찾기
     const matches: Array<{ start: number; end: number; className: string }> = [];
 
     keywords.forEach(keyword => {
-      const index = text.indexOf(keyword.text);
-      if (index !== -1) {
-        matches.push({
-          start: index,
-          end: index + keyword.text.length,
-          className: keyword.className,
-        });
+      if (keyword.text && keyword.text !== "None") {
+        const index = text.indexOf(keyword.text);
+        if (index !== -1) {
+          matches.push({
+            start: index,
+            end: index + keyword.text.length,
+            className: keyword.className,
+          });
+        }
       }
     });
 
@@ -117,6 +162,8 @@ const ConflictAnalysisCard: React.FC<ConflictAnalysisCardProps> = ({
       <div className="space-y-4">
         {validConflicts.map((conflict, index) => {
           const templateText = getConflictTemplate(conflict);
+
+          if (!templateText) return null; // templateText가 null이면 렌더링하지 않음
 
           return (
             <div key={index} className="bg-gray-100 rounded-lg p-4">

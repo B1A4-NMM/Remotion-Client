@@ -103,7 +103,7 @@ export default function WeeklyCalendar({
 
           const finalColorClass =
             (isToday || isSelected) && weekday !== 0 && weekday !== 6
-              ? "text-white"
+              ? "text-white dark:text-black"
               : baseColorClass;
 
           return (
@@ -119,17 +119,18 @@ export default function WeeklyCalendar({
                 const incomplete = status
                   ? status.todoTotalCount - status.completedCount
                   : 0;
-                const done = Boolean(status?.isAllCompleted) || incomplete === 0;
-                
-                return (
-                  <div
-                    className={clsx(
-                      "w-5 h-6 rounded-full text-[10px] flex items-center justify-center my-1",
-                      done
-                      ? "bg-[#D9D9D9] text-white"
-                      : "bg-[#D9D9D9] text-black dark:text-black"
-                    )}
-                  >
+                const done = Boolean(status?.isAllCompleted);
+
+              return (
+                <div
+                  className={clsx(
+                    "w-5 h-6 rounded-full text-[10px] flex items-center justify-center my-1",
+                    {
+                      "bg-[#F36B6B] dark:bg-[#F36B6B] text-white": done,
+                      "bg-[#D9D9D9] dark:bg-[#656565]": !done,
+                    }
+                  )}
+                >
                     {status ? (done ? <Check className="w-3 h-3" /> : incomplete) : ""}                  </div>
                 );
               })()}
@@ -140,8 +141,8 @@ export default function WeeklyCalendar({
                   "w-5 h-5 flex items-center justify-center rounded-full text-xs",
                   {
                     "font-bold": isToday || isSelected,
-                    "bg-black dark:bg-white" : isSelected,
-                    "bg-[#DADADA]": isToday && !isSelected,
+                    "bg-[#404040] dark:bg-[#DADADA]" : isSelected,
+                    "bg-[#DADADA] dark:bg-white": isToday && !isSelected,
                   },
                   finalColorClass
                 )}

@@ -31,11 +31,9 @@ const Title = () => {
   };
 
   return (
-    <div className="w-full px-5 pt-8">
+    <div className="w-full pt-8">
       {/* 메인 헤더 */}
-      <div className="flex items-center justify-between mb-5">
-        <h1 className="text-3xl font-bold text-gray-900 ml-2">추천</h1>
-      </div>
+      <h1 className="text-3xl font-bold text-gray-900 pb-8">추천</h1>
 
       {/* 버튼 위치 - 3개 버튼 정렬 */}
       <div className="buttonContainer">

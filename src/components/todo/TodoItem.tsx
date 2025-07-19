@@ -6,13 +6,15 @@ import { useDeleteTodo } from "@/api/queries/todo/useDeleteTodo";
 import { useTodoStore } from "@/store/todoStore";
 import type { Todo } from "@/store/todoStore";
 import { useState } from "react";
-import BottomPopup from "@/components/routine/BottomPopup";
+import BottomPopup from "@/components/BottomPopup";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import "@/styles/day-picker.css";
 import { formatDate } from "@/utils/date";
+import { format } from "date-fns";
+import { ko, enUS } from "date-fns/locale";
 
 interface TodoItemProps {
   todo: Todo;
@@ -30,6 +32,13 @@ export default function TodoItem({ todo }: TodoItemProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
 
+  const locale = {
+    ...ko,
+    options: { ...ko.options, weekStartsOn: 1 },
+  };
+  const formatCaption = (month: Date) => format(month, "yyyy년 MM월", { locale });
+  const formatWeekdayName = (day: Date) => format(day, "EEE", { locale: enUS }).toUpperCase();
+
   const commitEdit = () => {
     const trimmed = value.trim();
     setEditing(false);
@@ -40,9 +49,7 @@ export default function TodoItem({ todo }: TodoItemProps) {
 
     if (trimmed === todo.content) return;
 
-    setTodos(prev =>
-      prev.map(t => (t.id === todo.id ? { ...t, content: trimmed } : t)),
-    );
+    setTodos(prev => prev.map(t => (t.id === todo.id ? { ...t, content: trimmed } : t)));
     updateTodoContent({ id: todo.id, data: { content: trimmed } });
   };
 
@@ -93,10 +100,7 @@ export default function TodoItem({ todo }: TodoItemProps) {
           autoFocus
         />
       ) : (
-        <span
-          className={todo.isComplete ? "text-gray-400" : ""}
-          onClick={() => setEditing(true)}
-        >
+        <span className={todo.isComplete ? "text-gray-400" : ""} onClick={() => setEditing(true)}>
           {todo.content}
         </span>
       )}
@@ -113,9 +117,13 @@ export default function TodoItem({ todo }: TodoItemProps) {
         heightOption={{ wrapChildren: true }}
       >
         <div className="flex flex-col gap-3 w-full">
-          <Button onClick={handleDelete} className="w-full">
+          <Button
+            onClick={handleDelete}
+            className="w-full bg-[#F36B6B] hover:bg-[#e96060] text-white"
+          >
             삭제하기
           </Button>
+
           <Button
             onClick={() => {
               setDatePickerOpen(true);
@@ -135,7 +143,14 @@ export default function TodoItem({ todo }: TodoItemProps) {
           mode="single"
           selected={new Date(todo.date)}
           onSelect={handleDateChange}
-          className="bg-card text-card-foreground"
+          locale={locale}
+          formatters={{
+            formatCaption,
+            formatWeekdayName,
+          }}
+          // <TodoDatePicker
+          //   date={new Date(todo.date)}
+          className="bg-card text-card-foreground mx-auto"
         />
       </BottomPopup>
     </li>

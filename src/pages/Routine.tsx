@@ -131,7 +131,7 @@ const Routine = () => {
   };
 
   return (
-    <div className="  text-foreground min-h-screen">
+    <div className="min-h-screen overflow-auto text-foreground bg-[#fdfaf8] dark:bg-transparent px-4 pb-8">
       <Title />
 
       {/* 상단 제목 */}

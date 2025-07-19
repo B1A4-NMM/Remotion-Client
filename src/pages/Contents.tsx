@@ -8,7 +8,7 @@ const Contents = () => {
     const constraintsRef = useRef(null);
 
     return (
-        <motion.div ref={constraintsRef} style={{ height: "100dvh", overflow: "hidden" }} className="  text-foreground min-h-screen">
+        <motion.div ref={constraintsRef} style={{ height: "100dvh", overflow: "hidden" }} className="min-h-screen overflow-auto text-foreground bg-[#fdfaf8] dark:bg-transparent px-4 pb-8">
             <motion.div
                 drag="y"
                 dragConstraints={{ top: -500, bottom: 0 }}

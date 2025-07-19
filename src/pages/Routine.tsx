@@ -64,7 +64,7 @@ const Routine = () => {
         content: item.content,
         routineType: item.routineType,
       }));
-      
+
       setSelectedRoutines(normalized);
       await refetchRoutine();
     } catch (err) {
@@ -80,8 +80,6 @@ const Routine = () => {
       console.error("루틴 삭제 실패", err);
     }
   };
-  
-  
 
   const handleFolderClick = async (emotionTitle: string) => {
     const emotionKey = emotionTitle as RoutineItem["routineType"];

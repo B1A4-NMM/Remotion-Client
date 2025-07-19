@@ -1,11 +1,4 @@
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  LabelList,
-} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { ChartContainer } from "../../ui/chart";
 import { useMemo } from "react";
 import { useTheme } from "@/components/theme-provider";
@@ -48,24 +41,23 @@ const formatDateToTime = (dateStr: string) => {
 
 const formatDateToWeek = (dateStr: string) => {
   // 주별 키 형태: 2025-07-W2
-  if (dateStr.includes('-W')) {
-    const [yearMonth, week] = dateStr.split('-W');
-    const [year, month] = yearMonth.split('-');
+  if (dateStr.includes("-W")) {
+    const [yearMonth, week] = dateStr.split("-W");
+    const [year, month] = yearMonth.split("-");
     return `${parseInt(month, 10)}월 ${week}번째 주`;
   }
-  
+
   // 기존 날짜 형태
   const match = dateStr.match(/\d{4}-(\d{2})-(\d{2})/);
   if (!match) return dateStr;
-  
+
   const date = new Date(dateStr);
   const month = date.getMonth() + 1;
   const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
   const weekNumber = Math.ceil((date.getDate() + firstDay.getDay()) / 7);
-  
+
   return `${month}월 ${weekNumber}번째 주`;
 };
-
 
 const formatDateToMonth = (dateStr: string) => {
   const match = dateStr.match(/\d{4}-(\d{2})-(\d{2})/);
@@ -109,7 +101,11 @@ const getBarSize = (barCount: number) => {
 const MentalChart = ({ type, data, limit }: MentalChartProps) => {
   // 그룹형 차트 여부 판별
   const isGroup = type === "부정" || type === "긍정";
-  const groupTypes: MentalType[] = isGroup ? groupMap[type as GroupType] : isMentalType(type) ? [type] : [];
+  const groupTypes: MentalType[] = isGroup
+    ? groupMap[type as GroupType]
+    : isMentalType(type)
+      ? [type]
+      : [];
 
   const { theme } = useTheme();
   const isDark =
@@ -126,8 +122,10 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
 
   // 막대 개수 결정
   let barCount = 7;
-  if (limit === 7) barCount = 7; // daily
-  else if (limit === 8) barCount = 4; // weekly (4주)
+  if (limit === 7)
+    barCount = 7; // daily
+  else if (limit === 8)
+    barCount = 4; // weekly (4주)
   else if (limit === 6) barCount = 4; // monthly (4개월)
 
   const dateFormatter = getDateFormatter(limit);
@@ -136,7 +134,7 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
   // 데이터 그룹화 함수
   const groupDataByPeriodAndEmotion = (data: any[], limit?: number) => {
     if (!limit) return data;
-    let groupTarget = barCount;
+    const groupTarget = barCount;
     const grouped: Record<string, any> = {};
     data.forEach(item => {
       let dateKey: string;
@@ -151,7 +149,7 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
         const weekNumber = Math.ceil((date.getDate() + firstDay.getDay()) / 7);
         const year = date.getFullYear();
         const month = date.getMonth() + 1;
-        dateKey = `${year}-${month.toString().padStart(2, '0')}-W${weekNumber}`;
+        dateKey = `${year}-${month.toString().padStart(2, "0")}-W${weekNumber}`;
       } else {
         // 일별 그룹화
         dateKey = item.date;
@@ -164,7 +162,7 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
           emotionGroup: item.emotionGroup,
           intensity: 0,
           count: 0,
-          totalIntensity: 0
+          totalIntensity: 0,
         };
       }
       // 가중평균으로 intensity 계산
@@ -174,14 +172,16 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
       grouped[key].intensity = grouped[key].totalIntensity / grouped[key].count;
     });
     // 날짜순으로 정렬 후 limit 적용
-    const sortedData = Object.values(grouped).sort((a: any, b: any) => a.date.localeCompare(b.date));
+    const sortedData = Object.values(grouped).sort((a: any, b: any) =>
+      a.date.localeCompare(b.date)
+    );
     // 각 날짜별로 limit 적용 (최근 날짜부터)
     const uniqueDates = [...new Set(sortedData.map((item: any) => item.date))];
     const limitedDates = uniqueDates.slice(-groupTarget);
     return sortedData.filter((item: any) => limitedDates.includes(item.date));
   };
 
-  // 그룹형 데이터 가공 
+  // 그룹형 데이터 가공
   const groupedData = useMemo(() => {
     if (!isGroup) return [];
     // 기간별, 감정별로 데이터 그룹화
@@ -190,7 +190,7 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
     const dateMap: Record<string, any> = {};
     periodAndEmotionGroupedData.forEach(item => {
       if (!dateMap[item.date]) {
-        dateMap[item.date] = { 
+        dateMap[item.date] = {
           date: item.date,
           // 모든 감정 타입을 0으로 초기화
           스트레스: 0,
@@ -198,7 +198,7 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
           불안: 0,
           활력: 0,
           안정: 0,
-          유대: 0
+          유대: 0,
         };
       }
       dateMap[item.date][item.emotionGroup] = item.intensity;
@@ -229,9 +229,12 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
       <div className="w-full rounded-lg p-1 relative">
         {/* Legend */}
         <div className="absolute top-0 right-4 flex gap-3 z-10 bg-white/80 rounded-lg px-3 py-1 shadow text-xs">
-          {groupTypes.map((gType) => (
+          {groupTypes.map(gType => (
             <div key={gType} className="flex items-center gap-1">
-              <span className="inline-block w-3 h-3 rounded-full" style={{ backgroundColor: chartConfig[gType].color }}></span>
+              <span
+                className="inline-block w-3 h-3 rounded-full"
+                style={{ backgroundColor: chartConfig[gType].color }}
+              ></span>
               <span>{chartConfig[gType].label}</span>
             </div>
           ))}
@@ -246,7 +249,7 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
           >
             <CartesianGrid
               strokeDasharray="none"
-              stroke= {isDark? "#ffffff": "#c6c6c6"}
+              stroke={isDark ? "#ffffff" : "#c6c6c6"}
               strokeWidth={1}
               horizontal
               vertical={false}
@@ -256,10 +259,10 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
               tickFormatter={dateFormatter}
               axisLine={false}
               tickLine={false}
-              tick={{ fill: isDark? "#ffffff": "#c6c6c6", fontSize: 12 }}
-              interval={limit === 6 ? 0 : limit === 8 ? 0 : 'preserveStartEnd'}
+              tick={{ fill: isDark ? "#ffffff" : "#c6c6c6", fontSize: 12 }}
+              interval={limit === 6 ? 0 : limit === 8 ? 0 : "preserveStartEnd"}
               angle={barCount === 7 ? -45 : 0}
-              textAnchor={barCount === 7 ? 'end' : 'middle'}
+              textAnchor={barCount === 7 ? "end" : "middle"}
               height={barCount === 7 ? 60 : 40}
             />
             <YAxis domain={[0, maxValue]} hide />
@@ -283,8 +286,8 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
   return (
     <div className="w-full rounded-lg p-1">
       <ChartContainer config={chartConfig} className="h-full w-full">
-        <BarChart 
-          data={chartData} 
+        <BarChart
+          data={chartData}
           height={154}
           margin={{ top: 25, right: 10, left: 0, bottom: -10 }}
           barCategoryGap="0%"

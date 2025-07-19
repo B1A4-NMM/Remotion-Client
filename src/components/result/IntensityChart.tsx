@@ -29,7 +29,7 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
   const maxPositive = Math.max(0, ...processedScores.map(s => s.intensitySum));
   const maxNegative = Math.min(0, ...processedScores.map(s => s.intensitySum));
   const maxValue = Math.max(...processedScores.map(s => Math.abs(s.intensitySum)));
-  const scaleFactor = 0.8; // 스케일을 크게 해서 그래프가 적당한 크기로 보이게
+  const scaleFactor = 0.6; // 스케일을 더 작게 해서 그래프가 너무 크지 않게
 
   // 데이터 개수에 따른 동적 너비 계산
   const minWidth = 352; // 적절한 최소 너비
@@ -68,8 +68,8 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
   // 데이터의 최대/최소값에 따라 패딩 조정
   const hasHighValues = maxValue > 80; // 높은 값이 있으면 더 많은 공간 필요
 
-  const topPadding = hasHighValues ? 80 : 60; // 위쪽 툴팁 공간 (동적 조정)
-  const bottomPadding = hasHighValues ? 80 : 60; // 아래쪽 툴팁 공간 (동적 조정)
+  const topPadding = hasHighValues ? 100 : 80; // 위쪽 툴팁 공간 (동적 조정) - 더 늘림
+  const bottomPadding = hasHighValues ? 100 : 80; // 아래쪽 툴팁 공간 (동적 조정) - 더 늘림
 
   // 적응적 중심선 위치 계산
   // 0의 위치를 직접 조절하는 함수
@@ -92,11 +92,11 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
       // 둘 다 있으면 가운데
       manualOffset = 0;
     } else if (hasHighPositive) {
-      // 높은 양수만 있으면 아래로
-      manualOffset = 60;
+      // 높은 양수만 있으면 아래로 (더 보수적으로)
+      manualOffset = 40;
     } else if (hasLowNegative) {
-      // 낮은 음수만 있으면 위로
-      manualOffset = -60;
+      // 낮은 음수만 있으면 위로 (더 보수적으로)
+      manualOffset = -40;
     } else {
       // 둘 다 없으면 가운데
       manualOffset = 0;

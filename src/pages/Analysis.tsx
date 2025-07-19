@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import EmotionSummaryCard from "@/components/analysis/EmotionSummaryCard";
 import StrengthGraph from "@/components/analysis/StrengthGraph";
 import { Select } from "@/components/ui/select";
@@ -53,24 +53,24 @@ const Analysis = () => {
   };
 
   return (
-    <div className="px-4 py-8 text-foreground min-h-screen space-y-10">
+    <div className="px-4  text-foreground min-h-screen space-y-10">
       {/* 기간 선택 드롭다운 */}
       <div className="flex justify-between gap-10">
         <div className="w-full bg-white rounded-xl">
           <Select
             value={selectedPeriod}
-            onValueChange={(value) => setSelectedPeriod(value as PeriodType)}
+            onValueChange={value => setSelectedPeriod(value as PeriodType)}
             options={periodOptions}
             placeholder="기간을 선택하세요"
             className="font-bold !text-2xl"
           />
         </div>
-    {/* 도움말 버튼 */}
-      <div ref={helpRef} className="relative">
+        {/* 도움말 버튼 */}
+        <div ref={helpRef} className="relative">
           <button
             aria-label="도움말"
             className="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center shadow text-gray-600 text-xl font-bold border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
-            onClick={() => setHelpOpen((v) => !v)}
+            onClick={() => setHelpOpen(v => !v)}
             type="button"
           >
             <HelpCircle className="w-6 h-6" />
@@ -80,24 +80,27 @@ const Analysis = () => {
               <div className="font-semibold mb-2 flex items-center gap-2">
                 <HelpCircle className="w-5 h-5 text-gray-500" /> 도움말
               </div>
-              <div>여기서는 일기에서 나타난 감정들의 상세 분석을 확인할 수 있어요. 업데이트까지는 시간이 조금 걸려요.</div>
+              <div>
+                여기서는 일기에서 나타난 감정들의 상세 분석을 확인할 수 있어요. 업데이트까지는
+                시간이 조금 걸려요.
+              </div>
             </div>
           )}
-      </div>
+        </div>
       </div>
 
       {/* 부정적 감정 */}
       <section className="bg-white rounded-xl shadow p-6">
         <div className="flex justify-between mb-5">
           <h3 className="text-2xl font-semibold mb-2 text-gray-800">부정적 감정</h3>
-          <div onClick={()=>onClickHandler("부정")} className="cursor-pointer">
+          <div onClick={() => onClickHandler("부정")} className="cursor-pointer">
             <ChevronRight className="text-gray-400" />
           </div>
         </div>
         <div className="overflow-x-auto pb-2">
-          <EmotionSummaryCard 
-            key={"부정"} 
-            type={"부정"} 
+          <EmotionSummaryCard
+            key={"부정"}
+            type={"부정"}
             period={getPeriodConfig(selectedPeriod).days}
             barCount={getPeriodConfig(selectedPeriod).barCount}
           />
@@ -108,29 +111,29 @@ const Analysis = () => {
       <section className="bg-white rounded-xl shadow p-6">
         <div className="flex justify-between mb-5">
           <h3 className="text-2xl font-semibold mb-2 text-gray-800">긍정적 감정</h3>
-          <div onClick={()=>onClickHandler("긍정")} className="cursor-pointer">
+          <div onClick={() => onClickHandler("긍정")} className="cursor-pointer">
             <ChevronRight className="text-gray-400" />
           </div>
         </div>
         <div className="overflow-x-auto pb-2">
-            <EmotionSummaryCard 
-              key={"긍정"} 
-              type={"긍정"} 
-              period={getPeriodConfig(selectedPeriod).days}
-              barCount={getPeriodConfig(selectedPeriod).barCount}
-            />
+          <EmotionSummaryCard
+            key={"긍정"}
+            type={"긍정"}
+            period={getPeriodConfig(selectedPeriod).days}
+            barCount={getPeriodConfig(selectedPeriod).barCount}
+          />
         </div>
       </section>
 
       {/* 강점 */}
       <section className="bg-white rounded-xl shadow p-6">
-      <div className="flex justify-between mb-5">
+        <div className="flex justify-between mb-5">
           <h3 className="text-2xl font-semibold mb-2 text-gray-800">강점 그래프</h3>
-          <div onClick={()=>onClickHandler("Strength")} className="cursor-pointer">
+          <div onClick={() => onClickHandler("Strength")} className="cursor-pointer">
             <ChevronRight className="text-gray-400" />
           </div>
         </div>
-        <StrengthGraph/>
+        <StrengthGraph />
       </section>
     </div>
   );

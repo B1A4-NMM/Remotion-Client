@@ -19,12 +19,14 @@ export const getMonthlyStatus = async (year: string, month: string) => {
   if (import.meta.env.DEV) {
     console.log("📤 getMonthlyStatus called with:", { year, month });
   }
-  const response = await api.get<Array<{
-    date: string;
-    todoTotalCount: number;
-    completedCount: number;
-    isAllCompleted: boolean;
-  }>>("/todos/calendar", {
+  const response = await api.get<
+    Array<{
+      date: string;
+      todoTotalCount: number;
+      completedCount: number;
+      isAllCompleted: boolean;
+    }>
+  >("/todos/calendar", {
     params: { year, month },
   });
 

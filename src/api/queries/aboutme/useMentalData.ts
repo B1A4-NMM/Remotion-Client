@@ -34,5 +34,7 @@ export const useMentalData = (emotion: MentalType, period: string | number) => {
   return useQuery<MentalDataResponse>({
     queryKey: ["mental", emotion, period],
     queryFn: () => getMentalData(emotion, period),
+    staleTime: 5 * 60 * 1000, // 5분
+    gcTime: 10 * 60 * 1000, // 10분
   });
 };

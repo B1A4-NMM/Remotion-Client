@@ -27,7 +27,7 @@ export const deleteRoutineById = async (id: number): Promise<void> => {
   });
 };
 
-export const patchRoutineById = async(id:number) :Promise<void> => {
-  const response= await api.patch(`/routine/${id}`);
+export const patchRoutineById = async (id: number): Promise<void> => {
+  const response = await api.patch(`/routine/${id}`);
   return response.data;
 };

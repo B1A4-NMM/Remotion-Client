@@ -35,11 +35,12 @@ api.interceptors.response.use(
       // 토큰 만료 또는 무효
       localStorage.removeItem("accessToken");
 
-      // 모달 store가 설정되어 있으면 모달을 띄움
-      if (logoutModalStore) {
+      // 모달 store가 설정되어 있고 openModal 메서드가 있으면 모달을 띄움
+      if (logoutModalStore && typeof logoutModalStore.openModal === "function") {
         logoutModalStore.openModal();
       } else {
-        // 모달 store가 없으면 바로 리다이렉트
+        // 모달 store가 없거나 openModal이 없으면 바로 리다이렉트
+        console.warn("logoutModalStore not available, redirecting to login");
         window.location.href = "/login";
       }
     } else if (error.response?.status >= 500) {

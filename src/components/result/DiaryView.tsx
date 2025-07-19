@@ -12,11 +12,13 @@ interface DiaryViewProps {
 
 const DiaryView: React.FC<DiaryViewProps> = ({ diaryContent }) => {
   return (
-    <div className="space-y-6 mb-20">
+    <div className="space-y-6 mb-20 mx-4">
       <DiaryPhotos photos={diaryContent?.photoPath} />
       <DiaryAudio audio={diaryContent?.audioPath} />
       <DiaryContent content={diaryContent?.content} />
-      <DiaryLocation location={{latitude:diaryContent?.latitude, longitude:diaryContent?.longitude}} />
+      <DiaryLocation
+        location={{ latitude: diaryContent?.latitude, longitude: diaryContent?.longitude }}
+      />
     </div>
   );
 };

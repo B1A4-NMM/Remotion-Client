@@ -6,7 +6,7 @@ import { useGetRoutineByType } from "@/api/queries/routine/useGetRoutineByType";
 
 import Title from "@/components/recommend/Title";
 import FolderCardList from "@/components/routine/FolderCardList";
-import BottomPopup from "@/components/routine/BottomPopup";
+import BottomPopup from "@/components/BottomPopup";
 import RoutineModalContent from "@/components/routine/RoutineModalContent";
 import PersonalizedRoutineList from "@/components/routine/PersonalizedRoutineList";
 import RecommendedRoutinePopup from "@/components/routine/RecommendedRoutinePoPup";

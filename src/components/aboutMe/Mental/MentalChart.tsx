@@ -66,15 +66,6 @@ const formatDateToMonth = (dateStr: string) => {
   return `${month}월`;
 };
 
-const CustomLabel = (props: any) => {
-  const { x, y, value } = props;
-  return (
-    <text x={x + 20} y={y - 10} fill="#000000" textAnchor="middle" fontSize="12" fontWeight="500">
-      {value}
-    </text>
-  );
-};
-
 const groupMap: Record<GroupType, MentalType[]> = {
   부정: ["스트레스", "우울", "불안"],
   긍정: ["활력", "안정", "유대"],
@@ -83,14 +74,6 @@ const groupMap: Record<GroupType, MentalType[]> = {
 function isMentalType(type: any): type is MentalType {
   return ["스트레스", "불안", "우울", "활력", "안정", "유대"].includes(type);
 }
-
-const getBarCount = (limit?: number) => {
-  if (!limit) return 7;
-  if (limit === 7) return 7; // daily
-  if (limit === 8) return 5; // weekly (default 5, but fallback to 4 below)
-  if (limit === 6) return 4; // monthly
-  return limit;
-};
 
 const getBarSize = (barCount: number) => {
   if (barCount <= 4) return 50;
@@ -259,12 +242,16 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
               tickFormatter={dateFormatter}
               axisLine={false}
               tickLine={false}
-              tick={{ fill: isDark ? "#ffffff" : "#c6c6c6", fontSize: 12 }}
+              tick={{
+                className: isDark ? "text-white" : "text-gray-400",
+                fontSize: 12,
+              }}
               interval={limit === 6 ? 0 : limit === 8 ? 0 : "preserveStartEnd"}
               angle={barCount === 7 ? -45 : 0}
               textAnchor={barCount === 7 ? "end" : "middle"}
               height={barCount === 7 ? 60 : 40}
             />
+
             <YAxis domain={[0, maxValue]} hide />
             {groupTypes.map((gType, idx) => (
               <Bar

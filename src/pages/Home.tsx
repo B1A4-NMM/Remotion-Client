@@ -17,7 +17,6 @@ import { useInfiniteDiaries } from "../api/queries/home/useInfiniteDiaries";
 import { useQueryClient } from "@tanstack/react-query";
 import { usePatchDiaryBookmark } from "../api/queries/home/usePatchDiaryBookmark";
 // import RecommendHome from "@/components/home/RecommendHome";
-import RecommendHomeCard from "@/components/home/RecommendHomeCard";
 
 // S3 → http 변환 (실제 CDN 도메인에 맞게 수정 필요)
 const s3ToHttpUrl = (s3Path: string) =>
@@ -149,9 +148,7 @@ const Home = () => {
 
   return (
     <div className="flex flex-col  text-foreground min-h-screen">
-      <div
-        className={`sticky top-0 z-50  rounded-b-2xl pb-8 ${isDark ? "bg-[#181718]" : "bg-[#FAF6F4]"}`}
-      >
+      <div className="sticky top-0 z-50  rounded-b-2xl bg-[#F5F5F5] dark:bg-[#181718] dark:text-white pb-8">
         <Title
           emotionCountByMonth={emotionCountByMonth}
           totalDiaryCount={totalDiaryCount}

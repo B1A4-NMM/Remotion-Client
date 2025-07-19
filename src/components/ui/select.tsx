@@ -53,7 +53,7 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
           )}
         >
           <span className="flex items-center gap-2 text-lg font-semibold">
-            <span className="select-calendar-icon flex items-center"><Calendar className="w-5 h-5 mr-1 text-gray00" /></span>
+            <span className="select-calendar-icon flex items-center"><Calendar className="w-5 h-5 mr-1 text-gray-800" /></span>
             <span className={selectedOption ? "text-foreground" : "text-muted-foreground"}>
               {selectedOption ? selectedOption.label : placeholder}
             </span>
@@ -72,7 +72,7 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
                   option.value === value && "bg-accent text-accent-foreground"
                 )}
               >
-                <span className="select-calendar-icon flex items-center"><Calendar className="w-5 h-5 mr-1 text-gray-500" /></span>
+                <span className="select-calendar-icon flex items-center"><Calendar className="w-5 h-5 mr-1 text-gray-800" /></span>
                 <span>{option.label}</span>
               </button>
             ))}

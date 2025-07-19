@@ -5,6 +5,7 @@ import NotificationPreview from "@/components/notification/NotificationPreview";
 import { useGetAuthTest } from "@/api/queries/auth/useGetAuthTest";
 import kakao from "@/assets/img/kakao.svg";
 import google from "@/assets/img/google.svg";
+import Webpush from "@/components/Webpush";
 
 // 아이콘 컴포넌트들
 const SunIcon = ({ className }: { className?: string }) => (
@@ -164,6 +165,8 @@ export default function Mypage() {
               : "라이트 모드가 활성화되어 있습니다"}
           </p>
         </div>
+
+        <Webpush/>
 
         {/* 로그아웃 버튼 */}
         <button

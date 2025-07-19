@@ -370,11 +370,11 @@ const RadarChart = ({ lastTypeCount, currentTypeCount, onSelectCategory }: Radar
       <div className="flex gap-4 mb-2 items-center">
         <div className="flex items-center gap-1">
           <span className="inline-block w-4 h-4 rounded-full" style={{ background: CURRENT_COLOR }}></span>
-          <span className="text-sm font-medium text-gray-700">이번 달</span>
+          <span className="text-sm font-medium text-gray-800">이번 달</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="inline-block w-4 h-4 rounded-full" style={{ background: LAST_COLOR }}></span>
-          <span className="text-sm font-medium text-gray-700">저번 달</span>
+          <span className="text-sm font-medium text-gray-800">저번 달</span>
         </div>
       </div>
       <svg ref={svgRef}></svg>

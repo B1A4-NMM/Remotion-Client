@@ -7,15 +7,34 @@ import { Calendar, MapPin, Activity, Heart, TrendingUp } from "lucide-react";
 import { mapEmotionToColor } from "@/constants/emotionColors";
 import { Canvas } from "@react-three/fiber";
 import Blob from "@/components/Blob/Blob";
+import { useTheme } from "@/components/theme-provider";
+
+export type ColorKey = "gray" | "gray1" | "gray2" | "blue" | "green" | "red" | "yellow";
+
+export const baseColors: Record<ColorKey, string> = {
+  green: "#72C9A3",
+  red: "#F36B6B",
+  yellow: "#FFD47A",
+  blue: "#7DA7E3",
+  gray: "#DADADA",
+  gray1: "#DADADA",
+  gray2: "#DADADA",
+} as const;
 
 const RelationDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading } = useGetRelationDetail(id || "");
   const userName = "사용자";
 
+  const { theme } = useTheme();
+    const isDark =
+      theme === "dark" ||
+      (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
   // 데이터 분석 함수들
   const analyzeRelation = (relationData: RelationData) => {
     if (!relationData) return null;
+    console.log(relationData);
 
     const { emotions, diaries, targetName } = relationData;
 
@@ -141,7 +160,7 @@ const RelationDetail = () => {
 
   // 가장 강한 감정의 색상 가져오기
   const strongestEmotion = analysis.emotionStats[0]?.emotion;
-  const strongestEmotionColor = strongestEmotion ? mapEmotionToColor(strongestEmotion) : "#95A5A6";
+  const strongestEmotionColor = strongestEmotion ? baseColors[mapEmotionToColor(strongestEmotion)] : "#95A5A6";
 
   return (
     <div className="min-h-screen">
@@ -164,7 +183,7 @@ const RelationDetail = () => {
               {analysis.targetName}과의 관계
             </h2>
             <div className="text-6xl font-bold text-blue-600 mb-2">{analysis.intimacyScore}</div>
-            <div className="text-gray-600">친밀도 점수</div>
+            <div className="text-gray-800">친밀도 점수</div>
           </div>
 
           <div className="grid grid-cols-3 gap-4 text-center">
@@ -233,13 +252,13 @@ const RelationDetail = () => {
             {analysis.emotionStats.slice(0, 6).map(emotion => (
               <div key={emotion.emotion} className="flex items-center p-4 bg-gray-50 rounded-xl">
                 <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center mr-4"
-                  style={{ backgroundColor: mapEmotionToColor(emotion.emotion) }}
+                  className="w-16 h-16 rounded-full flex items-center justify-center mr-4"
+                  style={{ backgroundColor: baseColors[mapEmotionToColor(emotion.emotion)] }}
                 >
-                  <span className="text-white font-bold">{emotion.emotion}</span>
+                  <span className="text-white font-bold text-center">{emotion.emotion}</span>
                 </div>
                 <div>
-                  <div className="font-bold text-gray-900">{emotion.count}번</div>
+                  <div className="font-bold text-gray-600">{emotion.count}번</div>
                   <div className="text-sm text-gray-600">
                     평균 강도 {emotion.averageIntensity.toFixed(1)}
                   </div>
@@ -263,7 +282,6 @@ const RelationDetail = () => {
             </div>
 
             <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6">
-              <h4 className="font-bold text-gray-900 mb-2">{analysis.recentDiary.title}</h4>
               <p className="text-gray-700 mb-4">{analysis.recentDiary.content}</p>
               <div className="flex items-center justify-between text-sm text-gray-600">
                 <div className="flex items-center">

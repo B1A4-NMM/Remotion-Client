@@ -19,13 +19,13 @@ const Title = ({name, isBackActive=false, back="/analysis"}:{name:string, isBack
 
   // 더 세밀한 조정이 필요한 경우 인라인 스타일 사용
   const getFontSize = (nameLength: number) => {
-    const baseSize = 30; // text-3xl 기본 크기
+    const baseSize = 32; // text-3xl 기본 크기
     const minSize = 25;  // 최소 크기
     
-    if (nameLength <= 4) return baseSize;
+    if (nameLength <= 8) return baseSize;
     
     // 4글자 초과 시 1글자당 2px씩 감소
-    const reducedSize = baseSize - (nameLength - 4) * 2;
+    const reducedSize = baseSize - (nameLength - 4) * 4;
     return Math.max(reducedSize, minSize);
   }
 
@@ -51,8 +51,7 @@ const Title = ({name, isBackActive=false, back="/analysis"}:{name:string, isBack
           ):(
             <>
               <h1 
-                className={`font-bold text-gray-900 ${getFontSizeClass(name.length)}`}
-                style={{fontSize: `${getFontSize(name.length)}px`}}
+                className="font-bold text-gray-900 text-3xl"
               >
                 {name}
               </h1>

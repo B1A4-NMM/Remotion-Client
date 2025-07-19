@@ -17,3 +17,7 @@ export const getMonthDates = (date: Date): Date[] => {
 
 export const nextMonth = (date: Date) => addMonths(date, 1);
 export const prevMonth = (date: Date) => subMonths(date, 1);
+
+export function parseDateStringToDate(dateStr: string): Date { 
+  return new Date(dateStr); 
+}

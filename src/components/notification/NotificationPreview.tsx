@@ -1,8 +1,10 @@
-import React from "react";
+import React,{ useState,useMemo } from "react";
 import { useGetNotification } from  "@/api/queries/notifications/useGetNotifications"
 import { Notification } from "@/types/notification";
 import NotificationCard from "./NotificationCard";
 import { Link } from "react-router-dom";
+import { useNotificationExpand } from "@/hooks/useNotificationExpand";
+import { getTop5Notifications } from "@/utils/sortNotificationPreview";
 
 /* 상위 5개만 보여주는 컴포넌트 */
 
@@ -10,10 +12,17 @@ import { Link } from "react-router-dom";
 export default function NotificationPreview() {
     const { data: notifications = [] } = useGetNotification(); 
 
-    const recentNotifications = notifications
-    .slice()
-    .sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0,5); //5개만 자르기 
+    const previewNotifications = useMemo(() => {
+      return getTop5Notifications(notifications);
+    },[notifications]);
+    const { expandedId, handleToggleExpand } = useNotificationExpand();
+
+    
+
+    // const recentNotifications = notifications
+    // .slice()
+    // .sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    // .slice(0,5); // 상위 5개만 자르기 
 
 
     return (
@@ -25,12 +34,17 @@ export default function NotificationPreview() {
           </Link>
         </div>
   
-        {recentNotifications.length === 0 ? (
+        {previewNotifications.length === 0 ? (
           <p className="text-sm text-muted-foreground">최근 알림이 없습니다.</p>
         ) : (
           <ul className="space-y-3">
-            {recentNotifications.map((noti) => (
-              <NotificationCard key={noti.id} noti={noti} />
+            {previewNotifications.map((noti) => (
+              <NotificationCard 
+              key={noti.id} 
+              noti={noti}
+              isExpanded={expandedId === noti.id}
+              onToggleExpand={handleToggleExpand}
+          />
             ))}
           </ul>
         )}

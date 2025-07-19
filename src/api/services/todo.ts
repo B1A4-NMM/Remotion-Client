@@ -129,7 +129,7 @@ export const toggleTodo = async (id: number) => {
     if (import.meta.env.DEV) {
       console.log("🔄 toggleTodo called with:", { id });
     }
-    const response = await api.patch<ApiTodo>(`/todos/calendar/completion/${id}`);
+    const response = await api.patch<ApiTodo>(`/todos/calendar/${id}`);
 
     if (import.meta.env.DEV) {
       console.log("🔄 toggleTodo response.data:", response.data);

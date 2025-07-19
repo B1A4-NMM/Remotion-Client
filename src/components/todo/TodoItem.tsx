@@ -12,7 +12,10 @@ import { MoreHorizontal } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import "@/styles/day-picker.css";
+import TodoDatePicker from "@/components/todo/TodoDatePicker";
 import { formatDate } from "@/utils/date";
+import { format } from "date-fns";
+import { ko, enUS } from "date-fns/locale";
 
 interface TodoItemProps {
   todo: Todo;
@@ -29,6 +32,15 @@ export default function TodoItem({ todo }: TodoItemProps) {
   const [isComposing, setIsComposing] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
+
+  const locale = {
+    ...ko,
+    options: { ...ko.options, weekStartsOn: 1 },
+  };
+  const formatCaption = (month: Date) =>
+    format(month, "yyyy년 MM월", { locale });
+  const formatWeekdayName = (day: Date) =>
+    format(day, "EEE", { locale: enUS }).toUpperCase();
 
   const commitEdit = () => {
     const trimmed = value.trim();
@@ -113,9 +125,13 @@ export default function TodoItem({ todo }: TodoItemProps) {
         heightOption={{ wrapChildren: true }}
       >
         <div className="flex flex-col gap-3 w-full">
-          <Button onClick={handleDelete} className="w-full">
+          <Button
+            onClick={handleDelete}
+            className="w-full bg-[#F36B6B] hover:bg-[#e96060] text-white"
+          >            
             삭제하기
           </Button>
+
           <Button
             onClick={() => {
               setDatePickerOpen(true);
@@ -135,6 +151,13 @@ export default function TodoItem({ todo }: TodoItemProps) {
           mode="single"
           selected={new Date(todo.date)}
           onSelect={handleDateChange}
+          locale={locale}
+          formatters={{
+            formatCaption,
+            formatWeekdayName,
+          }}
+        // <TodoDatePicker
+        //   date={new Date(todo.date)}
           className="bg-card text-card-foreground"
         />
       </BottomPopup>

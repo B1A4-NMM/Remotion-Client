@@ -1,13 +1,12 @@
 // src/api/queries/relation/useGetRelation.ts
 import { useQuery } from "@tanstack/react-query";
-import { getNotification } from "../../services/notification";
-import axios from "axios";
+import { getNotification } from "@/api/services/notification";
 import { Notification } from "@/types/notification";
 
 
-export const useGetNotifications = () => {
+export const useGetNotification = () => {
   return useQuery<Notification[]>({
     queryKey: ["notifications"],
-    queryFn: useGetNotifications,
+    queryFn: getNotification,
   });
 };

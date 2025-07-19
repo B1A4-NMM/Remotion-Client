@@ -17,7 +17,7 @@ import Analysis from "./pages/Analysis";
 import Strength from "./pages/analysis/Strength";
 import Relation from "./pages/Relation";
 import RelationDetail from "./pages/RelationDetail";
-import Notifications from "./pages/notifications";
+import Notifications from "./pages/Notification";
 
 import Todos from "./pages/Todos";
 import Mypage from "./pages/Mypage";

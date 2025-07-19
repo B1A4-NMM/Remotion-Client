@@ -47,12 +47,12 @@ const Loading7 = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center text-gray-900 relative overflow-hidden">
-      <div className="relative pointer-events-none mb-1">
+      <div className="relative pointer-events-none mb-28">
         <Canvas camera={{ position: [0, 0, 13], fov: 30 }}>
           <LoadingBlob />
         </Canvas>
       </div>
-        <div className="relative w-[300px] h-[200px] mb-28">
+        <div className="relative w-[300px] h-[200px] mb-30">
           <Loading6/>
         </div>
     </div>

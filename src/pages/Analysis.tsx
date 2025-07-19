@@ -80,7 +80,7 @@ const Analysis = () => {
               <div className="font-semibold mb-2 flex items-center gap-2">
                 <HelpCircle className="w-5 h-5 text-gray-500" /> 도움말
               </div>
-              <div>여기서는 일기에서 나타난 감정들의 상세 분석을 확인할 수 있어요. 각 카드를 클릭해보세요.</div>
+              <div>여기서는 일기에서 나타난 감정들의 상세 분석을 확인할 수 있어요. 업데이트까지는 시간이 조금 걸려요.</div>
             </div>
           )}
       </div>

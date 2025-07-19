@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { useTheme } from "../theme-provider";
 
 const phrases: string[] = [
   "감정을 곱씹는 중이에요",
@@ -38,14 +39,19 @@ const easeInOut = (t: number): number => {
 interface CheckRef {
   circle: SVGCircleElement | null;
   check: SVGPolygonElement | null;
+  currentAlpha: number; // 현재 alpha 값 추가
 }
 
 const Loading6: React.FC = () => {
   const phrasesRef = useRef<SVGGElement | null>(null);
   const checksRef = useRef<CheckRef[]>([]);
   const colorMapRef = useRef<string[]>([]);
-  // 문구를 2배로 복제하여 자연스러운 무한 반복
   const doubledPhrases = useRef<string[]>([...shuffleArray([...phrases]), ...shuffleArray([...phrases])]);
+
+  const { theme } = useTheme();
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   useEffect(() => {
     colorMapRef.current = doubledPhrases.current.map(() => {
@@ -57,7 +63,7 @@ const Loading6: React.FC = () => {
     let currentY = 0;
     const verticalSpacing = 100;
     const totalHeight = verticalSpacing * (doubledPhrases.current.length - 1);
-    const centerY = 90; // SVG 중앙 기준값 (height 190, y=90~100)
+    const containerHeight = 400; // 컨테이너 높이
 
     const animate = () => {
       const now = new Date().getTime();
@@ -73,15 +79,20 @@ const Loading6: React.FC = () => {
         currentY = 0;
       }
 
-      // 체크 애니메이션: 문구가 중앙에 도달할 때만 체크
+      // 체크 애니메이션: 화면 영역 안에 있을 때만 체크 표시
       checksRef.current.forEach((check, i) => {
-        const phraseY = 40 + i * 50 + currentY;
-        // 중앙(90~110) 근처에 오면 체크 fade-in, 아니면 fade-out
-        const distToCenter = Math.abs(phraseY - centerY +40);
+        const phraseY = 100 + i * 40 + currentY;
+        
+        // 화면 영역(0~containerHeight) 안에 있는지 확인
+        const isInViewport = phraseY >= 0 && phraseY <= containerHeight;
+        
         let alpha = 0;
-        if (distToCenter < 100) {
-          alpha = 1 - distToCenter / 20; // 0~1
+        if (isInViewport) {
+          // 화면 영역 안에 있으면 체크 표시
+          alpha = 1;
         }
+        // 화면을 벗어나면 자동으로 alpha = 0이 되어 체크 해제
+        
         if (check.circle) check.circle.setAttribute("fill", `rgba(255,255,255,${alpha})`);
         if (check.check) check.check.setAttribute("fill", `rgba(130,231,159,${alpha})`);
       });
@@ -110,8 +121,8 @@ const Loading6: React.FC = () => {
         style={{
           display: "flex",
           flexDirection: "column",
-          height: 190,
-          width: 400,
+          height: 400,
+          width: 700, // 500에서 700으로 확장
           overflow: "hidden",
         }}
       >
@@ -131,17 +142,30 @@ const Loading6: React.FC = () => {
           <g style={{ mask: "url(#mask)" }}>
             <g ref={phrasesRef}>
               {doubledPhrases.current.map((phrase, i) => {
-                const y = 40 + i * 50;
+                const y = 40 + i * 70;
                 return (
                   <React.Fragment key={i}>
-                    <text x="50" y={y} fontSize="12" fontFamily="Arial" fill="text-foreground">
-                      {phrase}
-                    </text>
+                    {/* 줄바꿈이 가능한 텍스트 */}
+                    <foreignObject x="50" y={y - 10} width="600" height="50">
+                      <div 
+                        style={{
+                          fontSize: "16px",
+                          fontFamily: "Arial",
+                          color: isDark ? "#ffffff" : "#000000", // 다크모드 처리
+                          lineHeight: "1.4",
+                          wordWrap: "break-word",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {phrase}
+                      </div>
+                    </foreignObject>
+                    
                     <g transform={`translate(10 ${y - 20}) scale(.9)`}>
                       <circle
                         ref={el => {
                           if (!checksRef.current[i])
-                            checksRef.current[i] = { circle: null, check: null };
+                            checksRef.current[i] = { circle: null, check: null, currentAlpha: 0 };
                           checksRef.current[i].circle = el;
                         }}
                         cx="16"
@@ -154,7 +178,7 @@ const Loading6: React.FC = () => {
                       <polygon
                         ref={el => {
                           if (!checksRef.current[i])
-                            checksRef.current[i] = { circle: null, check: null };
+                            checksRef.current[i] = { circle: null, check: null, currentAlpha: 0 };
                           checksRef.current[i].check = el;
                         }}
                         points="21.661,7.643 13.396,19.328 9.429,15.361 7.075,17.714 13.745,24.384 24.345,9.708"

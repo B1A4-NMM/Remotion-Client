@@ -92,6 +92,20 @@ function isMentalType(type: any): type is MentalType {
   return ["스트레스", "불안", "우울", "활력", "안정", "유대"].includes(type);
 }
 
+const getBarCount = (limit?: number) => {
+  if (!limit) return 7;
+  if (limit === 7) return 7; // daily
+  if (limit === 8) return 5; // weekly (default 5, but fallback to 4 below)
+  if (limit === 6) return 4; // monthly
+  return limit;
+};
+
+const getBarSize = (barCount: number) => {
+  if (barCount <= 4) return 50;
+  if (barCount <= 7) return 35;
+  return 20;
+};
+
 const MentalChart = ({ type, data, limit }: MentalChartProps) => {
   // 그룹형 차트 여부 판별
   const isGroup = type === "부정" || type === "긍정";
@@ -99,8 +113,8 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
 
   const { theme } = useTheme();
   const isDark =
-  theme === "dark" ||
-  (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    theme === "dark" ||
+    (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   // 날짜 포맷터 결정 (limit에 따라)
   const getDateFormatter = (limit?: number) => {
@@ -110,18 +124,22 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
     return formatDateToMD; // 기본: 월/일 표시
   };
 
+  // 막대 개수 결정
+  let barCount = 7;
+  if (limit === 7) barCount = 7; // daily
+  else if (limit === 8) barCount = 4; // weekly (4주)
+  else if (limit === 6) barCount = 4; // monthly (4개월)
+
   const dateFormatter = getDateFormatter(limit);
+  const barSize = getBarSize(barCount);
 
   // 데이터 그룹화 함수
-
   const groupDataByPeriodAndEmotion = (data: any[], limit?: number) => {
     if (!limit) return data;
-
+    let groupTarget = barCount;
     const grouped: Record<string, any> = {};
-    
     data.forEach(item => {
       let dateKey: string;
-      
       if (limit === 6) {
         // 월별 그룹화
         const match = item.date.match(/\d{4}-(\d{2})-\d{2}/);
@@ -138,10 +156,8 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
         // 일별 그룹화
         dateKey = item.date;
       }
-
       // 날짜와 감정을 조합한 고유 키 생성
       const key = `${dateKey}_${item.emotionGroup}`;
-
       if (!grouped[key]) {
         grouped[key] = {
           date: dateKey,
@@ -151,33 +167,25 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
           totalIntensity: 0
         };
       }
-      
       // 가중평균으로 intensity 계산
       const currentCount = item.count || 1;
       grouped[key].totalIntensity += item.intensity * currentCount;
       grouped[key].count += currentCount;
       grouped[key].intensity = grouped[key].totalIntensity / grouped[key].count;
     });
-
     // 날짜순으로 정렬 후 limit 적용
     const sortedData = Object.values(grouped).sort((a: any, b: any) => a.date.localeCompare(b.date));
-    
     // 각 날짜별로 limit 적용 (최근 날짜부터)
     const uniqueDates = [...new Set(sortedData.map((item: any) => item.date))];
-    const limitedDates = uniqueDates.slice(-limit);
-    
+    const limitedDates = uniqueDates.slice(-groupTarget);
     return sortedData.filter((item: any) => limitedDates.includes(item.date));
   };
-
-
 
   // 그룹형 데이터 가공 
   const groupedData = useMemo(() => {
     if (!isGroup) return [];
-    
     // 기간별, 감정별로 데이터 그룹화
     const periodAndEmotionGroupedData = groupDataByPeriodAndEmotion(data, limit);
-    
     // 날짜별로 감정별 intensity를 매핑
     const dateMap: Record<string, any> = {};
     periodAndEmotionGroupedData.forEach(item => {
@@ -195,16 +203,21 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
       }
       dateMap[item.date][item.emotionGroup] = item.intensity;
     });
-    
     // 날짜 정렬
     return Object.values(dateMap).sort((a: any, b: any) => a.date.localeCompare(b.date));
   }, [data, isGroup, limit]);
 
-
-  
-
   // 단일 감정 데이터
-  const processedData = limit ? data.slice(-limit) : data;
+  let processedData = data;
+  if (limit === 7) {
+    processedData = data.slice(-7);
+  } else if (limit === 8) {
+    processedData = data.slice(-4);
+  } else if (limit === 6) {
+    processedData = data.slice(-4);
+  } else if (limit) {
+    processedData = data.slice(-limit);
+  }
   const chartData = processedData.map(item => ({
     date: item.date,
     value: item.intensity,
@@ -245,11 +258,10 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
               tickLine={false}
               tick={{ fill: isDark? "#ffffff": "#c6c6c6", fontSize: 12 }}
               interval={limit === 6 ? 0 : limit === 8 ? 0 : 'preserveStartEnd'}
-              angle={limit === 7 ? -45 : 0}
-              textAnchor={limit === 7 ? 'end' : 'middle'}
-              height={limit === 7 ? 60 : 40}
+              angle={barCount === 7 ? -45 : 0}
+              textAnchor={barCount === 7 ? 'end' : 'middle'}
+              height={barCount === 7 ? 60 : 40}
             />
-
             <YAxis domain={[0, maxValue]} hide />
             {groupTypes.map((gType, idx) => (
               <Bar
@@ -257,7 +269,7 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
                 dataKey={gType}
                 fill={chartConfig[gType as MentalType]?.color || "#8884d8"}
                 radius={[2, 4, 0, 0]}
-                barSize={5}
+                barSize={barSize}
                 // label 제거
               />
             ))}
@@ -308,7 +320,7 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
             dataKey="value"
             fill={`url(#gradient-${type})`}
             radius={[4, 4, 0, 0]}
-            barSize={limit === 7 ? 40 : limit === 8 ? 30 : limit === 6 ? 50 : 40}
+            barSize={barSize}
           />
         </BarChart>
       </ChartContainer>

@@ -45,6 +45,11 @@ const PeopleSection = ({ type, data, selectedPeriod }: PeopleSectionProps) => {
   const groupDataByPeriod = (data: any[], selectedPeriod?: string) => {
     if (!selectedPeriod || !data.length) return data;
 
+    // 기간별 제한 개수
+    let periodLimit = 7;
+    if (selectedPeriod === "weekly") periodLimit = 4;
+    else if (selectedPeriod === "monthly") periodLimit = 4;
+
     const grouped: Record<string, any> = {};
     
     data.forEach(item => {
@@ -100,7 +105,7 @@ const PeopleSection = ({ type, data, selectedPeriod }: PeopleSectionProps) => {
     
     // 각 날짜별로 limit 적용 (최근 날짜부터)
     const uniqueDates = [...new Set(sortedData.map((item: any) => item.date))];
-    const limitedDates = uniqueDates.slice(-period);
+    const limitedDates = uniqueDates.slice(-periodLimit);
     
     return sortedData.filter((item: any) => limitedDates.includes(item.date));
   };

@@ -36,6 +36,7 @@ export const getMonthlyStatus = async (year: string, month: string) => {
   return response.data;
 };
 
+// ✅ 목록: year, month, date
 export const getTodosByDate = async (date: string) => {
   if (import.meta.env.DEV) {
     console.log("📤 getTodosByDate called with:", { date });
@@ -79,7 +80,7 @@ export const createTodo = async ({
   }
 };
 
-// ✅ 수정 (내용 업데이트)
+// ✅ 수정 (내용 변경)
 export const updateTodoContent = async (
   id: number,
   data: Partial<Omit<ApiTodo, "id">>,
@@ -101,7 +102,7 @@ export const updateTodoContent = async (
   }
 };
 
-// ✅ 수정 (날짜 업데이트)
+// ✅ 수정 (날짜 변경)
 export const updateTodoDate = async (id: number, date: string) => {
   try {
     if (import.meta.env.DEV) {
@@ -122,7 +123,7 @@ export const updateTodoDate = async (id: number, date: string) => {
   }
 };
 
-// ✅ 토글
+// ✅ 토글 (isComplete)
 export const toggleTodo = async (id: number) => {
   try {
     if (import.meta.env.DEV) {

@@ -2,6 +2,7 @@
 
 import { useTodos } from "@/api/queries/todo/useTodos";
 import { useSelectedDate } from "@/hooks/useSelectedDate";
+import { formatDate } from "@/utils/date";
 import CalendarSection from "../components/todo/CalendarSection";
 import TodoSection from "../components/todo/TodoSection";
 import Title from "@/components/recommend/Title";
@@ -9,7 +10,7 @@ import Title from "@/components/recommend/Title";
 export default function TodosPage() {
   // const { selectedDate } = useSelectedDate();
   const { selectedDate } = useSelectedDate();
-  useTodos(selectedDate.toISOString().slice(0, 10)); // 📌 할 일 데이터 패칭
+  useTodos(formatDate(selectedDate)); // 📌 할 일 데이터 패칭
 
   return (
     <div className="min-h-screen overflow-auto text-foreground bg-[#fdfaf8] dark:bg-transparent px-4 pb-8">

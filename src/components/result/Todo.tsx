@@ -6,6 +6,7 @@ import { CirclePlus, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCreateTodo } from '@/api/queries/todo/useCreateTodo';
 import { useSelectedDate } from '@/hooks/useSelectedDate';
+import { formatDate } from '@/utils/date';
 
 interface TodosProps {
   todos: string[]; // Result.tsx에서 전달받은 투두 리스트 :  결과로 받은 todo
@@ -22,7 +23,7 @@ const Todos: React.FC<TodosProps> = ({ todos }) => {
   }
   const handleTodoAdd = (todoItem: string) => {
     mutate(
-      { content: todoItem, date: selectedDate.toISOString().slice(0, 10) },
+      { content: todoItem, date: formatDate(selectedDate) },
       {
         onSuccess: () => {
           toast.success(`"${todoItem}" 추가 완료!`, {

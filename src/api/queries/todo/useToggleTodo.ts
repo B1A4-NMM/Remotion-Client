@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateTodo } from "@/api/services/todo"; // ✅ toggleTodo 대신 updateTodo 사용
+import { toggleTodo } from "@/api/services/todo";
 import { useTodoStore } from "@/store/todoStore";
 
 import type { Todo } from "@/store/todoStore";
@@ -9,13 +9,8 @@ export const useToggleTodo = () => {
   const { setTodos } = useTodoStore.getState();
 
   return useMutation({
-    // ✅ mutationFn은 toggleTodo 대신 updateTodo
     mutationFn: async (id: number) => {
-      // 현재 todos에서 해당 todo 찾아서 isComplete 상태 반전
-      const todo = useTodoStore.getState().todos.find(t => t.id === id);
-      if (!todo) throw new Error("Todo not found");
-
-      return updateTodo(id, { isComplete: !todo.isComplete });
+      return toggleTodo(id);
     },
 
     // Optimistic Update: 스토어 먼저 갱신

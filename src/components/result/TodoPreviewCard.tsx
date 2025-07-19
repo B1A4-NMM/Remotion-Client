@@ -1,6 +1,7 @@
 import { Plus, CheckSquare } from "lucide-react";
 import { useCreateTodo } from "@/api/queries/todo/useCreateTodo";
 import { useSelectedDate } from "@/hooks/useSelectedDate";
+import { formatDate } from "@/utils/date";
 import { toast } from "sonner";
 
 interface TodoPreviewCardProps {
@@ -17,7 +18,7 @@ const TodoPreviewCard: React.FC<TodoPreviewCardProps> = ({
 
   const handleAddTodo = (todoText: string) => {
     createTodo(
-      { content: todoText, date: selectedDate.toISOString().slice(0, 10) },
+      { content: todoText, date: formatDate(selectedDate) },
       {
         onSuccess: () => {
           toast.success(`"${todoText}" 할일이 추가되었습니다!`);

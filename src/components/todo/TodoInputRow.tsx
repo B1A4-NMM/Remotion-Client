@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useCreateTodo } from "@/api/queries/todo/useCreateTodo";
 import { useSelectedDate } from "@/hooks/useSelectedDate";
+import { formatDate } from "@/utils/date";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTheme } from "../theme-provider";
 
@@ -26,7 +27,7 @@ export default function TodoInputRow() {
         // ✅ 조합 중에는 Enter 키를 무시해야 한글 입력이 정상 처리됨
         if (e.key === "Enter" && !isComposing && value.trim()) {
             e.preventDefault();     // ✅ preventDefault()는 <form> 구조에서 Enter 시 submit 방지 역할
-            mutate({ content: value.trim(), date: selectedDate.toISOString().slice(0, 10) });
+            mutate({ content: value.trim(), date: formatDate(selectedDate) });
             setValue("");           // 인풋 초기화
         }
     };

@@ -4,6 +4,7 @@ import TodoItem from "./TodoItem";
 import TodoInputRow from "./TodoInputRow";
 import { useTodos } from "@/api/queries/todo/useTodos";
 import { useSelectedDate } from "@/hooks/useSelectedDate";
+import { formatDate } from "@/utils/date";
 
 export default function TodoList() {
   const todos = useTodoStore(state => state.todos);
@@ -11,7 +12,7 @@ export default function TodoList() {
   const toggleShowDone = useTodoStore(state => state.toggleShowDone);
 
   const { selectedDate } = useSelectedDate();
-  const { data: fetchedTodos } = useTodos(selectedDate.toISOString().slice(0, 10));
+  const { data: fetchedTodos } = useTodos(formatDate(selectedDate));
   const setTodos = useTodoStore(state => state.setTodos);
 
   useEffect(() => {

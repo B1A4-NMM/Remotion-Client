@@ -1,5 +1,5 @@
 import { Checkbox } from "@/components/ui/checkbox";
-// import { useToggleTodo } from "@/api/queries/todo/useToggleTodo";
+import { useToggleTodo } from "@/api/queries/todo/useToggleTodo";
 import { useUpdateTodo } from "@/api/queries/todo/useUpdateTodo";
 import { useDeleteTodo } from "@/api/queries/todo/useDeleteTodo";
 import { useTodoStore } from "@/store/todoStore";
@@ -14,6 +14,7 @@ interface TodoItemProps {
 }
 
 export default function TodoItem({ todo }: TodoItemProps) {
+  const { mutate: toggleTodo } = useToggleTodo();
   const { mutate: updateTodo } = useUpdateTodo();
   const { mutate: deleteTodo } = useDeleteTodo();
   const setTodos = useTodoStore(state => state.setTodos);
@@ -60,12 +61,8 @@ export default function TodoItem({ todo }: TodoItemProps) {
         {/* ✅ isComplete 상태 연동 */}
         <Checkbox
             checked={todo.isComplete}
-            onCheckedChange={(checked) => {
-              const complete = Boolean(checked);
-              setTodos(prev => prev.map(t =>
-                t.id === todo.id ? { ...t, isComplete: complete } : t
-              ));
-              updateTodo({ id: todo.id, data: { isComplete: complete } });
+            onCheckedChange={() => {
+              toggleTodo(todo.id);
             }}
         />
 

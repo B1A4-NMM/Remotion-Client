@@ -87,6 +87,25 @@ export const updateTodo = async (id: number, data: Partial<Omit<ApiTodo, "id">>)
   }
 };
 
+// ✅ 토글
+export const toggleTodo = async (id: number) => {
+  try {
+    if (import.meta.env.DEV) {
+      console.log("🔄 toggleTodo called with:", { id });
+    }
+    const response = await api.patch<ApiTodo>(`/todos/calendar/${id}`);
+
+    if (import.meta.env.DEV) {
+      console.log("🔄 toggleTodo response.data:", response.data);
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error("❌ toggleTodo error:", error);
+    throw error;
+  }
+};
+
 // ✅ 삭제
 export const deleteTodo = async (id: number) => {
   if (import.meta.env.DEV) {

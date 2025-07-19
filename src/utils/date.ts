@@ -1,6 +1,13 @@
-import { addDays, addMonths, subMonths, startOfMonth, endOfMonth } from "date-fns";
+import {
+  addDays,
+  addMonths,
+  subMonths,
+  startOfMonth,
+  endOfMonth,
+  format,
+} from "date-fns";
 
-export const formatDate = (date: Date) => date.toISOString().slice(0, 10);
+export const formatDate = (date: Date) => format(date, "yyyy-MM-dd");
 
 export const getMonthDates = (date: Date): Date[] => {
   const start = startOfMonth(date);

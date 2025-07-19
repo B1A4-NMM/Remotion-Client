@@ -10,6 +10,7 @@ import {
 } from "date-fns";
 import { useState, useEffect, useMemo } from "react";
 import clsx from "clsx";
+import { Check } from "lucide-react";
 
 interface WeeklyCalendarProps {
   selectedDate: Date;
@@ -72,15 +73,14 @@ export default function WeeklyCalendar({
         {WEEKDAYS.map((day, idx) => (
           <span
             key={day}
-            className="text-[12px] font-medium text-center flex-1"
-            style={{
-              color:
-                idx === 6
-                  ? "#F36B6B"
-                  : idx === 5
-                  ? "#7DA7E3"
-                  : "black",
-            }}
+            className={clsx(
+              "text-[12px] font-medium text-center flex-1",
+              idx === 6
+                ? "text-[#F36B6B]"
+                : idx === 5
+                ? "text-[#7DA7E3]"
+                : "text-black dark:text-white"
+            )}
           >
             {day}
           </span>
@@ -94,17 +94,17 @@ export default function WeeklyCalendar({
           const isSelected = isSameDate(day, selectedDate);
           const weekday = getDay(day);
 
-          const dateColor =
+          const baseColorClass =
             weekday === 0
-              ? "#F36B6B"
+              ? "text-[#F36B6B]"
               : weekday === 6
-              ? "#7DA7E3"
-              : "#656565";
+              ? "text-[#7DA7E3]"
+              : "text-[#656565] dark:text-white";
 
-          const finalDateColor =
+          const finalColorClass =
             (isToday || isSelected) && weekday !== 0 && weekday !== 6
-              ? "white"
-              : dateColor;
+              ? "text-white"
+              : baseColorClass;
 
           return (
             <div
@@ -116,33 +116,35 @@ export default function WeeklyCalendar({
               {(() => {
                 const key = format(day, "yyyy-MM-dd");
                 const status = statusMap[key];
-                const ratio = status
-                  ? `${status.completedCount}/${status.todoTotalCount}`
-                  : "";
-                const done = status?.isAllCompleted;
+                const incomplete = status
+                  ? status.todoTotalCount - status.completedCount
+                  : 0;
+                const done = Boolean(status?.isAllCompleted) || incomplete === 0;
+                
                 return (
                   <div
                     className={clsx(
                       "w-5 h-6 rounded-full text-[10px] flex items-center justify-center my-1",
-                      done ? "bg-black text-white" : "bg-[#D9D9D9]"
+                      done
+                      ? "bg-[#D9D9D9] text-white"
+                      : "bg-[#D9D9D9] text-black dark:text-black"
                     )}
                   >
-                    {ratio}
-                  </div>
+                    {status ? (done ? <Check className="w-3 h-3" /> : incomplete) : ""}                  </div>
                 );
               })()}
 
-              {/* 날짜 원 */}
+              {/* 날짜 원 (isToday, isSelected) */}
               <span
                 className={clsx(
                   "w-5 h-5 flex items-center justify-center rounded-full text-xs",
                   {
                     "font-bold": isToday || isSelected,
-                    "bg-black": isSelected,
+                    "bg-black dark:bg-white" : isSelected,
                     "bg-[#DADADA]": isToday && !isSelected,
-                  }
+                  },
+                  finalColorClass
                 )}
-                style={{ color: finalDateColor }}
               >
                 {day.getDate()}
               </span>

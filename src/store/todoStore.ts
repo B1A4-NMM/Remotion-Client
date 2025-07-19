@@ -4,7 +4,7 @@ export type Todo = {
     id: number;
     content: string;
     isComplete: boolean;
-    // date: string;
+    date: string;
     // isRepeat: boolean;
     // repeatRule: string | null;
     // repeatEndDate: string | null;

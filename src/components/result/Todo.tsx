@@ -5,6 +5,8 @@ import { Button } from '../ui/button';
 import { CirclePlus, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCreateTodo } from '@/api/queries/todo/useCreateTodo';
+import { useSelectedDate } from '@/hooks/useSelectedDate';
+import { formatDate } from '@/utils/date';
 
 interface TodosProps {
   todos: string[]; // Result.tsx에서 전달받은 투두 리스트 :  결과로 받은 todo
@@ -13,6 +15,7 @@ interface TodosProps {
 const Todos: React.FC<TodosProps> = ({ todos }) => {
 
   const { mutate } = useCreateTodo();
+  const { selectedDate } = useSelectedDate();
 
   // todos가 빈 배열이면 아무것도 렌더링하지 않음
   if (!todos || todos.length === 0) {
@@ -20,7 +23,7 @@ const Todos: React.FC<TodosProps> = ({ todos }) => {
   }
   const handleTodoAdd = (todoItem: string) => {
     mutate(
-      { title: todoItem },
+      { content: todoItem, date: formatDate(selectedDate) },
       {
         onSuccess: () => {
           toast.success(`"${todoItem}" 추가 완료!`, {

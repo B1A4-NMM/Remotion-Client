@@ -2,14 +2,14 @@ import { create } from "zustand"; // 상태관리
 
 export type Todo = {
     id: number;
-    title: string;
-    isCompleted: boolean;
-    date: string | null;
-    isRepeat: boolean;
-    repeatRule: string | null;
-    repeatEndDate: string | null;
-    createdAt: string;
-    updatedAt: string;
+    content: string;
+    isComplete: boolean;
+    date: string;
+    // isRepeat: boolean;
+    // repeatRule: string | null;
+    // repeatEndDate: string | null;
+    // createdAt: string;
+    // updatedAt: string;
 };
 
 type TodoStore = {

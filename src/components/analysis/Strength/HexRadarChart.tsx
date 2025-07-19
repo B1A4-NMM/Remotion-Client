@@ -83,8 +83,26 @@ const RadarChart = ({ lastTypeCount, currentTypeCount, onSelectCategory }: Radar
   const hasLastData = isValidData(lastTypeCount);
   const hasCurrentData = isValidData(currentTypeCount);
 
-  const lastValues = hasLastData ? calculateValues(lastTypeCount) : Array(LABELS.length).fill(0);
-  const currentValues = hasCurrentData ? calculateValues(currentTypeCount) : Array(LABELS.length).fill(0);
+  // 정규화 함수
+  function normalizeRadarValues(values: number[], maxAllowed: number) {
+    const maxValue = Math.max(...values, 0);
+    if (maxValue > maxAllowed) {
+      return values.map(v => (v / maxValue) * maxAllowed);
+    }
+    return values;
+  }
+
+  let lastValues = hasLastData ? calculateValues(lastTypeCount) : Array(LABELS.length).fill(0);
+  let currentValues = hasCurrentData ? calculateValues(currentTypeCount) : Array(LABELS.length).fill(0);
+
+  //정규화 전에 원본 값 저장해야 소숫점 안나옴 
+  const originalLastValues = [...lastValues];
+  const originalCurrentValues = [...currentValues];
+
+  // 정규화: 최댓값이 5를 넘으면 비율로 축소
+  const maxAllowed = 5;
+  lastValues = normalizeRadarValues(lastValues, maxAllowed);
+  currentValues = normalizeRadarValues(currentValues, maxAllowed);
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
@@ -182,7 +200,7 @@ const RadarChart = ({ lastTypeCount, currentTypeCount, onSelectCategory }: Radar
     });
 
     // 데이터 포인트 계산 함수
-    const calculateDataPoints = (values: number[]) => {
+    const calculateDataPoints = (values: number[], originalValues: number[]) => {
       return values.map((v, i) => {
         const angle = angleSlice * i;
         const rawScaled = (v / maxValue) * radius;
@@ -190,14 +208,15 @@ const RadarChart = ({ lastTypeCount, currentTypeCount, onSelectCategory }: Radar
         return {
           x: centerX + scaled * Math.cos(angle - Math.PI / 2),
           y: centerY + scaled * Math.sin(angle - Math.PI / 2),
-          value: v,
+          value: v, // 정규화된 값 (좌표 계산용)
+          originalValue: originalValues[i], // 원본 값 (텍스트 표시용)
         };
       });
     };
 
     // ✅ 저번 달 데이터가 있을 때만 그래프 그리기
     if (hasLastData) {
-      const lastDataPoints = calculateDataPoints(lastValues);
+      const lastDataPoints = calculateDataPoints(lastValues, originalLastValues);
 
       // 📈 저번 달 데이터 영역 (파란색)
       const lastArea = svg
@@ -239,7 +258,7 @@ const RadarChart = ({ lastTypeCount, currentTypeCount, onSelectCategory }: Radar
           .style("font-size", "12px")
           .style("font-weight", "600")
           .attr("fill", LAST_COLOR)
-          .text(point.value)
+          .text(point.originalValue)
           .style("opacity", 0);
 
         // 애니메이션
@@ -265,7 +284,7 @@ const RadarChart = ({ lastTypeCount, currentTypeCount, onSelectCategory }: Radar
 
     // ✅ 이번 달 데이터가 있을 때만 그래프 그리기
     if (hasCurrentData) {
-      const currentDataPoints = calculateDataPoints(currentValues);
+      const currentDataPoints = calculateDataPoints(currentValues, originalCurrentValues);
 
       // 📈 이번 달 데이터 영역 (주황색)
       const currentArea = svg
@@ -308,7 +327,7 @@ const RadarChart = ({ lastTypeCount, currentTypeCount, onSelectCategory }: Radar
           .style("font-size", "12px")
           .style("font-weight", "600")
           .attr("fill", CURRENT_COLOR)
-          .text(point.value)
+          .text(point.originalValue)
           .style("opacity", 0);
 
         // 애니메이션
@@ -347,10 +366,22 @@ const RadarChart = ({ lastTypeCount, currentTypeCount, onSelectCategory }: Radar
   }, [lastTypeCount, currentTypeCount, hasLastData, hasCurrentData]);
 
   return (
-    <div className="w-full flex justify-center p-5">
+    <div className="w-full flex flex-col items-center p-5">
+      <div className="flex gap-4 mb-2 items-center">
+        <div className="flex items-center gap-1">
+          <span className="inline-block w-4 h-4 rounded-full" style={{ background: CURRENT_COLOR }}></span>
+          <span className="text-sm font-medium text-gray-700">이번 달</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="inline-block w-4 h-4 rounded-full" style={{ background: LAST_COLOR }}></span>
+          <span className="text-sm font-medium text-gray-700">저번 달</span>
+        </div>
+      </div>
       <svg ref={svgRef}></svg>
     </div>
   );
 };
 
 export default RadarChart;
+
+

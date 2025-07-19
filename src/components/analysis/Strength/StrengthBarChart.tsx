@@ -20,6 +20,14 @@ const CATEGORY_GROUPS: Record<string, string[]> = {
   긍정: ["미적 감상", "감사", "희망", "유머"],
 };
 
+function normalizeValues(values: number[], maxAllowed: number) {
+  const maxValue = Math.max(...values, 0);
+  if (maxValue > maxAllowed) {
+    return values.map(v => (v / maxValue) * maxAllowed);
+  }
+  return values;
+}
+
 const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthBarChartProps) => {
   const ref = useRef<SVGSVGElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -27,13 +35,6 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
 
   const category = selectedCategory || "지혜";
   const detailKeys = CATEGORY_GROUPS[category] || [];
-
-  console.log("currentData:", currentData);
-
-  // null 체크
-  if (!lastData || !currentData) {
-    return <div>데이터가 없습니다.</div>;
-  }
 
   // 컨테이너 크기 감지
   useEffect(() => {
@@ -57,6 +58,17 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
       return;
     }
 
+    // 원본 값 추출
+    const lastValues = detailKeys.map(key => Math.max(0, (lastData && lastData[key]) || 0));
+    const currentValues = detailKeys.map(key => Math.max(0, (currentData && currentData[key]) || 0));
+    // 전체 값 중 최댓값
+    const allValues = [...lastValues, ...currentValues];
+    // 기준치
+    const maxAllowed = 8;
+    // 정규화
+    const normLastValues = normalizeValues(lastValues, maxAllowed);
+    const normCurrentValues = normalizeValues(currentValues, maxAllowed);
+
     // 컨테이너 크기에 맞춰 동적 조정
     const containerWidth = Math.max(containerSize.width, 300);
     const containerHeight = Math.max(containerSize.height - 50, 200);
@@ -76,14 +88,14 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
 
     // barHeightRatio를 forEach 밖으로 이동
     const maxBarHeight = Math.max(100, height - 100);
-    const barHeightRatio = Math.max(10, Math.min(25, maxBarHeight / 8));
+    const barHeightRatio = Math.max(10, Math.min(25, maxBarHeight / maxAllowed));
 
     svg.attr("width", width).attr("height", height);
 
     // 각 세부 분류에 대해 막대 생성
     detailKeys.forEach((key, i) => {
-      const lastValue = Math.max(0, (lastData && lastData[key]) || 0);
-      const currentValue = Math.max(0, (currentData && currentData[key]) || 0);
+      const lastValue = normLastValues[i];
+      const currentValue = normCurrentValues[i];
 
       const groupX = offsetX + i * (groupWidth + groupGap);
 
@@ -139,7 +151,7 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
         .attr("fill", LAST_COLOR)
         .style("font-size", "12px")
         .style("font-weight", "600")
-        .text(lastValue)
+        .text(lastData ? lastData[key] : 0)
         .style("opacity", 0)
         .transition()
         .duration(300)
@@ -154,7 +166,7 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
         .attr("fill", CURRENT_COLOR)
         .style("font-size", "12px")
         .style("font-weight", "600")
-        .text(currentValue)
+        .text(currentData ? currentData[key] : 0)
         .style("opacity", 0)
         .transition()
         .duration(300)
@@ -175,12 +187,12 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
 
     // 범례 추가
     const legendGroup = svg.append("g").attr("class", "legend");
-    const legendX = Math.max(20, width - 140);
+    const legendX = Math.max(10, width - 140);
 
     legendGroup
       .append("rect")
       .attr("x", legendX)
-      .attr("y", 20)
+      .attr("y", 10)
       .attr("width", 14)
       .attr("height", 14)
       .attr("fill", LAST_COLOR)
@@ -188,8 +200,8 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
 
     legendGroup
       .append("text")
-      .attr("x", legendX + 20)
-      .attr("y", 31)
+      .attr("x", legendX + 21)
+      .attr("y", 21)
       .attr("fill", "#333")
       .style("font-size", "12px")
       .style("font-weight", "500")
@@ -198,7 +210,7 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
     legendGroup
       .append("rect")
       .attr("x", legendX + 70)
-      .attr("y", 20)
+      .attr("y", 10)
       .attr("width", 14)
       .attr("height", 14)
       .attr("fill", CURRENT_COLOR)
@@ -207,7 +219,7 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
     legendGroup
       .append("text")
       .attr("x", legendX + 90)
-      .attr("y", 31)
+      .attr("y", 21)
       .attr("fill", "#333")
       .style("font-size", "12px")
       .style("font-weight", "500")
@@ -232,6 +244,11 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
     }
   }, [lastData, currentData, selectedCategory, category, detailKeys, containerSize]);
 
+  // null 체크는 Hook 호출 이후에!
+  if (!lastData && !currentData) {
+    return <div>데이터가 없습니다.</div>;
+  }
+
   return (
     <div ref={containerRef} className="w-full h-full relative">
       <div className="absolute top-0 left-0 flex gap-2 z-10">
@@ -240,7 +257,7 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
         </span>
         <h3 className="text-black text-xl">의 세부 강점</h3>
       </div>
-      <div className="pt-12 w-full h-full">
+      <div className="pt-12 w-full h-full ">
         <svg ref={ref} className="w-full h-full"></svg>
       </div>
     </div>

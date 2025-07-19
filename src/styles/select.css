@@ -1,0 +1,26 @@
+/* Custom styles for the select dropdown */
+.select-custom-wrapper {
+  font-size: 1.25rem;
+}
+.select-custom-wrapper .select-calendar-icon {
+  display: flex;
+  align-items: center;
+}
+.select-custom-wrapper .select-dropdown-menu button {
+  font-size: 1.15rem;
+  padding-top: 0.7rem;
+  padding-bottom: 0.7rem;
+}
+.select-custom-wrapper .select-dropdown-menu button:hover,
+.select-custom-wrapper .select-dropdown-menu button:focus {
+  background: #f0f6ff;
+  color: #2563eb;
+}
+.select-custom-wrapper .select-dropdown-menu button .select-calendar-icon svg {
+  color: #2563eb;
+}
+.select-custom-wrapper button[aria-expanded="true"],
+.select-custom-wrapper button:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px #2563eb33;
+} 

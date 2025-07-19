@@ -39,3 +39,10 @@ export default function App() {
     </AuthProvider>
   );
 }
+
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+  });
+}

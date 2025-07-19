@@ -8,11 +8,11 @@ const Title = () => {
   // 현재 경로에 따라 활성 버튼 판단
   const isRoutineActive = location.pathname === "/routine";
   const isContentsActive = location.pathname === "/contents";
-  const isCalendarActive = location.pathname === "/calendar";
-  const handleCalendarClick = () => {
-    if (!isCalendarActive) {
+  const isTodosActive = location.pathname === "/todos";
+  const handleTodosClick = () => {
+    if (!isTodosActive) {
       // 이미 캘린더 페이지라면 이동하지 않음
-      navigate("/calendar");
+      navigate("/todos");
     }
   };
 
@@ -40,8 +40,8 @@ const Title = () => {
       {/* 버튼 위치 - 3개 버튼 정렬 */}
       <div className="buttonContainer">
         <button
-          className={`button ${isCalendarActive ? "active" : ""}`}
-          onClick={handleCalendarClick}
+          className={`button ${isTodosActive ? "active" : ""}`}
+          onClick={handleTodosClick}
           aria-label="할일 버튼"
         >
           할일

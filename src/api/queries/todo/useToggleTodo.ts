@@ -9,27 +9,25 @@ export const useToggleTodo = () => {
   const { setTodos } = useTodoStore.getState();
 
   return useMutation({
-    mutationFn: async (id: number) => {
-      return toggleTodo(id);
-    },
+    mutationFn: (id: number) => toggleTodo(id),
 
     // Optimistic Update: 스토어 먼저 갱신
     onMutate: async (id: number) => {
       setTodos(prev =>
-        prev.map(t => (t.id === id ? { ...t, isComplete: !t.isComplete } : t))
+        prev.map(t => (t.id === id ? { ...t, isComplete: !t.isComplete } : t)),
       );
     },
 
     onSuccess: (updated: Todo) => {
-      setTodos((prev) =>
-        prev.map((t) => (t.id === updated.id ? updated : t))
+      setTodos(prev =>
+        prev.map(t => (t.id === updated.id ? updated : t)),
       );
 
       queryClient.invalidateQueries({ queryKey: ["todos"] });
       queryClient.invalidateQueries({ queryKey: ["monthlyStatus"] });
     },
 
-    onError: (error) => {
+    onError: error => {
       console.error("Todo toggle 실패:", error);
       // rollback 필요하면 여기서 처리
     },

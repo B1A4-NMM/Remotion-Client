@@ -1,0 +1,21 @@
+.rdp {
+  --rdp-cell-size: 40px;
+  --rdp-caption-font-size: 18px;
+  --rdp-background-color: hsl(var(--card));
+  --rdp-color: hsl(var(--card-foreground));
+  --rdp-accent-color: hsl(var(--primary));
+}
+
+.rdp-day_selected {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+.rdp-day_today {
+  color: hsl(var(--primary)) !important;
+  font-weight: bold;
+}
+
+.rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
+  background-color: hsl(var(--accent)) !important;
+}

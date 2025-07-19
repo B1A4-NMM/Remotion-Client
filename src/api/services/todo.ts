@@ -19,12 +19,14 @@ export const getMonthlyStatus = async (year: string, month: string) => {
   if (import.meta.env.DEV) {
     console.log("📤 getMonthlyStatus called with:", { year, month });
   }
-  const response = await api.get<Array<{
-    date: string;
-    todoTotalCount: number;
-    completedCount: number;
-    isAllCompleted: boolean;
-  }>>("/todos/calendar", {
+  const response = await api.get<
+    Array<{
+      date: string;
+      todoTotalCount: number;
+      completedCount: number;
+      isAllCompleted: boolean;
+    }>
+  >("/todos/calendar", {
     params: { year, month },
   });
 
@@ -49,13 +51,22 @@ export const getTodosByDate = async (date: string) => {
 };
 
 // ✅ 생성
-export const createTodo = async ({ content, date }: { content: string; date: string }) => {
+export const createTodo = async ({
+  content,
+  date,
+}: {
+  content: string;
+  date: string;
+}) => {
   try {
     if (import.meta.env.DEV) {
       console.log("✨ createTodo called with:", { content, date });
     }
 
-    const response = await api.post<ApiTodo>("/todos/calendar", { content, date });
+    const response = await api.post<ApiTodo>("/todos/calendar", {
+      content,
+      date,
+    });
 
     if (import.meta.env.DEV) {
       console.log("✨ createTodo response.data:", response.data);
@@ -68,13 +79,16 @@ export const createTodo = async ({ content, date }: { content: string; date: str
   }
 };
 
-// ✅ 수정 (필드 업데이트)
-export const updateTodo = async (id: number, data: Partial<Omit<ApiTodo, "id">>) => {
+// ✅ 수정 (내용 업데이트)
+export const updateTodoContent = async (
+  id: number,
+  data: Partial<Omit<ApiTodo, "id">>,
+) => {
   try {
     if (import.meta.env.DEV) {
       console.log("🐛 updateTodo called with:", { id, data });
     }
-    const response = await api.patch<ApiTodo>(`/todos/calendar/${id}`, data);
+    const response = await api.patch<ApiTodo>(`/todos/calendar/content/${id}`, data);
 
     if (import.meta.env.DEV) {
       console.log("🐛 updateTodo response.data:", response.data);
@@ -87,13 +101,34 @@ export const updateTodo = async (id: number, data: Partial<Omit<ApiTodo, "id">>)
   }
 };
 
+// ✅ 수정 (날짜 업데이트)
+export const updateTodoDate = async (id: number, date: string) => {
+  try {
+    if (import.meta.env.DEV) {
+      console.log("🗓️ updateTodoDate called with:", { id, date });
+    }
+    const response = await api.patch<ApiTodo>(`/todos/calendar/date/${id}`, {
+      date,
+    });
+
+    if (import.meta.env.DEV) {
+      console.log("🗓️ updateTodoDate response.data:", response.data);
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error("❌ updateTodoDate error:", error);
+    throw error;
+  }
+};
+
 // ✅ 토글
 export const toggleTodo = async (id: number) => {
   try {
     if (import.meta.env.DEV) {
       console.log("🔄 toggleTodo called with:", { id });
     }
-    const response = await api.patch<ApiTodo>(`/todos/calendar/${id}`);
+    const response = await api.patch<ApiTodo>(`/todos/calendar/completion/${id}`);
 
     if (import.meta.env.DEV) {
       console.log("🔄 toggleTodo response.data:", response.data);

@@ -140,8 +140,8 @@ export default function MonthlyCalendar({
                 "w-5 h-5 flex items-center justify-center rounded-full text-xs",
                 {
                   "font-bold": isToday || isSelected,
-                  "bg-black dark:bg-white" : isSelected,
-                  "bg-[#DADADA]": isToday && !isSelected,
+                  "bg-[#404040] dark:bg-[#DADADA]" : isSelected,
+                  "bg-[#DADADA] dark:bg-white": isToday && !isSelected,
                 },
                 bgClass,
                 finalColorClass

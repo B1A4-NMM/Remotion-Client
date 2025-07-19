@@ -141,7 +141,7 @@ export default function WeeklyCalendar({
                   "w-5 h-5 flex items-center justify-center rounded-full text-xs",
                   {
                     "font-bold": isToday || isSelected,
-                    "bg-black dark:bg-[#DADADA]" : isSelected,
+                    "bg-[#404040] dark:bg-[#DADADA]" : isSelected,
                     "bg-[#DADADA] dark:bg-white": isToday && !isSelected,
                   },
                   finalColorClass

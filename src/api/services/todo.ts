@@ -6,7 +6,7 @@ export interface ApiTodo {
   id: number;
   content: string;
   isComplete: boolean;
-  date: string;
+  // date: string;
   // isRepeat: boolean;
   // repeatRule: string | null;
   // repeatEndDate: string | null;
@@ -14,7 +14,7 @@ export interface ApiTodo {
   // updatedAt: string;
 }
 
-// ✅ 목록: from/to 유지
+// ✅ 목록: year, month
 export const getMonthlyStatus = async (year: string, month: string) => {
   if (import.meta.env.DEV) {
     console.log("📤 getMonthlyStatus called with:", { year, month });

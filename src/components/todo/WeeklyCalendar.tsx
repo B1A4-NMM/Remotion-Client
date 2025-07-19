@@ -8,13 +8,19 @@ import {
   subWeeks,
   getDay,
 } from "date-fns";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import clsx from "clsx";
 
 interface WeeklyCalendarProps {
   selectedDate: Date;
   setSelectedDate: (date: Date) => void;
   onSwitchToMonthly?: () => void;
+  monthlyStatus?: Array<{
+    date: string;
+    todoTotalCount: number;
+    completedCount: number;
+    isAllCompleted: boolean;
+  }>;
 }
 
 const WEEKDAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
@@ -23,10 +29,24 @@ export default function WeeklyCalendar({
   selectedDate,
   setSelectedDate,
   onSwitchToMonthly,
+  monthlyStatus,
 }: WeeklyCalendarProps) {
   const [currentWeekStart, setCurrentWeekStart] = useState(
     startOfWeek(selectedDate, { weekStartsOn: 1 })
   );
+
+  const statusMap = useMemo(() => {
+    const map: Record<string, {
+      date: string;
+      todoTotalCount: number;
+      completedCount: number;
+      isAllCompleted: boolean;
+    }> = {};
+    monthlyStatus?.forEach((s) => {
+      map[s.date] = s;
+    });
+    return map;
+  }, [monthlyStatus]);
 
   const days = Array.from({ length: 7 }, (_, i) =>
     addDays(currentWeekStart, i)
@@ -92,8 +112,25 @@ export default function WeeklyCalendar({
               onClick={() => setSelectedDate(day)}
               className="flex flex-col items-center cursor-pointer flex-1"
             >
-              {/* 완료 표시용 박스 */}
-              <div className="w-5 h-6 rounded-full bg-[#D9D9D9] my-1" />
+              {/* 날짜별 Todo 완료 현황 */}
+              {(() => {
+                const key = format(day, "yyyy-MM-dd");
+                const status = statusMap[key];
+                const ratio = status
+                  ? `${status.completedCount}/${status.todoTotalCount}`
+                  : "";
+                const done = status?.isAllCompleted;
+                return (
+                  <div
+                    className={clsx(
+                      "w-5 h-6 rounded-full text-[10px] flex items-center justify-center my-1",
+                      done ? "bg-black text-white" : "bg-[#D9D9D9]"
+                    )}
+                  >
+                    {ratio}
+                  </div>
+                );
+              })()}
 
               {/* 날짜 원 */}
               <span

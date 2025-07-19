@@ -5,10 +5,12 @@ import WeeklyCalendar from "./WeeklyCalendar";
 import MonthlyCalendar from "./MonthlyCalendar";
 import { addWeeks, subWeeks, addMonths, subMonths, format } from "date-fns";
 import { useSelectedDate } from "@/hooks/useSelectedDate";
+import { useMonthlyStatus } from "@/api/queries/todo/useMonthlyStatus";
 
 export default function CalendarSection() {
   const [view, setView] = useState<"week" | "month">("week");
   const { selectedDate, setSelectedDate } = useSelectedDate();
+  const { data: monthlyStatus } = useMonthlyStatus(selectedDate);
 
   const goPrev = () => {
     setSelectedDate(
@@ -54,11 +56,13 @@ export default function CalendarSection() {
         <WeeklyCalendar
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
+          monthlyStatus={monthlyStatus}
         />
       ) : (
         <MonthlyCalendar
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
+          monthlyStatus={monthlyStatus}
         />
       )}
     </div>

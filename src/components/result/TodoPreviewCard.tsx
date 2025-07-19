@@ -17,11 +17,21 @@ const TodoPreviewCard: React.FC<TodoPreviewCardProps> = ({
   const { selectedDate } = useSelectedDate();
 
   const handleAddTodo = (todoText: string) => {
+    // 내일 날짜 계산
+    const tomorrow = new Date(selectedDate);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
     createTodo(
-      { content: todoText, date: formatDate(selectedDate) },
+      { content: todoText, date: formatDate(tomorrow) },
       {
         onSuccess: () => {
-          toast.success(`"${todoText}" 할일이 추가되었습니다!`);
+          toast.success(
+            <div>
+              <span>"{todoText}" 할일이 </span>
+              <span className="font-bold text-blue-400">내일 할 일</span>
+              <span>로 추가되었어요!</span>
+            </div>
+          );
         },
         onError: () => {
           toast.error("할일 추가에 실패했습니다.");

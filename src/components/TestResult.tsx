@@ -31,7 +31,7 @@ const TestResult = ({ type, score }: TestResultProps) => {
   const matched = levels.find(level => score <= level.max) ?? levels[levels.length - 1];
 
   return (
-    <div className="p-6 max-w-xl mx-auto">
+    <div className="pt-6 max-w-xl mx-auto">
       <Card
         className={clsx("p-6 border-l-8 shadow-md", {
           "border-green-500": matched.tone === "green",

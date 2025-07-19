@@ -26,6 +26,7 @@ export const useToggleTodo = () => {
       );
 
       queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.invalidateQueries({ queryKey: ["monthlyStatus"] });
     },
 
     onError: (error) => {

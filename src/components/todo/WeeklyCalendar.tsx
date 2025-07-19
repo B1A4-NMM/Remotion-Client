@@ -119,17 +119,18 @@ export default function WeeklyCalendar({
                 const incomplete = status
                   ? status.todoTotalCount - status.completedCount
                   : 0;
-                const done = Boolean(status?.isAllCompleted) || incomplete === 0;
-                
-                return (
-                  <div
-                    className={clsx(
-                      "w-5 h-6 rounded-full text-[10px] flex items-center justify-center my-1",
-                      done
-                      ? "bg-[#D9D9D9] text-white"
-                      : "bg-[#D9D9D9] text-black dark:text-black"
-                    )}
-                  >
+                const done = Boolean(status?.isAllCompleted);
+
+              return (
+                <div
+                  className={clsx(
+                    "w-5 h-6 rounded-full text-[10px] flex items-center justify-center my-1",
+                    {
+                      "bg-[#F36B6B] dark:bg-[#F36B6B] text-white": done,
+                      "bg-[#D9D9D9] text-black dark:text-black": !done,
+                    }
+                  )}
+                >
                     {status ? (done ? <Check className="w-3 h-3" /> : incomplete) : ""}                  </div>
                 );
               })()}

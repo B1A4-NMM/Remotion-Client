@@ -28,8 +28,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
         />
         <span
           className={cn(
-            "h-4 w-4 shrink-0 rounded-sm peer-checked:rounded-sm border border-white shadow flex items-center justify-center",
-            // "text-white",
+            "h-4 w-4 shrink-0 rounded-sm peer-checked:!rounded-sm border border-white shadow flex items-center justify-center",            // "text-white",
             // "peer-focus-visible:outline-none peer-focus-visible:ring-1 peer-focus-visible:ring-ring",
             isDark
               ? "border-white text-white peer-checked:bg-white peer-checked:text-black"

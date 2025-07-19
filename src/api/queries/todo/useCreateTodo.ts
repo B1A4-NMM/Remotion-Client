@@ -32,6 +32,7 @@ export const useCreateTodo = () => {
         setTodos(prev => prev.map(t => (t.id === context.tempId ? created : t)));
       }
       queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.invalidateQueries({ queryKey: ["monthlyStatus"] });
     },
 
     // 실패 시: 필요하다면 rollback 처리도 가능

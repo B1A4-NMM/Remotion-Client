@@ -55,7 +55,7 @@ const Analysis = () => {
   return (
     <div className="px-4 py-8 text-foreground min-h-screen space-y-10">
       {/* 기간 선택 드롭다운 */}
-      <div className="flex justify-between gap-10">
+      <div className="flex justify-between gap-10 ">
         <div className="w-full bg-white rounded-xl">
           <Select
             value={selectedPeriod}

@@ -12,20 +12,109 @@ interface PeopleSectionProps {
     emotion: string;
     totalIntensity: number;
     count: number;
+    date?: string; // 날짜 정보 추가
   }[];
+  selectedPeriod: PeriodType;
 }
 
-const PeopleSection = ({ type, data }: PeopleSectionProps) => {
-  const navigate = useNavigate();
+type PeriodType = "daily" | "weekly" | "monthly";
 
-  console.log(data);
-  const isGroup = type === "부정" || type==="긍정";
+interface PeriodConfig {
+  days: number;
+  barCount: number;
+  label: string;
+}
+
+const PeopleSection = ({ type, data, selectedPeriod }: PeopleSectionProps) => {
+  const navigate = useNavigate();
+  const periodConfigs: Record<PeriodType, PeriodConfig> = {
+    daily: { days: 7, barCount: 7, label: "일간" },
+    weekly: { days: 60, barCount: 8, label: "주간" }, // 2개월 = 60일, 8주
+    monthly: { days: 180, barCount: 6, label: "월간" }, // 6개월 = 180일, 6개월
+  };
+  
+  const getPeriodConfig = (period: PeriodType): PeriodConfig => {
+    return periodConfigs[period];
+  };
+
+  const period = getPeriodConfig(selectedPeriod).days;
+
+  const isGroup = type === "부정" || type === "긍정";
+
+  // 기간별 데이터 그룹화 함수
+  const groupDataByPeriod = (data: any[], selectedPeriod?: string) => {
+    if (!selectedPeriod || !data.length) return data;
+
+    const grouped: Record<string, any> = {};
+    
+    data.forEach(item => {
+      let dateKey: string;
+      
+      if (selectedPeriod === "montly") {
+        // 월별 그룹화 (monthly)
+        const match = item.date?.match(/\d{4}-(\d{2})-\d{2}/);
+        dateKey = match ? `${item.date.substring(0, 7)}-01` : item.date || 'unknown';
+      } else if (selectedPeriod === "weekly") {
+        // 주별 그룹화 (weekly)
+        if (item.date?.includes('-W')) {
+          dateKey = item.date;
+        } else {
+          const date = new Date(item.date || new Date());
+          const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+          const weekNumber = Math.ceil((date.getDate() + firstDay.getDay()) / 7);
+          const year = date.getFullYear();
+          const month = date.getMonth() + 1;
+          dateKey = `${year}-${month.toString().padStart(2, '0')}-W${weekNumber}`;
+        }
+      } else if (selectedPeriod === "daily") {
+        // 일별 그룹화 (daily)
+        dateKey = item.date || 'unknown';
+      } else {
+        // 기본값: 일별 그룹화
+        dateKey = item.date || 'unknown';
+      }
+
+      // 사람과 날짜를 조합한 고유 키 생성
+      const key = `${dateKey}_${item.targetId}_${item.emotion}`;
+
+      if (!grouped[key]) {
+        grouped[key] = {
+          targetId: item.targetId,
+          targetName: item.targetName,
+          emotion: item.emotion,
+          totalIntensity: 0,
+          count: 0,
+          date: dateKey
+        };
+      }
+      
+      // 가중평균으로 intensity 계산
+      const currentCount = item.count || 1;
+      grouped[key].totalIntensity += item.totalIntensity * currentCount;
+      grouped[key].count += currentCount;
+      grouped[key].totalIntensity = grouped[key].totalIntensity / grouped[key].count;
+    });
+
+    // 날짜순으로 정렬 후 limit 적용
+    const sortedData = Object.values(grouped).sort((a: any, b: any) => a.date.localeCompare(b.date));
+    
+    // 각 날짜별로 limit 적용 (최근 날짜부터)
+    const uniqueDates = [...new Set(sortedData.map((item: any) => item.date))];
+    const limitedDates = uniqueDates.slice(-period);
+    
+    return sortedData.filter((item: any) => limitedDates.includes(item.date));
+  };
+
+
   const merged = useMemo(() => {
     if (!isGroup) return [];
     
-    // ✅ targetId를 키로 사용 (문자열로 변환)
+    // 기간별 데이터 그룹화 적용
+    const periodGroupedData = groupDataByPeriod(data, selectedPeriod);
+    
+    // targetId를 키로 사용 (문자열로 변환)
     const map: Record<string, { targetId: number, targetName: string; totalIntensity: number }> = {};
-    data.forEach(item => {
+    periodGroupedData.forEach(item => {
       const key = item.targetId.toString(); // targetId를 문자열로 변환
       if (!map[key]) {
         map[key] = { targetId: item.targetId, targetName: item.targetName, totalIntensity: 0 };
@@ -37,11 +126,13 @@ const PeopleSection = ({ type, data }: PeopleSectionProps) => {
     const arr = Object.values(map);
     arr.sort((a, b) => b.totalIntensity - a.totalIntensity);
     return arr.slice(0, 3);
-  }, [data, isGroup]);
+  }, [data, isGroup, selectedPeriod]);
 
   const onClickHandler = ({ id }: { id: number }) => {
     navigate(`/relation/${id}`);
   }
+
+
 
   if (isGroup) {
     return (
@@ -50,14 +141,14 @@ const PeopleSection = ({ type, data }: PeopleSectionProps) => {
           {merged.map((person, idx) => {
             return (
               <div
-                key={person.targetId} // ✅ targetId를 key로 사용
+                key={person.targetId}
                 className="
                   bg-white border-2 border-gray-200
                   rounded-xl p-4 shadow-lg hover:shadow-xl
                   transition-all duration-300 hover:scale-105
                   transform cursor-pointer
                 "
-                onClick={() => onClickHandler({ id: person.targetId })} // ✅ 객체 형태로 전달
+                onClick={() => onClickHandler({ id: person.targetId })}
               >
                 <div className="flex items-center justify-between">
                   {/* 순위 배지 */}

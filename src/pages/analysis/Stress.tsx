@@ -8,13 +8,16 @@ import EmotionSummaryCard from "@/components/analysis/EmotionSummaryCard";
 import Title from "@/components/analysis/Title";
 
 const Stress=()=>{
-    const {data}= useMentalData("스트레스", 365) //최근 
+    const period = 365; // 최근 1년
+    const barCount = 12; // 12개월 표시
+    const {data}= useMentalData("스트레스", period)
     return(
 
         <div className="mb-10">
             <Title
                 name="스트레스"
                 isBackActive={true}
+                back="/analysis"
             />
             <div className="pl-3 pr-3">
                 <div className="bg-white rounded-3xl shadow-xl mb-4">
@@ -22,22 +25,22 @@ const Stress=()=>{
                     <MentalChart
                         type="스트레스"
                         data={data?.date??[]}
-                        limit={10}/>
+                        limit={barCount}/>
 
                 </div>
 
                 <div className="bg-white rounded-3xl shadow-xl mb-4">
                     <div className="text-xl font-bold pt-5 pl-5 pb-2"> 스트레스를 유발한 활동</div>
-                        <ActivitySection type="스트레스" data={data?.activities ?? []} />
+                        <ActivitySection type="스트레스" data={data?.activities ?? []} period={period} barCount={barCount} />
                     <div className="text-xl font-bold pt-5 pl-5 mt-10"> 스트레스를 준 사람들</div>
-                        <PeopleSection type="스트레스" data={data?.people ?? []} />
+                        <PeopleSection type="스트레스" data={data?.people ?? []} period={period} barCount={barCount} />
                 </div>
 
 
                 <div className="text-2xl font-bold pt-10 mb-3">다른 심리 상태 둘러보기</div>
                 <div className="grid grid-cols-2 gap-3">
-                    <EmotionSummaryCard type={"불안"} color={"red"}/>
-                    <EmotionSummaryCard type={"우울"} color={"red"}/>
+                    <EmotionSummaryCard type={"불안"} period={period} barCount={barCount}/>
+                    <EmotionSummaryCard type={"우울"} period={period} barCount={barCount}/>
                 </div>
 
             </div>

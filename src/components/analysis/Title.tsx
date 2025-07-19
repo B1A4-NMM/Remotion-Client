@@ -8,6 +8,27 @@ const Title = ({name, isBackActive=false, back="/analysis"}:{name:string, isBack
     navigate(back)
   }
 
+  // name 길이에 따른 폰트 크기 계산 함수
+  const getFontSizeClass = (nameLength: number) => {
+    if (nameLength <= 4) return "text-3xl"; // 30px
+    if (nameLength <= 6) return "text-2xl"; // 24px  
+    if (nameLength <= 8) return "text-xl";  // 20px
+    if (nameLength <= 10) return "text-lg"; // 18px
+    return "text-base"; // 16px
+  }
+
+  // 더 세밀한 조정이 필요한 경우 인라인 스타일 사용
+  const getFontSize = (nameLength: number) => {
+    const baseSize = 30; // text-3xl 기본 크기
+    const minSize = 25;  // 최소 크기
+    
+    if (nameLength <= 4) return baseSize;
+    
+    // 4글자 초과 시 1글자당 2px씩 감소
+    const reducedSize = baseSize - (nameLength - 4) * 2;
+    return Math.max(reducedSize, minSize);
+  }
+
   return (
     <>
       <div className="w-full ">
@@ -23,11 +44,21 @@ const Title = ({name, isBackActive=false, back="/analysis"}:{name:string, isBack
                     </span>
                   </button>
                 </div>
-                <h1 className="text-3xl font-bold text-gray-900">{name}</h1>
+                <h1 
+                  className={`font-bold text-gray-900 ${getFontSizeClass(name.length)}`}
+                  style={{fontSize: `${getFontSize(name.length)}px`}}
+                >
+                  {name}
+                </h1>
               </>
           ):(
             <>
-              <h1 className="text-3xl font-bold text-gray-900 ">{name}</h1>
+              <h1 
+                className={`font-bold text-gray-900 ${getFontSizeClass(name.length)}`}
+                style={{fontSize: `${getFontSize(name.length)}px`}}
+              >
+                {name}
+              </h1>
               <div className="flex items-center gap-2">
                 <button
                   className="p-2 rounded-full text-foreground border border-border hover:bg-secondary focus:ring-2 focus:ring-primary transition-colors box-shadow shadow-xl"
@@ -41,7 +72,6 @@ const Title = ({name, isBackActive=false, back="/analysis"}:{name:string, isBack
                   </svg>
 
                   </button>
-
 
                   <button
                   className="p-2 rounded-full text-foreground border border-border hover:bg-secondary focus:ring-2 focus:ring-primary transition-colors box-shadow shadow-xl"

@@ -82,6 +82,14 @@
   .dark .icon {
     filter: brightness(1.2);
   }
+
+  .dark .noti-unread {
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    background-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px) saturate(180%);
+    border-radius: 20px;
+    
+  }
 }
 
 @layer base {

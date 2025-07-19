@@ -8,7 +8,7 @@ export const redirectStrategies : Record<
     > = {
         ROUTINE: () => "/routine",
         TODO: (noti) => 
-            `/calendar?date=${noti.targetDate}`,
+            `/todos?date${noti.targetDate}`,
         RECAP: (noti) =>
             `/result/${noti.diaryId}`,
         CHARACTER : () => "analysis/character",

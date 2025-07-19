@@ -20,3 +20,56 @@ export const getMentalData = async (
 
   return response.data;
 };
+
+
+export const getNegativeData = async (
+  period: string | number
+) => {
+  const response = await api.get("/emotion/negative", {
+    params: {
+      period,
+    }
+  });
+
+  return response.data;
+};
+
+export const getPositiveData = async (
+  period: string | number
+) => {
+  const response = await api.get("/emotion/positive", {
+    params: {
+      period,
+    }
+  });
+
+  return response.data;
+};
+
+
+export const getNegativeActData = async (
+  period: string | number
+) => {
+  const response = await api.get("/emotion/activity/negative", {
+    params: {
+      period,
+    }
+  });
+
+  return response.data;
+};
+
+export const getPositiveActData = async (
+  period: string | number
+) => {
+  const response = await api.get("/emotion/activity/positive", {
+    params: {
+      period,
+    }
+  });
+
+  return response.data;
+};
+
+
+

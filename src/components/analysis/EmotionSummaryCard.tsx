@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useMentalData } from "@/api/queries/aboutme/useMentalData";
+import { useMentalData, useNegativeData, usePositiveData } from "@/api/queries/aboutme/useMentalData";
 import LoadingAnimation from "../Loading";
 import MentalChart from "../aboutMe/Mental/MentalChart";
 
@@ -11,9 +11,23 @@ interface EmotionSummaryCardProps {
   barCount: number;
 }
 
-const groupMap: Record<GroupType, MentalType[]> = {
-  부정: ["스트레스", "우울", "불안"],
-  긍정: ["활력", "안정", "유대"],
+const extractDateData = (data: any, type: GroupType) => {
+  if (!data) return [];
+  
+  if (type === "부정") {
+    return [
+      ...(data.stressDate || []),
+      ...(data.depressionDate || []),
+      ...(data.anxietyDate || [])
+    ];
+  } else if (type === "긍정") {
+    return [
+      ...(data.vitalityDate || []),
+      ...(data.stabilityDate || []),
+      ...(data.bondDate || [])
+    ];
+  }
+  return [];
 };
 
 const EmotionSummaryCard = ({ type, period, barCount }: EmotionSummaryCardProps) => {
@@ -21,13 +35,21 @@ const EmotionSummaryCard = ({ type, period, barCount }: EmotionSummaryCardProps)
 
   // 그룹형 처리
   if (type === "부정" || type === "긍정") {
-    const queries = groupMap[type].map((emotion: MentalType) => useMentalData(emotion, period));
-    const isLoading = queries.some((q) => q.isLoading);
-    const data = queries.flatMap((q) => q.data?.date || []);
+    // 개별 감정별로 각각 호출하지 말고, 그룹 API 한 번만 호출
+    const query = type === "부정" 
+      ? useNegativeData(period)
+      : usePositiveData(period);
+
+    const isLoading = query.isLoading;
+    const data = extractDateData(query.data, type);
+
+    console.log("API 응답:", query.data);
+    console.log("추출된 데이터:", data);
+
     return (
       <div
         onClick={() => navigate(`/analysis/${type}`)}
-        className="min-w-[160px]p-4 cursor-pointer"
+        className="min-w-[160px] p-4 cursor-pointer"
       >
         {isLoading ? (
           <LoadingAnimation />
@@ -38,20 +60,6 @@ const EmotionSummaryCard = ({ type, period, barCount }: EmotionSummaryCardProps)
     );
   }
 
-  // 단일 감정 처리
-  const { data, isLoading } = useMentalData(type as MentalType, period);
-  return (
-    <div
-      onClick={() => navigate(`/analysis/${type}`)}
-      className="min-w-[160px] p-4 cursor-pointer"
-    >
-      {isLoading ? (
-        <LoadingAnimation />
-      ) : (
-        <MentalChart type={type as MentalType} data={data?.date || []} limit={barCount} />
-      )}
-    </div>
-  );
 };
 
 export default EmotionSummaryCard;

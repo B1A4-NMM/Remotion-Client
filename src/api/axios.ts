@@ -2,6 +2,9 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_SOCIAL_AUTH_URL,
+  // baseURL: import.meta.env.DEV
+  // ? '/api'
+  // : import.meta.env.VITE_SOCIAL_AUTH_URL,
 });
 
 // 전역 로그아웃 모달 상태 관리

@@ -26,6 +26,8 @@ interface MapProps {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Map: React.FC<MapProps> = _ => {
+
+  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null); 
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -47,6 +49,9 @@ const Map: React.FC<MapProps> = _ => {
         center: fallbackCenter,
         zoom: 14,
       });
+
+      //채민 추가
+      setMapInstance(map);
 
       // ✅ 현재 위치 요청
       if (navigator.geolocation) {
@@ -188,11 +193,27 @@ const Map: React.FC<MapProps> = _ => {
   }, [markerDataList]);
 
   return (
+    <div style= {{position: "relative"}}>
+      {/*줌아웃 버튼*/}
+      <button
+        onClick={() => {
+          if (mapInstance) {
+            mapInstance.setZoom(5); // 전 세계 뷰
+            mapInstance.setCenter({ lat: 36.5, lng: 127.5 }); // 한국 중심
+          }
+        }}
+        className="absolute top-[60px] right-[10px] z-50 bg-white shadow-md rounded px-3 py-1 text-sm"
+      >
+        줌아웃
+      </button>
+    {/*지도 컨테이너*/}
+
     <div
       ref={mapRef}
       className="bg-white rounded-2xl shadow  overflow-hidden"
       style={{ height: "calc(100vh - 250px )", minHeight: 150 }}
     />
+    </div>
   );
 };
 

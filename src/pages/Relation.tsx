@@ -92,6 +92,9 @@ const Relation = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const hasScrolledToMe = useRef(false);
   
+  const { theme } = useTheme();
+  const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  
   const [nodes, setNodes] = useState<ProcessedNode[]>([]);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   
@@ -194,20 +197,6 @@ const Relation = () => {
     
   }, [relationData]);
 
-  // ✅ 수정된 3D 좌표 변환 - 화면 좌표와 정확히 일치하도록
-  const blobPositions = useMemo(() => {
-    if (!containerSize.width || !containerSize.height) return [];
-    
-    return nodes.map(node => {
-      // ✅ 화면 좌표를 그대로 사용하되, 스케일만 조정
-      const scale = 2; // 스케일 팩터
-      const x = (node.x - containerSize.width / 2) / (containerSize.width / scale);
-      const y = -(node.y - containerSize.height / 2) / (containerSize.height / scale);
-      const z = 0;
-      return [x, y, z] as [number, number, number];
-    });
-  }, [nodes, containerSize]);
-
   const handleNodeClick = (node: ProcessedNode) => {
     if (node.isMe) {
       navigate('/analysis');
@@ -230,10 +219,10 @@ const Relation = () => {
         style={{
           width: containerSize.width * 3,
           height: containerSize.height,
-          minHeight: '100vh'
+          minHeight: '100vh',
         }}
       >
-        {/* ✅ 연결선 SVG */}
+        {/* 연결선 SVG */}
         <svg
           className="absolute inset-0 pointer-events-none"
           width="100%"
@@ -259,20 +248,16 @@ const Relation = () => {
               />
             </marker>
           </defs>
-
           {nodes.length > 0 && nodes.slice(1).map((node, index) => {
             const meNode = nodes[0];
             const opacity = Math.max(0.3, Math.min(0.8, node.affection / 100));
             const strokeWidth = Math.max(1.5, Math.min(3, (node.affection / 100) * 2 + 1));
-            
             const angle = Math.atan2(meNode.y - node.y, meNode.x - node.x);
             const startX = node.x + Math.cos(angle) * node.radius * 1.2;
             const startY = node.y + Math.sin(angle) * node.radius * 1.2;
             const endX = meNode.x - Math.cos(angle) * meNode.radius * 1.3;
             const endY = meNode.y - Math.sin(angle) * meNode.radius * 1.3;
-            
             const pathData = `M ${startX} ${startY} L ${endX} ${endY}`;
-            
             return (
               <path
                 key={`edge-${index}`}
@@ -287,48 +272,77 @@ const Relation = () => {
             );
           })}
         </svg>
-
-        {/* ✅ 수정된 Canvas 설정 */}
-        <div className="absolute inset-0" style={{ zIndex: 2 }}>
-          <Canvas
-            camera={{ 
-              position: [10, 0, 20], // ✅ 카메라 위치 수정
-              fov: 75,             // ✅ FOV 증가
-              near: 0.1,
-              far: 1000
-            }}
-            gl={{ 
-              antialias: true,
-              alpha: true,
-              powerPreference: "high-performance",
-            }}
-            style={{ background: 'transparent' }}
-          >
-            <ambientLight intensity={0.6} />
-            <pointLight position={[10, 10, 10]} intensity={0.4} />
-            
-            {/* ✅ 모든 Blob을 하나의 Canvas에서 렌더링 */}
-            {nodes.map((node, index) => (
-              <RelationBlob
-                key={`blob-${node.id}`}
-                node={node}
-                position={blobPositions[index] || [0, 0, 0]}
-              />
-            ))}
-          </Canvas>
-        </div>
-
-        {/* ✅ 텍스트 라벨들 (Canvas 위에 오버레이) */}
-        <div className="absolute inset-0" style={{ zIndex: 3 }}>
+        {/* 단일 Canvas에서 모든 Blob을 3D로 렌더링 (orthographic camera) */}
+        <Canvas
+          orthographic
+          camera={{
+            zoom: 1,
+            left: 0,
+            right: containerSize.width * 3,
+            top: 0,
+            bottom: containerSize.height,
+            near: -100,
+            far: 100,
+            position: [containerSize.width * 1.5, containerSize.height / 2, 10],
+          }}
+          style={{
+            width: containerSize.width * 3,
+            height: containerSize.height,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            pointerEvents: 'none',
+            zIndex: 2,
+          }}
+          gl={{
+            antialias: true,
+            alpha: true,
+            powerPreference: "high-performance",
+            preserveDrawingBuffer: true,
+          }}
+          dpr={Math.min(window.devicePixelRatio, 2)}
+        >
+          <ambientLight intensity={0.6} />
+          <pointLight position={[8, 8, 8]} intensity={0.4} />
           {nodes.map((node) => (
-            <div
-              key={`label-${node.id}`}
-              onClick={() => handleNodeClick(node)}
-            >
-              <NodeLabel node={node} />
-            </div>
+            <group key={node.id} position={[node.x, containerSize.height - node.y, 0]}>
+            <StaticBlob emotions={node.emotions} scale={node.scale} />
+          </group>
           ))}
-        </div>
+        </Canvas>
+        {/* 라벨 오버레이 */}
+        {nodes.map((node) => (
+          <div
+            key={node.id}
+            style={{
+              position: 'absolute',
+              left: node.x - node.radius,
+              top: node.y - node.radius,
+              width: node.radius * 2,
+              height: node.radius * 2,
+              zIndex: node.isMe ? 20 : 10,
+              pointerEvents: 'auto',
+            }}
+            onClick={() => handleNodeClick(node)
+            }
+            className="cursor-pointer" 
+          >
+            <div
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center font-medium whitespace-nowrap pointer-events-none select-none"
+              style={{
+                color: isDark ? '#FFF' : '#000',
+                fontWeight: node.isMe ? 'bold' : 'normal',
+                fontSize: node.isMe ? '20px' : node.radius > 60 ? '16px' : node.radius > 40 ? '14px' : '12px',
+                textShadow: isDark
+                  ? '1px 1px 2px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.5)'
+                  : '1px 1px 2px rgba(255,255,255,0.9), 0 0 4px rgba(255,255,255,0.6)',
+                zIndex: 10,
+              }}
+            >
+              {node.name}
+            </div>
+          </div>
+        ))}
       </motion.div>
     </div>
   );

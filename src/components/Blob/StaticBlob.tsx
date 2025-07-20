@@ -72,7 +72,7 @@ const StaticBlob: React.FC<StaticBlobProps> = ({ emotions, scale = 1.0 }) => {
   // ✅ 정적 uniforms (useFrame 없음)
   const uniforms = useMemo(() => ({
     u_time: { value: 0 },
-    u_intensity: { value: 0.3 },
+    u_intensity: { value: 0.1 },
     u_color1: { value: emotionColors.color1 },
     u_color2: { value: emotionColors.color2 },
     u_color3: { value: emotionColors.color3 },

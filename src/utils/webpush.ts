@@ -12,7 +12,17 @@ export function urlBase64ToUint8Array(base64String: string): Uint8Array {
     return outputArray;
   }
   
-  export const isPushSupported = (): boolean => {
-    return "serviceWorker" in navigator && "PushManager" in window;
-  };
+  export function isPushSupported() {
+    // iOS 환경 감지
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.userAgent.includes('Macintosh') && 'ontouchend' in document);
+  
+    if (isIOS) return false;
+  
+    return (
+      'serviceWorker' in navigator &&
+      'PushManager' in window &&
+      'Notification' in window
+    );
+  }
   

@@ -7,6 +7,9 @@ import { PushManagerService } from "@/api/services/pushManager";
 import { WEBPUSH_CONFIG } from "../../webpush";
 
 const Webpush = () => {
+  // iOS 등 푸시 미지원 환경에서는 아무것도 렌더링하지 않음
+  if (!isPushSupported()) return null;
+
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscription, setSubscription] = useState<PushSubscription | null>(null);
   const [permissionGranted, setPermissionGranted] = useState(
@@ -17,11 +20,6 @@ const Webpush = () => {
   // 초기 상태 확인 개선
   useEffect(() => {
     const checkSubscriptionStatus = async () => {
-      if (!isPushSupported()) {
-        setLoading(false);
-        return;
-      }
-
       try {
         const registration = await navigator.serviceWorker.ready;
         const browserSub = await registration.pushManager.getSubscription();

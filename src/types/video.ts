@@ -1,6 +1,7 @@
 // types/video.ts
 export interface VideoApiResponse {
-  videoId: string[];  // 문자열 배열로 변경
+  videoId: string[];
+  emotion: string;
   message: string;
 }
 
@@ -10,8 +11,17 @@ export interface VideoDetails {
   description: string;
 }
 
-export interface VideoType {
+// 개별 비디오 아이템용 타입 (UI에서 사용)
+export interface VideoItem {
   videoId: string;
+  emotion: string;
+  message: string;
+}
+
+// 네비게이션 시 전달할 데이터 타입
+export interface VideoNavigationData {
+  videoIds: string[];
+  selectedVideoId: string;
   emotion: string;
   message: string;
 }

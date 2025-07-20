@@ -83,7 +83,7 @@ const Routine = () => {
 
   const handleFolderClick = async (emotionTitle: string) => {
     const emotionKey = emotionTitle as RoutineItem["routineType"];
-    console.log("🔥 폴더 클릭됨", emotionKey);
+    // console.log("🔥 폴더 클릭됨", emotionKey);
 
     // 초기화
     setIsPopupOpen(false);

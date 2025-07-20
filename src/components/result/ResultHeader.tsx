@@ -19,7 +19,7 @@ const ResultHeader: React.FC<ResultHeaderProps> = ({ writtenDate }) => {
   dayjs.locale("ko");
 
   return (
-    <div className="sticky mb-8 z-10 top-0 w-full bg-[#F5F5F5]/80 dark:bg-[#181718]/80 backdrop-blur-md rounded-b-3xl">
+    <div className="sticky mb-8 z-10 top-0 w-full bg-[#FAF6F4]/80 dark:bg-[#181718]/80 backdrop-blur-md rounded-b-3xl">
       <div className="w-full">
         <div className="flex items-start justify-between px-4 pt-6 pb-4 w-full">
           <div className="flex flex-col">

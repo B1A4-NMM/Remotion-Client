@@ -1,9 +1,9 @@
 // components/VirtualizedRelationNode.tsx
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import React, { useMemo, useCallback } from 'react';
 import StaticBlob from './StaticBlob';
 import { Canvas } from '@react-three/fiber';
 import { mapEmotionToColor } from '../../constants/emotionColors';
+import { useTheme } from '../theme-provider';
 
 export type ColorKey = "gray" | "gray2" | "blue" | "green" | "red" | "yellow";
 
@@ -26,38 +26,20 @@ interface VirtualizedRelationNodeProps {
   x: number;
   y: number;
   radius: number;
-  isActive?: boolean;
   onClick?: () => void;
   isMe?: boolean;
 }
 
 const VirtualizedRelationNode: React.FC<VirtualizedRelationNodeProps> = ({
-    nodeData,
-    x,
-    y,
-    radius,
-    isActive = true,
-    onClick,
-    isMe = false
-  }) => {
-    // ✅ '나' 노드는 초기값을 true로 설정
-    const [shouldRender, setShouldRender] = useState(isMe);
-    const nodeRef = useRef<HTMLDivElement>(null);
-    
-    const { isIntersecting } = useIntersectionObserver(nodeRef, {
-      threshold: 0.1,
-      rootMargin: '100px'
-    });
-  
-    useEffect(() => {
-      // ✅ '나' 노드는 항상 렌더링, 다른 노드만 viewport 기반
-      if (isMe) {
-        setShouldRender(true);
-      } else {
-        setShouldRender(isIntersecting && isActive);
-      }
-    }, [isIntersecting, isActive, isMe]);
-  
+  nodeData,
+  x,
+  y,
+  radius,
+  onClick,
+  isMe = false
+}) => {
+  const { theme } = useTheme();
+  const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   // ✅ 관계 데이터를 emotions 배열로 변환
   const processRelationEmotions = useCallback((data: RelationNodeData): Emotion[] => {
@@ -86,87 +68,82 @@ const VirtualizedRelationNode: React.FC<VirtualizedRelationNodeProps> = ({
     return emotions;
   }, []);
 
-  // ✅ '나' 노드는 무색, 다른 노드는 감정 기반 색상
+  // ✅ '나' 노드는 중성 색상, 다른 노드는 감정 기반 색상
   const processedEmotions = useMemo(() => {
     if (isMe) {
-        return [{ color: "red" as ColorKey, intensity: 1 }]; // 매우 연한 회색
+      return [{ color: "gray2" as ColorKey, intensity: 0.1 }];
     }
     return processRelationEmotions(nodeData);
   }, [isMe, nodeData, processRelationEmotions]);
 
   const scale = useMemo(() => {
-    const baseScale = radius / 30; // 기본 반지름 30 기준
-    return Math.max(0.5, Math.min(2.0, baseScale));
-  }, [radius]);
-
-  // ✅ '나' 노드용 placeholder 색상
-  const getPlaceholderColor = () => {
     if (isMe) {
-      return '#F3F4F6'; // 매우 연한 회색
+      return 1.8; // '나' 노드는 고정 크기
     }
-    
-    const primaryEmotion = processedEmotions[0];
-    if (!primaryEmotion) return '#9CA3AF';
-    
-    const colorMap: Record<ColorKey, string> = {
-      gray: '#9CA3AF',
-      gray2: '#D1D5DB',
-      blue: '#3B82F6',
-      green: '#10B981',
-      red: '#EF4444',
-      yellow: '#F59E0B'
-    };
-    
-    return colorMap[primaryEmotion.color] || '#9CA3AF';
+    const baseScale = radius / 35;
+    return Math.max(0.8, Math.min(1.6, baseScale));
+  }, [radius, isMe]);
+
+  // ✅ 폰트 크기 계산
+  const getFontSize = () => {
+    if (isMe) return '20px';
+    return radius > 60 ? '16px' : radius > 40 ? '14px' : '12px';
   };
 
   return (
     <div
-      ref={nodeRef}
       className="absolute pointer-events-auto"
       style={{
         left: x - radius,
         top: y - radius,
-        width: radius * 2,
-        height: radius * 2,
+        width: radius ,
+        height: radius ,
         zIndex: isMe ? 20 : 10,
       }}
       onClick={onClick}
     >
-      <div className="w-full h-full cursor-pointer" style={{ borderRadius: '50%', overflow: 'hidden' }}>
-        {/* ✅ '나' 노드는 항상 Canvas, 다른 노드는 조건부 */}
-        {(shouldRender || isMe) ? (
-          <Canvas camera={{ position: [0, 0, 3 * scale] }}>
-            <ambientLight intensity={0.5} />
-            <pointLight position={[10, 10, 10]} />
-            <StaticBlob emotions={processedEmotions} scale={scale} />
-          </Canvas>
-        ) : (
-          <div
-            className="w-full h-full rounded-full flex items-center justify-center text-xs font-medium"
-            style={{
-              backgroundColor: getPlaceholderColor(),
-              color: isMe ? '#6B7280' : '#FFFFFF',
-              border: isMe ? '2px solid #E5E7EB' : 'none'
-            }}
-          >
-            {nodeData.name}
-          </div>
-        )}
-      </div>
-      
-      {/* 이름 라벨 */}
-      <div 
-        className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-center font-medium whitespace-nowrap"
-        style={{ 
-          color: isMe ? '#000' : '#666',
-          fontWeight: isMe ? 'bold' : 'normal'
+      <div
+        className="w-full h-full cursor-pointer relative"
+        style={{
+          borderRadius: '50%',
+          overflow: 'hidden',
         }}
       >
-        {nodeData.name}
+        {/* ✅ 항상 Canvas로 렌더링 - Intersection Observer 제거 */}
+        <Canvas 
+          camera={{ position: [0, 0, 3 * scale], fov: 5 }}
+          gl={{ 
+            antialias: true,
+            alpha: true,
+            powerPreference: "high-performance", // 성능 우선
+            preserveDrawingBuffer: true, // 렌더링 안정성
+          }}
+          style={{ background: 'transparent' }}
+          dpr={Math.min(window.devicePixelRatio, 2)} // DPR 제한으로 성능 최적화
+        >
+          <ambientLight intensity={0.6} />
+          <pointLight position={[8, 8, 8]} intensity={0.4} />
+          <StaticBlob emotions={processedEmotions} scale={scale} />
+        </Canvas>
+        
+        {/* ✅ 이름 라벨 - 항상 표시 */}
+        <div 
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center font-medium whitespace-nowrap pointer-events-none select-none"
+          style={{ 
+            color: isDark ? '#FFF' : '#000',
+            fontWeight: isMe ? 'bold' : 'normal',
+            fontSize: getFontSize(),
+            textShadow: isDark 
+              ? '1px 1px 2px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.5)' 
+              : '1px 1px 2px rgba(255,255,255,0.9), 0 0 4px rgba(255,255,255,0.6)',
+            zIndex: 10
+          }}
+        >
+          {nodeData.name}
+        </div>
       </div>
     </div>
-  );  
+  );
 };
 
 export default VirtualizedRelationNode;

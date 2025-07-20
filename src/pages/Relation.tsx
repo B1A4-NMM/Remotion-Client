@@ -1,351 +1,316 @@
 "use client";
 
-// components/Relation.tsx
-import React, { useRef, useEffect, useState, useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
+import { useQuery } from "@tanstack/react-query";
+import React, { useRef, useEffect, useState } from "react";
 import { motion, useMotionValue } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import StaticBlob from "@/components/Blob/StaticBlob";
-import { mapEmotionToColor } from "@/constants/emotionColors";
+
+import type { Node, AnimatedBranch, Edge } from "@/types/emotionalGraph";
 import { useGetRelation } from "../api/queries/relation/useGetRelation";
-import { useTheme } from "@/components/theme-provider";
 
-export type ColorKey = "gray" | "gray2" | "blue" | "green" | "red" | "yellow";
+import { updatePhysics } from "@/utils/physics";
+import {
+  createRootNode,
+  createAnimatedBranches,
+  updateNodeOpacity,
+  updateEdgeOpacity,
+  updateNodeBounce,
+  createNodeFromBranch,
+} from "@/utils/animation";
+import { drawEdges, drawAnimatedBranch, drawNodes } from "@/utils/drawing";
 
-interface Emotion {
-  color: ColorKey;
-  intensity: number;
-}
+const EmotionalGraph = () => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null); // 캔버스 DOM 참조
+  const containerRef = useRef<HTMLDivElement | null>(null); // 캔버스를 감싸는 div 참조
+  const hasScrolledToMe = useRef(false); // "나" 노드로 한 번만 스크롤 이동 여부 체크
 
-interface RelationNodeData {
-  affection: number;
-  count: number;
-  highestEmotion: string;
-  id: number;
-  name: string;
-  secondEmotion?: string;
-}
+  const animationRef = useRef<number>(); // animation frame ID 저장
+  const nodesRef = useRef<Node[]>([]); // 현재 모든 노드 정보 저장
+  const edgesRef = useRef<Edge[]>([]); // 노드 간 간선 정보 저장
+  const animatedBranchesRef = useRef<AnimatedBranch[]>([]); // 점진적으로 생성될 브랜치(노드)
 
-interface ProcessedNode extends RelationNodeData {
-  x: number;
-  y: number;
-  radius: number;
-  isMe: boolean;
-  emotions: Emotion[];
-  scale: number;
-}
+  const startTimeRef = useRef<number>(0); // 전체 애니메이션 시작 시간
+  const previousTimestampRef = useRef<number>(0); // 프레임 간 시간 차 계산용
 
-// ✅ 개별 Blob 컴포넌트
-const RelationBlob: React.FC<{ 
-  node: ProcessedNode; 
-  position: [number, number, number];
-}> = ({ node, position }) => {
-  return (
-    <group position={position}>
-      <StaticBlob emotions={node.emotions} scale={node.scale} />
-    </group>
-  );
-};
+  const { data: relationData } = useGetRelation(); // 관계 데이터 패칭
 
-// ✅ 텍스트 라벨 컴포넌트
-const NodeLabel: React.FC<{ 
-  node: ProcessedNode; 
-}> = ({ node }) => {
-  const { theme } = useTheme();
-  const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-  
-  const getFontSize = () => {
-    if (node.isMe) return '20px';
-    return node.radius > 60 ? '16px' : node.radius > 40 ? '14px' : '12px';
+  const dpr = window.devicePixelRatio || 1; // 디바이스 픽셀 비율
+  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 }); // 캔버스 크기 상태
+
+  const offsetX = useMotionValue(0); // 드래그에 따른 X 오프셋
+  const offsetY = useMotionValue(0); // 드래그에 따른 Y 오프셋
+
+  const navigate = useNavigate(); // 페이지 이동용
+
+  const clickStartRef = useRef<{ x: number; y: number } | null>(null); // 클릭/드래그 구분용 좌표 저장
+
+  // 🔹 드래그 시작 시 좌표 저장
+  const handleCanvasMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    clickStartRef.current = { x: e.clientX, y: e.clientY };
   };
 
-  return (
-    <div
-      className="absolute pointer-events-auto cursor-pointer"
-      style={{
-        left: node.x - node.radius,
-        top: node.y - node.radius,
-        width: node.radius * 2,
-        height: node.radius * 2,
-        zIndex: node.isMe ? 20 : 10,
-      }}
-    >
-      <div 
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center font-medium whitespace-nowrap pointer-events-none select-none"
-        style={{ 
-          color: isDark ? '#FFF' : '#000',
-          fontWeight: node.isMe ? 'bold' : 'normal',
-          fontSize: getFontSize(),
-          textShadow: isDark 
-            ? '1px 1px 2px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.5)' 
-            : '1px 1px 2px rgba(255,255,255,0.9), 0 0 4px rgba(255,255,255,0.6)',
-          zIndex: 10
-        }}
-      >
-        {node.name}
-      </div>
-    </div>
-  );
-};
-
-const Relation = () => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const hasScrolledToMe = useRef(false);
-  
-  const { theme } = useTheme();
-  const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-  
-  const [nodes, setNodes] = useState<ProcessedNode[]>([]);
-  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
-  
-  const { data: relationData } = useGetRelation();
-  const navigate = useNavigate();
-  
-  const offsetX = useMotionValue(0);
-  const offsetY = useMotionValue(0);
-
-  // 감정 처리 함수
-  const processRelationEmotions = (data: RelationNodeData): Emotion[] => {
-    const emotions: Emotion[] = [];
-    
-    if (data.highestEmotion && data.highestEmotion !== '무난') {
-      const primaryColor = mapEmotionToColor(data.highestEmotion);
-      emotions.push({
-        color: primaryColor,
-        intensity: Math.min(data.affection / 100, 1) || 0.7
-      });
+  // 🔹 드래그 끝났을 때 클릭으로 판단되면 클릭 핸들러 실행
+  const handleCanvasMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!clickStartRef.current) return;
+    const dx = e.clientX - clickStartRef.current.x;
+    const dy = e.clientY - clickStartRef.current.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    if (distance < 5) {
+      handleCanvasClick(e);
     }
-    
-    if (data.secondEmotion && data.secondEmotion !== data.highestEmotion && data.secondEmotion !== '무난') {
-      const secondaryColor = mapEmotionToColor(data.secondEmotion);
-      emotions.push({
-        color: secondaryColor,
-        intensity: 0.3
-      });
-    }
-    
-    if (emotions.length === 0) {
-      emotions.push({ color: "gray", intensity: 1 });
-    }
-    
-    return emotions;
+    clickStartRef.current = null;
   };
 
-  // 노드 생성
+  // 🔹 캔버스 클릭 시, 해당 위치의 노드 확인 후 페이지 이동
+  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const cssX = e.clientX - rect.left;
+    const cssY = e.clientY - rect.top;
+
+    const offsetXValue = offsetX.get();
+    const offsetYValue = offsetY.get();
+
+    let clickedNode = null;
+
+    for (const node of nodesRef.current) {
+      const dx = cssX - node.x;
+      const dy = cssY - node.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance <= node.radius) {
+        clickedNode = node;
+        break;
+      }
+    }
+
+    // 클릭된 노드가 있으면 조건에 따라 라우팅
+    if (clickedNode) {
+      const id = clickedNode.diaryId || clickedNode.id;
+
+      if (typeof id === "number" || (typeof id === "string" && !isNaN(Number(id)))) {
+        navigate(`/relation/${id}`);
+      } else if (clickedNode.label === "나") {
+        navigate(`/analysis`);
+      } else {
+        console.warn("⚠️ 유효하지 않은 ID:", id);
+        navigate(`/relation/1`);
+      }
+    }
+  };
+
+  // 🔹 캔버스 렌더링 및 애니메이션 로직
   useEffect(() => {
-    if (!relationData?.relations?.relations || !containerRef.current) return;
-    
-    const container = containerRef.current;
-    const { width, height } = container.getBoundingClientRect();
-    setContainerSize({ width, height });
-    
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const resizeCanvas = () => {
+      const parent = canvas.parentElement;
+      if (!parent) return;
+      const { width, height } = parent.getBoundingClientRect();
+
+      canvas.width = width * dpr * 3 + 200;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width * 3 + 200}px`;
+      canvas.style.height = `${height}px`;
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0); // 초기화
+      ctx.scale(dpr, dpr); // 고해상도 대응
+      setCanvasSize({ width, height });
+    };
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    const { width, height } = canvas.parentElement?.getBoundingClientRect() || { width: 0, height: 0 };
     const centerX = width / 2;
     const centerY = height / 2;
-    
-    const relationArray = relationData.relations.relations;
-    const processedNodes: ProcessedNode[] = [];
-    
-    // "나" 노드 생성
-    const meNode: ProcessedNode = {
-      id: 0,
-      name: "나",
-      affection: 0,
-      count: 0,
-      highestEmotion: "",
-      secondEmotion: "",
-      x: centerX,
-      y: centerY,
-      radius: 80,
-      isMe: true,
-      emotions: [{ color: "gray2" as ColorKey, intensity: 0.1 }],
-      scale: 1.8
-    };
-    processedNodes.push(meNode);
-    
-    // 관계 노드들 생성
-    relationArray.forEach((relation: RelationNodeData, index: number) => {
-      const angle = (index * 2 * Math.PI) / relationArray.length;
-      const baseDistance = 180;
-      const affectionBonus = (relation.affection / 100) * 80;
-      const distance = baseDistance + affectionBonus;
-      
-      const baseRadius = 20;
-      const affectionRadius = (relation.affection / 100) * 25;
-      const radius = Math.max(25, Math.min(75, baseRadius + affectionRadius));
-      const scale = Math.max(0.8, Math.min(1.6, radius / 35));
-      
-      const node: ProcessedNode = {
-        ...relation,
-        x: centerX + Math.cos(angle) * distance,
-        y: centerY + Math.sin(angle) * distance,
-        radius: radius,
-        isMe: false,
-        emotions: processRelationEmotions(relation),
-        scale: scale
-      };
-      processedNodes.push(node);
-    });
-    
-    setNodes(processedNodes);
-    console.log(`총 ${processedNodes.length}개 노드 생성 완료`);
-    
-    if (!hasScrolledToMe.current) {
-      const targetX = centerX - width / 2;
-      container.scrollLeft = targetX;
-      hasScrolledToMe.current = true;
-    }
-    
-  }, [relationData]);
 
-  const handleNodeClick = (node: ProcessedNode) => {
-    if (node.isMe) {
-      navigate('/analysis');
-    } else {
-      navigate(`/relation/${node.id}`);
+    // 초기화
+    nodesRef.current = [];
+    edgesRef.current = [];
+    animatedBranchesRef.current = [];
+
+    // 루트 노드("나") 생성
+    const rootNode = createRootNode(centerX, centerY);
+    nodesRef.current.push(rootNode);
+
+    // 브랜치(자식 노드)들 생성
+    const relationArray = relationData?.relations?.relations;
+    if (Array.isArray(relationArray)) {
+      animatedBranchesRef.current = createAnimatedBranches(
+        rootNode,
+        centerX,
+        centerY,
+        relationArray
+      );
     }
-  };
+
+    // 메인 draw 루프 (requestAnimationFrame 기반)
+    const draw = (timestamp: number) => {
+      if (!startTimeRef.current) {
+        startTimeRef.current = timestamp;
+        previousTimestampRef.current = timestamp;
+      }
+
+      const dt = (timestamp - previousTimestampRef.current) / 16; // 물리 시뮬레이션용 시간 차이
+      const elapsed = timestamp - startTimeRef.current;
+      previousTimestampRef.current = timestamp;
+
+      const { width, height } = canvasSize;
+      ctx.clearRect(0, 0, width, height); // 캔버스 초기화
+
+      const centerX = width / 2 - offsetX.get();
+      const centerY = height / 2 - offsetY.get();
+
+      // 첫 6초 동안만 물리 시뮬레이션 적용
+      if (elapsed < 1000) {
+        updatePhysics(nodesRef.current, edgesRef.current, dt);
+      }
+
+      // const centerX = width / 2 - offsetX.get();
+      // const centerY = height / 2 - offsetY.get();
+
+      // 루트 노드 페이드인
+      updateNodeOpacity(nodesRef.current[0], elapsed);
+
+      drawEdges(ctx, edgesRef.current);
+
+      // 각 애니메이티드 브랜치 진행
+      for (let i = animatedBranchesRef.current.length - 1; i >= 0; i--) {
+        const branch = animatedBranchesRef.current[i];
+        if (!branch.finished && elapsed >= branch.startTime) {
+          const branchElapsed = elapsed - branch.startTime;
+          branch.progress = Math.min(branchElapsed / branch.duration, 1);
+          branch.opacity = Math.min(branchElapsed / (branch.duration * 0.3), 1);
+          drawAnimatedBranch(ctx, branch);
+
+          if (branch.progress === 1) {
+            const newNode = createNodeFromBranch(branch, elapsed);
+            nodesRef.current.push(newNode);
+            edgesRef.current.push({
+              from: branch.from,
+              to: newNode,
+              restLength: Math.hypot(newNode.x - branch.from.x, newNode.y - branch.from.y),
+              opacity: branch.opacity,
+            });
+            branch.finished = true;
+            animatedBranchesRef.current.splice(i, 1);
+          }
+        }
+      }
+
+      // [As-is] 마우스 중심 근처의 노드 확대 효과
+      // [To-be] 노드 투명도, 간선 투명도 및 바운스 업데이트
+      nodesRef.current.forEach(node => {
+        if (node.label === "나") return;
+
+        // const dx = node.x - centerX;
+        // const dy = node.y - centerY;
+        // const dist = Math.sqrt(dx * dx + dy * dy);
+        // const activeRadius = 100;
+        // const maxRadius = 50;
+        // const minRadius = 30;
+
+        // if (dist < activeRadius) {
+        //   node.radius = Math.min(node.radius + 0.5, maxRadius);
+        // } else {
+        //   node.radius = Math.max(node.radius - 0.5, minRadius);
+        // }
+
+        const dx = node.x - centerX;
+        const dy = node.y - centerY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const activeRadius = 100;
+
+        if (
+          dist < activeRadius &&
+          (node.bounceStart === undefined || elapsed - node.bounceStart > (node.bounceDuration ?? 300))
+        ) {
+          node.bounceStart = elapsed;
+        }
+
+        updateNodeBounce(node, elapsed);
+        updateNodeOpacity(node, elapsed);
+        updateEdgeOpacity(edgesRef.current, node);
+      });
+
+      drawNodes(ctx, nodesRef.current);
+      ctx.globalAlpha = 1;
+
+      // 최초 진입 시 "나" 노드로 스크롤 이동
+      if (!hasScrolledToMe.current) {
+        const meNode = nodesRef.current.find(n => n.label === "나");
+        const container = containerRef.current;
+        if (meNode && container) {
+          const targetX = meNode.x - container.clientWidth / 2;
+
+          const smoothScrollTo = (element: HTMLElement, target: number, duration = 1500) => {
+            const start = element.scrollLeft;
+            const change = target - start;
+            const startTime = performance.now();
+
+            const easeInOutQuad = (t: number) =>
+              t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+            const animateScroll = (currentTime: number) => {
+              const elapsed = currentTime - startTime;
+              const progress = Math.min(elapsed / duration, 1);
+              const eased = easeInOutQuad(progress);
+              element.scrollLeft = start + change * eased;
+              if (progress < 1) {
+                requestAnimationFrame(animateScroll);
+              }
+            };
+
+            requestAnimationFrame(animateScroll);
+          };
+
+          smoothScrollTo(container, targetX, 1000);
+          hasScrolledToMe.current = true;
+        }
+      }
+
+      animationRef.current = requestAnimationFrame(draw);
+    };
+
+    animationRef.current = requestAnimationFrame(draw);
+
+    return () => {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      window.removeEventListener("resize", resizeCanvas);
+    };
+  }, [canvasSize.width, canvasSize.height, relationData]);
 
   return (
-    <div 
-      ref={containerRef} 
-      className="w-full h-screen overflow-auto relative"
-    >
+    <div ref={containerRef} className="w-full h-screen overflow-hidden relative">
       <motion.div
         drag
         dragMomentum={false}
         dragElastic={0.1}
         style={{ x: offsetX, y: offsetY }}
-        className="relative"
-        style={{
-          width: containerSize.width * 3,
-          height: containerSize.height,
-          minHeight: '100vh',
-        }}
+        className="w-[300%] h-full relative"
       >
-        {/* 연결선 SVG */}
-        <svg
-          className="absolute inset-0 pointer-events-none"
-          width="100%"
-          height="100%"
-          style={{ zIndex: 1 }}
-        >
-          <defs>
-            <marker
-              id="arrowhead-v"
-              markerWidth="10"
-              markerHeight="8"
-              refX="8"
-              refY="4"
-              orient="auto"
-            >
-              <path
-                d="M 2 2 L 8 4 L 2 6"
-                fill="none"
-                stroke="#9CA3AF"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </marker>
-          </defs>
-          {nodes.length > 0 && nodes.slice(1).map((node, index) => {
-            const meNode = nodes[0];
-            const opacity = Math.max(0.3, Math.min(0.8, node.affection / 100));
-            const strokeWidth = Math.max(1.5, Math.min(3, (node.affection / 100) * 2 + 1));
-            const angle = Math.atan2(meNode.y - node.y, meNode.x - node.x);
-            const startX = node.x + Math.cos(angle) * node.radius * 1.2;
-            const startY = node.y + Math.sin(angle) * node.radius * 1.2;
-            const endX = meNode.x - Math.cos(angle) * meNode.radius * 1.3;
-            const endY = meNode.y - Math.sin(angle) * meNode.radius * 1.3;
-            const pathData = `M ${startX} ${startY} L ${endX} ${endY}`;
-            return (
-              <path
-                key={`edge-${index}`}
-                d={pathData}
-                stroke="#9CA3AF"
-                strokeWidth={strokeWidth}
-                strokeOpacity={opacity}
-                fill="none"
-                markerEnd="url(#arrowhead-v)"
-                strokeLinecap="round"
-              />
-            );
-          })}
-        </svg>
-        {/* 단일 Canvas에서 모든 Blob을 3D로 렌더링 (orthographic camera) */}
-        <Canvas
-          orthographic
-          camera={{
-            zoom: 1,
-            left: 0,
-            right: containerSize.width * 3,
-            top: 0,
-            bottom: containerSize.height,
-            near: -100,
-            far: 100,
-            position: [containerSize.width * 1.5, containerSize.height / 2, 10],
-          }}
+        {/* 캔버스를 motion.div 안에 넣어야 드래그에 반응 */}
+        <canvas
+          ref={canvasRef}
+          onMouseDown={handleCanvasMouseDown}
+          onMouseUp={handleCanvasMouseUp}
+          className="absolute top-0 left-0 w-full h-full z-10"
           style={{
-            width: containerSize.width * 3,
-            height: containerSize.height,
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            pointerEvents: 'none',
-            zIndex: 2,
+            cursor: "pointer",
+            borderRadius: 20,
+            display: "block",
+            pointerEvents: "auto",
           }}
-          gl={{
-            antialias: true,
-            alpha: true,
-            powerPreference: "high-performance",
-            preserveDrawingBuffer: true,
-          }}
-          dpr={Math.min(window.devicePixelRatio, 2)}
-        >
-          <ambientLight intensity={0.6} />
-          <pointLight position={[8, 8, 8]} intensity={0.4} />
-          {nodes.map((node) => (
-            <group key={node.id} position={[node.x, containerSize.height - node.y, 0]}>
-            <StaticBlob emotions={node.emotions} scale={node.scale} />
-          </group>
-          ))}
-        </Canvas>
-        {/* 라벨 오버레이 */}
-        {nodes.map((node) => (
-          <div
-            key={node.id}
-            style={{
-              position: 'absolute',
-              left: node.x - node.radius,
-              top: node.y - node.radius,
-              width: node.radius * 2,
-              height: node.radius * 2,
-              zIndex: node.isMe ? 20 : 10,
-              pointerEvents: 'auto',
-            }}
-            onClick={() => handleNodeClick(node)
-            }
-            className="cursor-pointer" 
-          >
-            <div
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center font-medium whitespace-nowrap pointer-events-none select-none"
-              style={{
-                color: isDark ? '#FFF' : '#000',
-                fontWeight: node.isMe ? 'bold' : 'normal',
-                fontSize: node.isMe ? '20px' : node.radius > 60 ? '16px' : node.radius > 40 ? '14px' : '12px',
-                textShadow: isDark
-                  ? '1px 1px 2px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.5)'
-                  : '1px 1px 2px rgba(255,255,255,0.9), 0 0 4px rgba(255,255,255,0.6)',
-                zIndex: 10,
-              }}
-            >
-              {node.name}
-            </div>
-          </div>
-        ))}
+        />
       </motion.div>
     </div>
   );
 };
 
-export default Relation;
+export default EmotionalGraph;

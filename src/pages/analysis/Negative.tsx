@@ -95,7 +95,7 @@ const extractPeopleData = (data: any) => {
           
           {/* 기간 선택 드롭다운 */}
           <div className="flex justify-center mb-8">
-            <div className="w-full bg-white rounded-xl">
+            <div className="w-full bg-white rounded-xl z-50">
               <Select
                 value={selectedPeriod}
                 onValueChange={(value) => setSelectedPeriod(value as PeriodType)}

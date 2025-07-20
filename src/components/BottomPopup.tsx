@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useSpring, animated } from "@react-spring/web";
 
 type HeightOption = {
@@ -31,7 +31,7 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
     config: { tension: 300, friction: 30 },
     onRest: {
       height: value => {
-        console.log("🎭 애니메이션 완료:", { value: value.value, isOpen });
+        // console.log("🎭 애니메이션 완료:", { value: value.value, isOpen });
         if (value.value === "0px") {
           setIsInDOM(false);
         }
@@ -91,13 +91,13 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
           onClick={handleOverlayClick}
         />
       )}
-      
+
       <animated.div
         style={{
           ...springProps,
           display: "block",
         }}
-        className="absolute bottom-0 left-0 w-full z-[100] bg-white rounded-t-2xl overflow-y-auto shadow-xl"
+        className="absolute bottom-0 left-0 w-full z-[100] bg-[#FAF6F4] dark:bg-[#29222B] rounded-t-2xl overflow-y-auto shadow-xl"
         onClick={handleContentClick}
       >
 

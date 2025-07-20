@@ -90,11 +90,10 @@ const Home = () => {
   };
 
   const handleToggleBookmark = (diaryId: number) => {
-    const token = localStorage.getItem("accessToken") || "";
     const diary = infiniteDiaries.find(d => d.id === diaryId);
     if (!diary) return;
     patchBookmark.mutate(
-      { token, diaryId, isBookmarked: !diary.bookmarked },
+      { diaryId, isBookmarked: !diary.bookmarked },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["infiniteDiaries"] });
@@ -148,7 +147,7 @@ const Home = () => {
 
   return (
     <div className="flex flex-col  text-foreground min-h-screen">
-      <div className="sticky top-0 z-50  rounded-b-2xl bg-[#F5F5F5] dark:bg-[#181718] dark:text-white pb-8">
+      <div className="sticky top-0 z-50  rounded-b-2xl bg-[#FAF6F4] dark:bg-[#181718] dark:text-white pb-8">
         <Title
           emotionCountByMonth={emotionCountByMonth}
           totalDiaryCount={totalDiaryCount}

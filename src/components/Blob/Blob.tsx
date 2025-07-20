@@ -1,12 +1,12 @@
 import React, { useRef, useMemo, useState, useEffect, useCallback } from "react";
-import { Mesh, Vector3 } from "three";
+import { Mesh } from "three";
 import { useFrame } from "@react-three/fiber";
 import WebGLContextPool from "./WebGLContextPool";
 
 import vertexShader from "./vertexShader";
 import fragmentShaderLight from "./fragmentShaderLight";
 import fragmentShaderDark from "./fragmentShaderDark";
-import { baseColors, mapEmotionToColor } from "../../constants/emotionColors";
+import { baseColors } from "../../constants/emotionColors";
 import { useTheme } from "../theme-provider";
 
 // 타입 정의
@@ -18,23 +18,25 @@ interface Emotion {
 }
 
 interface BlobProps {
-  diaryContent?: any;
+  emotions: Emotion[]; // ✅ diaryContent 대신 emotions 배열 받기
+  id?: string;
+  onContextLost?: () => void;
 }
 
-const Blob: React.FC<BlobProps> = ({ diaryContent, id, onContextLost }) => {
+const Blob: React.FC<BlobProps> = ({ emotions, id, onContextLost }) => {
   const mesh = useRef<Mesh>(null);
-  const [emotions, setEmotions] = useState<Emotion[]>([]);
   const [isActive, setIsActive] = useState(false);
   const contextPool = WebGLContextPool.getInstance();
   
   const { theme } = useTheme();
   
   const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-
-  const frag= isDark? fragmentShaderDark : fragmentShaderLight;
+  const frag = isDark ? fragmentShaderDark : fragmentShaderLight;
 
   // 컴포넌트 마운트 시 컨텍스트 요청
   useEffect(() => {
+    if (!id) return;
+    
     const canRender = contextPool.requestContext(id);
     setIsActive(canRender);
     
@@ -47,7 +49,7 @@ const Blob: React.FC<BlobProps> = ({ diaryContent, id, onContextLost }) => {
     };
   }, [id]);
   
-  // 1. 함수들을 useCallback으로 메모이제이션
+  // ✅ hexToRgb 함수만 유지
   const hexToRgb = useCallback((hex: string): [number, number, number] => {
     const r = parseInt(hex.slice(1, 3), 16) / 255;
     const g = parseInt(hex.slice(3, 5), 16) / 255;
@@ -55,58 +57,9 @@ const Blob: React.FC<BlobProps> = ({ diaryContent, id, onContextLost }) => {
     return [r, g, b];
   }, []);
 
-  const processDiaryContentEmotions = useCallback((content: any): Emotion[] => {
-    if (!content) {
-      return [{ color: "gray" as ColorKey, intensity: 1 }];
-    }
-
-    const allEmotions: { type: string; intensity: number }[] = [];
-
-    // emotions 배열 지원 추가
-    if (content.emotions && Array.isArray(content.emotions)) {
-      content.emotions.forEach((emotion: any) => {
-        if (emotion && emotion.emotion  && emotion.emotion!='무난') {
-          allEmotions.push({
-            type: emotion.emotion,
-            intensity: emotion.intensity || 5,
-          });
-        }
-      });
-    }
-
-
-
-    if (allEmotions.length === 0) {
-      return [{ color: "gray" as ColorKey, intensity: 1 }];
-    }
-
-    const colorMap = new Map<ColorKey, number>();
-    allEmotions.forEach(({ type, intensity }) => {
-      const color = mapEmotionToColor(type);
-      colorMap.set(color, (colorMap.get(color) || 0) + intensity);
-    });
-
-
-
-    if (colorMap.size > 1) {
-      colorMap.delete("gray");
-      colorMap.delete("gray2");
-    }
-
-    
-    const totalColorIntensity = [...colorMap.values()].reduce((sum, val) => sum + val, 0);
-
-    return [...colorMap.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .map(([color, total]) => ({
-        color,
-        intensity: +(total / totalColorIntensity).toFixed(3),
-      }));
-  }, []); // 빈 의존성 배열
-
-  // 2. 색상 계산 수정
+  // ✅ emotions 배열을 기반으로 색상 계산
   const emotionColors = useMemo(() => {
-    if (emotions.length === 0) {
+    if (!emotions || emotions.length === 0) {
       const grayRgb = hexToRgb(baseColors.gray);
       return {
         color1: grayRgb,
@@ -122,7 +75,7 @@ const Blob: React.FC<BlobProps> = ({ diaryContent, id, onContextLost }) => {
     const secondaryEmotion = emotions[1] || emotions[0];
     const tertiaryEmotion = emotions[2] || emotions[0];
 
-    const result = {
+    return {
       color1: hexToRgb(baseColors[primaryEmotion.color]),
       color2: hexToRgb(baseColors[secondaryEmotion.color]),
       color3: hexToRgb(baseColors[tertiaryEmotion.color]),
@@ -130,11 +83,9 @@ const Blob: React.FC<BlobProps> = ({ diaryContent, id, onContextLost }) => {
       intensity2: emotions[1]?.intensity || 0.0,
       intensity3: emotions[2]?.intensity || 0.0,
     };
+  }, [emotions, hexToRgb]);
 
-    return result;
-  }, [emotions, hexToRgb]); // 이제 hexToRgb가 안정적임
-
-  // 3. uniforms 생성
+  // uniforms 생성
   const uniforms = useRef({
     u_time: { value: 0 },
     u_intensity: { value: 0.4 },
@@ -146,13 +97,7 @@ const Blob: React.FC<BlobProps> = ({ diaryContent, id, onContextLost }) => {
     u_colorIntensity3: { value: 0.0 },
   });
 
-  // 4. 중복 제거 - 하나의 useEffect만 사용
-  useEffect(() => {
-    const processedEmotions = processDiaryContentEmotions(diaryContent);
-    setEmotions(processedEmotions);
-  }, [diaryContent, processDiaryContentEmotions]);
-
-  // 5. 색상 업데이트
+  // 색상 업데이트
   useEffect(() => {
     uniforms.current.u_color1.value = emotionColors.color1;
     uniforms.current.u_color2.value = emotionColors.color2;
@@ -162,14 +107,14 @@ const Blob: React.FC<BlobProps> = ({ diaryContent, id, onContextLost }) => {
     uniforms.current.u_colorIntensity3.value = emotionColors.intensity3;
   }, [emotionColors]);
 
-  // 6. 프레임 업데이트
+  // 프레임 업데이트
   useFrame(state => {
     const t = state.clock.getElapsedTime();
     uniforms.current.u_time.value = t;
     uniforms.current.u_intensity.value = 0.2 + 0.1 * Math.sin(t * 0.4);
   });
 
-  if(!isActive){
+  if (!isActive) {
     return null;
   }
 

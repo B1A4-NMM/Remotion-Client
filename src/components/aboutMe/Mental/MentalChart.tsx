@@ -82,6 +82,15 @@ const getBarSize = (barCount: number) => {
 };
 
 const MentalChart = ({ type, data, limit }: MentalChartProps) => {
+  if (!data || data.length === 0) {
+    return (
+      <div className="flex h-48 w-full items-center justify-center rounded-lg border border-dashed">
+        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+          데이터가 없습니다
+        </p>
+      </div>
+    );
+  }
   // 그룹형 차트 여부 판별
   const isGroup = type === "부정" || type === "긍정";
   const groupTypes: MentalType[] = isGroup
@@ -269,53 +278,7 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
     );
   }
 
-  // 기존 단일 감정 차트
-  return (
-    <div className="w-full rounded-lg p-1">
-      <ChartContainer config={chartConfig} className="h-full w-full">
-        <BarChart
-          data={chartData}
-          height={154}
-          margin={{ top: 25, right: 10, left: 0, bottom: -10 }}
-          barCategoryGap="0%"
-          barGap={0}
-        >
-          <defs>
-            <linearGradient id={`gradient-${type}`} x1="0" y1="1" x2="0" y2="0">
-              {isMentalType(type) ? (
-                <>
-                  <stop offset="0%" stopColor={chartConfig[type].color} stopOpacity={0.9} />
-                  <stop offset="100%" stopColor={chartConfig[type].color} stopOpacity={0.4} />
-                </>
-              ) : null}
-            </linearGradient>
-          </defs>
-          <CartesianGrid
-            strokeDasharray="none"
-            stroke="#ffffff"
-            strokeWidth={1}
-            horizontal
-            vertical={false}
-          />
-          <XAxis
-            dataKey="date"
-            tickFormatter={dateFormatter}
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: "#ffffff", fontSize: 12 }}
-            interval={0}
-          />
-          <YAxis domain={[0, maxValue]} hide />
-          <Bar
-            dataKey="value"
-            fill={`url(#gradient-${type})`}
-            radius={[4, 4, 0, 0]}
-            barSize={barSize}
-          />
-        </BarChart>
-      </ChartContainer>
-    </div>
-  );
+  
 };
 
 export default MentalChart;

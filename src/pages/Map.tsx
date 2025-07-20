@@ -141,14 +141,14 @@ const Map: React.FC<MapProps> = _ => {
             const tail = document.createElement("div");
             tail.style.position = "absolute";
             tail.style.top = "100%";
-            tail.style.left = "50%";
-            tail.style.transform = "translateX(-50%)";
-            tail.style.width = "0";
-            tail.style.height = "0";
-            tail.style.borderLeft = "5px solid transparent";
-            tail.style.borderRight = "5px solid transparent";
-            tail.style.borderTop = "5px solid white";
-            tail.style.zIndex = "1";
+            tail.style.left = "100%";
+            tail.style.transform = "translateX(50%)";
+            tail.style.width = "100100";
+            tail.style.height = "100";
+            tail.style.borderLeft = "100px solid";
+            tail.style.borderRight = "100px solid ";
+            tail.style.borderTop = "1000px solid white";
+            tail.style.zIndex = "9999";
 
             // 외부 래퍼
             const outer = document.createElement("div");

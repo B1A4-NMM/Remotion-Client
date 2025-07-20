@@ -1,13 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
-import { Image as LucideImage, Mic, MicOff } from "lucide-react";
 import { usePostDiary } from "@/api/queries/diary/usePostDiary.ts";
-import Loading6 from "../components/Loading/Loading6";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
-import { LocationPicker, LocationPreview } from "@/components/LocationPicker";
+import { LocationPicker } from "@/components/LocationPicker";
 import { useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import FilePreview, { Attachment } from "@/components/diary/FilePreview";
@@ -69,7 +65,7 @@ const Diary = () => {
       setIsSubmitting(false);
       setAnimatedText("");
       setContentLength(0); // 글자 수 리셋
-      setSubmittedDiary(prev => prev ? { ...prev, isAnalysisDone: true } : null); // 분석 완료 신호
+      setSubmittedDiary(prev => (prev ? { ...prev, isAnalysisDone: true } : null)); // 분석 완료 신호
     },
   });
 
@@ -206,9 +202,9 @@ const Diary = () => {
       content: data.content || "",
       writtenDate: date || dayjs().format("YYYY-MM-DD"),
     };
-    
+
     setSubmittedDiary(diaryContent);
-    sessionStorage.setItem('shouldFadeFromLoading', 'true');
+    sessionStorage.setItem("shouldFadeFromLoading", "true");
 
     const formData = new FormData();
 
@@ -255,7 +251,7 @@ const Diary = () => {
   }
 
   // if (isSubmitting) return <Loading6 key={Date.now()} />;
-  if (isSubmitting)  return <Loading7 key={Date.now()}/>;
+  if (isSubmitting) return <Loading7 key={Date.now()} />;
 
   return (
     <>

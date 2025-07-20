@@ -90,11 +90,10 @@ const Home = () => {
   };
 
   const handleToggleBookmark = (diaryId: number) => {
-    const token = localStorage.getItem("accessToken") || "";
     const diary = infiniteDiaries.find(d => d.id === diaryId);
     if (!diary) return;
     patchBookmark.mutate(
-      { token, diaryId, isBookmarked: !diary.bookmarked },
+      { diaryId, isBookmarked: !diary.bookmarked },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["infiniteDiaries"] });

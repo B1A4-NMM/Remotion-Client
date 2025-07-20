@@ -22,9 +22,7 @@ const ResultToggle: React.FC<ResultToggleProps> = ({ view }) => {
       <div className="relative grid grid-cols-2 w-fit max-w-[400px] rounded-full bg-white p-1 shadow-lg">
         <button
           className={`px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 ease-in-out ${
-            view === "record"
-              ? "bg-black text-white border-2 border-white"
-              : "bg-white text-black border-2 border-white"
+            view === "record" ? "bg-black text-white border-white" : "text-black dark:text-white"
           }`}
           onClick={() => handleTabClick("record")}
           aria-label="일기 버튼"
@@ -33,9 +31,7 @@ const ResultToggle: React.FC<ResultToggleProps> = ({ view }) => {
         </button>
         <button
           className={`px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 ease-in-out ${
-            view === "analysis"
-              ? "bg-black text-white border-2 border-white"
-              : "bg-white text-black border-2 border-white"
+            view === "analysis" ? "bg-black text-white border-white" : "text-black dark:text-white"
           }`}
           onClick={() => handleTabClick("analysis")}
           aria-label="분석 버튼"

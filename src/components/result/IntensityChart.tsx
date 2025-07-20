@@ -187,7 +187,7 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
 
   return (
     <div className="mb-6 overflow-visible">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4 px-4">감정 타임라인</h2>
+      <h2 className="text-xl font-semibold text-gray-800 mb-4 px-4">오늘까지 감정 타임라인</h2>
       <div
         className="rounded-2xl shadow-lg p-4 overflow-visible"
         style={{ backgroundColor: "#FFFFFF" }}

@@ -28,8 +28,22 @@ const EmotionalGraph = () => {
   const animatedBranchesRef = useRef<AnimatedBranch[]>([]);
   const startTimeRef = useRef<number>(0);
   const previousTimestampRef = useRef<number>(0);
-  const { data: relationData } = useGetRelation();
 
+  // Replace useGetRelation with separate queries and combine data
+  const relationQueries = useQuery({
+    queryKey: ['relations', 'allTypes'],
+    queryFn: async () => {
+      // Assuming the API supports fetching different types; if not, adjust accordingly.
+      // Here, we simulate fetching all relations by type and combining them.
+      const types = ['type1', 'type2', 'type3'];
+      const results = await Promise.all(types.map(type => fetch(`/api/relations?type=${type}`).then(res => res.json())));
+      // Flatten and combine all relations arrays
+      const combinedRelations = results.flatMap(result => result.relations || []);
+      return combinedRelations;
+    },
+  });
+
+  const relationData = relationQueries.data ? { relations: { relations: relationQueries.data } } : undefined;
 
   const dpr = window.devicePixelRatio || 1;
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });

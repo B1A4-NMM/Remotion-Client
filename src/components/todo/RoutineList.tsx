@@ -1,57 +1,63 @@
-import React from "react";
-import TodoItem from "./TodoItem";
-import { useAddTodo } from "@/api/queries/todo/useAddTodo";
-import { useTodoStore } from "@/store/todoStore";
-import { useDepressionRoutines } from "@/api/queries/routine/useDepressionRoutines";
-
-interface RoutineItemProps {
-  routine: { id: number; content: string };
-}
-
-function RoutineItem({ routine }: RoutineItemProps) {
-  const { mutate: addTodo } = useAddTodo();
-  const setTodos = useTodoStore(state => state.setTodos);
-  const [isAdded, setIsAdded] = React.useState(false);
-
-  const handleAddRoutineAsTodo = () => {
-    if (!isAdded) {
-      const newTodo = {
-        id: Date.now(), // 임시 ID
-        content: routine.content,
-        isComplete: false,
-        date: new Date().toISOString().split('T')[0],
-      };
-      setTodos(prev => [...prev, newTodo]);
-      addTodo({ content: routine.content, date: new Date().toISOString().split('T')[0] });
-      setIsAdded(true);
-    }
-  };
-
-  return (
-    <li
-      className={`flex items-center gap-3 ${isAdded ? '' : 'text-gray-400'}`}
-      onClick={handleAddRoutineAsTodo}
-    >
-      <span className="flex-grow">{routine.content}</span>
-    </li>
-  );
-}
+import { useQuery } from '@tanstack/react-query';
+import { getRoutineByType } from '@/api/services/routine';
+import { Routine } from '@/types/routine';
+import { useAddTodo } from '@/api/queries/todo/useAddTodo';
+import { useTodos } from '@/api/queries/todo/useTodos';
+import { useSelectedDate } from '@/hooks/useSelectedDate';
+import { formatDate } from '@/utils/date';
 
 export default function RoutineList() {
-  const { data: routines, isLoading, isError } = useDepressionRoutines();
+  const { selectedDate } = useSelectedDate();
 
-  if (isLoading) return <div>루틴 불러오는 중...</div>;
-  if (isError) return <div>루틴을 불러오는데 실패했습니다.</div>;
+  const depressionQuery = useQuery<Routine[], Error>({
+    queryKey: ['routines', 'depression'],
+    queryFn: () => getRoutineByType('depression'),
+  });
 
-  if (!routines || routines.length === 0) return <div>등록된 루틴이 없습니다.</div>;
+  const anxietyQuery = useQuery<Routine[], Error>({
+    queryKey: ['routines', 'anxiety'],
+    queryFn: () => getRoutineByType('anxiety'),
+  });
+
+  const stressQuery = useQuery<Routine[], Error>({
+    queryKey: ['routines', 'stress'],
+    queryFn: () => getRoutineByType('stress'),
+  });
+
+  const { data: todos } = useTodos(formatDate(selectedDate));
+  const { mutate: addTodo } = useAddTodo();
+
+  const handleAddTodo = (content: string) => {
+    addTodo({ date: formatDate(selectedDate), content });
+  };
+
+  if (depressionQuery.isLoading || anxietyQuery.isLoading || stressQuery.isLoading)
+    return <div>Loading...</div>;
+  if (depressionQuery.error || anxietyQuery.error || stressQuery.error)
+    return <div>Error: {(depressionQuery.error || anxietyQuery.error || stressQuery.error)?.message}</div>;
+
+  const routines = [
+    ...(depressionQuery.data || []),
+    ...(anxietyQuery.data || []),
+    ...(stressQuery.data || []),
+  ];
+
+  const todoContents = new Set(todos?.map((todo) => todo.content));
 
   return (
-    <div className="overflow-y-auto flex-grow">
-      <ul className="space-y-2">
-        {routines.map(routine => (
-          <RoutineItem key={routine.id} routine={routine} />
-        ))}
-      </ul>
+    <div className="flex flex-col gap-3 mt-3">
+      {routines.map((routine) => {
+        const isAdded = todoContents.has(routine.content);
+        return (
+          <div
+            key={routine.id}
+            className={`cursor-pointer ${isAdded ? 'text-black' : 'text-gray-500'}`}
+            onClick={() => !isAdded && handleAddTodo(routine.content)}
+          >
+            {routine.content}
+          </div>
+        );
+      })}
     </div>
   );
 }

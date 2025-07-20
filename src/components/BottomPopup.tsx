@@ -31,7 +31,7 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
     config: { tension: 300, friction: 30 },
     onRest: {
       height: value => {
-        console.log("🎭 애니메이션 완료:", { value: value.value, isOpen });
+        // console.log("🎭 애니메이션 완료:", { value: value.value, isOpen });
         if (value.value === "0px") {
           setIsInDOM(false);
         }

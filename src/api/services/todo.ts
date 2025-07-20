@@ -17,7 +17,7 @@ export interface ApiTodo {
 // ✅ 목록: year, month
 export const getMonthlyStatus = async (year: string, month: string) => {
   if (import.meta.env.DEV) {
-    console.log("📤 getMonthlyStatus called with:", { year, month });
+    // console.log("📤 getMonthlyStatus called with:", { year, month });
   }
   const response = await api.get<
     Array<{
@@ -30,24 +30,24 @@ export const getMonthlyStatus = async (year: string, month: string) => {
     params: { year, month },
   });
 
-  if (import.meta.env.DEV) {
-    console.log("📥 getMonthlyStatus response.data:", response.data);
-  }
+  // if (import.meta.env.DEV) {
+  //   console.log("📥 getMonthlyStatus response.data:", response.data);
+  // }
   return response.data;
 };
 
 // ✅ 목록: year, month, date
 export const getTodosByDate = async (date: string) => {
-  if (import.meta.env.DEV) {
-    console.log("📤 getTodosByDate called with:", { date });
-  }
+  // if (import.meta.env.DEV) {
+  //   console.log("📤 getTodosByDate called with:", { date });
+  // }
   const response = await api.get<ApiTodo[]>("/todos/calendar/date", {
     params: { date },
   });
 
-  if (import.meta.env.DEV) {
-    console.log("📥 getTodosByDate response.data:", response.data);
-  }
+  // if (import.meta.env.DEV) {
+  //   console.log("📥 getTodosByDate response.data:", response.data);
+  // }
   return response.data;
 };
 
@@ -60,18 +60,18 @@ export const createTodo = async ({
   date: string;
 }) => {
   try {
-    if (import.meta.env.DEV) {
-      console.log("✨ createTodo called with:", { content, date });
-    }
+    // if (import.meta.env.DEV) {
+    //   console.log("✨ createTodo called with:", { content, date });
+    // }
 
     const response = await api.post<ApiTodo>("/todos/calendar", {
       content,
       date,
     });
 
-    if (import.meta.env.DEV) {
-      console.log("✨ createTodo response.data:", response.data);
-    }
+    // if (import.meta.env.DEV) {
+    //   console.log("✨ createTodo response.data:", response.data);
+    // }
 
     return response.data;
   } catch (error) {
@@ -86,14 +86,14 @@ export const updateTodoContent = async (
   data: Partial<Omit<ApiTodo, "id">>,
 ) => {
   try {
-    if (import.meta.env.DEV) {
-      console.log("🐛 updateTodo called with:", { id, data });
-    }
+    // if (import.meta.env.DEV) {
+    //   console.log("🐛 updateTodo called with:", { id, data });
+    // }
     const response = await api.patch<ApiTodo>(`/todos/calendar/content/${id}`, data);
 
-    if (import.meta.env.DEV) {
-      console.log("🐛 updateTodo response.data:", response.data);
-    }
+    // if (import.meta.env.DEV) {
+    //   console.log("🐛 updateTodo response.data:", response.data);
+    // }
 
     return response.data;
   } catch (error) {
@@ -105,16 +105,16 @@ export const updateTodoContent = async (
 // ✅ 수정 (날짜 변경)
 export const updateTodoDate = async (id: number, date: string) => {
   try {
-    if (import.meta.env.DEV) {
-      console.log("🗓️ updateTodoDate called with:", { id, date });
-    }
+    // if (import.meta.env.DEV) {
+    //   console.log("🗓️ updateTodoDate called with:", { id, date });
+    // }
     const response = await api.patch<ApiTodo>(`/todos/calendar/date/${id}`, {
       date,
     });
 
-    if (import.meta.env.DEV) {
-      console.log("🗓️ updateTodoDate response.data:", response.data);
-    }
+    // if (import.meta.env.DEV) {
+    //   console.log("🗓️ updateTodoDate response.data:", response.data);
+    // }
 
     return response.data;
   } catch (error) {
@@ -126,14 +126,14 @@ export const updateTodoDate = async (id: number, date: string) => {
 // ✅ 토글 (isComplete)
 export const toggleTodo = async (id: number) => {
   try {
-    if (import.meta.env.DEV) {
-      console.log("🔄 toggleTodo called with:", { id });
-    }
+    // if (import.meta.env.DEV) {
+    //   console.log("🔄 toggleTodo called with:", { id });
+    // }
     const response = await api.patch<ApiTodo>(`/todos/calendar/${id}`);
 
-    if (import.meta.env.DEV) {
-      console.log("🔄 toggleTodo response.data:", response.data);
-    }
+    // if (import.meta.env.DEV) {
+    //   console.log("🔄 toggleTodo response.data:", response.data);
+    // }
 
     return response.data;
   } catch (error) {
@@ -144,14 +144,19 @@ export const toggleTodo = async (id: number) => {
 
 // ✅ 삭제
 export const deleteTodo = async (id: number) => {
-  if (import.meta.env.DEV) {
-    console.log("🗑️ deleteTodo called with:", { id });
-  }
-  const response = await api.delete(`/todos/calendar/${id}`);
+  try {
+    // if (import.meta.env.DEV) {
+    //   console.log("🗑️ deleteTodo called with:", { id });
+    // }
+    const response = await api.delete(`/todos/calendar/${id}`);
 
-  if (import.meta.env.DEV) {
-    console.log("🗑️ deleteTodo response.data:", response.data);
-  }
+    // if (import.meta.env.DEV) {
+    //   console.log("🗑️ deleteTodo response.data:", response.data);
+    // }
 
-  return response.data;
+    return response.data;
+  } catch (error) {
+    console.error("❌ deleteTodo error:", error);
+    throw error;
+  }
 };

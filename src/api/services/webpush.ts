@@ -32,6 +32,5 @@ export const webpushStatus = async (endpoint: string): Promise<boolean> => {
   const response = await api.get("/webpush/status", {
     params: { endpoint },
   });
-  console.log(response.data);
   return response.data;
 };

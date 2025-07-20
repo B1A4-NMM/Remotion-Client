@@ -104,9 +104,9 @@ const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
   const targetNames = targets.join(", ");
 
   return (
-    <div className="flex flex-col items-center text-center space-y-2 mb-4 ">
+    <div className="flex flex-col items-center text-center space-y-[16px] mb-4 ">
       <p className="text-sm text-gray-500">하루의 감정</p>
-      <div>
+      <div className="w-[130px] h-[130px]">
         <Canvas camera={{ position: [0, 0, 10], fov: 30 }}>
           <Blob diaryContent={{ emotions }} />
         </Canvas>
@@ -119,7 +119,7 @@ const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
       )}
 
       {targetNames && (
-        <p className="text-base text-gray-500 line-clamp-2 leading-relaxed m-7">{targetNames}</p>
+        <p className="text-lg text-gray-500 line-clamp-2 leading-relaxed m-7">{targetNames}</p>
       )}
     </div>
   );

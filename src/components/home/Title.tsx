@@ -23,17 +23,23 @@ const Title: React.FC<TitleProps> = ({
     (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
   return (
     <>
-      <div className="w-full relative">
+      <div className={`w-full relative ${isDark ? "bg-[#181718]" : "bg-[#FAF6F4]"}`}>
         {/* 메인 헤더 */}
         <div className="w-full">
           <div className="flex items-center justify-between px-4 pt-8">
-            <h1 className="text-3xl font-bold text-foreground">하루 기록</h1>
+            <h1 className={`text-3xl font-bold ${isDark ? "text-white" : "text-foreground"}`}>
+              하루 기록
+            </h1>
 
             {/* 액션 버튼들 */}
             <div className="flex items-center gap-2">
               {/* 메뉴 버튼 */}
               <button
-                className="p-2 rounded-full text-foreground border border-border hover:bg-secondary focus:ring-2 focus:ring-primary transition-colors box-shadow shadow-xl"
+                className={`p-2 rounded-full border transition-colors box-shadow shadow-xl ${
+                  isDark
+                    ? "text-white border-gray-600 hover:bg-gray-800 focus:ring-gray-500"
+                    : "text-foreground border-border hover:bg-secondary focus:ring-primary"
+                }`}
                 aria-label="메뉴"
                 onClick={() => setSelectedTab("list")}
               >
@@ -43,7 +49,15 @@ const Title: React.FC<TitleProps> = ({
                   viewBox="0 0 22 22"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
-                  className={selectedTab === "list" ? "text-black" : "text-gray-400"}
+                  className={
+                    selectedTab === "list"
+                      ? isDark
+                        ? "text-white"
+                        : "text-black"
+                      : isDark
+                        ? "text-gray-400"
+                        : "text-gray-400"
+                  }
                 >
                   <path
                     fillRule="evenodd"
@@ -68,12 +82,16 @@ const Title: React.FC<TitleProps> = ({
 
               {/* 위치 버튼 */}
               <button
-                className="p-2 rounded-full text-foreground border border-border hover:bg-secondary focus:ring-2 focus:ring-primary transition-colors box-shadow shadow-xl"
+                className={`p-2 rounded-full border transition-colors box-shadow shadow-xl ${
+                  isDark
+                    ? "text-white border-gray-600 hover:bg-gray-800 focus:ring-gray-500"
+                    : "text-foreground border-border hover:bg-secondary focus:ring-primary"
+                }`}
                 aria-label="위치"
                 onClick={() => setSelectedTab("map")}
               >
                 <svg
-                  className={`w-5 h-5 ${selectedTab === "map" ? "text-black" : "text-gray-400"}`}
+                  className={`w-5 h-5 ${selectedTab === "map" ? (isDark ? "text-white" : "text-black") : isDark ? "text-gray-400" : "text-gray-400"}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -94,12 +112,16 @@ const Title: React.FC<TitleProps> = ({
               </button>
               {/* 검색 버튼 */}
               <button
-                className="p-2 rounded-full text-foreground border border-border hover:bg-secondary focus:ring-2 focus:ring-primary transition-colors box-shadow shadow-xl"
+                className={`p-2 rounded-full border transition-colors box-shadow shadow-xl ${
+                  isDark
+                    ? "text-white border-gray-600 hover:bg-gray-800 focus:ring-gray-500"
+                    : "text-foreground border-border hover:bg-secondary focus:ring-primary"
+                }`}
                 aria-label="검색"
                 onClick={() => navigate("/search")}
               >
                 <svg
-                  className={`w-5 h-5 ${selectedTab === "search" ? "text-black" : "text-gray-400"}`}
+                  className={`w-5 h-5 ${selectedTab === "search" ? (isDark ? "text-white" : "text-black") : isDark ? "text-gray-400" : "text-gray-400"}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

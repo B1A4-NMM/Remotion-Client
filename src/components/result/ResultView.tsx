@@ -9,11 +9,14 @@ import Todos from "./Todo";
 import WarningTestBox from "../WariningTestBox";
 import TestModal from "../TestModal";
 import PeopleCard from "../home/PeopleCard";
+import ActivityAnalysisCard from "../home/ActivityAnalysisCard";
 import IntensityChart from "./IntensityChart";
 import BrainEmotionMap from "./BrainEmotionMap";
 import TodoPreviewCard from "./TodoPreviewCard";
 import ConflictAnalysisCard from "./ConflictAnalysisCard";
 import RoutineRecommendCard from "./RoutineRecommendCard";
+import RelationshipChangeCard from "./RelationshipChangeCard";
+import NegativeEmotionCard from "./NegativeEmotionCard";
 
 interface ResultViewProps {
   diaryContent: any | null;
@@ -53,13 +56,31 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
 
   const activityAnalysis = diaryContent?.analysis?.activity_analysis ?? [];
 
-  // 사람별 카드 데이터로 변환
-  const peopleCardsData = activityAnalysis.flatMap((activityItem: any) =>
-    (activityItem.peoples || []).map((person: any) => ({
-      activity: activityItem.activity,
-      person, // 해당 사람 객체 전체 전달
-    }))
-  );
+  // activity_analysis 전체를 ActivityAnalysisCard에 전달
+  const peopleCardsData = {
+    peoples: activityAnalysis.flatMap((activityItem: any) =>
+      (activityItem.peoples || []).map((person: any) => ({
+        name: person.name,
+        feel: person.interactions.emotion.map((emotion: string, index: number) => ({
+          emotionType: emotion,
+          intensity: person.interactions.emotion_intensity[index] || 5,
+        })),
+        count: 1,
+      }))
+    ),
+    selfEmotion: activityAnalysis.flatMap((activityItem: any) =>
+      (activityItem.self_emotions?.emotion || []).map((emotion: string, index: number) => ({
+        emotionType: emotion,
+        intensity: activityItem.self_emotions?.emotion_intensity[index] || 5,
+      }))
+    ),
+    stateEmotion: activityAnalysis.flatMap((activityItem: any) =>
+      (activityItem.state_emotions?.emotion || []).map((emotion: string, index: number) => ({
+        emotionType: emotion,
+        intensity: activityItem.state_emotions?.emotion_intensity[index] || 5,
+      }))
+    ),
+  };
 
   const todos = diaryContent?.analysis?.todos ?? [];
 
@@ -74,16 +95,7 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
 
   // problem 중 하나라도 null 값이 있는지 확인
   const hasValidProblems = allProblems.some(
-    (problem: any) =>
-      problem &&
-      problem.situation &&
-      problem.approach &&
-      problem.outcome &&
-      problem.conflict_response_code &&
-      problem.situation !== "None" &&
-      problem.approach !== "None" &&
-      problem.outcome !== "None" &&
-      problem.conflict_response_code !== "None"
+    (problem: any) => problem && problem.situation && problem.situation !== "None"
   );
 
   // beforeDiaryScores 데이터 추출
@@ -92,11 +104,18 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
   // diaryId 추출
   const diaryId = diaryContent?.id;
 
+  // people 데이터 추출
+  const people = diaryContent?.people ?? [];
+
+  // 변화가 있는 사람들만 필터링
+  const peopleWithChanges = people.filter((person: any) => person.changeScore !== 0);
+
   // beforeDiaryScores 데이터 콘솔에 출력
   console.log("beforeDiaryScores 데이터:", beforeDiaryScores);
   console.log("beforeDiaryScores 길이:", beforeDiaryScores.length);
   console.log("diaryContent?.beforeDiaryScores:", diaryContent?.beforeDiaryScores);
   console.log("diaryId:", diaryId);
+  console.log("people 데이터:", people);
 
   const convertWarningToTestType = (warning: "stress" | "anxiety" | "depression") => {
     switch (warning) {
@@ -108,6 +127,65 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
         return "stress";
     }
   };
+
+  // 경고 데이터 확인
+  const getWarningType = () => {
+    if (!diaryContent) return null;
+    const { anxietyWarning, depressionWarning, stressWarning } = diaryContent;
+
+    // 우선순위: depression > anxiety > stress
+    if (depressionWarning) return "depression";
+    if (anxietyWarning) return "anxiety";
+    if (stressWarning) return "stress";
+    return null;
+  };
+
+  const warningType = getWarningType();
+
+  const handleWarningClick = (type: "stress" | "anxiety" | "depression") => {
+    setTestType(type);
+  };
+
+  // 부정적인 감정 감지 함수
+  const getNegativeEmotionType = () => {
+    if (!diaryContent) return null;
+
+    // 감정 분석 데이터에서 부정적인 감정 확인
+    const emotions = activityAnalysis.flatMap((activity: any) => [
+      ...(activity.self_emotions?.emotion || []),
+      ...(activity.state_emotions?.emotion || []),
+    ]);
+
+    // 부정적인 감정 키워드 매핑
+    const negativeEmotionMap: Record<
+      string,
+      "stress" | "anxiety" | "depression" | "sadness" | "anger"
+    > = {
+      스트레스: "stress",
+      불안: "anxiety",
+      우울: "depression",
+      슬픔: "sadness",
+      화: "anger",
+      분노: "anger",
+      걱정: "anxiety",
+      짜증: "anger",
+      우울함: "depression",
+      불안함: "anxiety",
+    };
+
+    // 감지된 부정적인 감정 찾기
+    for (const emotion of emotions) {
+      for (const [keyword, type] of Object.entries(negativeEmotionMap)) {
+        if (emotion.includes(keyword)) {
+          return type;
+        }
+      }
+    }
+
+    return null;
+  };
+
+  const negativeEmotionType = getNegativeEmotionType();
 
   if (isLoading) {
     // 스켈레톤 로딩 UI
@@ -127,21 +205,26 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
     );
   }
 
-  // Pass peopleCardsData to PeopleCard
+  // Pass activityAnalysis to ActivityAnalysisCard
   return (
     <div className="px-4">
-      <PeopleCard data={peopleCardsData} />
-      <BrainEmotionMap activityAnalysis={activityAnalysis} />
-
+      <ActivityAnalysisCard data={activityAnalysis} />
+      {/* <BrainEmotionMap activityAnalysis={activityAnalysis} /> */}
+      {peopleWithChanges.length > 0 && (
+        <>
+          <RelationshipChangeCard people={peopleWithChanges} />
+        </>
+      )}
       {hasValidProblems && (
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mt-[60px] mb-[20px] px-4">
-            마음 사건 리포트
+          <h2 className="text-xl font-semibold text-gray-800 mt-[30px] mb-[20px] px-4">
+            오늘의 사건 리포트
           </h2>
 
           <ConflictAnalysisCard conflicts={allProblems} />
         </div>
       )}
+
       <IntensityChart scores={beforeDiaryScores} diaryId={diaryId} />
       {recommendRoutines && recommendRoutines.content && (
         <div className="mb-6">
@@ -153,7 +236,8 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
           </div>
         </div>
       )}
-
+      {warningType && <WarningTestBox type={warningType} onClick={handleWarningClick} />}
+      {negativeEmotionType && <NegativeEmotionCard emotionType={negativeEmotionType} />}
       {reflectionTodos.length > 0 && (
         <div className=" mb-6">
           {/* <h2 className="text-xl font-semibold text-gray-800 mt-[60px] mb-[20px]  px-4">

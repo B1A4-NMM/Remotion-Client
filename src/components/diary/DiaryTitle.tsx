@@ -21,7 +21,7 @@ const DiaryTitle: React.FC<DiaryTitleProps> = ({ selectedDate, onCalendarClick }
   return (
     <div className="relative pt-[32px] left-0 w-full ">
       <div className="flex items-center justify-between px-4 pb-[20px]">
-        <h1 className="text-3xl font-bold text-gray-900 ml-2">{formatDate(selectedDate)}</h1>
+        <h1 className="text-2xl font-bold text-gray-900 ml-2">{formatDate(selectedDate)}</h1>
 
         {/* 액션 버튼들 */}
         <div className="flex items-center gap-2">
@@ -143,7 +143,7 @@ const DiaryTitle: React.FC<DiaryTitleProps> = ({ selectedDate, onCalendarClick }
         </div>
       </div>
 
-      <hr className="border-gray-300 mt-2 mr-5 ml-5"></hr>
+      <hr className="border-gray-300 mr-5 ml-5"></hr>
     </div>
   );
 };

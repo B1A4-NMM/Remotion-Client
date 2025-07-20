@@ -19,7 +19,6 @@ const Webpush = () => {
   // ✅ 더 자세한 푸시 지원 여부 확인
   useEffect(() => {
     const checkPushSupport = async () => {
-      console.log('=== Push Support 체크 시작 ===');
       
       // 기본 API 체크
       const basicChecks = {
@@ -30,12 +29,10 @@ const Webpush = () => {
         hasNotification: 'Notification' in window,
       };
       
-      console.log('Basic checks:', basicChecks);
       
       const basicSupport = Object.values(basicChecks).every(Boolean);
       
       if (!basicSupport) {
-        console.log('❌ Basic support failed');
         setIsSupported(false);
         setSupportCheckComplete(true);
         setLoading(false);
@@ -44,15 +41,11 @@ const Webpush = () => {
 
       // Service Worker 등록 상태 체크
       try {
-        console.log('Service Worker 상태 확인 중...');
         const registration = await navigator.serviceWorker.getRegistration();
-        console.log('SW Registration:', registration);
         
         if (!registration) {
-          console.log('⚠️ Service Worker 등록되지 않음 - 등록 시도');
           try {
             await navigator.serviceWorker.register('/sw.js');
-            console.log('✅ Service Worker 등록 성공');
           } catch (error) {
             console.error('❌ Service Worker 등록 실패:', error);
           }
@@ -62,10 +55,8 @@ const Webpush = () => {
         const testRegistration = await navigator.serviceWorker.ready;
         const hasValidPushManager = testRegistration.pushManager !== undefined;
         
-        console.log('PushManager 테스트:', hasValidPushManager);
         
         setIsSupported(hasValidPushManager);
-        console.log('✅ Push support:', hasValidPushManager);
         
       } catch (error) {
         console.error('❌ Service Worker 체크 실패:', error);
@@ -84,18 +75,15 @@ const Webpush = () => {
 
     const checkSubscriptionStatus = async () => {
       try {
-        console.log('구독 상태 확인 시작...');
         const registration = await navigator.serviceWorker.ready;
         const browserSub = await registration.pushManager.getSubscription();
         
-        console.log('Browser subscription:', browserSub);
         setSubscription(browserSub);
         
         if (browserSub) {
           try {
             const serverStatus = await webpushStatus(browserSub.endpoint);
             setIsSubscribed(serverStatus);
-            console.log('Server status:', serverStatus);
           } catch (error) {
             console.error("서버 상태 확인 실패:", error);
             setIsSubscribed(true);

@@ -90,7 +90,7 @@ export default function Mypage() {
         </div>
 
         {/* 알림 5개 미리보기 카드*/}
-        <NotificationPreview/>
+        <NotificationPreview />
 
         {/* 계정 정보 카드 */}
         <div className="bg-card rounded-2xl shadow-lg p-6 mb-6 border">
@@ -166,7 +166,7 @@ export default function Mypage() {
           </p>
         </div>
 
-        <Webpush/>
+        <Webpush />
 
         {/* 로그아웃 버튼 */}
         <button

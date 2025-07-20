@@ -23,7 +23,10 @@ export function highlightEmotions(emotions: string[]): React.ReactNode {
 // 활동 하이라이트 함수 (회색 박스)
 export function highlightActivity(activity: string): React.ReactNode {
   return (
-    <span className="inline-block px-2 py-1 rounded-md text-base font-semibold mr-1 mb-1 bg-gray-100 text-gray-800">
+    <span
+      className="inline-block px-2 py-1 rounded-md text-base font-semibold mr-1 mb-1 bg-gray-100"
+      style={{ color: "#000" }}
+    >
       {activity}
     </span>
   );

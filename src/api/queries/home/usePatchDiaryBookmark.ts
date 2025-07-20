@@ -7,15 +7,8 @@ export const usePatchDiaryBookmark = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      token,
-      diaryId,
-      isBookmarked,
-    }: {
-      token: string;
-      diaryId: number;
-      isBookmarked: boolean;
-    }) => patchDiaryBookmark(token, diaryId, isBookmarked),
+    mutationFn: ({ diaryId, isBookmarked }: { diaryId: number; isBookmarked: boolean }) =>
+      patchDiaryBookmark(diaryId, isBookmarked),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["diaries"] });
       toast.success("북마크 상태가 변경되었습니다.", {

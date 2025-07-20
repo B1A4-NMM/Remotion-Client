@@ -41,7 +41,7 @@ const RoutineRecommendCard: React.FC<RoutineRecommendCardProps> = ({
     const emotionInfo = getEmotionTypeDisplay(routine.routineType);
     return {
       greeting: "💌 안녕! 너에게 전하고 싶은 작은 메모야",
-      fullMessage: `요즘 ${emotionInfo.name}한 마음이 들 땐 잠깐 ${routine.content}하는 게 정말 도움이 되더라. 예전에 너도 그렇게 했을 때, 마음이 한결 가벼워졌던 거 기억나?`,
+      fullMessage: `요즘 ${emotionInfo.name}한 마음이 들 땐 잠깐 ${routine.content}하는 게 정말 도움이 되더라. <br/> 예전에 너도 그렇게 했을 때, 마음이 한결 가벼워졌던 거 기억나?`,
       suggestion: "오늘도 한 번 그렇게 해보면 어때? ",
       signature: "— 너를 늘 생각하는 마음으로",
       content: routine.content,
@@ -66,12 +66,14 @@ const RoutineRecommendCard: React.FC<RoutineRecommendCardProps> = ({
             >
               {/* 상단 인사말 */}
               <div className="text-center mb-4">
-                <p className="text-gray-700 text-base">{message.greeting}</p>
+                <p className="text-base" style={{ color: "#000" }}>
+                  {message.greeting}
+                </p>
               </div>
 
               {/* 메인 메시지 - 자연스러운 글 */}
               <div className="text-center space-y-4 mb-5">
-                <p className="text-gray-800 leading-relaxed text-base">
+                <div className="leading-relaxed text-base" style={{ color: "#000" }}>
                   {message.fullMessage.split(message.content).map((part, index) => {
                     // emotionInfo.name을 찾아서 파란색으로 강조
                     const emotionInfo = getEmotionTypeDisplay(routine.routineType);
@@ -81,16 +83,27 @@ const RoutineRecommendCard: React.FC<RoutineRecommendCardProps> = ({
                       <span key={index}>
                         {parts.map((subPart, subIndex) => (
                           <span key={subIndex}>
-                            {subPart}
+                            {subPart.split("<br/>").map((text: string, brIndex: number) => (
+                              <span key={brIndex}>
+                                {text}
+                                {brIndex < subPart.split("<br/>").length - 1 && <br />}
+                              </span>
+                            ))}
                             {subIndex < parts.length - 1 && (
-                              <span className="bg-blue-200 px-1 py-0.5 rounded-sm font-medium text-black-900">
+                              <span
+                                className="bg-blue-200 px-1 py-0.5 rounded-sm font-medium"
+                                style={{ color: "#000" }}
+                              >
                                 {emotionInfo.name}
                               </span>
                             )}
                           </span>
                         ))}
                         {index < message.fullMessage.split(message.content).length - 1 && (
-                          <span className="bg-yellow-300 px-1 py-0.5 rounded-sm font-medium relative">
+                          <span
+                            className="bg-yellow-300 px-1 py-0.5 rounded-sm font-medium relative"
+                            style={{ color: "#000" }}
+                          >
                             {message.content}
                             <span className="absolute bottom-0 left-0 w-full h-0.5 bg-yellow-400"></span>
                           </span>
@@ -98,14 +111,16 @@ const RoutineRecommendCard: React.FC<RoutineRecommendCardProps> = ({
                       </span>
                     );
                   })}
-                </p>
+                </div>
 
-                <p className="text-gray-700 font-medium">{message.suggestion}</p>
+                <p className="font-medium" style={{ color: "#000" }}>
+                  {message.suggestion}
+                </p>
               </div>
 
               {/* 서명 */}
               <div className="text-right">
-                <p className="text-gray-600 text-sm italic transform rotate-1">
+                <p className="text-sm italic transform rotate-1" style={{ color: "#000" }}>
                   {message.signature}
                 </p>
               </div>

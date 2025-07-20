@@ -71,10 +71,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="flex gap-4 items-center rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] mb-4 py-[14px] px-[20px]">
+              <div className="flex gap-4 items-center rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] mb-4 py-[14px] px-[20px]">
                 <div className="w-[70px] h-[70px] flex items-center justify-center rounded-full overflow-hidden">
                   <VirtualizedBlobCard
                     key={mappedDiary.id}
@@ -159,13 +159,13 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-3 gap-2 rounded-2xl mb-2" style={{ height: "120px" }}>
+              <div className="grid grid-cols-3 gap-2 rounded-lg mb-2" style={{ height: "120px" }}>
                 {/* Blob */}
                 <div className="col-span-1 h-full">
-                  <div className="h-full w-full max-h-[120px] rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
+                  <div className="h-full w-full max-h-[120px] rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
                     {/* 감정 요약 (위) */}
                     <div className="text-xs text-[#85848F] font-medium text-center ">
                       {mappedDiary.emotions && mappedDiary.emotions.length > 0
@@ -259,13 +259,13 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-3 gap-2 rounded-2xl mb-2" style={{ height: "130px" }}>
+              <div className="grid grid-cols-3 gap-2 rounded-lg mb-2" style={{ height: "130px" }}>
                 {/* Blob */}
                 <div className="col-span-1 h-full">
-                  <div className="h-full w-full max-h-[120px] rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
+                  <div className="h-full w-full max-h-[120px] rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
                     {/* 감정 요약 (위) */}
                     <div className="text-xs text-[#85848F] font-medium text-center ">
                       {mappedDiary.emotions && mappedDiary.emotions.length > 0
@@ -351,13 +351,13 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-3 gap-2 rounded-2xl mb-2" style={{ height: "120px" }}>
+              <div className="grid grid-cols-3 gap-2 rounded-lg mb-2" style={{ height: "120px" }}>
                 {/* Blob */}
                 <div className="col-span-1 h-full">
-                  <div className="h-full w-full max-h-[120px] rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
+                  <div className="h-full w-full max-h-[120px] rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
                     {/* 감정 요약 (위) */}
                     <div className="text-xs text-[#85848F] font-medium text-center ">
                       {mappedDiary.emotions && mappedDiary.emotions.length > 0
@@ -445,13 +445,13 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-3 gap-2 rounded-2xl mb-2" style={{ height: "120px" }}>
+              <div className="grid grid-cols-3 gap-2 rounded-lg mb-2" style={{ height: "120px" }}>
                 {/* Blob */}
                 <div className="col-span-1 h-full">
-                  <div className="h-full w-full max-h-[120px] rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
+                  <div className="h-full w-full max-h-[120px] rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
                     {/* 감정 요약 (위) */}
                     <div className="text-xs text-[#85848F] font-medium text-center ">
                       {mappedDiary.emotions && mappedDiary.emotions.length > 0
@@ -533,7 +533,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="flex items-center justify-center h-24 text-gray-400">

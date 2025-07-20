@@ -27,9 +27,11 @@ const RelationshipChangeCard: React.FC<RelationshipChangeCardProps> = ({ people 
                 오늘 일기로 <br />{" "}
                 {increased.map((person, index) => (
                   <span key={person.name}>
-                    <span className="text-black font-semibold">{person.name}</span>
+                    <span className="font-semibold" style={{ color: "#000" }}>
+                      {person.name}
+                    </span>
                     와의 친밀도가{" "}
-                    <span className="text-green-600 font-medium">
+                    <span className="text-green-600 dark:text-green-300 font-medium">
                       {person.changeScore.toFixed(1)}점{" "}
                     </span>
                     올랐
@@ -47,7 +49,9 @@ const RelationshipChangeCard: React.FC<RelationshipChangeCardProps> = ({ people 
                 {increased.length > 0 ? "" : "오늘 일기로 <br/> "}
                 {decreased.map((person, index) => (
                   <span key={person.name}>
-                    <span className="text-black font-semibold">{person.name}</span>
+                    <span className="font-semibold" style={{ color: "#000" }}>
+                      {person.name}
+                    </span>
                     와의 친밀도가{" "}
                     <span className="text-red-600 font-medium">
                       {Math.abs(person.changeScore).toFixed(1)}점{" "}
@@ -60,7 +64,7 @@ const RelationshipChangeCard: React.FC<RelationshipChangeCardProps> = ({ people 
               </p>
             )}
 
-            <p className="text-sm text-gray-500 mt-2 font-semibold">
+            <p style={{ color: "#000" }} className="text-sm mt-2 font-semibold">
               카드를 클릭해서 관계 변화를 확인하세요
             </p>
           </div>

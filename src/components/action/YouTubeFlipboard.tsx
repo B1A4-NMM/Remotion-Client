@@ -130,7 +130,6 @@ const YouTubeFlipboard: React.FC<YouTubeFlipboardProps> = ({
 
   // ✅ 플레이어 이벤트 핸들러들 (메모이제이션)
   const onPlayerReady = useCallback((event: any) => {
-    console.log('✅ 플레이어 준비됨');
     setIsPlayerReady(true);
     playerInstanceRef.current = event.target;
     

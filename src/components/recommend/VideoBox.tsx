@@ -30,7 +30,6 @@ const YouTubeBoard: React.FC<YouTubeBoardProps> = ({}) => {
     theme === "dark" ||
     (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
-  console.log("API Response:", data);
 
   useEffect(() => {
     const handleGlobalMouseMove = (e: MouseEvent) => {
@@ -93,7 +92,6 @@ const YouTubeBoard: React.FC<YouTubeBoardProps> = ({}) => {
   };
 
   const videos = getVideos();
-  console.log("Processed Videos:", videos);
 
   // YouTube 썸네일 URL 생성
   const getThumbnailUrl = (videoId: string) => {
@@ -152,7 +150,6 @@ const YouTubeBoard: React.FC<YouTubeBoardProps> = ({}) => {
     // sessionStorage에 전체 데이터 저장
     sessionStorage.setItem("videoData", JSON.stringify(navigationData));
     
-    console.log("Navigation Data:", navigationData);
     
     navigate("/video");
   };

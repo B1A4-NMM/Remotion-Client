@@ -147,7 +147,7 @@ const Home = () => {
 
   return (
     <div className="flex flex-col  text-foreground min-h-screen">
-      <div className="sticky top-0 z-50  rounded-b-2xl bg-[#F5F5F5] dark:bg-[#181718] dark:text-white pb-8">
+      <div className="sticky top-0 z-50  rounded-b-2xl bg-[#FAF6F4] dark:bg-[#181718] dark:text-white pb-8">
         <Title
           emotionCountByMonth={emotionCountByMonth}
           totalDiaryCount={totalDiaryCount}

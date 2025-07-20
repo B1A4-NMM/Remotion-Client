@@ -32,7 +32,6 @@ const Webpush = () => {
           // 브라우저에 구독이 있으면 서버 상태 확인
           try {
             const serverStatus = await webpushStatus(browserSub.endpoint);
-            console.log("서버 상태:", serverStatus);
             setIsSubscribed(serverStatus);
           } catch (error) {
             console.error("서버 상태 확인 실패:", error);

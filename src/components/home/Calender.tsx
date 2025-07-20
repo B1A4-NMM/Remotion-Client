@@ -69,6 +69,20 @@ interface MonthlyCalendarProps {
       }
     };
 
+    // useLayoutEffect(() => {
+    //   if (selectedDate) {
+    //     const newSelected = dayjs(selectedDate);
+    //     setInternalSelected(newSelected);
+    
+    //     const newMonth = newSelected.startOf('month');
+    //     setCurrentMonth(newMonth);
+    
+    //     requestAnimationFrame(() => {
+    //       centerSelectedDateInMonth(newMonth, newSelected);
+    //     });
+    //   }
+    // }, [selectedDate]);
+
     useLayoutEffect(() => {
       if (internalSelected && internalSelected.isSame(currentMonth, 'month')) {
         const idx = getMonthDates(currentMonth).findIndex(d =>

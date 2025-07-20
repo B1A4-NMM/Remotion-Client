@@ -20,34 +20,29 @@ const API_TO_DISPLAY_LABEL_MAP: Record<string, string> = {
 const Strength = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  console.log("selectedCategory", selectedCategory);
-
-  const token = localStorage.getItem("accessToken") || "";
-
   // 현재 날짜 정보
   const now = dayjs();
-  const currentYear = now.year();
-  const currentMonth = now.month() + 1; // dayjs month는 0부터 시작하므로 +1
+  const year = now.year();
+  const currentMonth = now.month() + 1;
 
   // 지난 달 정보
   const lastMonthDate = now.subtract(1, "month");
-  const lastYear = lastMonthDate.year();
   const lastMonth = lastMonthDate.month() + 1;
 
   // API 호출
-  const { 
-     data: currentData, 
-     isLoading: currentLoading, 
-     error: currentError 
-   } = useGetStrengthPeriod(token, "2024", "09");
- 
-   const { 
-     data: lastData, 
-     isLoading: lastLoading, 
-     error: lastError 
-   } = useGetStrengthPeriod(token, "2024", "08");
- 
+  const {
+    data: currentData,
+    isLoading: currentLoading,
+    error: currentError,
+  } = useGetStrengthPeriod(year.toString(), currentMonth.toString());
 
+  const {
+    data: lastData,
+    isLoading: lastLoading,
+    error: lastError,
+  } = useGetStrengthPeriod(year.toString(), lastMonth.toString());
+
+  
   // 로딩 상태 체크
   if (currentLoading || lastLoading) {
     return <div>로딩 중...</div>;
@@ -59,7 +54,6 @@ const Strength = () => {
   }
 
   // API label → Display label 변환
-  const apiToDisplay = (apiLabel: string) => API_TO_DISPLAY_LABEL_MAP[apiLabel];
   const displayToApi = (displayLabel: string) =>
     Object.entries(API_TO_DISPLAY_LABEL_MAP).find(([, d]) => d === displayLabel)?.[0] || "";
 
@@ -73,9 +67,10 @@ const Strength = () => {
       ? (currentData.detailCount[displayToApi(selectedCategory)] ?? null)
       : null;
 
+
   return (
     <div className="mb-10">
-      <Title name={"Strength"} isBackActive={true} />
+      <Title name={"Strength"} isBackActive={true} back="/analysis" />
       <div className="pl-3 pr-3">
         <div className="text-gray-400 text-right mb-6">
           <p>
@@ -84,20 +79,22 @@ const Strength = () => {
           </p>
           <p>
             {" "}
-            VIA 강점은 타고난 재능뿐만 아니라 노력으로 개발된 역량까지 포함하며, 6가지 핵심 덕목 아래
-            24가지 성격 강점으로 분류됩니다.{" "}
+            VIA 강점은 타고난 재능뿐만 아니라 노력으로 개발된 역량까지 포함하며, 6가지 핵심 덕목
+            아래 24가지 성격 강점으로 분류됩니다.{" "}
           </p>
         </div>
 
         <div className="bg-white rounded-3xl shadow-xl mb-4">
-          <RadarChart
-            lastTypeCount={lastData.typeCount}
-            currentTypeCount={currentData.typeCount}
-            onSelectCategory={setSelectedCategory}
-          />
+          {lastData && currentData && (
+            <RadarChart
+              lastTypeCount={lastData.typeCount}
+              currentTypeCount={currentData.typeCount}
+              onSelectCategory={setSelectedCategory}
+            />
+          )}
         </div>
         <div className="bg-white rounded-3xl shadow-xl p-4 flex justify-start left-0">
-          {lastdetailData || (currentdetailData && selectedCategory) ? (
+          {selectedCategory ? (
             <StrengthBarChart
               lastData={lastdetailData}
               currentData={currentdetailData}

@@ -10,13 +10,13 @@ export const useGetStrength = () => {
   });
 };
 
-export const useGetStrengthPeriod = (token: string, year: string, month:string) => {
+export const useGetStrengthPeriod = (year: string, month: string) => {
   return useQuery({
-    queryKey: ["strength", year, month, token],
+    queryKey: ["strength", year, month],
     queryFn: () => {
-      return getStrengthPeriod(token, year, month);
+      return getStrengthPeriod(year, month);
     },
-    enabled: !!token ,
+    enabled: !!year && !!month,
     staleTime: 1000 * 60 * 5,
   });
 };

@@ -39,7 +39,7 @@ const DiaryActionModal: React.FC<DiaryActionModalProps> = ({
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogOverlay className="!bg-transparent" />
       <DialogContent
-        className="max-w-[320px] w-full rounded-2xl bg-[#FAF6F4] border border-[#D6D3F0] shadow-lg px-6 pt-12 pb-6"
+        className="max-w-[320px] w-full rounded-2xl bg-[#FAF6F4] dark:bg-[#4A3551] border border-[#D6D3F0] dark:border-[#6B4F6B] shadow-lg px-6 pt-12 pb-6"
         tabIndex={0}
       >
         {titleHidden ? (
@@ -47,7 +47,7 @@ const DiaryActionModal: React.FC<DiaryActionModalProps> = ({
             <DialogTitle>일기 관리</DialogTitle>
           </VisuallyHidden>
         ) : (
-          <DialogTitle className="text-base font-semibold text-gray-900 mb-3">
+          <DialogTitle className="text-base font-semibold text-gray-900 dark:text-white mb-3">
             일기 관리
           </DialogTitle>
         )}
@@ -59,7 +59,7 @@ const DiaryActionModal: React.FC<DiaryActionModalProps> = ({
               setOpen(false);
             }}
             tabIndex={-1}
-            className="flex items-center justify-center gap-2 rounded-xl bg-white border border-[#E5E5EA] text-gray-900 w-full h-11 text-sm font-medium transition-colors focus:outline-none focus:ring-0 focus:border-[#E5E5EA] focus-visible:outline-none focus-visible:border-[#E5E5EA] hover:bg-white hover:border-[#E5E5EA] hover:text-gray-900 active:bg-white active:border-[#E5E5EA] active:text-gray-900 shadow-none"
+            className="flex items-center justify-center gap-2 rounded-xl bg-white dark:bg-[#6B4F6B] border border-[#E5E5EA] dark:border-[#8B6B8B] text-gray-900 dark:text-white w-full h-11 text-sm font-medium transition-colors focus:outline-none focus:ring-0 focus:border-[#E5E5EA] dark:focus:border-[#8B6B8B] focus-visible:outline-none focus-visible:border-[#E5E5EA] dark:focus-visible:border-[#8B6B8B] hover:bg-white dark:hover:bg-[#7B5F7B] hover:border-[#E5E5EA] dark:hover:border-[#9B7B9B] hover:text-gray-900 dark:hover:text-white active:bg-white dark:active:bg-[#6B4F6B] active:border-[#E5E5EA] dark:active:border-[#8B6B8B] active:text-gray-900 dark:active:text-white shadow-none"
           >
             <img
               src={BookmarkIcon}
@@ -72,9 +72,12 @@ const DiaryActionModal: React.FC<DiaryActionModalProps> = ({
           </button>
           <button
             type="button"
-            onClick={onDelete}
+            onClick={() => {
+              onDelete();
+              setOpen(false);
+            }}
             tabIndex={-1}
-            className="flex items-center justify-center gap-2 rounded-xl bg-white border border-[#E5E5EA] text-gray-900 w-full h-11 text-sm font-medium transition-colors focus:outline-none focus:ring-0 focus:border-[#E5E5EA] focus-visible:outline-none focus-visible:border-[#E5E5EA] hover:bg-white hover:border-[#E5E5EA] hover:text-gray-900 active:bg-white active:border-[#E5E5EA] active:text-gray-900 shadow-none"
+            className="flex items-center justify-center gap-2 rounded-xl bg-white dark:bg-[#6B4F6B] border border-[#E5E5EA] dark:border-[#8B6B8B] text-gray-900 dark:text-white w-full h-11 text-sm font-medium transition-colors focus:outline-none focus:ring-0 focus:border-[#E5E5EA] dark:focus:border-[#8B6B8B] focus-visible:outline-none focus-visible:border-[#E5E5EA] dark:focus-visible:border-[#8B6B8B] hover:bg-white dark:hover:bg-[#7B5F7B] hover:border-[#E5E5EA] dark:hover:border-[#9B7B9B] hover:text-gray-900 dark:hover:text-white active:bg-white dark:active:bg-[#6B4F6B] active:border-[#E5E5EA] dark:active:border-[#8B6B8B] active:text-gray-900 dark:active:text-white shadow-none"
           >
             <Trash2
               className="w-4 h-4 block align-middle shrink-0 outline-none border-none"

@@ -18,10 +18,10 @@ const animalData: Record<AnimalKey, { name: string; description: string; imgSrc:
     imgSrc: "../assets/img/tiger.svg",
   },
   새: {
-    name: "밝게 웃지만 속은 불안한 작은 토끼",
+    name: "밝게 웃지만 속은 불안한 작은 족제비",
     description:
       "처음엔 밝고 사랑스러운 웃음으로 상대를 사로잡지만, 내면엔 '잘하고 있을까?' 하는 걱정이 자리합니다. 사랑과 설렘을 동시에 추구해 감정의 롤러코스터를 자주 타며, 지나간 선택에 대한 후회를 오래 품곤 합니다. 꾸준한 지지와 안전한 공간을 제공해 주면 한층 안정되고 깊은 애정을 보여 줍니다.",
-    imgSrc: "../assets/img/rabbit.svg",
+    imgSrc: "../assets/img/weasel.svg",
   },
   개: {
     name: "지나치게 배려하는 긴장한 강아지",
@@ -110,7 +110,7 @@ const animalData: Record<AnimalKey, { name: string; description: string; imgSrc:
   unknown: {
     name: "아직 무엇이 될 지 모를 작은 알",
     description: "아직 데이터가 부족해요. 더 데이터를 쌓아 알을 부화시켜봐요.",
-    imgSrc: "../assets/img/bird.svg",
+    imgSrc: "../assets/img/egg.svg",
   },
 };
 

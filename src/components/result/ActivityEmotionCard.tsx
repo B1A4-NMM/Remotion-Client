@@ -56,7 +56,7 @@ const ActivityEmotionCard: React.FC<ActivityEmotionCardProps> = ({ activityAnaly
     type,
   }) => (
     <div
-      className="px-3 py-1.5 rounded-full text-sm font-medium text-gray-800 flex items-center gap-2"
+      className="px-3 py-1.5 rounded-full text-sm font-medium text-foreground flex items-center gap-2"
       style={{
         backgroundColor: getEmotionColor(emotion),
         opacity: getIntensityOpacity(intensity),

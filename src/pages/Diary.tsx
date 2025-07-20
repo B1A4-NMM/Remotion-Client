@@ -1,13 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
-import { Image as LucideImage, Mic, MicOff } from "lucide-react";
 import { usePostDiary } from "@/api/queries/diary/usePostDiary.ts";
-import Loading6 from "../components/Loading/Loading6";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
-import { LocationPicker, LocationPreview } from "@/components/LocationPicker";
+import { LocationPicker } from "@/components/LocationPicker";
 import { useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import FilePreview, { Attachment } from "@/components/diary/FilePreview";
@@ -16,6 +12,7 @@ import DiaryTitle from "@/components/diary/DiaryTitle";
 import BottomNavi from "@/components/diary/BottomNavi";
 import MonthlyCalendar from "@/components/diary/MontlyCalendar";
 import { toast } from "sonner";
+import Loading7 from "@/components/Loading/Loading7";
 
 const Diary = () => {
   const { date } = useParams();
@@ -36,6 +33,7 @@ const Diary = () => {
     handleSubmit,
     reset,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm();
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -45,6 +43,9 @@ const Diary = () => {
 
   // 글자 수 상태 추가
   const [contentLength, setContentLength] = useState(0);
+
+  // 제출된 일기 내용 상태 추가
+  const [submittedDiary, setSubmittedDiary] = useState<any>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -64,6 +65,7 @@ const Diary = () => {
       setIsSubmitting(false);
       setAnimatedText("");
       setContentLength(0); // 글자 수 리셋
+      setSubmittedDiary(prev => (prev ? { ...prev, isAnalysisDone: true } : null)); // 분석 완료 신호
     },
   });
 
@@ -195,6 +197,15 @@ const Diary = () => {
   };
 
   const onSubmit = (data: any) => {
+    // 제출된 일기 내용 저장
+    const diaryContent = {
+      content: data.content || "",
+      writtenDate: date || dayjs().format("YYYY-MM-DD"),
+    };
+
+    setSubmittedDiary(diaryContent);
+    sessionStorage.setItem("shouldFadeFromLoading", "true");
+
     const formData = new FormData();
 
     formData.append("content", data.content);
@@ -229,11 +240,18 @@ const Diary = () => {
     mutate(formData);
   };
 
+  useEffect(() => {
+    if (isSubmitting && submittedDiary?.isAnalysisDone) {
+      navigate(`/result/${date}`, { state: { diaryContent: submittedDiary } });
+    }
+  }, [isSubmitting, submittedDiary, navigate, date]);
+
   if (!browserSupportsSpeechRecognition) {
     return <p>⚠️ 브라우저가 음성 인식을 지원하지 않습니다.</p>;
   }
 
-  if (isSubmitting) return <Loading6 key={Date.now()} />;
+  // if (isSubmitting) return <Loading6 key={Date.now()} />;
+  if (isSubmitting) return <Loading7 key={Date.now()} />;
 
   return (
     <>
@@ -269,7 +287,7 @@ const Diary = () => {
               onFocus={() => setInputFocused(true)}
               onBlur={() => setInputFocused(false)}
               placeholder="오늘은 무슨 일이 있으셨나요? 100자 이상으로 작성 해 주세요."
-              className="resize-none flex-1 w-full min-h-[200px] max-h-none overflow-y-auto"
+              className="resize-none flex-1 w-full min-h-[200px] max-h-none overflow-y-auto border-none outline-none focus:border-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0"
             />
             <div className="flex-shrink-0 mt-2">
               {errors.content && (
@@ -291,18 +309,16 @@ const Diary = () => {
           />
         </form>
 
-        {!inputFocused && (
-          <BottomNavi
-            onMicClick={handleMicClick}
-            onLocationClick={handleLocationClick}
-            onImageClick={handleImageClick}
-            onSaveClick={handleSaveClick} // 저장 버튼 핸들러 추가
-            isListening={listening}
-            isPhotoActive={isPhotoActive}
-            isLocationActive={isLocationActive}
-            isSaveEnabled={contentLength >= 100} // 저장 버튼 활성화 조건
-          />
-        )}
+        <BottomNavi
+          onMicClick={handleMicClick}
+          onLocationClick={handleLocationClick}
+          onImageClick={handleImageClick}
+          onSaveClick={handleSaveClick} // 저장 버튼 핸들러 추가
+          isListening={listening}
+          isPhotoActive={isPhotoActive}
+          isLocationActive={isLocationActive}
+          isSaveEnabled={contentLength >= 100} // 저장 버튼 활성화 조건
+        />
       </div>
 
       {showLocationPicker && (

@@ -1,18 +1,9 @@
 // api/services/character.ts
-import axios from "axios";
+import api from "../axios";
 import type { EmotionAnalysisResponse } from "../../types/diary";
 
-export const getEmotionAnalysis = async (token: string): Promise<EmotionAnalysisResponse> => {
-  const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
-
-  const response = await axios.get(`${BASE_URL}/member/emotion/base-analysis`, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  // console.log("response.data", response.data);
-
+export const getEmotionAnalysis = async (): Promise<EmotionAnalysisResponse> => {
+  const response = await api.get("/member/emotion/base-analysis");
+  console.log("response.data", response.data);
   return response.data;
 };

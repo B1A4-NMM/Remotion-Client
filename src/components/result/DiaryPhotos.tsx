@@ -2,12 +2,6 @@
 
 import React from "react";
 
-const sample=[
-  "https://remotion-photo.s3.ap-northeast-2.amazonaws.com/bcdc2b34-a81e-4d51-be65-d14c4423e193.jpg",
-  "https://remotion-photo.s3.ap-northeast-2.amazonaws.com/bcdc2b34-a81e-4d51-be65-d14c4423e193.jpg",
-  "https://remotion-photo.s3.ap-northeast-2.amazonaws.com/bcdc2b34-a81e-4d51-be65-d14c4423e193.jpg",
-]
-
 interface DiaryPhotosProps {
   photos: string[]; // s3 URL 배열이라고 가정
 }
@@ -15,10 +9,10 @@ interface DiaryPhotosProps {
 const DiaryPhotos: React.FC<DiaryPhotosProps> = ({ photos }) => {
   if (!photos || photos.length === 0) return null;
 
-  const renderPhotos=()=>{
-    switch(photos.length){
+  const renderPhotos = () => {
+    switch (photos.length) {
       case 1:
-        return(
+        return (
           <div className="w-full h-[332px]">
             <img
               src={photos[0]}
@@ -26,62 +20,69 @@ const DiaryPhotos: React.FC<DiaryPhotosProps> = ({ photos }) => {
               className="object-cover w-full h-full rounded-2xl"
             />
           </div>
-        )
+        );
       case 2:
-        return(
-          <div className="h-[332px] grid grid-cols-1 gap-2">
-            {photos.map((url, idx) => (
-              <img
-                key={idx}
-                src={url}
-                alt={`Diary Photo ${idx}`}
-                className="object-cover w-full h-full rounded-lg"
-              />
-            ))}
-          </div>
-        )
-      case 3:
         return (
-          <div className="h-[332px] space-y-2">
-            {/* 상단 2개 */}
-            <div className="grid grid-cols-2 gap-2">
-              {photos.slice(1).map((url, idx) => (
+          <div className="h-[332px] space-y-3">
+            {photos.map((url, idx) => (
+              <div key={idx} className="h-[160px]">
                 <img
-                  key={idx + 1}
                   src={url}
-                  alt={`Diary Photo ${idx + 2}`}
+                  alt={`Diary Photo ${idx}`}
                   className="object-cover w-full h-full rounded-lg"
                 />
+              </div>
+            ))}
+          </div>
+        );
+      case 3:
+        return (
+          <div className="h-[332px] flex flex-col justify-between">
+            {/* 상단 2개 - 고정 높이 */}
+            <div className="grid grid-cols-2 gap-2 h-[160px]">
+              {photos.slice(1).map((url, idx) => (
+                <div key={idx + 1} className="h-[160px] w-full">
+                  <img
+                    src={url}
+                    alt={`Diary Photo ${idx + 2}`}
+                    className="object-cover w-full h-full rounded-lg"
+                  />
+                </div>
               ))}
             </div>
-            
-            {/* 하단 한개 */}
-            <img
-              src={photos[0]}
-              alt="Diary Photo 1"
-              className="object-cover w-full h-full rounded-xl"
-            />
+
+            {/* 하단 한개 - 고정 높이 */}
+            <div className="h-[160px] w-full">
+              <img
+                src={photos[0]}
+                alt="Diary Photo 1"
+                className="object-cover w-full h-full rounded-xl"
+              />
+            </div>
           </div>
         );
       case 4:
-        return(
+        return (
           <div className="h-[332px] grid grid-cols-2 gap-2">
             {photos.map((url, idx) => (
-              <img
-                key={idx}
-                src={url}
-                alt={`Diary Photo ${idx + 1}`}
-                className="object-cover w-full h-full rounded-xl"
-              />
+              <div key={idx} className="h-[160px]">
+                <img
+                  src={url}
+                  alt={`Diary Photo ${idx + 1}`}
+                  className="object-cover w-full h-full rounded-xl"
+                />
+              </div>
             ))}
           </div>
-        )
+        );
     }
-  }
+  };
 
   return (
-    <div className="rounded-2xl overflow-hidden shadow-lg">
-      {renderPhotos()}
+    <div className="w-full">
+      <div className="bg-white dark:bg-[#181718] rounded-2xl overflow-hidden shadow-lg p-[10px]">
+        {renderPhotos()}
+      </div>
     </div>
   );
 };

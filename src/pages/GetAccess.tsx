@@ -11,16 +11,17 @@ export default function GetAccess() {
 
     if (token) {
       localStorage.setItem("accessToken", token);
+      console.log("토큰 저장됨:", token);
       navigate("/");
     } else {
       console.error("토큰 없음");
-      navigate("/");
+      navigate("/login");
     }
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center">
-      <p className="text-xl">로그인 처리 중</p>
+      <p className="text-xl">로그인 처리 중...</p>
     </div>
   );
 }

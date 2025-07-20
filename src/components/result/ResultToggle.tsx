@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import "@/styles/togle.css";
 
 interface ResultToggleProps {
   view: "record" | "analysis";
@@ -19,17 +18,21 @@ const ResultToggle: React.FC<ResultToggleProps> = ({ view }) => {
   };
 
   return (
-    <div className="flex justify-center gap-2 mb-10 mt-10">
-      <div className="buttonContainer w-fit font-semibold text-[14px]">
+    <div className="flex justify-center mb-8 mt-8">
+      <div className="relative grid grid-cols-2 w-fit max-w-[400px] rounded-full bg-white p-1 shadow-lg">
         <button
-          className={`button ${view === "record" ? "active" : ""}`}
+          className={`px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 ease-in-out ${
+            view === "record" ? "bg-black text-white border-white" : "text-black dark:text-white"
+          }`}
           onClick={() => handleTabClick("record")}
-          aria-label="기록 버튼"
+          aria-label="일기 버튼"
         >
-          기록
+          일기
         </button>
         <button
-          className={`button ${view === "analysis" ? "active" : ""}`}
+          className={`px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 ease-in-out ${
+            view === "analysis" ? "bg-black text-white border-white" : "text-black dark:text-white"
+          }`}
           onClick={() => handleTabClick("analysis")}
           aria-label="분석 버튼"
         >

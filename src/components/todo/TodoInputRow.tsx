@@ -1,7 +1,10 @@
 import { useState } from "react";
-// import { useTodoStore } from "@/store/todoStore";
 import { useCreateTodo } from "@/api/queries/todo/useCreateTodo";
+import { useSelectedDate } from "@/hooks/useSelectedDate";
+import { formatDate } from "@/utils/date";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useTheme } from "../theme-provider";
+
 
 /**
  * ✅ 한글 IME(조합형 입력기) 트러블슈팅 요약:
@@ -11,8 +14,12 @@ import { Checkbox } from "@/components/ui/checkbox";
  */
 
 export default function TodoInputRow() {
-    // const addTodo = useTodoStore((state) => state.addTodo);
     const { mutate } = useCreateTodo();
+    const { selectedDate } = useSelectedDate();
+    const { theme } = useTheme();
+    const isDark =
+        theme === "dark" ||
+        (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
     const [value, setValue] = useState("");
     const [isComposing, setIsComposing] = useState(false);  // ✅ IME 조합 중 상태 관리
 
@@ -20,7 +27,7 @@ export default function TodoInputRow() {
         // ✅ 조합 중에는 Enter 키를 무시해야 한글 입력이 정상 처리됨
         if (e.key === "Enter" && !isComposing && value.trim()) {
             e.preventDefault();     // ✅ preventDefault()는 <form> 구조에서 Enter 시 submit 방지 역할
-            mutate({ title: value.trim() });
+            mutate({ content: value.trim(), date: formatDate(selectedDate) });
             setValue("");           // 인풋 초기화
         }
     };
@@ -28,18 +35,23 @@ export default function TodoInputRow() {
     return (
         <li className="flex items-center gap-3">
             {/* 비어있는 체크박스 자리 */}
-            <Checkbox disabled className="flex-shrink-0 opacity-50 border border-white bg-transparent" />
-
+            <Checkbox
+                disabled
+                className={
+                    `flex-shrink-0 opacity-50 border ${isDark ? 'border-white' : 'border-black'} bg-transparent`
+                }
+            />
+            
             {/* 인라인 input */}
             <input
                 type="text"
-                placeholder="New todo"
+                placeholder="새로운 할 일"
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onCompositionStart={() => setIsComposing(true)}   // ✅ 조합 시작 시 플래그 true
                 onCompositionEnd={() => setIsComposing(false)}    // ✅ 조합 끝나면 false
-                className="w-full bg-transparent outline-none placeholder:text-gray-400"
+                className="w-full bg-transparent outline-none placeholder:text-gray-400 text-black dark:text-white"
             />
         </li>
     );

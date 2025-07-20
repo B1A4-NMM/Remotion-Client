@@ -30,6 +30,7 @@ const EmotionalGraph = () => {
   const previousTimestampRef = useRef<number>(0);
   const { data: relationData } = useGetRelation();
 
+
   const dpr = window.devicePixelRatio || 1;
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
 
@@ -60,7 +61,6 @@ const EmotionalGraph = () => {
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) {
-      console.warn("❌ canvasRef가 없음");
       return;
     }
 
@@ -69,15 +69,11 @@ const EmotionalGraph = () => {
     const cssX = e.clientX - rect.left;
     const cssY = e.clientY - rect.top;
 
-    console.log("🖱 클릭 좌표 (CSS):", { x: cssX, y: cssY });
-    console.log("📐 canvas rect:", rect);
 
     const offsetXValue = offsetX.get();
     const offsetYValue = offsetY.get();
-    console.log("📦 motion 오프셋 값:", { offsetXValue, offsetYValue });
 
     if (!nodesRef.current || nodesRef.current.length === 0) {
-      console.warn("❌ nodesRef가 비어 있음");
       return;
     }
 
@@ -89,8 +85,6 @@ const EmotionalGraph = () => {
       // 따라서 클릭 좌표도 같은 방식으로 계산해야 함
 
       const { width, height } = canvasSize;
-      const drawCenterX = width / 2 - offsetXValue;
-      const drawCenterY = height / 2 - offsetYValue;
 
       // 실제 화면에서 노드가 그려지는 위치
       const nodeScreenX = node.x;
@@ -104,17 +98,6 @@ const EmotionalGraph = () => {
       const dy = adjustedClickY - nodeScreenY;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      console.log(`📏 노드 ${node.label}:`, {
-        캔버스크기: { width, height },
-        그리기중심: { x: drawCenterX, y: drawCenterY },
-        노드위치: { x: nodeScreenX, y: nodeScreenY },
-        클릭위치: { x: adjustedClickX, y: adjustedClickY },
-        motion오프셋: { x: offsetXValue, y: offsetYValue },
-        거리: distance,
-        반지름: node.radius,
-        선택됨: distance <= node.radius,
-      });
-
       if (distance <= node.radius) {
         clickedNode = node;
         break;
@@ -123,10 +106,19 @@ const EmotionalGraph = () => {
 
     if (clickedNode) {
       const id = clickedNode.diaryId || clickedNode.id;
-      console.log("🟢 클릭된 노드:", { id, label: clickedNode.label });
-      navigate(`/relation/${id}`);
+
+      // 숫자 ID인지 확인하고 전달
+      if (typeof id === "number" || (typeof id === "string" && !isNaN(Number(id)))) {
+        navigate(`/relation/${id}`);
+      } else if (clickedNode.label === "나") {
+        navigate(`/analysis`);
+      }
+      else{
+        console.warn("⚠️ 유효하지 않은 ID:", id);
+        // 기본값 사용
+        navigate(`/relation/1`);
+      }
     } else {
-      console.log("⚪️ 노드와 일치하는 클릭 없음");
     }
   };
 
@@ -293,9 +285,9 @@ const EmotionalGraph = () => {
 
   return (
     <div ref={containerRef} className="w-full h-screen overflow-hidden relative">
+
       <motion.div
         drag
-        onClick={() => console.log("✅ Clicked!")}
         dragMomentum={false}
         dragElastic={0.1}
         style={{ x: offsetX, y: offsetY }}

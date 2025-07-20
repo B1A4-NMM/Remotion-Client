@@ -7,6 +7,8 @@ import DiaryActionModal from "./DiaryActionModal";
 import dayjs from "dayjs";
 import { useDeleteDiary } from "../../api/queries/home/useDeleteDiary";
 import { useNavigate } from "react-router-dom";
+import { MapPin } from "lucide-react";
+import VirtualizedBlobCard from "../Blob/VirtualizedBlobCard";
 
 interface Diary {
   id: number;
@@ -69,14 +71,16 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="flex gap-4 items-center rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] mb-4 py-[14px] px-[20px]">
+              <div className="flex gap-4 items-center rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] mb-4 py-[14px] px-[20px]">
                 <div className="w-[70px] h-[70px] flex items-center justify-center rounded-full overflow-hidden">
-                  <Canvas className="w-full h-full">
-                    <Blob diaryContent={{ emotions: mappedDiary.emotions }} />
-                  </Canvas>
+                  <VirtualizedBlobCard
+                    key={mappedDiary.id}
+                    diaryContent={{ emotions: mappedDiary.emotions }}
+                    index={index}
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   {/* 감정 요약 */}
@@ -155,13 +159,13 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-3 gap-2 rounded-2xl mb-2" style={{ height: "120px" }}>
+              <div className="grid grid-cols-3 gap-2 rounded-lg mb-2" style={{ height: "120px" }}>
                 {/* Blob */}
                 <div className="col-span-1 h-full">
-                  <div className="h-full w-full max-h-[120px] rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
+                  <div className="h-full w-full max-h-[120px] rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
                     {/* 감정 요약 (위) */}
                     <div className="text-xs text-[#85848F] font-medium text-center ">
                       {mappedDiary.emotions && mappedDiary.emotions.length > 0
@@ -172,9 +176,11 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                         : "감정 없음"}
                     </div>
                     <div className="w-full h-full max-w-[120px] max-h-[120px] flex items-center justify-center rounded-full overflow-hidden mx-auto">
-                      <Canvas className="w-full h-full">
-                        <Blob diaryContent={{ emotions: mappedDiary.emotions }} />
-                      </Canvas>
+                      <VirtualizedBlobCard
+                        key={mappedDiary.id}
+                        diaryContent={{ emotions: mappedDiary.emotions }}
+                        index={index}
+                      />
                     </div>
                     {/* 대상 요약 (아래) */}
                     <div className="text-xs text-[#85848F] text-center">
@@ -192,12 +198,18 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                     className="rounded-lg object-cover w-full h-full"
                     style={{ aspectRatio: "1 / 1" }}
                   />
-                  <img
-                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${mappedDiary.map?.lat},${mappedDiary.map?.lng}&zoom=15&size=200x200&markers=color:red%7C${mappedDiary.map?.lat},${mappedDiary.map?.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
-                    alt="map-preview"
-                    className="rounded-lg object-cover w-full h-full"
-                    style={{ aspectRatio: "1 / 1" }}
-                  />
+                  <div className="relative w-full h-full">
+                    <img
+                      src={`https://maps.googleapis.com/maps/api/staticmap?center=${mappedDiary.map?.lat},${mappedDiary.map?.lng}&zoom=15&size=200x200&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
+                      alt="map-preview"
+                      className="rounded-lg object-cover w-full h-full"
+                      style={{ aspectRatio: "1 / 1" }}
+                    />
+                    {/* 커스텀 툴팁 */}
+                    <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                      <MapPin className="w-6 h-6 text-[#2a1c31] stroke-[#2a1c31] stroke-2 fill-transparent drop-shadow-lg" />
+                    </div>
+                  </div>
                 </div>
               </div>
               {/* 본문/날짜/아이콘 등 기존과 동일하게... */}
@@ -247,13 +259,13 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-3 gap-2 rounded-2xl mb-2" style={{ height: "130px" }}>
+              <div className="grid grid-cols-3 gap-2 rounded-lg mb-2" style={{ height: "130px" }}>
                 {/* Blob */}
                 <div className="col-span-1 h-full">
-                  <div className="h-full w-full max-h-[120px] rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
+                  <div className="h-full w-full max-h-[120px] rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
                     {/* 감정 요약 (위) */}
                     <div className="text-xs text-[#85848F] font-medium text-center ">
                       {mappedDiary.emotions && mappedDiary.emotions.length > 0
@@ -264,9 +276,11 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                         : "감정 없음"}
                     </div>
                     <div className="w-full h-full max-w-[120px] max-h-[120px] flex items-center justify-center rounded-full overflow-hidden mx-auto">
-                      <Canvas className="w-full h-full">
-                        <Blob diaryContent={{ emotions: mappedDiary.emotions }} />
-                      </Canvas>
+                      <VirtualizedBlobCard
+                        key={mappedDiary.id}
+                        diaryContent={{ emotions: mappedDiary.emotions }}
+                        index={index}
+                      />
                     </div>
                     {/* 대상 요약 (아래) */}
                     <div className="text-xs text-[#85848F] text-center">
@@ -277,13 +291,17 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                   </div>
                 </div>
                 {/* 지도만 */}
-                <div className="col-span-2 h-full flex items-center">
+                <div className="col-span-2 h-full flex items-center relative">
                   <img
-                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${mappedDiary.map?.lat},${mappedDiary.map?.lng}&zoom=15&size=200x200&markers=color:red%7C${mappedDiary.map?.lat},${mappedDiary.map?.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
+                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${mappedDiary.map?.lat},${mappedDiary.map?.lng}&zoom=15&size=200x200&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
                     alt="map-preview"
                     className="rounded-lg object-cover w-full h-full"
                     style={{ aspectRatio: "2 / 1" }}
                   />
+                  {/* 커스텀 툴팁 */}
+                  <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                    <MapPin className="w-6 h-6 text-[#2a1c31] stroke-[#2a1c31] stroke-2 fill-transparent drop-shadow-lg" />
+                  </div>
                 </div>
               </div>
               {/* 본문/날짜/아이콘 등 기존과 동일하게... */}
@@ -333,13 +351,13 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-3 gap-2 rounded-2xl mb-2" style={{ height: "120px" }}>
+              <div className="grid grid-cols-3 gap-2 rounded-lg mb-2" style={{ height: "120px" }}>
                 {/* Blob */}
                 <div className="col-span-1 h-full">
-                  <div className="h-full w-full max-h-[120px] rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
+                  <div className="h-full w-full max-h-[120px] rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
                     {/* 감정 요약 (위) */}
                     <div className="text-xs text-[#85848F] font-medium text-center ">
                       {mappedDiary.emotions && mappedDiary.emotions.length > 0
@@ -350,9 +368,11 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                         : "감정 없음"}
                     </div>
                     <div className="w-full h-full max-w-[120px] max-h-[120px] flex items-center justify-center rounded-full overflow-hidden mx-auto">
-                      <Canvas className="w-full h-full">
-                        <Blob diaryContent={{ emotions: mappedDiary.emotions }} />
-                      </Canvas>
+                      <VirtualizedBlobCard
+                        key={mappedDiary.id}
+                        diaryContent={{ emotions: mappedDiary.emotions }}
+                        index={index}
+                      />
                     </div>
                     {/* 대상 요약 (아래) */}
                     <div className="text-xs text-[#85848F] text-center">
@@ -425,13 +445,13 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-3 gap-2 rounded-2xl mb-2" style={{ height: "120px" }}>
+              <div className="grid grid-cols-3 gap-2 rounded-lg mb-2" style={{ height: "120px" }}>
                 {/* Blob */}
                 <div className="col-span-1 h-full">
-                  <div className="h-full w-full max-h-[120px] rounded-2xl bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
+                  <div className="h-full w-full max-h-[120px] rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
                     {/* 감정 요약 (위) */}
                     <div className="text-xs text-[#85848F] font-medium text-center ">
                       {mappedDiary.emotions && mappedDiary.emotions.length > 0
@@ -442,9 +462,11 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                         : "감정 없음"}
                     </div>
                     <div className="w-full h-full max-w-[120px] max-h-[120px] flex items-center justify-center rounded-full overflow-hidden mx-auto">
-                      <Canvas className="w-full h-full">
-                        <Blob diaryContent={{ emotions: mappedDiary.emotions }} />
-                      </Canvas>
+                      <VirtualizedBlobCard
+                        key={mappedDiary.id}
+                        diaryContent={{ emotions: mappedDiary.emotions }}
+                        index={index}
+                      />
                     </div>
                     {/* 대상 요약 (아래) */}
                     <div className="text-xs text-[#85848F] text-center">
@@ -511,7 +533,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-2xl shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="flex items-center justify-center h-24 text-gray-400">

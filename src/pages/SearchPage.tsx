@@ -41,9 +41,8 @@ const SearchPage = () => {
   const queryClient = useQueryClient();
   const deleteDiaryMutation = useDeleteDiary();
   const handleDeleteDiary = (diaryId: number) => {
-    const token = localStorage.getItem("accessToken") || "";
     deleteDiaryMutation.mutate(
-      { token, diaryId: String(diaryId) },
+      { diaryId: String(diaryId) },
       {
         onSuccess: () => {
           // 검색 결과를 다시 불러오거나, 쿼리 무효화
@@ -54,7 +53,7 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto  px-4">
+    <div className="max-w-xl mx-auto px-4   text-foreground min-h-screen">
       {/* 검색 바 */}
       <SearchBar
         value={inputValue}

@@ -1,10 +1,13 @@
-import { useLocation, Outlet } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useBottomPopupStore } from "./store/useBottomPopupStore";
 import BottomNavigation from "./components/BottomNavigation";
 import { Toaster } from "sonner";
+import AnimatedOutlet from "./components/AnimatedOutlet";
+import Title from "./components/analysis/Title";
 
 // 하단 네비게이션을 숨길 경로 목록
-const HIDE_NAV_PATHS = ["/signup", "/login", "/diary", "/video"];
+const HIDE_NAV_PATHS = ["/signup", "/login", "/diary", "/video", "/result", "/loading7"];
+const SHOW_TITLE_PATHS = ["/analysis", "/relation"];
 
 export default function Layout() {
   const location = useLocation();
@@ -14,11 +17,14 @@ export default function Layout() {
   const shouldShowNav =
     !HIDE_NAV_PATHS.some(path => location.pathname.startsWith(path)) && !isPopupOpen;
 
+  const shouldShowTitle = SHOW_TITLE_PATHS.includes(location.pathname);
+
   return (
-    <div className="w-full min-h-[100dvh] flex justify-center bg-[black] font-pretendard pb-[84]">
-      <div className="w-full max-w-[414px] flex flex-col relative bg-[#FAF6F4] text-black min-h-[100dvh]">
-        <main className={`flex-1 h-full bg-[#FAF6F4] ${shouldShowNav ? "pb-[84px]" : ""}`}>
-          <Outlet />
+    <div className="w-full min-h-[100dvh] flex justify-center bg-[black] font-pretendard">
+      <div className="w-full max-w-[414px] flex flex-col relative bg-[#FAF6F4] dark:bg-gradient-to-b dark:from-[#181718] dark:via-[#181718] dark:to-[#4A3551] dark:text-white min-h-[100dvh] bg-fixed">
+        {shouldShowTitle && <Title name={"감정 분석"} isBackActive={false} back={""} />}
+        <main className={`flex-1 h-full ${shouldShowNav ? "pb-[84px]" : ""}`}>
+          <AnimatedOutlet />
           <Toaster
             position="top-center"
             expand={true}

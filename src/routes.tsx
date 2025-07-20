@@ -1,54 +1,181 @@
-import Home from "./pages/Home";
-
-import Calendar from "./pages/Calendar";
-import Diary from "./pages/Diary";
-import Relation from "./pages/Relation";
-import RelationDetail from "./pages/RelationDetail";
-
-import Result from "./pages/Result";
-import Test from "./pages/Test";
-import TestResult from "./components/TestResult";
 import Login from "./pages/Login";
 import GetAccess from "./pages/GetAccess";
-import Loading6 from "./components/Loading/Loading6";
-import Analysis from "./pages/Analysis";
-import AboutMe from "./pages/AboutMe";
-import Map from "./pages/Map";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+import Home from "./pages/Home";
+import Diary from "./pages/Diary";
+import SearchPage from "./pages/SearchPage";
+import Result from "./pages/Result";
+// import Loading6 from "./components/Loading/Loading6";
+import Loading7 from "./components/Loading/Loading7";
+
 import Video from "./pages/Video";
 import Routine from "./pages/Routine";
 import Contents from "./pages/Contents";
-import SearchPage from "./pages/SearchPage";
 
+import Analysis from "./pages/Analysis";
 import Strength from "./pages/analysis/Strength";
-import Stress from "./pages/analysis/Stress";
-import Anxiety from "./pages/analysis/Anxiety";
-import Depress from "./pages/analysis/Depress";
-import Character from "./pages/analysis/Character";
+import Relation from "./pages/Relation";
+import RelationDetail from "./pages/RelationDetail";
+import Notifications from "./pages/Notification";
 
-import Action from "./pages/Action";
+import Todos from "./pages/Todos";
+import Mypage from "./pages/Mypage";
+import Negative from "./pages/analysis/Negative";
+import Positive from "./pages/analysis/Positive";
+
 export const routes = [
-  { path: "/", element: <Home /> },
-  { path: "/diary/:date", element: <Diary /> },
-  { path: "/calendar", element: <Calendar /> },
-  { path: "/relation", element: <Relation /> },
-  { path: "/relation/:id", element: <RelationDetail /> },
-  { path: "/result/:id", element: <Result /> },
-  { path: "/test", element: <Test /> },
-  { path: "/test/result", element: <TestResult /> },
-  { path: "/login", element: <Login /> },
-  { path: "/getAccess", element: <GetAccess /> },
-  { path: "/loading", element: <Loading6 /> },
-  { path: "/analysis", element: <Analysis /> },
-  { path: "/aboutme", element: <AboutMe /> },
-  { path: "/map", element: <Map /> },
-  { path: "/video", element: <Video /> },
-  { path: "/action", element: <Action /> },
-  { path: "/routine", element: <Routine /> },
-  { path: "/contents", element: <Contents /> },
-  { path: "/search", element: <SearchPage /> },
-  { path: "/analysis/strength", element: <Strength /> },
-  { path: "/analysis/stress", element: <Stress /> },
-  { path: "/analysis/anxiety", element: <Anxiety /> },
-  { path: "/analysis/depress", element: <Depress /> },
-  { path: "/analysis/character", element: <Character /> },
+  {
+    path: "/",
+    element: (
+      <ProtectedRoute>
+        <Home />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/diary/:date",
+    element: (
+      <ProtectedRoute>
+        <Diary />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/todos",
+    element: (
+      <ProtectedRoute>
+        <Todos />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/relation",
+    element: (
+      <ProtectedRoute>
+        <Relation />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/relation/:id",
+    element: (
+      <ProtectedRoute>
+        <RelationDetail />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/result/:id",
+    element: (
+      <ProtectedRoute>
+        <Result />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/login",
+    element: (
+      <ProtectedRoute requireAuth={false}>
+        <Login />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/getAccess",
+    element: (
+      <ProtectedRoute requireAuth={false}>
+        <GetAccess />
+      </ProtectedRoute>
+    ),
+  },
+  { path: "/loading7", element: <Loading7 /> },
+  {
+    path: "/analysis",
+    element: (
+      <ProtectedRoute>
+        <Analysis />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/video",
+    element: (
+      <ProtectedRoute>
+        <Video />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/routine",
+    element: (
+      <ProtectedRoute>
+        <Routine />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/contents",
+    element: (
+      <ProtectedRoute>
+        <Contents />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/search",
+    element: (
+      <ProtectedRoute>
+        <SearchPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/analysis/strength",
+    element: (
+      <ProtectedRoute>
+        <Strength />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/analysis/부정",
+    element: (
+      <ProtectedRoute>
+        <Negative />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/analysis/긍정",
+    element: (
+      <ProtectedRoute>
+        <Positive />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/mypage",
+    element: (
+      <ProtectedRoute>
+        <Mypage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "*",
+    element: (
+      <ProtectedRoute>
+        <Home />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/notifications",
+    element: (
+      <ProtectedRoute>
+        <Notifications />
+      </ProtectedRoute>
+    ),
+  },
 ];

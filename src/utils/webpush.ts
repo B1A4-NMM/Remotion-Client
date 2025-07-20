@@ -13,9 +13,9 @@ export function urlBase64ToUint8Array(base64String: string): Uint8Array {
   }
   
   export function isPushSupported() {
-    // iOS 환경 감지
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.userAgent.includes('Macintosh') && 'ontouchend' in document);
+    // iOS 환경 감지 (정확하게)
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+      || (navigator.userAgent.includes('Macintosh') && navigator.maxTouchPoints > 1);
   
     if (isIOS) return false;
   

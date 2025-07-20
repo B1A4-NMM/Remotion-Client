@@ -131,10 +131,16 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
               </svg>
             </div>
             <div className="text-gray-800 text-base leading-relaxed">
-              {highlightActivity(activity)}에는 <br />
+              {highlightActivity(activity)}에서 <br />
               {highlightTargets([{ name: person.name, colorKey: "blue" }])}에게{" "}
               {hasPersonEmotions ? <>{highlightEmotions(emotions)}을 느꼈고</> : <>함께했고</>}
-              {hasSelfEmotions && <> 활동에서 {highlightEmotions(selfEmotions)}을 느꼈고</>}
+              {hasSelfEmotions && (
+                <>
+                  {" "}
+                  <br />
+                  나에게는 {highlightEmotions(selfEmotions)}을 느끼고
+                </>
+              )}
               {hasStateEmotions && (
                 <>
                   {" "}

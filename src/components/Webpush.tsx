@@ -2,7 +2,7 @@
 import { Bell } from "lucide-react";
 import { useState, useEffect } from "react";
 import { isPushSupported, urlBase64ToUint8Array } from "../utils/webpush";
-import { subscribeToWebpush, unsubscribeFromWebpush, webpushStatus } from "@/api/services/webPush";
+import { subscribeToWebpush, unsubscribeFromWebpush, webpushStatus } from "@/api/services/webpush";
 import { PushManagerService } from "@/api/services/pushManager";
 import { WEBPUSH_CONFIG } from "../../webpush";
 

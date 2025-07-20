@@ -23,7 +23,7 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
 
   const { heightPixel: _heightPixel, wrapChildren } = heightOption || {};
   const heightPixel = wrapChildren
-    ? Math.max(contentRef.current?.offsetHeight || 0, 200) // 최소 200px 보장
+    ? Math.max(contentRef.current?.offsetHeight || 0, 400) // 최소 400px 보장
     : _heightPixel || window.innerHeight * 0.8;
 
   const [springProps, api] = useSpring(() => ({
@@ -97,9 +97,10 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
           ...springProps,
           display: "block",
         }}
-        className="absolute bottom-0 left-0 w-full z-[100] bg-[#FAF6F4] dark:bg-[#1b1a1f] rounded-t-2xl overflow-y-auto shadow-xl"
+        className="absolute bottom-0 left-0 w-full z-[100] bg-[#FAF6F4] dark:bg-[#29222B] rounded-t-2xl overflow-y-auto shadow-xl"
         onClick={handleContentClick}
       >
+
         {/* 상단 바 */}
         <div className="w-full flex justify-center py-2">
           <div className="w-10 h-1.5 bg-gray-300 rounded-full" />

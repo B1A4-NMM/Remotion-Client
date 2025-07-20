@@ -3,37 +3,16 @@ import { Play } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useGetVideo } from "../../api/queries/action/useGetVideo";
-import type { VideoType } from "../../types/video";
+import type { VideoApiResponse, VideoItem, VideoNavigationData } from "../../types/video";
 import { useTheme } from "../theme-provider";
 
-const SAMPLE_DATA: VideoType[] = [
-  {
-    videoId: "_8i8j_r8QFU",
-    emotion:
-      "이것은 첫 번째 비디오에 대한 상세한 설명입니다. 여기에는 비디오의 내용, 제작자 정보, 그리고 기타 관련 정보들이 포함될 수 있습니다.",
-    message: "비디오 예제",
-  },
-  {
-    videoId: "dQw4w9WgXcQ",
-    emotion:
-      "두 번째 비디오에 대한 설명입니다. 이 비디오는 다른 주제를 다루고 있으며, 사용자에게 유용한 정보를 제공합니다.",
-    message: "비디오 예제",
-  },
-  {
-    videoId: "jNQXAC9IVRw",
-    emotion: "마지막 비디오에 대한 설명입니다. 이 시리즈의 마무리를 담고 있습니다.",
-    message: "비디오 예제",
-  },
-];
-
 interface YouTubeBoardProps {
-  videos?: VideoType[];
+  videos?: VideoItem[];
   autoPlay?: boolean;
   showControls?: boolean;
 }
 
 const YouTubeBoard: React.FC<YouTubeBoardProps> = ({}) => {
-  // ✅ 모든 Hook을 컴포넌트 최상단에 배치
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const [isDragging, setIsDragging] = useState(false);
@@ -43,18 +22,15 @@ const YouTubeBoard: React.FC<YouTubeBoardProps> = ({}) => {
   const lastMoveTime = useRef<number>(0);
   const lastX = useRef<number>(0);
 
-  const token = localStorage.getItem("accessToken") ?? "";
-  const { data, isLoading, isError } = useGetVideo(token, 10);
-
-
+  const { data, isLoading, isError } = useGetVideo(10);
   const navigate = useNavigate();
-
   const { theme } = useTheme();
+  
   const isDark =
     theme === "dark" ||
     (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
-  // ✅ useEffect를 항상 같은 순서로 호출
+
   useEffect(() => {
     const handleGlobalMouseMove = (e: MouseEvent) => {
       if (!isDragging) return;
@@ -95,19 +71,24 @@ const YouTubeBoard: React.FC<YouTubeBoardProps> = ({}) => {
     };
   }, [isDragging, startX, scrollLeft]);
 
-  // ✅ 비디오 데이터 결정 로직
-  const getVideos = (): VideoType[] => {
-    if (isLoading) return [];
-    if (isError) return SAMPLE_DATA;
-    if (data && Array.isArray(data?.videoId) && data?.videoId.length > 0) {
-      // API 응답을 VideoType 형태로 변환
-      return data.videoId.map(videoId => ({
-        videoId,
-        emotion: "",
-        message: "",
-      }));
+  // ✅ 1. API 응답 형식에 맞게 수정된 getVideos 함수
+  const getVideos = (): VideoItem[] => {
+    if (isLoading || isError || !data) return [];
+    
+    // API 응답에서 videoId 배열과 emotion, message를 분리
+    const { videoId, emotion, message } = data;
+    
+    if (!Array.isArray(videoId) || videoId.length === 0) {
+      console.warn("videoId 배열이 비어있거나 올바르지 않습니다:", videoId);
+      return [];
     }
-    return SAMPLE_DATA;
+
+    // 각 videoId에 대해 전체 응답의 emotion과 message를 포함한 VideoItem 생성
+    return videoId.map(id => ({
+      videoId: id,
+      emotion: emotion || "",
+      message: message || "",
+    }));
   };
 
   const videos = getVideos();
@@ -151,12 +132,29 @@ const YouTubeBoard: React.FC<YouTubeBoardProps> = ({}) => {
     e.stopPropagation();
   };
 
-  const handleVideoClick = (videoId: string) => {
-    sessionStorage.setItem("selectedVideo", JSON.stringify(videoId));
+  // ✅ 2. videoId와 message 함께 전달하도록 수정된 함수
+  const handleVideoClick = (selectedVideoId: string) => {
+    if (!data) {
+      console.error("비디오 데이터가 없습니다.");
+      return;
+    }
+
+    // 네비게이션 시 전달할 전체 데이터 구성
+    const navigationData: VideoNavigationData = {
+      videoIds: data.videoId, // 전체 비디오 ID 배열
+      selectedVideoId: selectedVideoId, // 선택된 비디오 ID
+      emotion: data.emotion || "", // 감정 데이터
+      message: data.message || "", // 메시지 데이터
+    };
+
+    // sessionStorage에 전체 데이터 저장
+    sessionStorage.setItem("videoData", JSON.stringify(navigationData));
+    
+    
     navigate("/video");
   };
 
-  // ✅ 조건부 렌더링 (early return 대신)
+  // 조건부 렌더링
   if (isLoading) {
     return (
       <div className="w-full h-[300px] flex items-center justify-center bg-gray-100">
@@ -173,28 +171,27 @@ const YouTubeBoard: React.FC<YouTubeBoardProps> = ({}) => {
       <div className="w-full">
         <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
           <p className="font-bold">알림</p>
-          <p>비디오 데이터를 불러오는데 실패했습니다. 샘플 데이터를 표시합니다.</p>
+          <p>비디오 데이터를 불러오는데 실패했습니다.</p>
         </div>
-        {renderVideoBoard(videos)}
       </div>
     );
   }
 
   if (videos.length === 0) {
     return (
-      <div className="w-full h-[300px] flex items-center justify-center bg-gray-200 text-gray-600">
+      <section className="bg-white rounded-xl shadow p-6 mt-5">
         <div className="text-center">
-          <p className="text-lg font-semibold mb-2">비디오가 없습니다</p>
-          <p className="text-sm">추천할 비디오가 준비되면 여기에 표시됩니다.</p>
+          <p className="text-lg font-semibold mb-2">추천할 영상이 없습니다</p>
+          <p className="text-sm">오늘의 일기를 작성하면 영상이 준비됩니다.</p>
         </div>
-      </div>
+      </section>
     );
   }
 
   return renderVideoBoard(videos);
 
   // 비디오 보드 렌더링 함수
-  function renderVideoBoard(videoList: VideoType[]) {
+  function renderVideoBoard(videoList: VideoItem[]) {
     return (
       <div className="w-full">
         <motion.div
@@ -209,68 +206,64 @@ const YouTubeBoard: React.FC<YouTubeBoardProps> = ({}) => {
           onTouchStart={handleTouchStart}
         >
           <div className="flex space-x-4 p-4 shadow-xl">
-            {videoList.map(
-              (
-                video // ✅ 매개변수 이름을 video로 변경
-              ) => (
-                <div
-                  key={video.videoId}
-                  className={`
-                flex-shrink-0 min-w-[300px]
-                ${isDark ? "bg-[#FAF6F4]" : "bg-[#272727]"}
-                rounded-3xl shadow-md overflow-hidden snap-center
-              `}
-                >
-                  <div className="relative">
-                    <img
-                      src={getThumbnailUrl(video.videoId)} // ✅ video.videoId 사용
-                      className="w-full h-[169px] object-cover rounded-3xl p-2"
-                      alt={"Video thumbnail"}
-                    />
-                    <div
-                      onClick={() => handleVideoClick(video.videoId)} // ✅ video.videoId 사용
-                      className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity"
-                    >
-                      <Play className="w-12 h-12 text-white" />
-                    </div>
+            {videoList.map((video) => (
+              <div
+                key={video.videoId}
+                className={`
+                  flex-shrink-0 min-w-[300px]
+                  ${isDark ? "bg-[#FAF6F4]" : "bg-[#272727]"}
+                  rounded-3xl shadow-md overflow-hidden snap-center
+                `}
+              >
+                <div className="relative">
+                  <img
+                    src={getThumbnailUrl(video.videoId)}
+                    className="w-full h-[169px] object-cover rounded-3xl p-2"
+                    alt="Video thumbnail"
+                  />
+                  <div
+                    onClick={() => handleVideoClick(video.videoId)}
+                    className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
+                  >
+                    <Play className="w-12 h-12 text-white" />
                   </div>
+                </div>
 
-                  <div className="p-2 flex justify-between pl-3 pr-3">
-                    <div className="flex justify-start gap-3">
-                      <svg
-                        width="26"
-                        height="26"
-                        viewBox="0 0 26 26"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <circle cx="13" cy="13" r="13" fill={isDark ? "#272727" : "#FAF6F4"} />
-                      </svg>
-                    </div>
+                <div className="p-2 flex justify-between pl-3 pr-3">
+                  <div className="flex justify-start gap-3">
                     <svg
-                      width="4"
-                      height="14"
-                      viewBox="0 0 4 14"
+                      width="26"
+                      height="26"
+                      viewBox="0 0 26 26"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
                     >
-                      <path
-                        d="M2.00024 3.5C1.17162 3.5 0.5 2.82876 0.5 2C0.5 1.17173 1.17162 0.5 2.00024 0.5C2.82838 0.5 3.5 1.17173 3.5 2C3.5 2.82876 2.82838 3.5 2.00024 3.5"
-                        fill={isDark ? "black" : "white"}
-                      />
-                      <path
-                        d="M1.99976 8.5C1.17162 8.5 0.5 7.82876 0.5 7C0.5 6.17173 1.17162 5.5 1.99976 5.5C2.82838 5.5 3.5 6.17173 3.5 7C3.5 7.82876 2.82838 8.5 1.99976 8.5"
-                        fill={isDark ? "black" : "white"}
-                      />
-                      <path
-                        d="M1.99976 13.5C1.17162 13.5 0.5 12.8288 0.5 12C0.5 11.1717 1.17162 10.5 1.99976 10.5C2.82838 10.5 3.5 11.1717 3.5 12C3.5 12.8288 2.82838 13.5 1.99976 13.5"
-                        fill={isDark ? "black" : "white"}
-                      />
+                      <circle cx="13" cy="13" r="13" fill={isDark ? "#272727" : "#FAF6F4"} />
                     </svg>
                   </div>
+                  <svg
+                    width="4"
+                    height="14"
+                    viewBox="0 0 4 14"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M2.00024 3.5C1.17162 3.5 0.5 2.82876 0.5 2C0.5 1.17173 1.17162 0.5 2.00024 0.5C2.82838 0.5 3.5 1.17173 3.5 2C3.5 2.82876 2.82838 3.5 2.00024 3.5"
+                      fill={isDark ? "black" : "white"}
+                    />
+                    <path
+                      d="M1.99976 8.5C1.17162 8.5 0.5 7.82876 0.5 7C0.5 6.17173 1.17162 5.5 1.99976 5.5C2.82838 5.5 3.5 6.17173 3.5 7C3.5 7.82876 2.82838 8.5 1.99976 8.5"
+                      fill={isDark ? "black" : "white"}
+                    />
+                    <path
+                      d="M1.99976 13.5C1.17162 13.5 0.5 12.8288 0.5 12C0.5 11.1717 1.17162 10.5 1.99976 10.5C2.82838 10.5 3.5 11.1717 3.5 12C3.5 12.8288 2.82838 13.5 1.99976 13.5"
+                      fill={isDark ? "black" : "white"}
+                    />
+                  </svg>
                 </div>
-              )
-            )}
+              </div>
+            ))}
           </div>
         </motion.div>
       </div>

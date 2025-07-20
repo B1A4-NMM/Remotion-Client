@@ -39,6 +39,15 @@ interface PeriodConfig {
 
 
 const ActivitySection = ({ type, data, selectedPeriod }: ActivitySectionProps) => {
+  if (!data || data.length === 0) {
+    return (
+      <div className="flex h-48 w-full items-center justify-center rounded-lg border border-dashed">
+        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+          데이터가 없습니다
+        </p>
+      </div>
+    );
+  }
   const isGroup = type === "부정" || type === "긍정"; 
   const periodConfigs: Record<PeriodType, PeriodConfig> = {
     daily: { days: 7, barCount: 7, label: "일간" },

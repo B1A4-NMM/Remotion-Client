@@ -14,6 +14,7 @@ import {
   createAnimatedBranches,
   updateNodeOpacity,
   updateEdgeOpacity,
+  updateNodeBounce,
   createNodeFromBranch,
 } from "@/utils/animation";
 import { drawEdges, drawAnimatedBranch, drawNodes } from "@/utils/drawing";
@@ -163,13 +164,16 @@ const EmotionalGraph = () => {
       const { width, height } = canvasSize;
       ctx.clearRect(0, 0, width, height); // 캔버스 초기화
 
+      const centerX = width / 2 - offsetX.get();
+      const centerY = height / 2 - offsetY.get();
+
       // 첫 6초 동안만 물리 시뮬레이션 적용
       if (elapsed < 1000) {
         updatePhysics(nodesRef.current, edgesRef.current, dt);
       }
 
-      const centerX = width / 2 - offsetX.get();
-      const centerY = height / 2 - offsetY.get();
+      // const centerX = width / 2 - offsetX.get();
+      // const centerY = height / 2 - offsetY.get();
 
       // 루트 노드 페이드인
       updateNodeOpacity(nodesRef.current[0], elapsed);
@@ -200,23 +204,37 @@ const EmotionalGraph = () => {
         }
       }
 
-      // 마우스 중심 근처의 노드 확대 효과
+      // [As-is] 마우스 중심 근처의 노드 확대 효과
+      // [To-be] 노드 투명도, 간선 투명도 및 바운스 업데이트
       nodesRef.current.forEach(node => {
         if (node.label === "나") return;
+
+        // const dx = node.x - centerX;
+        // const dy = node.y - centerY;
+        // const dist = Math.sqrt(dx * dx + dy * dy);
+        // const activeRadius = 100;
+        // const maxRadius = 50;
+        // const minRadius = 30;
+
+        // if (dist < activeRadius) {
+        //   node.radius = Math.min(node.radius + 0.5, maxRadius);
+        // } else {
+        //   node.radius = Math.max(node.radius - 0.5, minRadius);
+        // }
 
         const dx = node.x - centerX;
         const dy = node.y - centerY;
         const dist = Math.sqrt(dx * dx + dy * dy);
         const activeRadius = 100;
-        const maxRadius = 50;
-        const minRadius = 30;
 
-        if (dist < activeRadius) {
-          node.radius = Math.min(node.radius + 0.5, maxRadius);
-        } else {
-          node.radius = Math.max(node.radius - 0.5, minRadius);
+        if (
+          dist < activeRadius &&
+          (node.bounceStart === undefined || elapsed - node.bounceStart > (node.bounceDuration ?? 300))
+        ) {
+          node.bounceStart = elapsed;
         }
 
+        updateNodeBounce(node, elapsed);
         updateNodeOpacity(node, elapsed);
         updateEdgeOpacity(edgesRef.current, node);
       });

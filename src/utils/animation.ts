@@ -117,10 +117,19 @@ export const createAnimatedBranches = (
     // };
     // const [colorA, colorB] = emotionColorMap[rel.highestEmotion] ?? ["#ccc", "#999"];
 
+    // highestEmotion 단일 색상
     const colorKey = mapEmotionToColor(rel.highestEmotion);
     const color = baseColors[colorKey] ?? "#ccc";
     const colorA = color;
     const colorB = color;
+
+    // highestEmotion, secondEmotion 믹싱 그라데이션
+    // const colorKeyA = mapEmotionToColor(rel.highestEmotion);
+    // const colorKeyB = rel.secondEmotion
+    //   ? mapEmotionToColor(rel.secondEmotion)
+    //   : colorKeyA;
+    // const colorA = baseColors[colorKeyA] ?? "#ccc";
+    // const colorB = baseColors[colorKeyB] ?? colorA;
     
     return {
       from: rootNode,
@@ -143,6 +152,13 @@ export const createAnimatedBranches = (
 };
 
 export const createNodeFromBranch = (branch: AnimatedBranch, now: number): Node => {
+  // affection 값(0~150)을 기반으로 노드 크기 설정
+  const minRadius = 30;
+  const maxRadius = 50;
+  const affection = Math.max(Math.min(branch.nodeData.affection, 150), 0);
+  const t = affection / 150; // 0 ~ 1 범위로 정규화
+  const radius = minRadius + t * (maxRadius - minRadius);
+
   return {
     x: branch.toPos.x,
     y: branch.toPos.y,
@@ -150,7 +166,9 @@ export const createNodeFromBranch = (branch: AnimatedBranch, now: number): Node 
     finalY: branch.toPos.y,
     vx: 0,
     vy: 0,
-    radius: 16,
+    radius,
+    baseRadius: radius,
+    bounceDuration: 1500,
     color: branch.nodeData.colorA,
     colorA: branch.nodeData.colorA,
     colorB: branch.nodeData.colorB,
@@ -176,6 +194,8 @@ export const createRootNode = (centerX: number, centerY: number): Node => {
     vx: 0,
     vy: 0,
     radius: 40,
+    baseRadius: 40,
+    bounceDuration: 600,
     color: "#ffffff",
     colorA: "#ffffff",
     colorB: "#ffffff",
@@ -203,4 +223,17 @@ export const updateNodeOpacity = (node: Node, elapsed: number) => {
     const fadeProgress = Math.min((elapsed - node.startTime) / node.fadeInDuration, 1);
     node.opacity = fadeProgress * node.targetOpacity;
   }
+};
+
+export const updateNodeBounce = (node: Node, elapsed: number) => {
+  if (node.bounceStart === undefined) return;
+  const duration = node.bounceDuration ?? 300;
+  const t = (elapsed - node.bounceStart) / duration;
+  if (t >= 1) {
+    node.radius = node.baseRadius;
+    node.bounceStart = undefined;
+    return;
+  }
+  const scale = 1 + Math.sin(t * Math.PI) * 0.3; // expand then contract
+  node.radius = node.baseRadius * scale;
 };

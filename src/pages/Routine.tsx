@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect,useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { BottomPopupHandle } from "@/components/BottomPopup";
 
 import { usePostRoutineByType } from "@/api/queries/routine/usePostRoutineByType";
 import { useGetRoutineByType } from "@/api/queries/routine/useGetRoutineByType";
@@ -29,6 +30,9 @@ const Routine = () => {
   );
   const [showRecommendation, setShowRecommendation] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  
+  //닫기 버튼 눌렀을 때 애니매이션 적용 
+  const popupRef = useRef<BottomPopupHandle>(null);
 
   // 서버에서 Trigger 루틴 조회
   useEffect(() => {
@@ -214,10 +218,12 @@ const Routine = () => {
 
       {selectedEmotion && (
         <BottomPopup
+          ref={popupRef}
           isOpen={isPopupOpen}
           onClose={() => {
             setSelectedEmotion(null);
             setShowRecommendation(false);
+            setIsPopupOpen(false);
           }}
           heightOption={{ heightPixel: 700 }}
         >
@@ -232,6 +238,7 @@ const Routine = () => {
             />
           ) : (
             <RoutineModalContent
+              popupRef={popupRef}
               emotion={selectedEmotion}
               routines={selectedRoutines}
               onAdd={handleAddRoutine}

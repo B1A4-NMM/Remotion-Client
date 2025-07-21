@@ -7,18 +7,21 @@ import { toast } from "sonner";
 interface TodoPreviewCardProps {
   todos: string[];
   title?: string;
+  writtenDate?: string;
 }
 
 const TodoPreviewCard: React.FC<TodoPreviewCardProps> = ({
   todos,
   title = "앞으로 해야할 일들",
+  writtenDate,
 }) => {
   const { mutate: createTodo } = useCreateTodo();
   const { selectedDate } = useSelectedDate();
 
   const handleAddTodo = (todoText: string) => {
-    // 내일 날짜 계산
-    const tomorrow = new Date(selectedDate);
+    // writtenDate의 다음날 계산
+    const baseDate = writtenDate ? new Date(writtenDate) : new Date(selectedDate);
+    const tomorrow = new Date(baseDate);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     createTodo(

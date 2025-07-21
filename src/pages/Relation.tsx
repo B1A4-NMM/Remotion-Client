@@ -82,8 +82,8 @@ const Relation = () => {
     const container = containerRef.current;
     const rect = container.getBoundingClientRect();
     
-    const expandedWidth = rect.width * 1.2;  // 20% 확장
-    const expandedHeight = rect.height * 1.2; // 20% 확장
+    const expandedWidth = rect.width * 1.3;  // 20% 확장
+    const expandedHeight = rect.height * 1.3; // 20% 확장
     
     setContainerSize({ 
       width: expandedWidth, 
@@ -93,8 +93,8 @@ const Relation = () => {
     // ✅ 확장된 Canvas 크기 기준으로 계산
     const canvasW = expandedWidth * 2;
     const canvasH = expandedHeight * 2;
-    const centerX = canvasW / 2;    // 확장된 공간의 중심
-    const centerY = canvasH /2;    // 확장된 공간의 중심
+    const centerX = canvasW / 2.35;    // 확장된 공간의 중심
+    const centerY = canvasH / 2.8;    // 확장된 공간의 중심
     
     const relationArray = relationData.relations.relations;
     const processedNodes: ProcessedNode[] = [];
@@ -167,6 +167,10 @@ const Relation = () => {
   // ✅ containerSize가 유효할 때만 Canvas 렌더링
   const canvasWidth = containerSize.width * 2;
   const canvasHeight = containerSize.height *2;
+
+  const isMobile = useMemo(() => {
+    return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }, []);
 
   return (
     <div className="w-full h-full flex items-center justify-center overflow-auto relative">
@@ -243,12 +247,12 @@ const Relation = () => {
             <Canvas
               orthographic
               camera={{
-                position: [0, 0, 350],           // ✅ 정면 시점으로 고정
-                zoom: 1,                          // ✅ 1:1 매핑을 위한 기본 줌
-                left: -canvasWidth / 2,           // ✅ 화면 좌표와 일치
+                position: [0, 0, 350],
+                zoom: 1,
+                left: -canvasWidth / 2,
                 right: canvasWidth / 2,
-                top: canvasHeight / 2,            // ✅ Y축 상단
-                bottom: -canvasHeight / 2,        // ✅ Y축 하단
+                top: canvasHeight / 2,
+                bottom: -canvasHeight / 2,
                 near: 1,
                 far: 2000,
               }}
@@ -262,12 +266,12 @@ const Relation = () => {
                 zIndex: 2,
               }}
               gl={{
-                antialias: true,
+                antialias: !isMobile, // ✅ 모바일에서 안티알리어싱 비활성화
                 alpha: true,
-                powerPreference: "high-performance",
+                powerPreference: isMobile ? "default" : "high-performance", // ✅ 모바일 최적화
                 preserveDrawingBuffer: true,
               }}
-              dpr={Math.min(window.devicePixelRatio, 2)}
+              dpr={isMobile ? 1 : Math.min(window.devicePixelRatio, 2)} // ✅ 모바일에서 DPR 1로 고정
             >
               <ambientLight intensity={0.6} />
               <pointLight position={[0, 0, 500]} intensity={0.4} />

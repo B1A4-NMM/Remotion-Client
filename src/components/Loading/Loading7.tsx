@@ -1,5 +1,4 @@
 import { Canvas } from "@react-three/fiber";
-import SimpleBlob from "../Blob/Simple/SimpleBlob";
 import React, { useEffect, useState } from "react";
 import LoadingBlob from "../Blob/Loading/LodingBlob";
 import Loading6 from "./Loading6";

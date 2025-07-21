@@ -4,7 +4,6 @@ import { getDiaryContent } from "../../services/diaryContent";
 import type { DiaryResponse } from "../../../types";
 
 export const useGetDiaryContent = (token: string, id: string) => {
-  
   return useQuery<DiaryResponse>({
     queryKey: ["diaryContent", id, token],
     queryFn: () => {

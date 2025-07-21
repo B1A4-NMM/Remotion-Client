@@ -1,23 +1,42 @@
-import { useLocation, Outlet } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useBottomPopupStore } from "./store/useBottomPopupStore";
 import BottomNavigation from "./components/BottomNavigation";
 import { Toaster } from "sonner";
+import AnimatedOutlet from "./components/AnimatedOutlet";
+import Title from "./components/analysis/Title";
 
 // 하단 네비게이션을 숨길 경로 목록
-const HIDE_NAV_PATHS = ["/signup", "/login", "/diary/", "/video"];
+const HIDE_NAV_PATHS = ["/signup", "/login", "/diary", "/video", "/result", "/loading7"];
+const SHOW_TITLE_PATHS = ["/analysis", "/relation"];
+
+// ✅ 경로별 타이틀 매핑
+const TITLE_MAP: Record<string, string> = {
+  "/analysis": "감정 분석",
+  "/relation": "관계 분석",
+};
 
 export default function Layout() {
   const location = useLocation();
-  const isPopupOpen =useBottomPopupStore((state) => state.isOpen);
+  const isPopupOpen = useBottomPopupStore(state => state.isOpen);
 
   // 현재 경로가 네비게이션을 숨겨야 하는 경로에 포함되지 않는 경우만 보여줌
-  const shouldShowNav = !HIDE_NAV_PATHS.includes(location.pathname) && !isPopupOpen;
+  const shouldShowNav =
+    !HIDE_NAV_PATHS.some(path => location.pathname.startsWith(path)) && !isPopupOpen;
+
+  const shouldShowTitle = SHOW_TITLE_PATHS.includes(location.pathname);
+
+  // ✅ 현재 경로에 따른 타이틀 이름 결정
+  const getTitleName = (): string => {
+    return TITLE_MAP[location.pathname] || "페이지";
+  };
 
   return (
-    <div className="w-full min-h-[100dvh] flex justify-center bg-[#FAF6F4] font-pretendard">
-      <div className="w-full max-w-[414px] flex flex-col relative bg-[#FAF6F4] text-black min-h-[100dvh]">
-        <main className="flex-1 h-full bg-[#FAF6F4] pb-[84px]">
-          <Outlet />
+    <div className="w-full min-h-[100dvh] flex justify-center bg-[black] font-pretendard">
+      <div className="w-full max-w-[414px] flex flex-col relative bg-[#FAF6F4] dark:bg-gradient-to-b dark:from-[#181718] dark:via-[#181718] dark:to-[#4A3551] dark:text-white min-h-[100dvh] bg-fixed">
+        {/* ✅ 동적 타이틀 이름 적용 */}
+        {shouldShowTitle && <Title name={getTitleName()} isBackActive={false} back={""} />}
+        <main className={`flex-1 h-full ${shouldShowNav ? "pb-[84px]" : ""}`}>
+          <AnimatedOutlet />
           <Toaster
             position="top-center"
             expand={true}

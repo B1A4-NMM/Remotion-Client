@@ -17,6 +17,9 @@ export interface Node {
   isStatic?: boolean;
   colorA?: string; // optional, matches utils/animation.ts
   colorB?: string; // optional, matches utils/animation.ts
+  baseRadius: number;
+  bounceStart?: number;
+  bounceDuration?: number;
   id?: number | string; // 추가
   diaryId?: number | string; // 필요하다면 추가
 }

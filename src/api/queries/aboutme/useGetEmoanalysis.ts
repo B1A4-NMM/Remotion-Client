@@ -2,11 +2,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { getEmotionAnalysis } from "../../services/emotionAnalysis";
 
-export const useGetEmotionAnalysis = (token: string) => {
+export const useGetEmotionAnalysis = () => {
   return useQuery({
-    queryKey: ["EmotionAnalysis", token],
-    queryFn: () => getEmotionAnalysis(token),
-    enabled: !!token ,
+    queryKey: ["EmotionAnalysis"],
+    queryFn: () => {
+      console.log("useGetEmotionAnalysis - queryFn 실행");
+      return getEmotionAnalysis();
+    },
     staleTime: 1000 * 60 * 5,
   });
 };

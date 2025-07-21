@@ -1,6 +1,5 @@
 // Home.tsx
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useGetDiaryContent } from "../api/queries/home/useGetDiary";
+import React, { useState, useRef, useCallback } from "react";
 import { useGetDiaryDate } from "../api/queries/home/useGetDiaryDate";
 import { useGetHomeData } from "../api/queries/home/useGetHome";
 import DiaryCards from "../components/home/DiaryCards";
@@ -8,18 +7,16 @@ import Title from "../components/home/Title";
 import Index from "../components/home/Index";
 import { useNavigate } from "react-router-dom";
 import Map from "./Map";
-
-import { Canvas } from "@react-three/fiber";
+import HomeBar from "@/components/home/HomeBar";
+import { useTheme } from "@/components/theme-provider";
 
 import "../styles/homeCard.css";
 import dayjs from "dayjs";
-import Blob from "../components/Blob/Blob";
 import { useDeleteDiary } from "../api/queries/home/useDeleteDiary";
 import { useInfiniteDiaries } from "../api/queries/home/useInfiniteDiaries";
 import { useQueryClient } from "@tanstack/react-query";
 import { usePatchDiaryBookmark } from "../api/queries/home/usePatchDiaryBookmark";
-import RecommendHome from "@/components/home/RecommendHome";
-import RecommendHomeCard from "@/components/home/RecommendHomeCard";
+// import RecommendHome from "@/components/home/RecommendHome";
 
 // S3 → http 변환 (실제 CDN 도메인에 맞게 수정 필요)
 const s3ToHttpUrl = (s3Path: string) =>
@@ -53,10 +50,14 @@ function mapApiDiaryToDiaryCard(apiDiary: any) {
 const Home = () => {
   const token = localStorage.getItem("accessToken") || "";
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   const [selectedDate, setSelectedDate] = useState<Date>(dayjs().toDate());
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [selectedTab, setSelectedTab] = useState<"menu" | "location" | "search">("menu");
+  const [selectedTab, setSelectedTab] = useState<"list" | "map" | "search">("list");
 
   const handleDateSelect = useCallback((date: Date) => {
     const selected = dayjs(date);
@@ -77,9 +78,8 @@ const Home = () => {
   const patchBookmark = usePatchDiaryBookmark();
 
   const handleDeleteDiary = (diaryId: number) => {
-    const token = localStorage.getItem("accessToken") || "";
     deleteDiaryMutation.mutate(
-      { token, diaryId: String(diaryId) },
+      { diaryId: String(diaryId) },
       {
         onSuccess: () => {
           // useInfiniteDiaries의 query key와 동일하게 맞춤
@@ -90,11 +90,10 @@ const Home = () => {
   };
 
   const handleToggleBookmark = (diaryId: number) => {
-    const token = localStorage.getItem("accessToken") || "";
     const diary = infiniteDiaries.find(d => d.id === diaryId);
     if (!diary) return;
     patchBookmark.mutate(
-      { token, diaryId, isBookmarked: !diary.bookmarked },
+      { diaryId, isBookmarked: !diary.bookmarked },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["infiniteDiaries"] });
@@ -125,10 +124,7 @@ const Home = () => {
     data?.pages.flatMap(page => page.item.diaries.map(mapApiDiaryToDiaryCard)) ?? [];
 
   // API 호출 시 string 변환
-  const { data: todayData, isLoading } = useGetDiaryDate(
-    token,
-    dayjs(selectedDate).format("YYYY-MM-DD")
-  );
+  const { data: todayData, isLoading } = useGetDiaryDate(dayjs(selectedDate).format("YYYY-MM-DD"));
 
   // 새로운 Home API 호출
   const { data: homeData, isLoading: homeLoading, error: homeError } = useGetHomeData(token);
@@ -139,38 +135,58 @@ const Home = () => {
   const continuousWritingDate = homeData?.item?.continuousWritingDate ?? 0;
   const diaries = homeData?.item?.diaries?.map(mapApiDiaryToDiaryCard) || [];
 
+  // useEffect(() => {
+  //   if (!homeLoading && diaries.length === 0) {
+  //     setSelectedTab("map");
+  //   }
+  // }, [homeLoading, diaries]);
+
   // 데이터 확인용 console.log
 
   const todayDiary = todayData ? todayData : null;
 
   return (
-    <div className=" flex flex-col px-4">
-      <Title
-        emotionCountByMonth={emotionCountByMonth}
-        totalDiaryCount={totalDiaryCount}
-        continuousWritingDate={continuousWritingDate}
-        selectedTab={selectedTab}
-        setSelectedTab={setSelectedTab}
-      />
-      {selectedTab === "menu" && (
-        <>
-          <RecommendHomeCard />
-          <DiaryCards
-            diaries={infiniteDiaries}
-            onDeleteDiary={handleDeleteDiary}
-            onToggleBookmark={handleToggleBookmark}
-            lastItemRef={lastDiaryRef}
-          />
-        </>
-      )}
-      {selectedTab === "location" && (
-        <Map
-          continuousWritingDate={continuousWritingDate}
+    <div className="flex flex-col  text-foreground min-h-screen">
+      <div className="sticky top-0 z-50  rounded-b-2xl bg-[#FAF6F4] dark:bg-[#181718] dark:text-white pb-8">
+        <Title
           emotionCountByMonth={emotionCountByMonth}
           totalDiaryCount={totalDiaryCount}
+          continuousWritingDate={continuousWritingDate}
+          selectedTab={selectedTab}
+          setSelectedTab={setSelectedTab}
         />
-      )}
-      {/* <Index className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" /> */}
+      </div>
+      <HomeBar
+        continuousWritingDate={continuousWritingDate}
+        emotionCountByMonth={emotionCountByMonth}
+        totalDiaryCount={totalDiaryCount}
+      />{" "}
+      <div className="mx-4">
+        {selectedTab === "list" && (
+          <>
+            {homeData?.item?.diaries && homeData.item.diaries.length > 0 ? (
+              <>
+                {/* <RecommendHomeCard /> */}
+                <DiaryCards
+                  diaries={infiniteDiaries}
+                  onDeleteDiary={handleDeleteDiary}
+                  onToggleBookmark={handleToggleBookmark}
+                  lastItemRef={lastDiaryRef}
+                />
+              </>
+            ) : (
+              <Index className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+            )}
+          </>
+        )}
+        {selectedTab === "map" && (
+          <Map
+            continuousWritingDate={continuousWritingDate}
+            emotionCountByMonth={emotionCountByMonth}
+            totalDiaryCount={totalDiaryCount}
+          />
+        )}
+      </div>
     </div>
   );
 };

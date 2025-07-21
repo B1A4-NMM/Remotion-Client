@@ -1,19 +1,43 @@
 import { Checkbox } from "@/components/ui/checkbox";
-// import { useToggleTodo } from "@/api/queries/todo/useToggleTodo";
-import { useUpdateTodo } from "@/api/queries/todo/useUpdateTodo";
+import { useToggleTodo } from "@/api/queries/todo/useToggleTodo";
+import { useUpdateTodoContent } from "@/api/queries/todo/useUpdateTodoContent";
+import { useUpdateTodoDate } from "@/api/queries/todo/useUpdateTodoDate";
 import { useDeleteTodo } from "@/api/queries/todo/useDeleteTodo";
 import { useTodoStore } from "@/store/todoStore";
+import type { Todo } from "@/store/todoStore";
 import { useState } from "react";
+import BottomPopup from "@/components/BottomPopup";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal } from "lucide-react";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
+import "@/styles/day-picker.css";
+import { formatDate } from "@/utils/date";
+import { format } from "date-fns";
+import { ko, enUS } from "date-fns/locale";
 
-export default function TodoItem({ todo }) {
-  // const toggleTodo = useTodoStore((state) => state.toggleTodo);
-  // const { mutate } = useToggleTodo();
-  const { mutate: updateTodo } = useUpdateTodo();
+interface TodoItemProps {
+  todo: Todo;
+}
+
+export default function TodoItem({ todo }: TodoItemProps) {
+  const { mutate: toggleTodo } = useToggleTodo();
+  const { mutate: updateTodoContent } = useUpdateTodoContent();
+  const { mutate: updateTodoDate } = useUpdateTodoDate();
   const { mutate: deleteTodo } = useDeleteTodo();
   const setTodos = useTodoStore(state => state.setTodos);
   const [editing, setEditing] = useState(false);
-  const [value, setValue] = useState(todo.title);
+  const [value, setValue] = useState(todo.content);
   const [isComposing, setIsComposing] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
+
+  const locale = {
+    ...ko,
+    options: { ...ko.options, weekStartsOn: 1 },
+  };
+  const formatCaption = (month: Date) => format(month, "yyyy년 MM월", { locale });
+  const formatWeekdayName = (day: Date) => format(day, "EEE", { locale: enUS }).toUpperCase();
 
   const commitEdit = () => {
     const trimmed = value.trim();
@@ -23,12 +47,10 @@ export default function TodoItem({ todo }) {
       return;
     }
 
-    if (trimmed === todo.title) return;
+    if (trimmed === todo.content) return;
 
-    setTodos(prev =>
-      prev.map(t => (t.id === todo.id ? { ...t, title: trimmed } : t))
-    );
-    updateTodo({ id: todo.id, data: { title: trimmed } });
+    setTodos(prev => prev.map(t => (t.id === todo.id ? { ...t, content: trimmed } : t)));
+    updateTodoContent({ id: todo.id, data: { content: trimmed } });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -37,51 +59,100 @@ export default function TodoItem({ todo }) {
       commitEdit();
     } else if (e.key === "Escape") {
       e.preventDefault();
-      setValue(todo.title);
+      setValue(todo.content);
       setEditing(false);
+    }
+  };
+
+  const handleDelete = () => {
+    setTodos(prev => prev.filter(t => t.id !== todo.id));
+    deleteTodo(todo.id);
+    setSheetOpen(false);
+  };
+
+  const handleDateChange = (date: Date | undefined) => {
+    if (date) {
+      const newDate = formatDate(date);
+      setTodos(prev => prev.filter(t => t.id !== todo.id));
+      updateTodoDate({ id: todo.id, date: newDate });
+      setDatePickerOpen(false);
+      setSheetOpen(false);
     }
   };
 
   return (
     <li className="flex items-center gap-3">
-        {/* ✅ shadcn Checkbox 사용 & isCompleted 상태 연동 */}
-        <Checkbox
-            checked={todo.isCompleted}
-            onCheckedChange={(checked) => {
-              const complete = Boolean(checked);
-              setTodos(prev => prev.map(t =>
-                t.id === todo.id ? { ...t, isCompleted: complete } : t
-              ));
-              updateTodo({ id: todo.id, data: { isCompleted: complete } });
-            }}
-
-            // className={`flex-shrink-0
-            //     ${todo.isCompleted
-            //       ? "bg-white text-black border-white peer-checked:bg-white peer-checked:text-black"
-            //       : "border border-white bg-transparent text-white hover:border-blue-400 focus:ring-blue-400"
-            // }`}
+      <Checkbox
+        checked={todo.isComplete}
+        onCheckedChange={() => {
+          toggleTodo(todo.id);
+        }}
+      />
+      {editing ? (
+        <input
+          value={value}
+          onChange={e => setValue(e.target.value)}
+          onBlur={commitEdit}
+          onKeyDown={handleKeyDown}
+          onCompositionStart={() => setIsComposing(true)}
+          onCompositionEnd={() => setIsComposing(false)}
+          className="w-full bg-transparent outline-none placeholder:text-gray-400"
+          autoFocus
         />
-
-        {/* ✅ 완료 시 텍스트 회색 처리 및 클릭 시 인라인 편집 */}
-        {editing ? (
-          <input
-            value={value}
-            onChange={e => setValue(e.target.value)}
-            onBlur={commitEdit}
-            onKeyDown={handleKeyDown}
-            onCompositionStart={() => setIsComposing(true)}
-            onCompositionEnd={() => setIsComposing(false)}
-            className="w-full bg-transparent outline-none placeholder:text-gray-400"
-            autoFocus
-          />
-        ) : (
-          <span
-            className={todo.isCompleted ? "text-gray-400" : ""}
-            onClick={() => setEditing(true)}
+      ) : (
+        <span className={todo.isComplete ? "text-gray-400" : ""} onClick={() => setEditing(true)}>
+          {todo.content}
+        </span>
+      )}
+      <button
+        type="button"
+        onClick={() => setSheetOpen(true)}
+        className="ml-auto p-1 text-gray-500 hover:text-gray-700"
+      >
+        <MoreHorizontal className="w-4 h-4" />
+      </button>
+      <BottomPopup
+        isOpen={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        heightOption={{ wrapChildren: true }}
+      >
+        <div className="flex flex-col gap-3 w-full">
+          <Button
+            onClick={handleDelete}
+            className="w-full bg-[#F36B6B] hover:bg-[#e96060] text-white"
           >
-            {todo.title}
-          </span>
-        )}
+            삭제하기
+          </Button>
+
+          <Button
+            onClick={() => {
+              setDatePickerOpen(true);
+            }}
+            className="w-full"
+          >
+            날짜 변경하기
+          </Button>
+        </div>
+      </BottomPopup>
+      <BottomPopup
+        isOpen={datePickerOpen}
+        onClose={() => setDatePickerOpen(false)}
+        heightOption={{ wrapChildren: true }}
+      >
+        <DayPicker
+          mode="single"
+          selected={new Date(todo.date)}
+          onSelect={handleDateChange}
+          locale={locale}
+          formatters={{
+            formatCaption,
+            formatWeekdayName,
+          }}
+          // <TodoDatePicker
+          //   date={new Date(todo.date)}
+          className="bg-card text-card-foreground mx-auto"
+        />
+      </BottomPopup>
     </li>
   );
 }

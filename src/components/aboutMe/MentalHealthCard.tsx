@@ -19,8 +19,10 @@ const colorMap: Record<MentalType, string> = {
 };
 
 const MentalHealthCard = ({ isActive }: MentalCardProps) => {
-  const [currentType, setCurrentType] = useState<MentalType>("스트레스"); // ✅ 영어 아님!
-  const { data } = useMentalData(currentType, 365); // 최근 3일치
+  const [currentType, setCurrentType] = useState<MentalType>("스트레스");
+  const period = 365; // 최근 1년
+  const barCount = 12; // 12개월 표시
+  const { data } = useMentalData(currentType, period);
 
   const buttons: { type: MentalType; label: string }[] = [
     { type: "스트레스", label: "스트레스" },
@@ -56,9 +58,9 @@ const MentalHealthCard = ({ isActive }: MentalCardProps) => {
       </div>
 
       {/* 차트 및 상세 섹션 */}
-      <MentalChart type={currentType} data={data?.date ?? []} />
-      <ActivitySection type={currentType} data={data?.activities ?? []} />
-      <PeopleSection type={currentType} data={data?.people ?? []} />
+      <MentalChart type={currentType} data={data?.date ?? []} limit={barCount} />
+      <ActivitySection type={currentType} data={data?.activities ?? []} period={period} barCount={barCount} />
+      <PeopleSection type={currentType} data={data?.people ?? []} period={period} barCount={barCount} />
     </div>
   );
 };

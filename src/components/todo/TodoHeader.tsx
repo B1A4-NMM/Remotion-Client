@@ -1,10 +1,13 @@
 import React from "react";
 
-export default function TodoHeader() {
+interface TodoHeaderProps {
+  initialTab: string;
+}
+
+export default function TodoHeader({ initialTab }: TodoHeaderProps) {
   return (
     <div className="flex justify-between items-center mb-2">
-      <h2 className="text-lg font-bold">Inbox</h2>
-      {/* <button className="text-gray-500">⋯</button> */}
+      <h4 className="text-lg font-bold">{initialTab}</h4>
     </div>
   );
 }

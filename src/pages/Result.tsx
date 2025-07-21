@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 
 import { useGetDiaryContentResult } from "../api/queries/home/useGetDiary";
 import { useGetMemberSummary } from "../api/queries/result/useGetmemSummary";
+import { useDiaryOwnership } from "../hooks/useDiaryOwnership";
 
 import ResultHeader from "../components/result/ResultHeader";
 import EmotionSummary from "../components/result/EmotionSummary";
 import ResultToggle from "../components/result/ResultToggle";
 import DiaryView from "../components/result/DiaryView";
 import ResultView from "../components/result/ResultView";
+import ActivityEmotionCard from "../components/result/ActivityEmotionCard";
 
 import "../styles/resultCard.css";
 import "../styles/App.css";
@@ -18,6 +20,7 @@ import PeopleCard from "@/components/home/PeopleCard";
 // ✅ 안전한 샘플 데이터
 const sampleDiary = {
   id: 102,
+  userId: 1, // 소유자 ID 추가
   writtenDate: "2025-07-14",
   photoPath: [],
   audioPath: null,
@@ -70,8 +73,13 @@ const Result: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const token = localStorage.getItem("accessToken") || "";
   const location = useLocation();
+  const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
   const view = params.get("view") === "analysis" ? "analysis" : "record";
+  const { validateAccess } = useDiaryOwnership();
+
+  const [shouldFade, setShouldFade] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   const {
     data: diaryContent,
@@ -89,6 +97,17 @@ const Result: React.FC = () => {
 
     checkTouchDevice();
   }, []);
+
+  // 일기 소유권 확인
+  useEffect(() => {
+    if (diaryContent && !isLoading) {
+      const hasAccess = validateAccess(diaryContent);
+      if (!hasAccess) {
+        // 권한이 없으면 홈으로 리다이렉트
+        return;
+      }
+    }
+  }, [diaryContent, isLoading, validateAccess]);
 
   // 스크롤 상태 감지 (선택사항)
   useEffect(() => {
@@ -115,13 +134,24 @@ const Result: React.FC = () => {
     };
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen text-white">
-        일기 내용 로딩 중...
-      </div>
-    );
-  }
+  useEffect(() => {
+    // 페이드 효과 여부 확인
+    const fadeFlag = sessionStorage.getItem("shouldFadeFromLoading");
+
+    if (fadeFlag === "true") {
+      setShouldFade(true);
+      // 플래그 제거
+      sessionStorage.removeItem("shouldFadeFromLoading");
+
+      // 페이드 인 효과 시작
+      setTimeout(() => {
+        setIsVisible(true);
+      }, 2000);
+    } else {
+      // 페이드 효과 없이 즉시 표시
+      setIsVisible(true);
+    }
+  }, []);
 
   if (isError) {
     return (
@@ -138,15 +168,14 @@ const Result: React.FC = () => {
 
   const finalDiaryContent = diaryContent || sampleDiary;
 
-  console.log(finalDiaryContent);
 
   return (
     <div
-      className={`
-        result-container px-4 h-screen
-        ${isTouchDevice ? "overflow-y-auto scrollbar-hide touch-scroll" : "overflow-y-auto"}
-        ${isScrolling ? "scrolling" : ""}
-      `}
+      className={`result-container  h-screen text-foreground transition-opacity duration-1000 ${
+        shouldFade ? "fade-transition" : ""
+      } ${isTouchDevice ? "overflow-y-auto scrollbar-hide touch-scroll" : "overflow-y-auto"} ${
+        isScrolling ? "scrolling" : ""
+      }`}
       style={{
         WebkitOverflowScrolling: isTouchDevice ? "touch" : "auto",
         scrollBehavior: "smooth",
@@ -154,9 +183,13 @@ const Result: React.FC = () => {
       }}
     >
       {/* ✅ Header - 원래 위치 유지 */}
-      <ResultHeader writtenDate={finalDiaryContent.writtenDate || ""} />
+      <ResultHeader
+        writtenDate={finalDiaryContent.writtenDate || ""}
+        diaryId={Number(id)}
+        isBookmarked={false}
+      />
 
-      <div className="mt-[200px]">
+      <div>
         {/* ✅ Emotion Summary */}
         <EmotionSummary diaryContent={finalDiaryContent} />
 
@@ -167,7 +200,7 @@ const Result: React.FC = () => {
         {view === "record" ? (
           <DiaryView diaryContent={finalDiaryContent} />
         ) : (
-          <ResultView diaryContent={finalDiaryContent} />
+          <ResultView diaryContent={finalDiaryContent} isLoading={isLoading} />
         )}
       </div>
     </div>

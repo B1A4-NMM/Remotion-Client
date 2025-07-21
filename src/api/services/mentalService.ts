@@ -1,19 +1,13 @@
-import axios from "axios";
+import api from "../axios";
 
 export const getMentalData = async (
-  emotion: "스트레스" | "불안" | "우울",
+  emotion: "스트레스" | "불안" | "우울" | "활력" | "안정" | "유대",
   period: string | number
 ) => {
-  const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
-  const token = localStorage.getItem("accessToken");
-
-  const response = await axios.get(`${BASE_URL}/emotion`, {
+  const response = await api.get("/emotion", {
     params: {
       emotion,
       period,
-    },
-    headers: {
-      Authorization: `Bearer ${token}`,
     },
     paramsSerializer: params => {
       const usp = new URLSearchParams();
@@ -22,8 +16,61 @@ export const getMentalData = async (
       });
       return usp.toString();
     },
+    timeout: 15000, // 15초 타임아웃 유지
   });
-
 
   return response.data;
 };
+
+
+export const getNegativeData = async (
+  period: string | number
+) => {
+  const response = await api.get("/emotion/negative", {
+    params: {
+      period,
+    }
+  });
+
+  return response.data;
+};
+
+export const getPositiveData = async (
+  period: string | number
+) => {
+  const response = await api.get("/emotion/positive", {
+    params: {
+      period,
+    }
+  });
+
+  return response.data;
+};
+
+
+export const getNegativeActData = async (
+  period: string | number
+) => {
+  const response = await api.get("/emotion/activity/negative", {
+    params: {
+      period,
+    }
+  });
+
+  return response.data;
+};
+
+export const getPositiveActData = async (
+  period: string | number
+) => {
+  const response = await api.get("/emotion/activity/positive", {
+    params: {
+      period,
+    }
+  });
+
+  return response.data;
+};
+
+
+

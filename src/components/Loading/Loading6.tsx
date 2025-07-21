@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { useTheme } from "../theme-provider";
 
 const phrases: string[] = [
   "감정을 곱씹는 중이에요",
@@ -19,11 +20,8 @@ const phrases: string[] = [
   "조금만 기다려 주세요, 마음을 다듬는 중이에요",
 ];
 
-const COLORS = ["#82e79f", "#fcbcba", "#f8e76c", "#70cfe4"]; // green, red, yellow, blue
-const MAIN_TEXT_COLOR = "#22223B";
-const MAIN_BG_COLOR = "#FAF6F4";
+const COLORS = ["#82e79f", "#fcbcba", "#f8e76c", "#70cfe4"];
 
-// ✅ 타입 명시
 const shuffleArray = (array: string[]): string[] => {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -33,52 +31,73 @@ const shuffleArray = (array: string[]): string[] => {
 };
 
 const easeInOut = (t: number): number => {
-  const period = 200;
-  return (Math.sin(t / period + 100) + 1) / 2;
+  const period = 500;
+  const amplitude = 3.0;
+  return (Math.sin(t / period + 100) + 1) / 2 * amplitude;
 };
 
-// ✅ 체크 아이콘 타입 정의
 interface CheckRef {
   circle: SVGCircleElement | null;
   check: SVGPolygonElement | null;
+  currentAlpha: number; // 현재 alpha 값 추가
 }
 
 const Loading6: React.FC = () => {
   const phrasesRef = useRef<SVGGElement | null>(null);
   const checksRef = useRef<CheckRef[]>([]);
   const colorMapRef = useRef<string[]>([]);
-  const shuffledPhrases = useRef<string[]>(shuffleArray([...phrases]));
+  const doubledPhrases = useRef<string[]>([...shuffleArray([...phrases]), ...shuffleArray([...phrases])]);
+
+  const { theme } = useTheme();
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   useEffect(() => {
-    colorMapRef.current = shuffledPhrases.current.map(() => {
+    colorMapRef.current = doubledPhrases.current.map(() => {
       const randIdx = Math.floor(Math.random() * COLORS.length);
       return COLORS[randIdx];
     });
 
     const upwardGroup = phrasesRef.current;
     let currentY = 0;
-    const verticalSpacing = 70;
-    const startTime = new Date().getTime();
+    const verticalSpacing = 100;
+    const totalHeight = verticalSpacing * (doubledPhrases.current.length - 1);
+    const containerHeight = 400; // 컨테이너 높이
 
     const animate = () => {
       const now = new Date().getTime();
       if (!upwardGroup) return;
 
       upwardGroup.setAttribute("transform", `translate(0 ${currentY})`);
-      currentY -= 1.35 * easeInOut(now);
+      const baseSpeed = 0.15;
+      const easingValue = easeInOut(now);
+      currentY -= baseSpeed * easingValue;
 
+      // 무한 반복: 끝에 도달하면 처음으로 다시 시작
+      if (currentY <= -totalHeight / 2) {
+        currentY = 0;
+      }
+
+      // 체크 애니메이션: 화면 영역 안에 있을 때만 체크 표시
       checksRef.current.forEach((check, i) => {
-        const boundary = -i * verticalSpacing + verticalSpacing + 50;
-        if (currentY < boundary) {
-          const alpha = Math.max(Math.min(1 - (currentY - boundary + 15) / 30, 1), 0);
-          if (check.circle) check.circle.setAttribute("fill", `rgba(255,255,255,${alpha})`);
-          if (check.check) check.check.setAttribute("fill", `rgba(130,231,159,${alpha})`); // example: fade in green
+        const phraseY = 40 + i * 70 + currentY;
+        
+        // 화면 영역(0~containerHeight) 안에 있는지 확인
+        const isInViewport = phraseY >= 0 && phraseY <= containerHeight;
+        
+        let alpha = 0;
+        if (isInViewport) {
+          // 화면 영역 안에 있으면 체크 표시
+          alpha = 1;
         }
+        // 화면을 벗어나면 자동으로 alpha = 0이 되어 체크 해제
+        
+        if (check.circle) check.circle.setAttribute("fill", `rgba(255,255,255,${alpha})`);
+        if (check.check) check.check.setAttribute("fill", `rgba(130,231,159,${alpha})`);
       });
 
-      if (now - startTime < 30000 && currentY > -710) {
-        requestAnimationFrame(animate);
-      }
+      requestAnimationFrame(animate);
     };
 
     animate();
@@ -95,15 +114,15 @@ const Loading6: React.FC = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: MAIN_BG_COLOR,
+        background: " ",
       }}
     >
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          height: 290,
-          width: 400,
+          height: 400,
+          width: 700, // 500에서 700으로 확장
           overflow: "hidden",
         }}
       >
@@ -122,18 +141,31 @@ const Loading6: React.FC = () => {
 
           <g style={{ mask: "url(#mask)" }}>
             <g ref={phrasesRef}>
-              {shuffledPhrases.current.map((phrase, i) => {
+              {doubledPhrases.current.map((phrase, i) => {
                 const y = 40 + i * 70;
                 return (
                   <React.Fragment key={i}>
-                    <text x="50" y={y} fontSize="17" fontFamily="Arial" fill={MAIN_TEXT_COLOR}>
-                      {phrase}
-                    </text>
+                    {/* 줄바꿈이 가능한 텍스트 */}
+                    <foreignObject x="50" y={y - 10} width="600" height="50">
+                      <div 
+                        style={{
+                          fontSize: "16px",
+                          fontFamily: "Arial",
+                          color: isDark ? "#ffffff" : "#000000", // 다크모드 처리
+                          lineHeight: "1.4",
+                          wordWrap: "break-word",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {phrase}
+                      </div>
+                    </foreignObject>
+                    
                     <g transform={`translate(10 ${y - 20}) scale(.9)`}>
                       <circle
                         ref={el => {
                           if (!checksRef.current[i])
-                            checksRef.current[i] = { circle: null, check: null };
+                            checksRef.current[i] = { circle: null, check: null, currentAlpha: 0 };
                           checksRef.current[i].circle = el;
                         }}
                         cx="16"
@@ -146,7 +178,7 @@ const Loading6: React.FC = () => {
                       <polygon
                         ref={el => {
                           if (!checksRef.current[i])
-                            checksRef.current[i] = { circle: null, check: null };
+                            checksRef.current[i] = { circle: null, check: null, currentAlpha: 0 };
                           checksRef.current[i].check = el;
                         }}
                         points="21.661,7.643 13.396,19.328 9.429,15.361 7.075,17.714 13.745,24.384 24.345,9.708"
@@ -174,7 +206,7 @@ const Loading6: React.FC = () => {
           right: 0,
           display: "flex",
           justifyContent: "center",
-          color: MAIN_TEXT_COLOR,
+          color: "text-foreground",
         }}
       >
         <div id="logo" style={{ marginRight: 8 }}></div>

@@ -1,28 +1,15 @@
 // api/services/diaryContent.ts
-import axios from "axios";
+import api from "../axios";
 import type { DiaryResponse } from "../../types/diary";
 
-export const getDiaryContent = async (token: string, id: string): Promise<DiaryResponse> => {
-  const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
-
-  const response = await axios.get(`${BASE_URL}/diary/${id}`, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export const getDiaryContent = async (id: string): Promise<DiaryResponse> => {
+  const response = await api.get(`/diary/${id}`);
   // console.log(response.data);
   return response.data;
 };
-export const getDiaryContentResult = async (token: string, id: string): Promise<DiaryResponse> => {
-  const BASE_URL = import.meta.env.VITE_SOCIAL_AUTH_URL;
 
-  const response = await axios.get(`${BASE_URL}/diary/json/${id}`, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  // console.log(response.data);
+export const getDiaryContentResult = async (id: string): Promise<DiaryResponse> => {
+  const response = await api.get(`/diary/json/${id}`);
+  console.log("임구철 돼지", response.data);
   return response.data;
 };

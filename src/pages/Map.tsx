@@ -7,7 +7,7 @@ interface MarkerData {
   imageUrl?: string;
   text?: string;
 }
-import { useGetMapData } from "./../api/map/useGetMapData";
+import { useGetMapData } from "../api/queries/map/useGetMapData";
 
 // API 응답 타입
 interface ApiMarkerData {
@@ -26,6 +26,7 @@ interface MapProps {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Map: React.FC<MapProps> = _ => {
+  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -48,6 +49,8 @@ const Map: React.FC<MapProps> = _ => {
         zoom: 14,
       });
 
+      setMapInstance(map);
+
       // ✅ 현재 위치 요청
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -63,7 +66,16 @@ const Map: React.FC<MapProps> = _ => {
               position: userLatLng,
               map,
               icon: {
-                url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+                url:
+                  "data:image/svg+xml;charset=UTF-8," +
+                  encodeURIComponent(`
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" 
+                            fill="#2a1c31" stroke="#2a1c31" stroke-width="2"/>
+                    </svg>
+                  `),
+                scaledSize: new google.maps.Size(32, 32),
+                anchor: new google.maps.Point(16, 32),
               },
               title: "현재 위치",
             });
@@ -104,6 +116,41 @@ const Map: React.FC<MapProps> = _ => {
             bubble.style.overflow = "hidden";
             bubble.style.fontFamily = "sans-serif";
 
+            // 줌 레벨에 따른 크기 조정 함수 (꼬리 요소들은 나중에 정의되므로 제외)
+            const updateBubbleSize = () => {
+              const currentZoom = map.getZoom() || 14;
+              const baseSize = 70;
+              // 줌 레벨에 따른 크기 조정 (줌이 작을수록 크기도 작아짐)
+              let newSize;
+              if (currentZoom >= 17) {
+                newSize = baseSize;
+              } else if (currentZoom >= 10) {
+                newSize = baseSize * 0.9;
+              } else if (currentZoom >= 7) {
+                newSize = baseSize * 0.7;
+              } else if (currentZoom >= 5) {
+                newSize = baseSize * 0.6;
+              } else if (currentZoom >= 3) {
+                newSize = baseSize * 0.4;
+              } else if (currentZoom >= 1) {
+                newSize = baseSize * 0.3;
+              } else if (currentZoom >= 0) {
+                newSize = baseSize * 0.2;
+              } else {
+                // 최대 줌아웃 상태 (줌 레벨이 음수일 때)
+                newSize = baseSize * 0.1;
+              }
+
+              bubble.style.width = `${Math.round(newSize)}px`;
+              bubble.style.height = `${Math.round(newSize)}px`;
+            };
+
+            // 초기 크기 설정
+            updateBubbleSize();
+
+            // 줌 변경 이벤트 리스너 추가
+            google.maps.event.addListener(map, "zoom_changed", updateBubbleSize);
+
             // 🖼️ 이미지 or 텍스트 삽입
             if (markerData.photo_path) {
               const img = document.createElement("img");
@@ -137,7 +184,7 @@ const Map: React.FC<MapProps> = _ => {
             tailBorder.style.borderTop = "6px solid #ccc";
             tailBorder.style.zIndex = "0";
 
-            // 꼬리 내부 (흰색)
+            // 꼬리 내부 (border와 같은 색상)
             const tail = document.createElement("div");
             tail.style.position = "absolute";
             tail.style.top = "100%";
@@ -147,7 +194,7 @@ const Map: React.FC<MapProps> = _ => {
             tail.style.height = "0";
             tail.style.borderLeft = "5px solid transparent";
             tail.style.borderRight = "5px solid transparent";
-            tail.style.borderTop = "5px solid white";
+            tail.style.borderTop = "5px solid #ccc";
             tail.style.zIndex = "1";
 
             // 외부 래퍼
@@ -188,11 +235,26 @@ const Map: React.FC<MapProps> = _ => {
   }, [markerDataList]);
 
   return (
-    <div
-      ref={mapRef}
-      className="bg-white rounded-2xl shadow  overflow-hidden"
-      style={{ height: "calc(100vh - 250px )", minHeight: 150 }}
-    />
+    <div style={{ position: "relative" }}>
+      {/* 줌아웃 버튼 */}
+      <button
+        onClick={() => {
+          if (mapInstance) {
+            mapInstance.setZoom(5);
+          }
+        }}
+        className="absolute top-4 right-4 z-50 bg-[#FAF6F4] dark:bg-[#4A3551] shadow-lg rounded-lg px-3 py-2 text-sm font-medium text-black dark:text-black transition-colors"
+      >
+        줌아웃
+      </button>
+
+      {/* 지도 컨테이너 */}
+      <div
+        ref={mapRef}
+        className="bg-white rounded-2xl shadow overflow-hidden"
+        style={{ height: "calc(100vh - 250px)", minHeight: 150 }}
+      />
+    </div>
   );
 };
 

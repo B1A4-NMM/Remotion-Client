@@ -2,6 +2,8 @@ import { ChevronRight } from "lucide-react";
 import MentalChart from "../aboutMe/Mental/MentalChart";
 import { useMentalData } from "./../../api/queries/aboutme/useMentalData";
 import { useNavigate } from "react-router-dom";
+import LoadingAnimation from "../Loading";
+
 
 
 const Depress=()=>{
@@ -11,7 +13,7 @@ const Depress=()=>{
         navigator("/analysis/depress");
     }
 
-    const { data } = useMentalData("우울", 4); // 최근 3일치
+    const { data, isLoading } = useMentalData("우울", 365); // 최근 3일치
     
     return(
         <div className="w-full mt-5 " >
@@ -29,7 +31,11 @@ const Depress=()=>{
                 <hr className="mr-5 ml-5"/>
                 <div className="h-44 content-end">
                     <div className="h-fit">
-                        <MentalChart type={"우울"} data={data?.date ?? []} />
+                    {isLoading? (
+                        <LoadingAnimation />
+                        ) : (
+                        <MentalChart type={"우울"} data={data.date} limit={4} />
+                        )}
                     </div>
                 </div>
             </div>

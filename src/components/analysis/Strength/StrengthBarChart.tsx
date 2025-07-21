@@ -1,19 +1,15 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
+import type { DetailStrength } from "@/types/strength";
+import { useTheme } from "@/components/theme-provider";
 
 type StrengthBarChartProps = {
-  lastData: {
-    detailCount: Record<string, Record<string, number>>;
-    typeCount: Record<string, number>;
-  };
-  currentData: {
-    detailCount: Record<string, Record<string, number>>;
-    typeCount: Record<string, number>;
-  };
+  lastData: DetailStrength | null;
+  currentData: DetailStrength | null;
   selectedCategory: string | null;
 };
 
-const LAST_COLOR = "#007aff"; // 전체 데이터 - 파란색
+const LAST_COLOR = "#007aff"; // 저번 달 데이터 - 파란색
 const CURRENT_COLOR = "#ff9500"; // 이번 달 데이터 - 주황색
 
 const CATEGORY_GROUPS: Record<string, string[]> = {
@@ -21,48 +17,100 @@ const CATEGORY_GROUPS: Record<string, string[]> = {
   도전: ["용감함", "끈기", "정직함", "활력"],
   정의: ["팀워크", "공정함", "리더십"],
   배려: ["사랑", "친절함", "사회적 지능"],
-  절제: ["용서", "겸손", "신중함", "자기 조절"],
+  절제: ["용서", "겸손", "신중함", "자기조절"],
   긍정: ["미적 감상", "감사", "희망", "유머"],
 };
 
+function normalizeValues(values: number[], maxAllowed: number) {
+  const maxValue = Math.max(...values, 0);
+  if (maxValue > maxAllowed) {
+    return values.map(v => (v / maxValue) * maxAllowed);
+  }
+  return values;
+}
+
 const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthBarChartProps) => {
+  const { theme } = useTheme();
+    const isDark =
+      theme === "dark" ||
+      (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
   const ref = useRef<SVGSVGElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
   const category = selectedCategory || "지혜";
   const detailKeys = CATEGORY_GROUPS[category] || [];
+
+  // 컨테이너 크기 감지
+  useEffect(() => {
+    const updateSize = () => {
+      if (containerRef.current) {
+        const { width, height } = containerRef.current.getBoundingClientRect();
+        setContainerSize({ width, height });
+      }
+    };
+
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
 
   useEffect(() => {
     const svg = d3.select(ref.current);
     svg.selectAll("*").remove();
 
-    if (detailKeys.length === 0) {
+    if (detailKeys.length === 0 || containerSize.width <= 0 || containerSize.height <= 0) {
       return;
     }
 
-    // 동적 차트 크기 (세부 항목 수에 따라 조정)
+    // 원본 값 추출
+    const lastValues = detailKeys.map(key => Math.max(0, (lastData && lastData[key]) || 0));
+    const currentValues = detailKeys.map(key => Math.max(0, (currentData && currentData[key]) || 0));
+    // 전체 값 중 최댓값
+    const allValues = [...lastValues, ...currentValues];
+    // 기준치
+    const maxAllowed = 8;
+    // 정규화
+    const normLastValues = normalizeValues(lastValues, maxAllowed);
+    const normCurrentValues = normalizeValues(currentValues, maxAllowed);
+
+    // 컨테이너 크기에 맞춰 동적 조정
+    const containerWidth = Math.max(containerSize.width, 300);
+    const containerHeight = Math.max(containerSize.height - 50, 200);
+
     const itemCount = detailKeys.length;
-    const barWidth = 30;
-    const groupGap = 15;
-    const barGap = 6;
-    const groupWidth = barWidth * 2 + barGap;
-    const lastWidth = itemCount * groupWidth + (itemCount - 1) * groupGap;
-    const width = Math.max(lastWidth + 100, 400); // 최소 400px
-    const height = 300;
-    const offsetX = (width - lastWidth) / 2;
+    const availableWidth = containerWidth - 60;
+    const groupWidth = Math.min(80, Math.max(50, availableWidth / itemCount));
+    const barWidth = Math.min(30, Math.max(15, groupWidth * 0.35));
+    const barGap = Math.min(6, Math.max(2, groupWidth * 0.1));
+    const groupGap = Math.max(10, (availableWidth - itemCount * groupWidth) / (itemCount - 1));
+
+    const totalWidth = itemCount * groupWidth + (itemCount - 1) * groupGap;
+    const offsetX = (containerWidth - totalWidth) / 2;
+
+    const width = containerWidth;
+    const height = containerHeight;
+
+    // barHeightRatio를 forEach 밖으로 이동
+    const maxBarHeight = Math.max(100, height - 100);
+    const barHeightRatio = Math.max(10, Math.min(25, maxBarHeight / maxAllowed));
 
     svg.attr("width", width).attr("height", height);
 
     // 각 세부 분류에 대해 막대 생성
     detailKeys.forEach((key, i) => {
-      // 안전한 접근
-      const lastValue = (lastData && lastData[key]) || 0;
-      const currentValue = (currentData && currentData[key]) || 0;
+      const lastValue = normLastValues[i];
+      const currentValue = normCurrentValues[i];
 
       const groupX = offsetX + i * (groupWidth + groupGap);
 
-      // 전체 데이터 막대 (파란색)
+      // 막대 높이 계산 (음수 방지)
+      const lastBarHeight = Math.max(0, Math.min(lastValue * barHeightRatio, maxBarHeight));
+      const currentBarHeight = Math.max(0, Math.min(currentValue * barHeightRatio, maxBarHeight));
+
+      // 저번 달 데이터 막대
       const lastBarX = groupX;
-      const lastBarY = height - lastValue * 25 - 60;
+      const lastBarY = Math.max(20, height - lastBarHeight - 60);
 
       svg
         .append("rect")
@@ -76,11 +124,11 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
         .duration(800)
         .delay(i * 100)
         .attr("y", lastBarY)
-        .attr("height", lastValue * 25);
+        .attr("height", lastBarHeight);
 
-      // 이번 달 데이터 막대 (주황색)
+      // 이번 달 데이터 막대
       const currentBarX = groupX + barWidth + barGap;
-      const currentBarY = height - currentValue * 25 - 60;
+      const currentBarY = Math.max(20, height - currentBarHeight - 60);
 
       svg
         .append("rect")
@@ -94,62 +142,63 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
         .duration(800)
         .delay(i * 100 + 150)
         .attr("y", currentBarY)
-        .attr("height", currentValue * 25);
+        .attr("height", currentBarHeight);
 
-      // 전체 데이터 수치 표시
+      // 수치 표시
+      const lastTextY = Math.max(15, lastBarY - 8);
+      const currentTextY = Math.max(15, currentBarY - 8);
+
       svg
         .append("text")
         .attr("x", lastBarX + barWidth / 2)
-        .attr("y", lastBarY - 8)
+        .attr("y", lastTextY)
         .attr("text-anchor", "middle")
         .attr("fill", LAST_COLOR)
         .style("font-size", "12px")
         .style("font-weight", "600")
-        .text(lastValue)
+        .text(lastData ? lastData[key] : 0)
         .style("opacity", 0)
         .transition()
         .duration(300)
         .delay(i * 100 + 800)
         .style("opacity", 1);
 
-      // 이번 달 데이터 수치 표시
       svg
         .append("text")
         .attr("x", currentBarX + barWidth / 2)
-        .attr("y", currentBarY - 8)
+        .attr("y", currentTextY)
         .attr("text-anchor", "middle")
         .attr("fill", CURRENT_COLOR)
         .style("font-size", "12px")
         .style("font-weight", "600")
-        .text(currentValue)
+        .text(currentData ? currentData[key] : 0)
         .style("opacity", 0)
         .transition()
         .duration(300)
         .delay(i * 100 + 950)
         .style("opacity", 1);
 
-      // 세부 분류 라벨 (한글 표시)
-      const displayLabel = key;
-
-      svg
+      // 라벨
+        svg
         .append("text")
         .attr("x", groupX + groupWidth / 2)
         .attr("y", height - 35)
         .attr("text-anchor", "middle")
-        .attr("fill", "#333")
+        .attr("fill", isDark ? "#ffffff" : "#333")
         .style("font-size", "13px")
         .style("font-weight", "500")
-        .text(displayLabel);
+        .text(key);
+    
     });
 
     // 범례 추가
     const legendGroup = svg.append("g").attr("class", "legend");
+    const legendX = Math.max(10, width - 140);
 
-    // 전체 범례
     legendGroup
       .append("rect")
-      .attr("x", width - 130)
-      .attr("y", 20)
+      .attr("x", legendX)
+      .attr("y", 10)
       .attr("width", 14)
       .attr("height", 14)
       .attr("fill", LAST_COLOR)
@@ -157,18 +206,17 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
 
     legendGroup
       .append("text")
-      .attr("x", width - 110)
-      .attr("y", 31)
-      .attr("fill", "#333")
+      .attr("x", legendX + 21)
+      .attr("y", 21)
+      .attr("fill", isDark ? "#ffffff" : "#333")
       .style("font-size", "12px")
       .style("font-weight", "500")
-      .text("전체");
+      .text("저번 달");
 
-    // 이번 달 범례
     legendGroup
       .append("rect")
-      .attr("x", width - 70)
-      .attr("y", 20)
+      .attr("x", legendX + 70)
+      .attr("y", 10)
       .attr("width", 14)
       .attr("height", 14)
       .attr("fill", CURRENT_COLOR)
@@ -176,39 +224,48 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
 
     legendGroup
       .append("text")
-      .attr("x", width - 50)
-      .attr("y", 31)
-      .attr("fill", "#333")
+      .attr("x", legendX + 90)
+      .attr("y", 21)
+      .attr("fill", isDark ? "#ffffff" : "#333")
       .style("font-size", "12px")
       .style("font-weight", "500")
       .text("이번 달");
 
-    // 격자 라인 추가
+    // 격자 라인 추가 (이제 barHeightRatio에 접근 가능)
     const gridGroup = svg.append("g").attr("class", "grid");
 
     for (let i = 1; i <= 8; i++) {
-      const y = height - 60 - i * 25;
-      gridGroup
-        .append("line")
-        .attr("x1", offsetX - 15)
-        .attr("y1", y)
-        .attr("x2", offsetX + lastWidth + 15)
-        .attr("y2", y)
-        .attr("stroke", "#f5f5f5")
-        .attr("stroke-width", 1)
-        .attr("stroke-dasharray", "2,2");
+      const y = height - 60 - i * barHeightRatio;
+      if (y > 20) {
+        gridGroup
+          .append("line")
+          .attr("x1", Math.max(0, offsetX - 15))
+          .attr("y1", y)
+          .attr("x2", Math.min(width, offsetX + totalWidth + 15))
+          .attr("y2", y)
+          .attr("stroke", "#f5f5f5")
+          .attr("stroke-width", 1)
+          .attr("stroke-dasharray", "2,2");
+      }
     }
-  }, [lastData, currentData, selectedCategory, category, detailKeys]);
+  }, [lastData, currentData, selectedCategory, category, detailKeys, containerSize]);
+
+  // null 체크는 Hook 호출 이후에!
+  if (!lastData && !currentData) {
+    return <div>데이터가 없습니다.</div>;
+  }
 
   return (
-    <div className="flex justify-left ">
-      <div className="absolute flex py-1 px-4 gap-2 mb-4 mt-2">
+    <div ref={containerRef} className="w-full h-full relative">
+      <div className="absolute top-0 left-0 flex gap-2 z-10">
         <span className="inline-block px-4 py-1 rounded-full text-lg font-medium shadow">
           {selectedCategory}
         </span>
-        <h3 className="text-black text-xl py-1">의 세부 강점</h3>
+        <h3 className="text-black text-xl">의 세부 강점</h3>
       </div>
-      <svg ref={ref}></svg>
+      <div className="pt-12 w-full h-full ">
+        <svg ref={ref} className="w-full h-full"></svg>
+      </div>
     </div>
   );
 };

@@ -1,18 +1,17 @@
 // src/constants/emotionColors.ts
 
-export type ColorKey = "gray" | "gray1" | "gray2" | "blue" | "green" | "red" | "yellow";
+export type ColorKey = "gray" | "blue" | "green" | "red" | "yellow";
 
 export const baseColors: Record<ColorKey, string> = {
-  green: "#23db91",
-  red: "#fc1111",
-  yellow: "#f2e52a",
-  blue: "#1c90d8",
-  gray: "#E1E1E1",
-  gray1: "#E1E1E1",
-  gray2: "#E1E1E1",
+  green: "#72C9A3",
+  red: "#F36B6B",
+  yellow: "#FFD47A",
+  blue: "#7DA7E3",
+  gray: "#DADADA"
 } as const;
 
-export const mapEmotionToColor = (emotion: string): ColorKey => {
+// 🟡
+export const mapEmotionToColor = (emotion: string): ColorKey => {  
   const highEnergyPleasant = new Set([
     "행복",
     "기쁨",
@@ -30,6 +29,7 @@ export const mapEmotionToColor = (emotion: string): ColorKey => {
     "놀람",
   ]);
 
+  // 🔴
   const highEnergyUnpleasant = new Set([
     "분노",
     "짜증",
@@ -46,6 +46,7 @@ export const mapEmotionToColor = (emotion: string): ColorKey => {
     "상처",
   ]);
 
+  // 🔵
   const lowEnergyUnpleasant = new Set([
     "우울",
     "슬픔",
@@ -67,6 +68,7 @@ export const mapEmotionToColor = (emotion: string): ColorKey => {
     "부담",
   ]);
 
+  // 🟢
   const lowEnergyPleasant = new Set([
     "평온",
     "편안",
@@ -81,9 +83,9 @@ export const mapEmotionToColor = (emotion: string): ColorKey => {
     "만족감",
   ]);
 
-  if (highEnergyPleasant.has(emotion)) return "yellow";
-  if (highEnergyUnpleasant.has(emotion)) return "red";
-  if (lowEnergyUnpleasant.has(emotion)) return "blue";
-  if (lowEnergyPleasant.has(emotion)) return "green";
-  return "gray1";
+  if (highEnergyPleasant.has(emotion)) return "yellow"; // 🟡
+  if (highEnergyUnpleasant.has(emotion)) return "red";  // 🔴
+  if (lowEnergyUnpleasant.has(emotion)) return "blue";  // 🔵
+  if (lowEnergyPleasant.has(emotion)) return "green";   // 🟢
+  return "gray";
 };

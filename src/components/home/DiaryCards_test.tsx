@@ -5,20 +5,20 @@ import clsx from "clsx";
 import { useDiaryStore } from "./Calender";
 import { Button } from "../ui/button";
 import { useDeleteDiary } from "../../api/queries/home/useDeleteDiary";
+import { toast } from "sonner";
 
 interface DiaryCardsProps {
-    hasTodayDiary: boolean;
-    todayDiary: any | null;
-    diaryContent: any | null;
-    isContentLoading: boolean;
-    isContentError: boolean;
+  hasTodayDiary: boolean;
+  todayDiary: any | null;
+  diaryContent: any | null;
+  isContentLoading: boolean;
+  isContentError: boolean;
 }
 
 const sampleDiary = {
   id: "sample",
-  title: "오늘 하루는 어땠나요? 일기를 작성해보세요."
+  title: "오늘 하루는 어땠나요? 일기를 작성해보세요.",
 };
-
 
 const DiaryCards = ({
   hasTodayDiary,
@@ -33,7 +33,6 @@ const DiaryCards = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   // 카드 확장 상태 관리
-  const token = localStorage.getItem("accessToken") || "";
   const { isExpanded, setIsExpanded } = useDiaryStore();
   const [isImageExpanded, setIsImageExpanded] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -58,14 +57,12 @@ const DiaryCards = ({
 
     try {
       await deleteDiaryMutation.mutateAsync({
-        token,
         diaryId: displayDiary.diaryId.toString(),
       });
-      
+
       // 삭제 성공 시 모달 닫기
       setShowDeleteConfirm(false);
       setIsExpanded(false);
-      
     } catch (error) {
       console.error("일기 삭제 중 오류 발생:", error);
     }
@@ -75,9 +72,6 @@ const DiaryCards = ({
   const handleCancelDelete = () => {
     setShowDeleteConfirm(false);
   };
-
-  
-
 
   // 감정 매핑 함수
   const mapEmotionToColor = (emotion: string): keyof typeof baseColors => {
@@ -150,27 +144,26 @@ const DiaryCards = ({
   const getPeopleWithEmotions = () => {
     // todayDiary 구조로 변경
     if (!hasTodayDiary || !todayDiary?.todayDiaries?.[0]?.targets) return [];
-    
+
     const firstDiary = todayDiary.todayDiaries[0];
     const targets = firstDiary.targets || [];
     const emotions = firstDiary.emotions || [];
-    
+
     // targets 배열의 각 사람에게 기본 감정 색상 할당
     return targets.map((personName: string, index: number) => {
       // 해당 일기의 감정들 중 첫 번째를 기본으로 사용하거나 순환 할당
       const assignedEmotion = emotions[index % emotions.length] || "무난";
       const emotionColor = mapEmotionToColor(assignedEmotion);
-      
+
       return {
         name: personName,
         emotionColor: emotionColor,
         dominantEmotion: assignedEmotion,
         emotionIntensity: 5, // 기본값
-        name_similarity: 0
+        name_similarity: 0,
       };
     });
   };
-  
 
   // 카드 클릭 핸들러
   const handleCardClick = () => {
@@ -190,7 +183,6 @@ const DiaryCards = ({
     e.stopPropagation(); // 부모 클릭 이벤트 방지
     setIsImageExpanded(true);
   };
-
 
   return (
     <>
@@ -235,8 +227,8 @@ const DiaryCards = ({
               <div
                 className="absolute inset-0 w-full h-full rounded-3xl"
                 style={{
-                  backgroundImage: diaryContent?.photo_path 
-                    ? `url(${diaryContent.photo_path})` 
+                  backgroundImage: diaryContent?.photo_path
+                    ? `url(${diaryContent.photo_path})`
                     : "none", // 그라데이션 제거
                   backgroundSize: "cover",
                   backgroundPosition: "center",
@@ -249,12 +241,9 @@ const DiaryCards = ({
                 )}
               </div>
 
-
               {/* 카드 컨텐츠 */}
               <div className="relative z-10 backdrop-blur-sm rounded-3xl p-4 shadow-white border border-white/20">
                 <div className="flex flex-col p-2">
-                  
-
                   {/* 인물 태그 영역 */}
                   {getPeopleWithEmotions().length > 0 && (
                     <div className="mb-auto pt-6 pb-3">
@@ -291,7 +280,7 @@ const DiaryCards = ({
                         )}
                       >
                         {hasTodayDiary
-                          ? makePreview(todayDiary?.todayDiaries?.[0]?.content)  // content 필드 사용
+                          ? makePreview(todayDiary?.todayDiaries?.[0]?.content) // content 필드 사용
                           : "일기를 작성해주세요. 여기에는 일기 내용이 3줄까지 미리보기로 나타납니다."}
                       </p>
                     )}
@@ -397,9 +386,7 @@ const DiaryCards = ({
                   {/* 날짜 정보 */}
                   {todayDiary?.todayDiaries?.[0] && (
                     <div className="text-white/70 text-sm mb-6">
-                      {dayjs(todayDiary.todayDiaries[0].writtenDate).format(
-                        "YYYY년 MM월 DD일"
-                      )}
+                      {dayjs(todayDiary.todayDiaries[0].writtenDate).format("YYYY년 MM월 DD일")}
                     </div>
                   )}
 
@@ -551,13 +538,13 @@ const DiaryCards = ({
                     </div>
                   )}
                   <div>
-                    <Button 
+                    <Button
                       className="mt-10"
                       onClick={handleDeleteDiary}
                       disabled={deleteDiaryMutation.isPending}
                       style={{
                         backgroundColor: "#e64545",
-                        color: "#110303"
+                        color: "#110303",
                       }}
                     >
                       {deleteDiaryMutation.isPending ? "삭제 중..." : "일기 삭제하기"}
@@ -586,22 +573,22 @@ const DiaryCards = ({
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
             >
               {/* 아이콘 */}
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                  <svg 
-                    className="w-8 h-8 text-red-600" 
-                    fill="none" 
-                    stroke="currentColor" 
+                  <svg
+                    className="w-8 h-8 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" 
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                     />
                   </svg>
                 </div>
@@ -609,12 +596,8 @@ const DiaryCards = ({
 
               {/* 메시지 */}
               <div className="text-center mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  정말 삭제하시겠습니까?
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  삭제 후엔 복구 할 수 없습니다.
-                </p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">정말 삭제하시겠습니까?</h3>
+                <p className="text-gray-600 text-sm">삭제 후엔 복구 할 수 없습니다.</p>
               </div>
 
               {/* 버튼들 */}
@@ -626,7 +609,7 @@ const DiaryCards = ({
                   disabled={deleteDiaryMutation.isPending}
                   style={{
                     borderColor: "#d1d5db",
-                    color: "#6b7280"
+                    color: "#6b7280",
                   }}
                 >
                   취소
@@ -637,7 +620,7 @@ const DiaryCards = ({
                   disabled={deleteDiaryMutation.isPending}
                   style={{
                     backgroundColor: "#e64545",
-                    color: "#ffffff"
+                    color: "#ffffff",
                   }}
                 >
                   {deleteDiaryMutation.isPending ? "삭제 중..." : "삭제하기"}

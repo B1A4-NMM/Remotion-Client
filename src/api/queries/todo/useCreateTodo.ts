@@ -16,8 +16,12 @@ export const useCreateTodo = () => {
 
     // Optimistic update: 로컬 스토어에 먼저 추가 → 사용자 UX 좋음
     onMutate: async newTodo => {
-      const tempId = Date.now().toString();
-      const optimisticTodo = { ...newTodo, id: tempId, isCompleted: false };
+      const tempId = Date.now();
+      const optimisticTodo = {
+        id: tempId,
+        content: newTodo.content,
+        isComplete: false,
+      };
       setTodos(prev => [...prev, optimisticTodo]);
       return { tempId };
     },
@@ -28,6 +32,7 @@ export const useCreateTodo = () => {
         setTodos(prev => prev.map(t => (t.id === context.tempId ? created : t)));
       }
       queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.invalidateQueries({ queryKey: ["monthlyStatus"] });
     },
 
     // 실패 시: 필요하다면 rollback 처리도 가능

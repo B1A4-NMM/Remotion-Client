@@ -1,10 +1,10 @@
 .buttonContainer {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  width: calc(100% - 20px);  /* 화면 너비에 맞게 조정, 좌우 10px 여백 */
-  max-width: 300px;  /* 최대 너비 제한으로 overflow 방지 */
-  margin: 0 auto;  /* 중앙 정렬 */
+  grid-template-columns: repeat(3, 1fr);
+  width: calc(100% - 20px); /* 화면 너비에 맞게 조정, 좌우 10px 여백 */
+  max-width: 400px; /* 최대 너비 제한으로 overflow 방지 */
+  margin: 0 auto; /* 중앙 정렬 */
   border-radius: 9999px;
   background: #ffffff;
   font-weight: 600;
@@ -12,27 +12,27 @@
   cursor: pointer;
   overflow: hidden;
   padding: 2px;
-  top: 5px;  /* top 값 유지 */
-  box-shadow:#b8b8b8 0px 3px 8px;
+  top: 5px; /* top 값 유지 */
+  /* box-shadow: #b8b8b8 0px 3px 8px; */
+  /* Tailwind shadow-md */
+  /* box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); */
 }
 
 .button {
-  flex: 1;  /* 버튼이 동일한 너비 차지 */
-  padding: 6px 16px;  /* 패딩 조정 */
+  flex: 1; /* 버튼이 동일한 너비 차지 */
+  padding: 6px 16px; /* 패딩 조정 */
   border: 2px solid #ffffff;
   border-radius: 9999px;
-  background: #ffffff;  /* 기본 배경 흰색 */
-  color: #000000;  /* 기본 텍스트 색상 */
+  background: #ffffff; /* 기본 배경 흰색 */
+  color: #000000; /* 기본 텍스트 색상 */
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
 }
 
 .button.active {
-  background: #000000;  /* 활성 시 검은색 */
-  color: #ffffff;  /* 활성 시 텍스트 흰색 */
-  border-color: #FFFFFF;
+  background: #000000; /* 활성 시 검은색 */
+  color: #ffffff; /* 활성 시 텍스트 흰색 */
+  border-color: #ffffff;
 }
-
-

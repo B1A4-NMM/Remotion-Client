@@ -3,12 +3,16 @@ import { useEffect } from "react";
 import TodoItem from "./TodoItem";
 import TodoInputRow from "./TodoInputRow";
 import { useTodos } from "@/api/queries/todo/useTodos";
+import { useSelectedDate } from "@/hooks/useSelectedDate";
+import { formatDate } from "@/utils/date";
+
 export default function TodoList() {
   const todos = useTodoStore(state => state.todos);
   const showDone = useTodoStore(state => state.showDone);
   const toggleShowDone = useTodoStore(state => state.toggleShowDone);
 
-  const { data: fetchedTodos } = useTodos();
+  const { selectedDate } = useSelectedDate();
+  const { data: fetchedTodos } = useTodos(formatDate(selectedDate));
   const setTodos = useTodoStore(state => state.setTodos);
 
   useEffect(() => {
@@ -23,10 +27,10 @@ export default function TodoList() {
   }, [fetchedTodos, setTodos]);
 
   const activeTodos = Array.isArray(todos)
-    ? todos.filter(todo => !todo.isCompleted).sort((a, b) => a.id - b.id)
+    ? todos.filter(todo => !todo.isComplete).sort((a, b) => a.id - b.id)
     : [];
   const doneTodos = Array.isArray(todos)
-    ? todos.filter(todo => todo.isCompleted).sort((a, b) => a.id - b.id)
+    ? todos.filter(todo => todo.isComplete).sort((a, b) => a.id - b.id)
     : [];
   return (
     <div className="overflow-y-auto flex-grow">

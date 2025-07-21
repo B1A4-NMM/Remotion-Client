@@ -84,6 +84,24 @@ const Relation = () => {
     return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   }, []);
 
+  const mobileSettings = useMemo(() => {
+    if (!isMobile) {
+      return {
+        dpr: Math.min(window.devicePixelRatio, 2),
+        antialias: true,
+        powerPreference: "high-performance" as const
+      };
+    }
+
+    // 모바일 기기별 최적화
+    const dpr = window.devicePixelRatio;
+    return {
+      dpr: dpr >= 3 ? 2 : Math.min(dpr, 1.5), // ✅ 적절한 DPR 사용
+      antialias: true, // ✅ 안티알리어싱 활성화
+      powerPreference: "default" as const
+    };
+  }, [isMobile]);
+
   // 노드 생성
   useEffect(() => {
     if (!relationData?.relations?.relations || !containerRef.current) return;
@@ -281,7 +299,7 @@ const Relation = () => {
             <Canvas
               orthographic
               camera={{
-                position: [0, 0, 350],
+                position: [0, 0, 250],
                 zoom: 1,
                 left: -canvasWidth / 2,
                 right: canvasWidth / 2,
@@ -300,13 +318,19 @@ const Relation = () => {
                 zIndex: 2,
               }}
               gl={{
-                antialias: !isMobile, // ✅ 모바일에서 안티알리어싱 비활성화
+                antialias: mobileSettings.antialias, // ✅ 안티알리어싱 활성화
                 alpha: true,
-                powerPreference: isMobile ? "default" : "high-performance", // ✅ 모바일 최적화
+                powerPreference: mobileSettings.powerPreference,
                 preserveDrawingBuffer: true,
+                // ✅ 모바일 추가 최적화
+                ...(isMobile && {
+                  precision: "mediump", // 중간 정밀도로 성능 향상
+                  stencil: false,        // 스텐실 버퍼 비활성화
+                })
               }}
-              dpr={isMobile ? 1 : Math.min(window.devicePixelRatio, 2)} // ✅ 모바일에서 DPR 1로 고정
+              dpr={mobileSettings.dpr} // ✅ 최적화된 DPR
             >
+            
               <ambientLight intensity={0.6} />
               <pointLight position={[0, 0, 500]} intensity={0.4} />
               

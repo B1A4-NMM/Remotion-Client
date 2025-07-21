@@ -26,8 +26,7 @@ interface MapProps {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Map: React.FC<MapProps> = _ => {
-
-  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null); 
+  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -50,7 +49,6 @@ const Map: React.FC<MapProps> = _ => {
         zoom: 14,
       });
 
-      //채민 추가
       setMapInstance(map);
 
       // ✅ 현재 위치 요청
@@ -109,6 +107,23 @@ const Map: React.FC<MapProps> = _ => {
             bubble.style.overflow = "hidden";
             bubble.style.fontFamily = "sans-serif";
 
+            // 줌 레벨에 따른 크기 조정 함수 (꼬리 요소들은 나중에 정의되므로 제외)
+            const updateBubbleSize = () => {
+              const currentZoom = map.getZoom() || 14;
+              const baseSize = 70;
+              const zoomFactor = Math.max(0.6, Math.min(1.5, currentZoom / 14));
+              const newSize = Math.round(baseSize * zoomFactor);
+
+              bubble.style.width = `${newSize}px`;
+              bubble.style.height = `${newSize}px`;
+            };
+
+            // 초기 크기 설정
+            updateBubbleSize();
+
+            // 줌 변경 이벤트 리스너 추가
+            google.maps.event.addListener(map, "zoom_changed", updateBubbleSize);
+
             // 🖼️ 이미지 or 텍스트 삽입
             if (markerData.photo_path) {
               const img = document.createElement("img");
@@ -142,18 +157,18 @@ const Map: React.FC<MapProps> = _ => {
             tailBorder.style.borderTop = "6px solid #ccc";
             tailBorder.style.zIndex = "0";
 
-            // 꼬리 내부 (흰색)
+            // 꼬리 내부 (border와 같은 색상)
             const tail = document.createElement("div");
             tail.style.position = "absolute";
             tail.style.top = "100%";
-            tail.style.left = "100%";
-            tail.style.transform = "translateX(50%)";
-            tail.style.width = "100100";
-            tail.style.height = "100";
-            tail.style.borderLeft = "100px solid";
-            tail.style.borderRight = "100px solid ";
-            tail.style.borderTop = "1000px solid white";
-            tail.style.zIndex = "9999";
+            tail.style.left = "50%";
+            tail.style.transform = "translateX(-50%)";
+            tail.style.width = "0";
+            tail.style.height = "0";
+            tail.style.borderLeft = "5px solid transparent";
+            tail.style.borderRight = "5px solid transparent";
+            tail.style.borderTop = "5px solid #ccc";
+            tail.style.zIndex = "1";
 
             // 외부 래퍼
             const outer = document.createElement("div");
@@ -193,26 +208,25 @@ const Map: React.FC<MapProps> = _ => {
   }, [markerDataList]);
 
   return (
-    <div style= {{position: "relative"}}>
-      {/*줌아웃 버튼*/}
+    <div style={{ position: "relative" }}>
+      {/* 줌아웃 버튼 */}
       <button
         onClick={() => {
           if (mapInstance) {
-            mapInstance.setZoom(5); // 전 세계 뷰
-            mapInstance.setCenter({ lat: 36.5, lng: 127.5 }); // 한국 중심
+            mapInstance.setZoom(5);
           }
         }}
-        className="absolute top-[60px] right-[10px] z-50 bg-white shadow-md rounded px-3 py-1 text-sm"
+        className="absolute top-4 right-4 z-50 bg-[#FAF6F4] dark:bg-[#4A3551] shadow-lg rounded-lg px-3 py-2 text-sm font-medium text-black dark:text-black hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
       >
         줌아웃
       </button>
-    {/*지도 컨테이너*/}
 
-    <div
-      ref={mapRef}
-      className="bg-white rounded-2xl shadow  overflow-hidden"
-      style={{ height: "calc(100vh - 250px )", minHeight: 150 }}
-    />
+      {/* 지도 컨테이너 */}
+      <div
+        ref={mapRef}
+        className="bg-white rounded-2xl shadow overflow-hidden"
+        style={{ height: "calc(100vh - 250px)", minHeight: 150 }}
+      />
     </div>
   );
 };

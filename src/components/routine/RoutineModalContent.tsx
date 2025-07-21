@@ -1,6 +1,7 @@
 // RoutineModalContent.tsx
-import { useState } from "react";
+import { useState,useRef } from "react";
 import { RoutineItem } from "@/types/routine";
+import { BottomPopupHandle } from "../BottomPopup";
 
 interface RoutineModalContentProps {
   emotion: string;
@@ -8,6 +9,7 @@ interface RoutineModalContentProps {
   onAdd: (content: string) => void;
   onDelete: (id: number) => void;
   onClose: () => void;
+  popupRef: React.RefObject<BottomPopupHandle>;
 }
 
 const RoutineModalContent = ({
@@ -16,6 +18,7 @@ const RoutineModalContent = ({
   onAdd,
   onDelete,
   onClose,
+  popupRef,
 }: RoutineModalContentProps) => {
   const [newRoutine, setNewRoutine] = useState("");
 
@@ -32,7 +35,7 @@ const RoutineModalContent = ({
       <div className="flex justify-between items-center mb-4">
         <div className="text-lg font-bold text-black dark:text-white">{emotion} 루틴 모아보기</div>
         <button
-          onClick={onClose}
+          onClick={() => popupRef.current?.close()}
           className="text-gray-500 text-sm hover:text-black border border-gray-300 rounded px-3 py-1"
         >
           닫기

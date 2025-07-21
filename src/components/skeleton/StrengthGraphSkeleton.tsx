@@ -2,7 +2,10 @@ import React from "react";
 
 const StrengthGraphSkeleton = () => {
   return (
-    <div className="w-full animate-pulse">
+    <div
+      className="w-full opacity-10"
+      style={{ animation: "custom-pulse 2s ease-in-out infinite" }}
+    >
       {/* 헤더 영역 */}
       <div className="flex justify-between items-center mb-4">
         <div className="w-32 h-6 bg-gray-200 rounded"></div>

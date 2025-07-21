@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import ActivityCardSlider from "./ActivityCardSlider";
 import Todos from "./Todo";
 import WarningTestBox from "../WariningTestBox";
-import TestModal from "../TestModal";
+import TestModal from "./Test/TestModal";
 import PeopleCard from "../home/PeopleCard";
 import ActivityAnalysisCard from "../home/ActivityAnalysisCard";
 import IntensityChart from "./IntensityChart";

@@ -2,7 +2,10 @@ import React from "react";
 
 const PeopleSectionSkeleton = () => {
   return (
-    <div className="w-full animate-pulse">
+    <div
+      className="w-full opacity-10"
+      style={{ animation: "custom-pulse 2s ease-in-out infinite" }}
+    >
       {/* 사람 리스트 */}
       <div className="space-y-4 px-4">
         {Array.from({ length: 3 }).map((_, index) => (
@@ -33,12 +36,12 @@ const PeopleSectionSkeleton = () => {
       </div>
 
       {/* 하단 정보 */}
-      <div className="mt-6 px-4">
+      {/* <div className="mt-6 px-4">
         <div className="flex justify-between items-center">
           <div className="w-28 h-4 bg-gray-200 rounded"></div>
           <div className="w-24 h-4 bg-gray-200 rounded"></div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

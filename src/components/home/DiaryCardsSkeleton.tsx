@@ -4,7 +4,13 @@ const DiaryCardsSkeleton: React.FC = () => {
   return (
     <div className="flex flex-col gap-6 w-full max-w-[420px] mx-auto">
       {[1, 2, 3].map(index => (
-        <div key={index} className="w-full bg-white rounded-lg shadow-md p-3 animate-pulse">
+        <div
+          key={index}
+          className="w-full bg-white rounded-lg shadow-md p-3 opacity-10"
+          style={{
+            animation: "custom-pulse 2s ease-in-out infinite",
+          }}
+        >
           <div className="grid grid-cols-3 gap-2 rounded-lg mb-2" style={{ height: "120px" }}>
             {/* Blob 스켈레톤 */}
             <div className="col-span-1 h-full">

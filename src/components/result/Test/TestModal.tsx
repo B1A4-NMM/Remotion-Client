@@ -1,18 +1,18 @@
 // components/TestModal.tsx
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "../components/ui/button";
-import { Card } from "../components/ui/card";
-import { Label } from "../components/ui/label";
-import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
-import { Progress } from "../components/ui/progress";
-import { PHQ_QUESTIONS, PHQ_OPTIONS } from "../constants/phq-9";
-import { GAD7_QUESTIONS, GAD7_OPTIONS } from "../constants/gad-7";
-import { STRESS_QUESTIONS, STRESS_OPTIONS } from "../constants/pss";
-import { TEST_INTRO } from "../constants/testIntro";
+import { Button } from "../../ui/button";
+import { Card } from "../../ui/card";
+import { Label } from "../../ui/label";
+import { RadioGroup, RadioGroupItem } from "../../ui/radio-group";
+import { Progress } from "../../ui/progress";
+import { PHQ_QUESTIONS, PHQ_OPTIONS } from "../../../constants/phq-9";
+import { GAD7_QUESTIONS, GAD7_OPTIONS } from "../../../constants/gad-7";
+import { STRESS_QUESTIONS, STRESS_OPTIONS } from "../../../constants/pss";
+import { TEST_INTRO } from "../../../constants/testIntro";
 import { X } from "lucide-react";
 import TestResult from "./TestResult";
-import { postTestComplete } from "../api/services/test";
+import { postTestComplete } from "../../../api/services/test";
 
 type IncomingType = "phq9" | "gad7" | "stress" | "depression" | "anxiety";
 

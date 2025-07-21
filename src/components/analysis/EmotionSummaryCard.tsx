@@ -4,7 +4,7 @@ import {
   useNegativeData,
   usePositiveData,
 } from "@/api/queries/aboutme/useMentalData";
-import EmotionSummaryCardSkeleton from "./EmotionSummaryCardSkeleton";
+import EmotionSummaryCardSkeleton from "../skeleton/EmotionSummaryCardSkeleton";
 import MentalChart from "../aboutMe/Mental/MentalChart";
 
 type MentalType = "스트레스" | "불안" | "우울" | "활력" | "안정" | "유대";

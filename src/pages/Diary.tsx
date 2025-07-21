@@ -12,7 +12,7 @@ import DiaryTitle from "@/components/diary/DiaryTitle";
 import BottomNavi from "@/components/diary/BottomNavi";
 import MonthlyCalendar from "@/components/diary/MontlyCalendar";
 import { toast } from "sonner";
-import Loading7 from "@/components/Loading/Loading7";
+import Loading7 from "@/components/Loading/MainLoading";
 
 const Diary = () => {
   const { date } = useParams();

@@ -1,8 +1,7 @@
 import { Canvas } from "@react-three/fiber";
 import React, { useEffect, useState } from "react";
 import LoadingBlob from "../Blob/Loading/LodingBlob";
-import Loading6 from "./Loading6";
-
+import InSideLoading from "./InSideLoading";
 const ANALYSIS_STEPS = [
   "AI가 당신의 일기를 펼치고 있어요...",
   "감정의 흐름을 따라가고 있습니다...",
@@ -68,7 +67,7 @@ const Loading7 = () => {
         </Canvas>
       </div>
       <div className="relative w-[350px] h-[200px] mb-30">
-        <Loading6 />
+        <InSideLoading />
       </div>
 
       {/* 팁 표시 영역 */}

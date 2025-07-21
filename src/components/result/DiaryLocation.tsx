@@ -1,7 +1,6 @@
 // src/components/result/DiaryLocation.tsx
 
 import React from "react";
-import { MapPin } from "lucide-react";
 
 interface DiaryLocationProps {
   location: {
@@ -34,7 +33,23 @@ const DiaryLocation: React.FC<DiaryLocationProps> = ({ location }) => {
       />
       {/* 커스텀 툴팁 */}
       <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-        <MapPin className="w-8 h-8 text-[#2a1c31] stroke-[#2a1c31] stroke-2 fill-transparent drop-shadow-lg" />
+        <svg
+          width="32"
+          height="32"
+          viewBox="0 0 32 32"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="drop-shadow-lg"
+        >
+          {/* 막대기 (아래 부분) - 회색 */}
+          <rect x="14" y="16" width="4" height="12" fill="#666666" rx="2" />
+
+          {/* 동그란 부분 (위쪽) - 빨간색 */}
+          <circle cx="16" cy="12" r="8" fill="#FF4444" stroke="#CC0000" strokeWidth="1" />
+
+          {/* 중앙 점 */}
+          <circle cx="16" cy="12" r="2.5" fill="white" />
+        </svg>
       </div>
     </div>
   );

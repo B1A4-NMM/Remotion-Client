@@ -215,12 +215,21 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                         xmlns="http://www.w3.org/2000/svg"
                         className="drop-shadow-lg"
                       >
-                        <path
-                          d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
-                          fill="#2a1c31"
-                          stroke="#2a1c31"
-                          strokeWidth="2"
+                        {/* 막대기 (아래 부분) - 회색 */}
+                        <rect x="10" y="12" width="4" height="10" fill="#666666" rx="2" />
+
+                        {/* 동그란 부분 (위쪽) - 빨간색 */}
+                        <circle
+                          cx="12"
+                          cy="10"
+                          r="6"
+                          fill="#FF4444"
+                          stroke="#CC0000"
+                          stroke-width="1"
                         />
+
+                        {/* 중앙 점 */}
+                        <circle cx="12" cy="10" r="2" fill="white" />
                       </svg>
                     </div>
                   </div>
@@ -322,12 +331,21 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                       xmlns="http://www.w3.org/2000/svg"
                       className="drop-shadow-lg"
                     >
-                      <path
-                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
-                        fill="#2a1c31"
-                        stroke="#2a1c31"
-                        strokeWidth="2"
+                      {/* 막대기 (아래 부분) - 회색 */}
+                      <rect x="10" y="12" width="4" height="10" fill="#666666" rx="2" />
+
+                      {/* 동그란 부분 (위쪽) - 빨간색 */}
+                      <circle
+                        cx="12"
+                        cy="10"
+                        r="6"
+                        fill="#FF4444"
+                        stroke="#CC0000"
+                        stroke-width="1"
                       />
+
+                      {/* 중앙 점 */}
+                      <circle cx="12" cy="10" r="2" fill="white" />
                     </svg>
                   </div>
                 </div>

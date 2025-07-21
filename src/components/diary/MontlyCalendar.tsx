@@ -7,15 +7,21 @@ import dayjs from "dayjs";
 interface MonthlyCalendarProps {
   selectedDate: string;
   onDateSelect: (date: string) => void;
-  onClose: () => void;
-  isOpen: boolean;
+  onClose?: () => void;
+  isOpen?: boolean;
+  /**
+   * When true, render the calendar without its own overlay or modal
+   * wrapper so it can be embedded inside another component.
+   */
+  disableOverlay?: boolean;
 }
 
 const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   selectedDate,
   onDateSelect,
   onClose,
-  isOpen,
+  isOpen = true,
+  disableOverlay = false,
 }) => {
   const [currentMonth, setCurrentMonth] = useState(dayjs(selectedDate));
   const [calendarDays, setCalendarDays] = useState<(dayjs.Dayjs | null)[]>([]);
@@ -48,7 +54,9 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   const handleDateClick = (date: dayjs.Dayjs) => {
     const formattedDate = date.format("YYYY-MM-DD");
     onDateSelect(formattedDate);
-    onClose();
+    if (!disableOverlay) {
+      onClose?.();
+    }
   };
 
   const goToPreviousMonth = () => {
@@ -63,24 +71,29 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {(disableOverlay ? true : isOpen) && (
         <>
           {/* 배경 오버레이 */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-30 z-40"
-            onClick={onClose}
-          />
+          {!disableOverlay && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black bg-opacity-30 z-40"
+              onClick={onClose}
+            />
+          )}
 
           {/* 달력 모달 */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="absolute top-20 left-4 right-4 bg-white rounded-lg shadow-xl z-50 p-4"
-          >
+            className={
+              disableOverlay
+                ? "bg-white rounded-lg shadow-xl p-4"
+                : "absolute top-20 left-4 right-4 bg-white rounded-lg shadow-xl z-50 p-4"
+            }          >
             {/* 달력 헤더 */}
             <div className="flex items-center justify-between mb-4">
               <button

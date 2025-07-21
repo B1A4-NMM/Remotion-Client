@@ -23,7 +23,7 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
 
   const { heightPixel: _heightPixel, wrapChildren } = heightOption || {};
   const heightPixel = wrapChildren
-    ? Math.max(contentRef.current?.offsetHeight || 0, 400) // 최소 400px 보장
+    ? Math.max(contentRef.current?.offsetHeight || 0, 520) // 최소 400px 보장
     : _heightPixel || window.innerHeight * 0.8;
 
   const [springProps, api] = useSpring(() => ({

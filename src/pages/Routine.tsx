@@ -81,6 +81,18 @@ const Routine = () => {
     }
   };
 
+  // 루틴 폴더 상태관리 위한 함수 - 1
+  const refreshTriggeredRoutines = async () => { 
+    try{
+      const updated = await getTriggerRoutine();
+      setTriggeredRoutines(updated);
+    }catch(err){
+      console.error("루틴 생신 실패:", err);
+    }
+    // const data = await getTriggerRoutine();
+    // setTriggeredRoutines(data);
+  } 
+
   const handleFolderClick = async (emotionTitle: string) => {
     const emotionKey = emotionTitle as RoutineItem["routineType"];
     // console.log("🔥 폴더 클릭됨", emotionKey);
@@ -194,7 +206,9 @@ const Routine = () => {
             </p>
           </div>
         ) : (
-          <PersonalizedRoutineList routines={displayRoutines} />
+          <PersonalizedRoutineList 
+          routines={displayRoutines}
+          onRefresh= {refreshTriggeredRoutines} />
         );
       })()}
 

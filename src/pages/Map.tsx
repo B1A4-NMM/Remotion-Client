@@ -66,7 +66,16 @@ const Map: React.FC<MapProps> = _ => {
               position: userLatLng,
               map,
               icon: {
-                url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+                url:
+                  "data:image/svg+xml;charset=UTF-8," +
+                  encodeURIComponent(`
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" 
+                            fill="#2a1c31" stroke="#2a1c31" stroke-width="2"/>
+                    </svg>
+                  `),
+                scaledSize: new google.maps.Size(32, 32),
+                anchor: new google.maps.Point(16, 32),
               },
               title: "현재 위치",
             });
@@ -111,11 +120,29 @@ const Map: React.FC<MapProps> = _ => {
             const updateBubbleSize = () => {
               const currentZoom = map.getZoom() || 14;
               const baseSize = 70;
-              const zoomFactor = Math.max(0.6, Math.min(1.5, currentZoom / 14));
-              const newSize = Math.round(baseSize * zoomFactor);
+              // 줌 레벨에 따른 크기 조정 (줌이 작을수록 크기도 작아짐)
+              let newSize;
+              if (currentZoom >= 17) {
+                newSize = baseSize;
+              } else if (currentZoom >= 10) {
+                newSize = baseSize * 0.9;
+              } else if (currentZoom >= 7) {
+                newSize = baseSize * 0.7;
+              } else if (currentZoom >= 5) {
+                newSize = baseSize * 0.6;
+              } else if (currentZoom >= 3) {
+                newSize = baseSize * 0.4;
+              } else if (currentZoom >= 1) {
+                newSize = baseSize * 0.3;
+              } else if (currentZoom >= 0) {
+                newSize = baseSize * 0.2;
+              } else {
+                // 최대 줌아웃 상태 (줌 레벨이 음수일 때)
+                newSize = baseSize * 0.1;
+              }
 
-              bubble.style.width = `${newSize}px`;
-              bubble.style.height = `${newSize}px`;
+              bubble.style.width = `${Math.round(newSize)}px`;
+              bubble.style.height = `${Math.round(newSize)}px`;
             };
 
             // 초기 크기 설정
@@ -216,7 +243,7 @@ const Map: React.FC<MapProps> = _ => {
             mapInstance.setZoom(5);
           }
         }}
-        className="absolute top-4 right-4 z-50 bg-[#FAF6F4] dark:bg-[#4A3551] shadow-lg rounded-lg px-3 py-2 text-sm font-medium text-black dark:text-black hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        className="absolute top-4 right-4 z-50 bg-[#FAF6F4] dark:bg-[#4A3551] shadow-lg rounded-lg px-3 py-2 text-sm font-medium text-black dark:text-black transition-colors"
       >
         줌아웃
       </button>

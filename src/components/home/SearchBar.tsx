@@ -8,6 +8,7 @@ interface SearchBarProps {
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onSearch }) => {
+  console.log("🔍 SearchBar value prop:", value);
   return (
     <div
       className="bg-white rounded-bl-2xl rounded-br-2xl shadow-xl p-4 animate-slide-down-fade w-full mb-4"
@@ -21,9 +22,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onSearch }) => {
           <li>・팀장이 내 아이디어를 처음 칭찬해줬을 때</li>
         </ul>
       </div>
-      <div className="flex items-center bg-gray-100 rounded-xl px-4 py-2">
+      <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-xl px-4 py-2">
         <input
-          className="w-full bg-transparent outline-none text-base dark:text-gray-700"
+          className="w-full bg-transparent outline-none text-base text-gray-900 dark:text-white"
           placeholder="예: 원겸이가 회의에 빠졌던 날 "
           value={value}
           onChange={e => onChange(e.target.value)}
@@ -32,7 +33,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onSearch }) => {
           }}
         />
         <button onClick={onSearch} aria-label="검색">
-          <Search className="w-5 h-5 text-gray-500 ml-3" />
+          <Search className="w-5 h-5 text-gray-500 dark:text-gray-300 ml-3" />
         </button>
       </div>
     </div>

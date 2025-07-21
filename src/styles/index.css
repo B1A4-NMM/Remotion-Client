@@ -89,6 +89,14 @@
     backdrop-filter: blur(16px) saturate(180%);
     border-radius: 20px;
   }
+  .dark .calendar-modal {
+    background-color: #181718 !important;
+    opacity: 0.4;
+  }
+}
+.calendar-modal {
+  background-color: #faf6f4 !important;
+  opacity: 0.4;
 }
 
 @layer base {
@@ -258,14 +266,4 @@
 
 .animate-slide-down-fade {
   animation: slideDownFade 1s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes custom-pulse {
-  0%,
-  100% {
-    opacity: 0.1;
-  }
-  50% {
-    opacity: 0.2;
-  }
 }

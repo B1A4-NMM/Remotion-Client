@@ -44,10 +44,12 @@ const SearchCategories: React.FC<SearchCategoriesProps> = ({
   };
 
   const handleDateSelect = (date: string) => {
+    console.log("🔍 SearchCategories handleDateSelect 호출됨:", date);
+    console.log("🔍 onDateSelect prop 존재 여부:", !!onDateSelect);
     setSelectedDate(date);
     setIsCalendarOpen(false);
     onDateSelect?.(date);
-    onCategorySelect("date");
+    // onCategorySelect("date"); // 제거 - SearchPage에서 직접 처리
   };
 
   return (
@@ -79,6 +81,11 @@ const SearchCategories: React.FC<SearchCategoriesProps> = ({
         onClose={() => setIsCalendarOpen(false)}
         isOpen={isCalendarOpen}
       />
+      {console.log("🔍 MonthlyCalendar props:", {
+        selectedDate,
+        isCalendarOpen,
+        onDateSelect: typeof handleDateSelect,
+      })}
     </>
   );
 };

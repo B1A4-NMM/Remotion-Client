@@ -3,6 +3,7 @@ import React, { useState, useRef, useCallback } from "react";
 import { useGetDiaryDate } from "../api/queries/home/useGetDiaryDate";
 import { useGetHomeData } from "../api/queries/home/useGetHome";
 import DiaryCards from "../components/home/DiaryCards";
+import DiaryCardsSkeleton from "../components/home/DiaryCardsSkeleton";
 import Title from "../components/home/Title";
 import Index from "../components/home/Index";
 import { useNavigate } from "react-router-dom";
@@ -146,7 +147,7 @@ const Home = () => {
   const todayDiary = todayData ? todayData : null;
 
   return (
-    <div className="flex flex-col  text-foreground min-h-screen">
+    <div className="flex flex-col text-foreground ">
       <div className="sticky top-0 z-50  rounded-b-2xl bg-[#FAF6F4] dark:bg-[#181718] dark:text-white pb-8">
         <Title
           emotionCountByMonth={emotionCountByMonth}
@@ -164,7 +165,9 @@ const Home = () => {
       <div className="mx-4">
         {selectedTab === "list" && (
           <>
-            {homeData?.item?.diaries && homeData.item.diaries.length > 0 ? (
+            {homeLoading ? (
+              <DiaryCardsSkeleton />
+            ) : homeData?.item?.diaries && homeData.item.diaries.length > 0 ? (
               <>
                 {/* <RecommendHomeCard /> */}
                 <DiaryCards

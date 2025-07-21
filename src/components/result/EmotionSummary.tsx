@@ -23,14 +23,18 @@ const mapEmotionsWithIntensity = (diaryContent: any) => {
   const emotionMap = new Map<string, number>();
 
   activityAnalysis.forEach((activity: any) => {
+    console.log("Activity:", activity.activity);
     // 1. People의 interactions 감정 처리
     if (activity.peoples && Array.isArray(activity.peoples)) {
       activity.peoples.forEach((person: any) => {
+        console.log("Person:", person.name, "Interactions:", person.interactions);
         const interactions = person.interactions;
         if (interactions && interactions.emotion && interactions.emotion_intensity) {
+          console.log("Interactions emotions:", interactions.emotion);
           interactions.emotion.forEach((emotion: string, index: number) => {
             if (emotion && emotion !== "string") {
               const intensity = interactions.emotion_intensity[index] || 0;
+              console.log("Adding interaction emotion:", emotion, "intensity:", intensity);
               emotionMap.set(emotion, (emotionMap.get(emotion) || 0) + intensity);
             }
           });
@@ -39,12 +43,15 @@ const mapEmotionsWithIntensity = (diaryContent: any) => {
     }
 
     // 2. Self emotions 처리
+    console.log("Self emotions:", activity.self_emotions);
     if (activity.self_emotions) {
       const selfEmotions = activity.self_emotions;
       if (selfEmotions.emotion && selfEmotions.emotion_intensity) {
+        console.log("Self emotions array:", selfEmotions.emotion);
         selfEmotions.emotion.forEach((emotion: string, index: number) => {
           if (emotion && emotion !== "string") {
             const intensity = selfEmotions.emotion_intensity[index] || 0;
+            console.log("Adding self emotion:", emotion, "intensity:", intensity);
             emotionMap.set(emotion, (emotionMap.get(emotion) || 0) + intensity);
           }
         });
@@ -52,12 +59,15 @@ const mapEmotionsWithIntensity = (diaryContent: any) => {
     }
 
     // 3. State emotions 처리
+    console.log("State emotions:", activity.state_emotions);
     if (activity.state_emotions) {
       const stateEmotions = activity.state_emotions;
       if (stateEmotions.emotion && stateEmotions.emotion_intensity) {
+        console.log("State emotions array:", stateEmotions.emotion);
         stateEmotions.emotion.forEach((emotion: string, index: number) => {
           if (emotion && emotion !== "string") {
             const intensity = stateEmotions.emotion_intensity[index] || 0;
+            console.log("Adding state emotion:", emotion, "intensity:", intensity);
             emotionMap.set(emotion, (emotionMap.get(emotion) || 0) + intensity);
           }
         });
@@ -94,6 +104,7 @@ const extractTargets = (diaryContent: any) => {
 
 const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
   const rawEmotions = mapEmotionsWithIntensity(diaryContent);
+  console.log("Raw emotions:", rawEmotions);
   const targets = extractTargets(diaryContent);
 
   // ✅ 색상과 강도 계산
@@ -125,17 +136,17 @@ const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
       .slice(0, 3)
       .map(([color, total]) => ({
         color,
-        intensity: total / totalIntensity
+        intensity: total / totalIntensity,
       }));
 
     // ✅ 총합을 정확히 1.000으로 맞추기
     const rounded = sortedResults.map(item => ({
       color: item.color,
-      intensity: Math.round(item.intensity * 1000) / 1000
+      intensity: Math.round(item.intensity * 1000) / 1000,
     }));
 
     const sum = rounded.reduce((acc, item) => acc + item.intensity, 0);
-    const diff = 1.000 - sum;
+    const diff = 1.0 - sum;
     if (Math.abs(diff) > 0.001 && rounded.length > 0) {
       rounded[0].intensity = Math.round((rounded[0].intensity + diff) * 1000) / 1000;
     }
@@ -149,22 +160,24 @@ const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
     .slice(0, 3)
     .map(item => item.emotion)
     .join(", ");
-  
+
+  console.log("Main emotions:", mainEmotions);
+
   const targetNames = targets.join(", ");
 
   return (
     <div className="flex flex-col items-center text-center space-y-[16px] mb-4">
       <p className="text-sm text-gray-500">하루의 감정</p>
       <div className="w-[130px] h-[130px]">
-        <Canvas 
+        <Canvas
           camera={{ position: [0, 0, 10], fov: 30 }}
-          gl={{ 
+          gl={{
             antialias: true,
             alpha: true,
             powerPreference: "high-performance",
             preserveDrawingBuffer: true,
           }}
-          style={{ background: 'transparent' }}
+          style={{ background: "transparent" }}
           dpr={Math.min(window.devicePixelRatio, 2)}
         >
           <ambientLight intensity={0.6} />

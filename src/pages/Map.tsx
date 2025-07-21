@@ -251,7 +251,7 @@ const Map: React.FC<MapProps> = _ => {
       {/* 지도 컨테이너 */}
       <div
         ref={mapRef}
-        className="bg-white rounded-2xl shadow overflow-hidden"
+        className="rounded-2xl shadow overflow-hidden"
         style={{ height: "calc(100vh - 250px)", minHeight: 150 }}
       />
     </div>

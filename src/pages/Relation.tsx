@@ -80,26 +80,29 @@ const Relation = () => {
     return emotions;
   };
 
+  const isMobile = useMemo(() => {
+    return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }, []);
+
   // 노드 생성
   useEffect(() => {
     if (!relationData?.relations?.relations || !containerRef.current) return;
     
     const container = containerRef.current;
     const rect = container.getBoundingClientRect();
-    
-    const expandedWidth = rect.width * 1.3;  // 20% 확장
-    const expandedHeight = rect.height * 1.3; // 20% 확장
+        
+    const expandedWidth = rect.width * 1.3;
+    const expandedHeight = rect.height * 1.3;
     
     setContainerSize({ 
       width: expandedWidth, 
       height: expandedHeight 
     });
     
-    // ✅ 확장된 Canvas 크기 기준으로 계산
     const canvasW = expandedWidth * 2;
     const canvasH = expandedHeight * 2;
-    const centerX = canvasW / 2.35;    // 확장된 공간의 중심
-    const centerY = canvasH / 2.8;    // 확장된 공간의 중심
+    const centerX = canvasW / 2;
+    const centerY = canvasH / 2;
     
     const relationArray = relationData.relations.relations;
     const processedNodes: ProcessedNode[] = [];
@@ -124,8 +127,8 @@ const Relation = () => {
     // ✅ 관계 노드들 - 확장된 공간에 맞게 배치
     relationArray.forEach((relation: RelationNodeData, index: number) => {
       const angle = (index * 2 * Math.PI) / relationArray.length;
-      const baseDistance = 200;  // ✅ 기본 거리 확장 (180 → 300)
-      const affectionBonus = (relation.affection / 100) * 200;  // ✅ 보너스도 확장
+      const baseDistance = 200;  
+      const affectionBonus = (relation.affection / 100) * 200; 
       const distance = baseDistance + affectionBonus;
       
       const baseRadius = 10;
@@ -135,8 +138,8 @@ const Relation = () => {
       
       const node: ProcessedNode = {
         ...relation,
-        x: centerX + Math.cos(angle) * distance,
-        y: centerY + Math.sin(angle) * distance,
+        x: centerX + Math.cos(angle) * distance,  // 정중앙 기준
+        y: centerY + Math.sin(angle) * distance,  // 정중앙 기준
         radius: radius,
         isMe: false,
         emotions: processRelationEmotions(relation),
@@ -149,15 +152,45 @@ const Relation = () => {
     
     // ✅ 초기 스크롤 위치 - 확장된 공간의 중심으로
     if (!hasScrolledToMe.current) {
-      const targetX = (canvasW / 2) - (expandedWidth / 2);
-      const targetY = (canvasH / 2) - (expandedHeight / 2);
+      const meNodeX = centerX;
+      const meNodeY = centerY;
       
-      container.scrollLeft = targetX;
-      container.scrollTop = targetY;
+      // ✅ 실제 컨테이너 크기(화면에 보이는 크기) 기준으로 중앙 계산
+      const actualContainerWidth = rect.width;
+      const actualContainerHeight = rect.height;
+      
+      // ✅ 플랫폼별 중앙 위치 조정
+      let desiredScreenX, desiredScreenY;
+      
+      if (isMobile) { 
+        desiredScreenX = actualContainerWidth / 2;
+        desiredScreenY = actualContainerHeight / 2;
+      } else {
+        desiredScreenX = actualContainerWidth / 2;
+        desiredScreenY = actualContainerHeight / 2;
+      }
+      
+      // ✅ 정확한 스크롤 위치 계산
+      const targetX = meNodeX - desiredScreenX;
+      const targetY = meNodeY - desiredScreenY*0.8;
+      
+      // ✅ 스크롤 범위 제한 (음수 방지)
+      const finalX = Math.max(0, targetX);
+      const finalY = Math.max(0, targetY);
+      
+      // ✅ requestAnimationFrame으로 확실한 적용
+      requestAnimationFrame(() => {
+        container.scrollTo({
+          left: finalX,
+          top: finalY,
+          behavior: 'instant'
+        });
+      });
+      
       hasScrolledToMe.current = true;
     }
     
-  }, [relationData]);
+  }, [relationData, nickname]);
 
   
 
@@ -172,10 +205,6 @@ const Relation = () => {
   // ✅ containerSize가 유효할 때만 Canvas 렌더링
   const canvasWidth = containerSize.width * 2;
   const canvasHeight = containerSize.height *2;
-
-  const isMobile = useMemo(() => {
-    return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  }, []);
 
   return (
     <div className="w-full h-full flex items-center justify-center overflow-auto relative">

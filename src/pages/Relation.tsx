@@ -9,6 +9,7 @@ import StaticBlob from "@/components/Blob/StaticBlob";
 import { mapEmotionToColor } from "@/constants/emotionColors";
 import { useGetRelation } from "../api/queries/relation/useGetRelation";
 import { useTheme } from "@/components/theme-provider";
+import { useGetAuthTest } from "@/api/queries/auth/useGetAuthTest";
 
 export type ColorKey = "gray" | "gray2" | "blue" | "green" | "red" | "yellow";
 
@@ -36,6 +37,10 @@ interface ProcessedNode extends RelationNodeData {
 }
 
 const Relation = () => {
+  const { data: authData, isLoading, error } = useGetAuthTest();
+  const apiUser = authData?.user;
+  const nickname = apiUser?.nickname || '나';
+  
   const containerRef = useRef<HTMLDivElement | null>(null);
   const hasScrolledToMe = useRef(false);
   
@@ -75,26 +80,29 @@ const Relation = () => {
     return emotions;
   };
 
+  const isMobile = useMemo(() => {
+    return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }, []);
+
   // 노드 생성
   useEffect(() => {
     if (!relationData?.relations?.relations || !containerRef.current) return;
     
     const container = containerRef.current;
     const rect = container.getBoundingClientRect();
-    
-    const expandedWidth = rect.width * 1.2;  // 20% 확장
-    const expandedHeight = rect.height * 1.2; // 20% 확장
+        
+    const expandedWidth = rect.width * 1.3;
+    const expandedHeight = rect.height * 1.3;
     
     setContainerSize({ 
       width: expandedWidth, 
       height: expandedHeight 
     });
     
-    // ✅ 확장된 Canvas 크기 기준으로 계산
     const canvasW = expandedWidth * 2;
     const canvasH = expandedHeight * 2;
-    const centerX = canvasW / 2;    // 확장된 공간의 중심
-    const centerY = canvasH /2;    // 확장된 공간의 중심
+    const centerX = canvasW / 2;
+    const centerY = canvasH / 2;
     
     const relationArray = relationData.relations.relations;
     const processedNodes: ProcessedNode[] = [];
@@ -102,7 +110,7 @@ const Relation = () => {
     // "나" 노드 생성
     const meNode: ProcessedNode = {
       id: 0,
-      name: "나",
+      name: nickname,
       affection: 0,
       count: 0,
       highestEmotion: "",
@@ -119,8 +127,8 @@ const Relation = () => {
     // ✅ 관계 노드들 - 확장된 공간에 맞게 배치
     relationArray.forEach((relation: RelationNodeData, index: number) => {
       const angle = (index * 2 * Math.PI) / relationArray.length;
-      const baseDistance = 200;  // ✅ 기본 거리 확장 (180 → 300)
-      const affectionBonus = (relation.affection / 100) * 200;  // ✅ 보너스도 확장
+      const baseDistance = 200;  
+      const affectionBonus = (relation.affection / 100) * 200; 
       const distance = baseDistance + affectionBonus;
       
       const baseRadius = 10;
@@ -130,8 +138,8 @@ const Relation = () => {
       
       const node: ProcessedNode = {
         ...relation,
-        x: centerX + Math.cos(angle) * distance,
-        y: centerY + Math.sin(angle) * distance,
+        x: centerX + Math.cos(angle) * distance,  // 정중앙 기준
+        y: centerY + Math.sin(angle) * distance,  // 정중앙 기준
         radius: radius,
         isMe: false,
         emotions: processRelationEmotions(relation),
@@ -144,15 +152,45 @@ const Relation = () => {
     
     // ✅ 초기 스크롤 위치 - 확장된 공간의 중심으로
     if (!hasScrolledToMe.current) {
-      const targetX = (canvasW / 2) - (expandedWidth / 2);
-      const targetY = (canvasH / 2) - (expandedHeight / 2);
+      const meNodeX = centerX;
+      const meNodeY = centerY;
       
-      container.scrollLeft = targetX;
-      container.scrollTop = targetY;
+      // ✅ 실제 컨테이너 크기(화면에 보이는 크기) 기준으로 중앙 계산
+      const actualContainerWidth = rect.width;
+      const actualContainerHeight = rect.height;
+      
+      // ✅ 플랫폼별 중앙 위치 조정
+      let desiredScreenX, desiredScreenY;
+      
+      if (isMobile) { 
+        desiredScreenX = actualContainerWidth / 2;
+        desiredScreenY = actualContainerHeight / 2;
+      } else {
+        desiredScreenX = actualContainerWidth / 2;
+        desiredScreenY = actualContainerHeight / 2;
+      }
+      
+      // ✅ 정확한 스크롤 위치 계산
+      const targetX = meNodeX - desiredScreenX;
+      const targetY = meNodeY - desiredScreenY*0.8;
+      
+      // ✅ 스크롤 범위 제한 (음수 방지)
+      const finalX = Math.max(0, targetX);
+      const finalY = Math.max(0, targetY);
+      
+      // ✅ requestAnimationFrame으로 확실한 적용
+      requestAnimationFrame(() => {
+        container.scrollTo({
+          left: finalX,
+          top: finalY,
+          behavior: 'instant'
+        });
+      });
+      
       hasScrolledToMe.current = true;
     }
     
-  }, [relationData]);
+  }, [relationData, nickname]);
 
   
 
@@ -243,12 +281,12 @@ const Relation = () => {
             <Canvas
               orthographic
               camera={{
-                position: [0, 0, 350],           // ✅ 정면 시점으로 고정
-                zoom: 1,                          // ✅ 1:1 매핑을 위한 기본 줌
-                left: -canvasWidth / 2,           // ✅ 화면 좌표와 일치
+                position: [0, 0, 350],
+                zoom: 1,
+                left: -canvasWidth / 2,
                 right: canvasWidth / 2,
-                top: canvasHeight / 2,            // ✅ Y축 상단
-                bottom: -canvasHeight / 2,        // ✅ Y축 하단
+                top: canvasHeight / 2,
+                bottom: -canvasHeight / 2,
                 near: 1,
                 far: 2000,
               }}
@@ -262,12 +300,12 @@ const Relation = () => {
                 zIndex: 2,
               }}
               gl={{
-                antialias: true,
+                antialias: !isMobile, // ✅ 모바일에서 안티알리어싱 비활성화
                 alpha: true,
-                powerPreference: "high-performance",
+                powerPreference: isMobile ? "default" : "high-performance", // ✅ 모바일 최적화
                 preserveDrawingBuffer: true,
               }}
-              dpr={Math.min(window.devicePixelRatio, 2)}
+              dpr={isMobile ? 1 : Math.min(window.devicePixelRatio, 2)} // ✅ 모바일에서 DPR 1로 고정
             >
               <ambientLight intensity={0.6} />
               <pointLight position={[0, 0, 500]} intensity={0.4} />

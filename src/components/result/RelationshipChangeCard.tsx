@@ -46,7 +46,13 @@ const RelationshipChangeCard: React.FC<RelationshipChangeCardProps> = ({ people 
 
             {decreased.length > 0 && (
               <p className="mb-2">
-                {increased.length > 0 ? "" : "오늘 일기로 <br/> "}
+                {increased.length > 0 ? (
+                  ""
+                ) : (
+                  <>
+                    오늘 일기로 <br />
+                  </>
+                )}
                 {decreased.map((person, index) => (
                   <span key={person.name}>
                     <span className="font-semibold" style={{ color: "#000" }}>

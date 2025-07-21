@@ -134,7 +134,7 @@ const Result: React.FC = () => {
         <ResultHeader
           writtenDate={finalDiaryContent.writtenDate || ""}
           diaryId={Number(id)}
-          isBookmarked={false}
+          isBookmarked={finalDiaryContent.isBookmarked || false}
         />
       )}
 

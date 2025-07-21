@@ -168,7 +168,10 @@ const SearchPage = () => {
         <SearchBar
           value={inputValue}
           onChange={setInputValue}
-          onSearch={() => setSearchQuery(inputValue)}
+          onSearch={() => {
+            setSearchQuery(inputValue);
+            setSelectedCategory(null); // 검색 시 카테고리 초기화
+          }}
         />
       </div>
 

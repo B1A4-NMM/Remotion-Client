@@ -268,7 +268,15 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
       {/* </motion.div> */}
 
       {testType && (
-        <TestModal type={convertWarningToTestType(testType)} onClose={() => setTestType(null)} />
+        <TestModal
+          type={convertWarningToTestType(testType)}
+          onClose={() => setTestType(null)}
+          onFinish={score => {
+            console.log("🎯 테스트 완료! 점수:", score);
+            console.log("📝 테스트 타입:", testType);
+            setTestType(null);
+          }}
+        />
       )}
     </div>
   );

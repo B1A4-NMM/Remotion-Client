@@ -48,7 +48,8 @@ const TestModal = ({ type, onClose, onFinish }: TestModalProps) => {
   const progress = ((step + 1) / questions.length) * 100;
   const [mode, setMode] = useState<"intro" | "question" | "result">("intro");
   const [score, setScore] = useState(0);
-  console.log("✅ type 값:", type);
+  console.log("✅ TestModal type 값:", type);
+  console.log("✅ TestModal convertedType 값:", convertedType);
   const handleSelect = (value: number) => {
     const updated = [...answers];
     updated[step] = value;
@@ -64,8 +65,10 @@ const TestModal = ({ type, onClose, onFinish }: TestModalProps) => {
       setMode("result");
 
       // 테스트 결과를 서버로 전송
-      const apiTestType =
-        type === "depression" ? "depression" : type === "anxiety" ? "anxiety" : "stress";
+      const apiTestType = type === "phq9" ? "depression" : type === "gad7" ? "anxiety" : "stress";
+      console.log("🔍 handleNext에서 API 타입 결정:");
+      console.log("  - 원본 type:", type);
+      console.log("  - 결정된 apiTestType:", apiTestType);
       postTestComplete(apiTestType)
         .then(() => {
           console.log("테스트 완료 알림 전송 성공");

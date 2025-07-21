@@ -71,7 +71,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-[20px] shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="flex gap-4 items-center rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] mb-4 py-[14px] px-[20px]">
@@ -159,7 +159,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-[20px] shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="grid grid-cols-3 gap-2 rounded-lg mb-2" style={{ height: "120px" }}>
@@ -273,7 +273,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-[20px] shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="grid grid-cols-3 gap-2 rounded-lg mb-2" style={{ height: "130px" }}>
@@ -379,7 +379,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-[20px] shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="grid grid-cols-3 gap-2 rounded-lg mb-2" style={{ height: "120px" }}>
@@ -473,7 +473,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-[20px] shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="grid grid-cols-3 gap-2 rounded-lg mb-2" style={{ height: "120px" }}>
@@ -561,7 +561,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-[20px] shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="flex items-center justify-center h-24 text-gray-400">

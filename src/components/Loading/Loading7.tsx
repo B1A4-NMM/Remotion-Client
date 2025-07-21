@@ -37,6 +37,9 @@ const Loading7 = () => {
   // 랜덤 이모지
   // 단계 메시지
   const [step, setStep] = useState(0);
+  const [tipIndex, setTipIndex] = useState(0);
+  const [showTip, setShowTip] = useState(true);
+
   useEffect(() => {
     if (step < ANALYSIS_STEPS.length - 1) {
       const t = setTimeout(() => setStep(step + 1), 1800);
@@ -44,16 +47,40 @@ const Loading7 = () => {
     }
   }, [step]);
 
+  // 팁 로테이션 효과
+  useEffect(() => {
+    const tipInterval = setInterval(() => {
+      setShowTip(false);
+      setTimeout(() => {
+        setTipIndex(prev => (prev + 1) % APP_TIPS.length);
+        setShowTip(true);
+      }, 500); // 페이드 아웃 시간
+    }, 3000); // 3초마다 팁 변경
+
+    return () => clearInterval(tipInterval);
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center text-gray-900 relative overflow-hidden">
-      <div className="relative pointer-events-none mb-28 h-[200px]">
+      <div className="relative pointer-events-none mb-28 w-30 h-30">
         <Canvas camera={{ position: [0, 0, 15], fov: 20 }}>
           <LoadingBlob />
         </Canvas>
       </div>
-      <div className="relative w-[300px] h-[200px] mb-30">
+      <div className="relative w-[350px] h-[200px] mb-30">
         <Loading6 />
       </div>
+
+      {/* 팁 표시 영역 */}
+      {/* <div className="relative w-[300px] h-[200px] mb-30">
+        <div
+          className={`text-sm text-gray-600 dark:text-gray-300 transition-opacity duration-500 ${
+            showTip ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          {APP_TIPS[tipIndex]}
+        </div>
+      </div> */}
     </div>
   );
 };

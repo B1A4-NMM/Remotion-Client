@@ -123,7 +123,7 @@ const RelationDetail = () => {
     <div className="min-h-screen">
       <Title name={data?.targetName + "과 함께한 시간"} isBackActive={true} back="/relation" />
 
-      <div className="max-w-4xl mx-auto px-4 space-y-8">
+      <div className="max-w-4xl mx-auto px-4 space-y-10">
         {/* 관계 요약 카드 */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -131,7 +131,7 @@ const RelationDetail = () => {
           className="bg-white rounded-3xl shadow-xl p-6"
         >
           <div className="text-center mb-6">
-            <div className="w-20 h-20 bg-gray-50 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <div className="w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center">
               <Canvas className="w-full h-full">
                 <Blob emotions={analysis.emotionStats.slice(0, 3).map((e: any) => ({
                   color: mapEmotionToColor(e.emotion) as ColorKey,
@@ -167,46 +167,51 @@ const RelationDetail = () => {
         </motion.div>
 
         {/* 함께한 활동 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-3xl shadow-xl p-6"
-        >
-          <div className="flex items-center mb-6">
+        <div>
+          <div className="flex items-center mb-3">
             <Activity className="w-6 h-6 text-black mr-3" />
             <h3 className="text-xl font-bold text-gray-900">함께한 활동들</h3>
           </div>
 
-          <div className="space-y-3">
-            {analysis.topActivities.map(([activity, count]: [string, number], index: number) => (
-              <div
-                key={activity}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
-              >
-                <div className="flex items-center">
-                  <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center mr-3">
-                    <span className="text-white font-bold text-sm">{index + 1}</span>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white rounded-3xl shadow-xl p-6"
+          >
+
+            <div className="space-y-3">
+              {analysis.topActivities.map(([activity, count]: [string, number], index: number) => (
+                <div
+                  key={activity}
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
+                >
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center mr-3">
+                      <span className="text-white font-bold text-sm">{index + 1}</span>
+                    </div>
+                    <span className="font-medium text-gray-600">{activity}</span>
                   </div>
-                  <span className="font-medium text-gray-600">{activity}</span>
+                  <span className="text-gray-600">{count}번</span>
                 </div>
-                <span className="text-gray-600">{count}번</span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
 
         {/* 감정 분석 */}
+        <div>
+        <div className="flex items-center mb-3">
+          <TrendingUp className="w-6 h-6 text-black mr-3" />
+          <h3 className="text-xl font-bold text-gray-900">나눈 감정들</h3>
+        </div>
+          
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
           className="bg-white rounded-3xl shadow-xl p-6"
         >
-          <div className="flex items-center mb-6">
-            <TrendingUp className="w-6 h-6 text-black mr-3" />
-            <h3 className="text-xl font-bold text-gray-900">나눈 감정들</h3>
-          </div>
 
           <div className="grid grid-cols-2 gap-4">
             {analysis.emotionStats.slice(0, 6).map((emotion: any) => (
@@ -227,37 +232,42 @@ const RelationDetail = () => {
             ))}
           </div>
         </motion.div>
+        </div>
 
         {/* 최근 추억 */}
-        {analysis.recentDiary && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="bg-white rounded-3xl shadow-xl p-6"
-          >
-            <div className="flex items-center mb-6">
-              <Calendar className="w-6 h-6 text-black mr-3" />
+        <div>
+          {analysis.recentDiary && (
+            <>
+          <div className="flex items-center mb-3">
+            <Calendar className="w-6 h-6 text-black mr-3" />
               <h3 className="text-xl font-bold text-black">최근 함께한 순간</h3>
             </div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="bg-white rounded-3xl shadow-xl p-6"
+            >
 
-            <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6">
-              <p className="text-gray-700 mb-4">{analysis.recentDiary.content}</p>
-              <div className="flex items-center justify-between text-sm text-gray-600">
-                <div className="flex items-center">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  {analysis.recentDiary.writtenDate}
-                </div>
-                {analysis.recentDiary.latitude && analysis.recentDiary.longitude && (
+              <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6">
+                <p className="text-gray-700 mb-4">{analysis.recentDiary.content}</p>
+                <div className="flex items-center justify-between text-sm text-gray-600">
                   <div className="flex items-center">
-                    <MapPin className="w-4 h-4 mr-2" />
-                    위치 정보 있음
+                    <Calendar className="w-4 h-4 mr-2" />
+                    {analysis.recentDiary.writtenDate}
                   </div>
-                )}
+                  {analysis.recentDiary.latitude && analysis.recentDiary.longitude && (
+                    <div className="flex items-center">
+                      <MapPin className="w-4 h-4 mr-2" />
+                      위치 정보 있음
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          </motion.div>
-        )}
+            </motion.div>
+            </>
+          )}
+        </div>
 
         {/* 관계 분석 결론 */}
         <motion.div

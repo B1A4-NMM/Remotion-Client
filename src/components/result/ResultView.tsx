@@ -111,11 +111,6 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
   const peopleWithChanges = people.filter((person: any) => person.changeScore !== 0);
 
   // beforeDiaryScores 데이터 콘솔에 출력
-  console.log("beforeDiaryScores 데이터:", beforeDiaryScores);
-  console.log("beforeDiaryScores 길이:", beforeDiaryScores.length);
-  console.log("diaryContent?.beforeDiaryScores:", diaryContent?.beforeDiaryScores);
-  console.log("diaryId:", diaryId);
-  console.log("people 데이터:", people);
 
   const convertWarningToTestType = (warning: "stress" | "anxiety" | "depression") => {
     switch (warning) {
@@ -267,7 +262,6 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
         <TestModal
           type={convertWarningToTestType(testType)}
           onClose={() => setTestType(null)}
-          onFinish={score => console.log(`${testType} 점수:`, score)}
         />
       )}
     </div>

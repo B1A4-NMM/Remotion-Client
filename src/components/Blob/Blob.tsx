@@ -7,12 +7,11 @@ import WebGLContextPool from "./WebGLContextPool";
 import vertexShader from "./vertexShader";
 import fragmentShaderLight from "./fragmentShaderLight";
 import fragmentShaderDark from "./fragmentShaderDark";
-import { baseColors } from "../../constants/emotionColors";
+import { baseColors, ColorKey } from "../../constants/emotionColors";
 import { useTheme } from "../theme-provider";
 
 // 타입 정의
-export type ColorKey = "gray" | "gray2" | "blue" | "green" | "red" | "yellow";
-
+// ColorKey는 constants/emotionColors.ts에서 import
 interface Emotion {
   color: ColorKey;
   intensity: number;

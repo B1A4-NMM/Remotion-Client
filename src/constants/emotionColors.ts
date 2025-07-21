@@ -1,16 +1,13 @@
 // src/constants/emotionColors.ts
 
-export type ColorKey = "gray" | "gray1" | "gray2" | "blue" | "green" | "red" | "yellow"| "white";
+export type ColorKey = "gray" | "blue" | "green" | "red" | "yellow";
 
 export const baseColors: Record<ColorKey, string> = {
   green: "#72C9A3",
   red: "#F36B6B",
   yellow: "#FFD47A",
   blue: "#7DA7E3",
-  gray: "#DADADA",
-  gray1: "#DADADA",
-  gray2: "#DADADA",
-  white: "#FFFFFF"
+  gray: "#DADADA"
 } as const;
 
 // 🟡

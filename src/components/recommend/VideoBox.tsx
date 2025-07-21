@@ -210,7 +210,7 @@ const YouTubeBoard: React.FC<YouTubeBoardProps> = ({}) => {
               <div
                 key={video.videoId}
                 className={`
-                  flex-shrink-0 min-w-[300px]
+                  flex-shrink-0 w-[300px]
                   ${isDark ? "bg-[#FAF6F4]" : "bg-[#272727]"}
                   rounded-3xl shadow-md overflow-hidden snap-center
                 `}

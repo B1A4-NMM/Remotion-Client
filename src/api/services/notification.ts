@@ -1,5 +1,5 @@
 import api from "../axios";
-import { Notification } from "@/types/notification";
+import { Notification,NotiCount } from "@/types/notification";
 
 export const getNotification = async (): Promise<Notification[]> => {
     const response =await api.get("/noti/all");
@@ -21,3 +21,9 @@ export const patchNotification = async ( id : number ):Promise<void> => {
     await api.patch(`/noti/${id}`);
 }
 
+//갯수 카운트 해오는 api
+export const getNotiCount = async () : Promise<NotiCount> => {
+    const response = await api.get("/noti/count");
+    
+    return response.data;
+}

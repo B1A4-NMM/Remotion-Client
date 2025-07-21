@@ -8,15 +8,21 @@ import { useGetWrittenDays } from "../../api/queries/home/useGetWrittenDays";
 interface MonthlyCalendarProps {
   selectedDate: string;
   onDateSelect: (date: string) => void;
-  onClose: () => void;
-  isOpen: boolean;
+  onClose?: () => void;
+  isOpen?: boolean;
+  /**
+   * When true, render the calendar without its own overlay or modal
+   * wrapper so it can be embedded inside another component.
+   */
+  disableOverlay?: boolean;
 }
 
 const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   selectedDate,
   onDateSelect,
   onClose,
-  isOpen,
+  isOpen = true,
+  disableOverlay = false,
 }) => {
   const [currentMonth, setCurrentMonth] = useState(dayjs(selectedDate));
   const [calendarDays, setCalendarDays] = useState<(dayjs.Dayjs | null)[]>([]);
@@ -58,7 +64,9 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
     const formattedDate = date.format("YYYY-MM-DD");
     console.log("🔍 MonthlyCalendar handleDateClick 호출됨:", formattedDate);
     onDateSelect(formattedDate);
-    onClose();
+    if (!disableOverlay) {
+      onClose?.();
+    }
   };
 
   const goToPreviousMonth = () => {
@@ -81,16 +89,18 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {(disableOverlay ? true : isOpen) && (
         <>
           {/* 배경 오버레이 */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-30 z-40"
-            onClick={onClose}
-          />
+          {!disableOverlay && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black bg-opacity-30 z-40"
+              onClick={onClose}
+            />
+          )}
 
           {/* 달력 모달 */}
           <motion.div

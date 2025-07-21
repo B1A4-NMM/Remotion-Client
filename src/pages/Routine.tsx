@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect,useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { BottomPopupHandle } from "@/components/BottomPopup";
 
 import { usePostRoutineByType } from "@/api/queries/routine/usePostRoutineByType";
 import { useGetRoutineByType } from "@/api/queries/routine/useGetRoutineByType";
@@ -29,6 +30,9 @@ const Routine = () => {
   );
   const [showRecommendation, setShowRecommendation] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  
+  //닫기 버튼 눌렀을 때 애니매이션 적용 
+  const popupRef = useRef<BottomPopupHandle>(null);
 
   // 서버에서 Trigger 루틴 조회
   useEffect(() => {
@@ -80,6 +84,18 @@ const Routine = () => {
       console.error("루틴 삭제 실패", err);
     }
   };
+
+  // 루틴 폴더 상태관리 위한 함수 - 1
+  const refreshTriggeredRoutines = async () => { 
+    try{
+      const updated = await getTriggerRoutine();
+      setTriggeredRoutines(updated);
+    }catch(err){
+      console.error("루틴 생신 실패:", err);
+    }
+    // const data = await getTriggerRoutine();
+    // setTriggeredRoutines(data);
+  } 
 
   const handleFolderClick = async (emotionTitle: string) => {
     const emotionKey = emotionTitle as RoutineItem["routineType"];
@@ -194,16 +210,20 @@ const Routine = () => {
             </p>
           </div>
         ) : (
-          <PersonalizedRoutineList routines={displayRoutines} />
+          <PersonalizedRoutineList 
+          routines={displayRoutines}
+          onRefresh= {refreshTriggeredRoutines} />
         );
       })()}
 
       {selectedEmotion && (
         <BottomPopup
+          ref={popupRef}
           isOpen={isPopupOpen}
           onClose={() => {
             setSelectedEmotion(null);
             setShowRecommendation(false);
+            setIsPopupOpen(false);
           }}
           heightOption={{ heightPixel: 700 }}
         >
@@ -218,6 +238,7 @@ const Routine = () => {
             />
           ) : (
             <RoutineModalContent
+              popupRef={popupRef}
               emotion={selectedEmotion}
               routines={selectedRoutines}
               onAdd={handleAddRoutine}

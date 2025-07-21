@@ -118,11 +118,9 @@ const Result: React.FC = () => {
 
   return (
     <div
-      className={`result-container  h-screen text-foreground transition-opacity duration-1000 ${
+      className={`result-container h-full text-foreground transition-opacity duration-1000 ${
         shouldFade ? "fade-transition" : ""
-      } ${isTouchDevice ? "overflow-y-auto scrollbar-hide touch-scroll" : "overflow-y-auto"} ${
-        isScrolling ? "scrolling" : ""
-      }`}
+      } ${isTouchDevice ? "scrollbar-hide touch-scroll" : ""} ${isScrolling ? "scrolling" : ""}`}
       style={{
         WebkitOverflowScrolling: isTouchDevice ? "touch" : "auto",
         scrollBehavior: "smooth",
@@ -138,7 +136,7 @@ const Result: React.FC = () => {
         />
       )}
 
-      <div>
+      <div className="overflow-y-auto ">
         {/* ✅ Emotion Summary */}
         {isLoading ? (
           <div className="flex flex-col items-center text-center space-y-[16px] mb-4">

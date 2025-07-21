@@ -191,7 +191,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                   </div>
                 </div>
                 {/* 사진 1장 + 지도 1장 */}
-                <div className="col-span-2 grid grid-cols-2 gap-1 h-full">
+                <div className="col-span-2 grid grid-cols-2 gap-2 h-full">
                   <img
                     src={filteredImages[0]}
                     alt="diary-photo-0"
@@ -276,7 +276,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               className="w-full bg-white rounded-lg shadow-md p-3 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-3 gap-2 rounded-lg mb-2" style={{ height: "130px" }}>
+              <div className="grid grid-cols-3 gap-2 rounded-lg mb-2" style={{ height: "120px" }}>
                 {/* Blob */}
                 <div className="col-span-1 h-full">
                   <div className="h-full w-full max-h-[120px] rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
@@ -411,7 +411,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                   </div>
                 </div>
                 {/* 사진 2장 */}
-                <div className="col-span-2 grid grid-cols-2 gap-1 h-full">
+                <div className="col-span-2 grid grid-cols-2 gap-2 h-full">
                   <img
                     src={filteredImages[0]}
                     alt="diary-photo-0"

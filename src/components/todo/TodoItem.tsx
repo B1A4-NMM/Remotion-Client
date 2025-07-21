@@ -9,12 +9,8 @@ import { useState } from "react";
 import BottomPopup from "@/components/BottomPopup";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
-import { DayPicker } from "react-day-picker";
-import "react-day-picker/dist/style.css";
-import "@/styles/day-picker.css";
-import { formatDate } from "@/utils/date";
-import { format } from "date-fns";
-import { ko, enUS } from "date-fns/locale";
+import MonthlyCalendar from "@/components/diary/MontlyCalendar";
+import { formatDate, parseDateStringToDate } from "@/utils/date";
 
 interface TodoItemProps {
   todo: Todo;
@@ -31,13 +27,6 @@ export default function TodoItem({ todo }: TodoItemProps) {
   const [isComposing, setIsComposing] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
-
-  const locale = {
-    ...ko,
-    options: { ...ko.options, weekStartsOn: 1 },
-  };
-  const formatCaption = (month: Date) => format(month, "yyyy년 MM월", { locale });
-  const formatWeekdayName = (day: Date) => format(day, "EEE", { locale: enUS }).toUpperCase();
 
   const commitEdit = () => {
     const trimmed = value.trim();
@@ -70,14 +59,13 @@ export default function TodoItem({ todo }: TodoItemProps) {
     setSheetOpen(false);
   };
 
-  const handleDateChange = (date: Date | undefined) => {
-    if (date) {
-      const newDate = formatDate(date);
-      setTodos(prev => prev.filter(t => t.id !== todo.id));
-      updateTodoDate({ id: todo.id, date: newDate });
-      setDatePickerOpen(false);
-      setSheetOpen(false);
-    }
+  const handleDateSelect = (dateStr: string) => {
+    const date = parseDateStringToDate(dateStr);
+    const newDate = formatDate(date);
+    setTodos(prev => prev.filter(t => t.id !== todo.id));
+    updateTodoDate({ id: todo.id, date: newDate });
+    setDatePickerOpen(false);
+    setSheetOpen(false);
   };
 
   return (
@@ -139,18 +127,10 @@ export default function TodoItem({ todo }: TodoItemProps) {
         onClose={() => setDatePickerOpen(false)}
         heightOption={{ wrapChildren: true }}
       >
-        <DayPicker
-          mode="single"
-          selected={new Date(todo.date)}
-          onSelect={handleDateChange}
-          locale={locale}
-          formatters={{
-            formatCaption,
-            formatWeekdayName,
-          }}
-          // <TodoDatePicker
-          //   date={new Date(todo.date)}
-          className="bg-card text-card-foreground mx-auto"
+      <MonthlyCalendar
+        disableOverlay
+        selectedDate={todo.date}
+        onDateSelect={handleDateSelect}
         />
       </BottomPopup>
     </li>

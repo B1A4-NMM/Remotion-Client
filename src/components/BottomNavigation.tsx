@@ -1,8 +1,12 @@
+import { useGetNotiCount } from "../api/queries/notifications/useGetNotiCount";
 import { Link, useLocation } from "react-router-dom";
 import dayjs from "dayjs";
 import { useTheme } from "./theme-provider";
 
 export default function BottomNavigation() {
+  const { data } = useGetNotiCount();
+  const count =data?.count ?? 0;
+
   const location = useLocation();
   const path = location.pathname.toLowerCase();
   const today = dayjs().format("YYYY-MM-DD");
@@ -105,7 +109,14 @@ export default function BottomNavigation() {
             <div className="w-14 h-14 -mt-4 z-10 rounded-full" />
           </Link>
           <Link to="/todos" className="flex-1 h-full" />
-          <Link to="/mypage" className="flex-1 h-full" />
+          <Link to="/mypage" className="flex-1 h-full" >
+            {/* 알림 뱃지 */}
+            {count > 0 && (
+              <span className="absolute top-5 right-5 bg-[#F36B6B] text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5 z-50">
+                {count}
+              </span>
+            )}
+          </Link>
         </div>
       </div>
     </div>

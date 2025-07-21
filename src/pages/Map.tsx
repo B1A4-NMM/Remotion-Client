@@ -107,7 +107,7 @@ const Map: React.FC<MapProps> = _ => {
             bubble.style.width = "70px";
             bubble.style.height = "70px";
             bubble.style.background = "white";
-            bubble.style.border = "2px solid #ccc";
+            bubble.style.border = "2px solid white";
             bubble.style.borderRadius = "16px";
             bubble.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
             bubble.style.display = "flex";
@@ -181,7 +181,7 @@ const Map: React.FC<MapProps> = _ => {
             tailBorder.style.height = "0";
             tailBorder.style.borderLeft = "6px solid transparent";
             tailBorder.style.borderRight = "6px solid transparent";
-            tailBorder.style.borderTop = "6px solid #ccc";
+            tailBorder.style.borderTop = "6px solid white";
             tailBorder.style.zIndex = "0";
 
             // 꼬리 내부 (border와 같은 색상)
@@ -194,7 +194,7 @@ const Map: React.FC<MapProps> = _ => {
             tail.style.height = "0";
             tail.style.borderLeft = "5px solid transparent";
             tail.style.borderRight = "5px solid transparent";
-            tail.style.borderTop = "5px solid #ccc";
+            tail.style.borderTop = "5px solid white";
             tail.style.zIndex = "1";
 
             // 외부 래퍼

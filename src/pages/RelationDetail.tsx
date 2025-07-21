@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Title from "@/components/analysis/Title";
 import { useGetRelationDetail } from "@/api/queries/home/useGetRelationDetail";
 import { RelationData } from "@/types/relation";
@@ -13,8 +13,9 @@ import { useTheme } from "@/components/theme-provider";
 const RelationDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading } = useGetRelationDetail(id || "");
-  console.log(data);
   const userName = "사용자";
+
+  const navigate= useNavigate();
 
   const { theme } = useTheme();
   const isDark =
@@ -102,6 +103,8 @@ const RelationDetail = () => {
   const analysis = analyzeRelation(data);
   if (!analysis) return null;
 
+  console.log(analysis);
+
   // 가장 강한 감정의 색상 가져오기
   const strongestEmotion = analysis.emotionStats[0]?.emotion;
   const strongestEmotionColor = strongestEmotion ? mapEmotionToColor(strongestEmotion) : "#95A5A6";
@@ -118,6 +121,10 @@ const RelationDetail = () => {
     if (score >= 10) return "어색한";
     return "냉랭한";
   };
+
+  const gotoDiary=(id:number)=>{
+    navigate(`/result/${id}?view=record`);
+  }
 
   return (
     <div className="min-h-screen">
@@ -246,7 +253,8 @@ const RelationDetail = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="bg-white rounded-3xl shadow-xl p-6"
+              className="bg-white rounded-3xl shadow-xl p-6 cursor-pointer"
+              onClick={()=>gotoDiary(analysis.recentDiary.diaryId)}
             >
 
               <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6">

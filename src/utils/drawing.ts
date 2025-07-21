@@ -4,7 +4,7 @@ import { EMOTION_COLORS } from "@/constants/emotionalGraph.ts";
 export const drawEdges = (ctx: CanvasRenderingContext2D, edges: Edge[]) => {
   ctx.save(); // 기존 상태 저장
   ctx.strokeStyle = "rgba(200, 200, 200, 0.3)"; // 옅은 회색으로 통일
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth = 2;
 
   edges.forEach(edge => {
     const alpha = Math.min(edge.opacity, edge.from.opacity, edge.to.opacity);

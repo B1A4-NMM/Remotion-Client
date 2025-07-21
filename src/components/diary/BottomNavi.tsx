@@ -270,17 +270,18 @@ const BottomNavi = ({
 
       {/* 저장 버튼 - 조건부 스타일 적용 */}
       <button
-        className={`size-fit text-base rounded-full pl-5 pr-5 pt-3 pb-3 mt-2 transition-all duration-300 ${
+        className={`flex items-center justify-center w-fit text-lg rounded-full px-5 mt-2 mb-6 transition-all duration-300 font-medium ${
           isSaveEnabled
             ? "bg-black text-white hover:bg-gray-800 cursor-pointer"
             : "bg-gray-400 text-gray-600 cursor-not-allowed"
         }`}
         onClick={isSaveEnabled ? onSaveClick : undefined}
         disabled={!isSaveEnabled}
-        style={{ zIndex: 30 }} // 인라인 스타일로도 보장
+        style={{ zIndex: 30 }}
       >
         저장
       </button>
+
     </div>
   );
 };

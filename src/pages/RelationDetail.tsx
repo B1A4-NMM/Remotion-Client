@@ -5,21 +5,10 @@ import { RelationData } from "@/types/relation";
 import { motion } from "framer-motion";
 import { Calendar, MapPin, Activity, Heart, TrendingUp } from "lucide-react";
 import { mapEmotionToColor } from "@/constants/emotionColors";
+import type { ColorKey } from "@/components/Blob/Blob";
 import { Canvas } from "@react-three/fiber";
 import Blob from "@/components/Blob/Blob";
 import { useTheme } from "@/components/theme-provider";
-
-export type ColorKey = "gray" | "gray1" | "gray2" | "blue" | "green" | "red" | "yellow";
-
-export const baseColors: Record<ColorKey, string> = {
-  green: "#72C9A3",
-  red: "#F36B6B",
-  yellow: "#FFD47A",
-  blue: "#7DA7E3",
-  gray: "#DADADA",
-  gray1: "#DADADA",
-  gray2: "#DADADA",
-} as const;
 
 const RelationDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -115,7 +104,7 @@ const RelationDetail = () => {
 
   // 가장 강한 감정의 색상 가져오기
   const strongestEmotion = analysis.emotionStats[0]?.emotion;
-  const strongestEmotionColor = strongestEmotion ? baseColors[mapEmotionToColor(strongestEmotion)] : "#95A5A6";
+  const strongestEmotionColor = strongestEmotion ? mapEmotionToColor(strongestEmotion) : "#95A5A6";
 
   const getRelationshipStatus = (score: number): string => {
     if (score >= 90) return "둘도 없는";
@@ -144,7 +133,10 @@ const RelationDetail = () => {
           <div className="text-center mb-6">
             <div className="w-20 h-20 bg-gray-50 rounded-full mx-auto mb-4 flex items-center justify-center">
               <Canvas className="w-full h-full">
-                <Blob diaryContent={{ emotions: analysis.emotionStats }} />
+                <Blob emotions={analysis.emotionStats.slice(0, 3).map((e: any) => ({
+                  color: mapEmotionToColor(e.emotion) as ColorKey,
+                  intensity: e.averageIntensity || 1.0,
+                }))} />
               </Canvas>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
@@ -221,7 +213,7 @@ const RelationDetail = () => {
               <div key={emotion.emotion} className="flex items-center p-4 bg-gray-50 rounded-xl">
                 <div
                   className="w-16 h-16 rounded-full flex items-center justify-center mr-4"
-                  style={{ backgroundColor: baseColors[mapEmotionToColor(emotion.emotion)] }}
+                  style={{ backgroundColor: mapEmotionToColor(emotion.emotion) }}
                 >
                   <span className="text-white font-bold text-center">{emotion.emotion}</span>
                 </div>

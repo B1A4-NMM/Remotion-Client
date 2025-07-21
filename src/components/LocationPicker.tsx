@@ -30,6 +30,7 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
   );
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
+  const markerRef = useRef<google.maps.Marker | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -69,11 +70,20 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
                 setSelectedLocation(currentLocation);
                 setMapInitialized(true);
 
-                // 지도 중심이 바뀔 때마다 중심 좌표를 저장
+                // 지도 중심에 구글 지도 기본 마커 생성
+                markerRef.current = new window.google.maps.Marker({
+                  position: currentLocation,
+                  map,
+                });
+
+                // 지도 중심이 바뀔 때마다 마커 위치 갱신
                 map.addListener("center_changed", () => {
                   const center = map.getCenter();
                   if (center) {
                     setSelectedLocation({ lat: center.lat(), lng: center.lng() });
+                    if (markerRef.current) {
+                      markerRef.current.setPosition(center);
+                    }
                   }
                 });
               },
@@ -93,10 +103,20 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
                 setSelectedLocation(fallbackLatLng);
                 setMapInitialized(true);
 
+                // 지도 중심에 구글 지도 기본 마커 생성
+                markerRef.current = new window.google.maps.Marker({
+                  position: fallbackLatLng,
+                  map,
+                });
+
+                // 지도 중심이 바뀔 때마다 마커 위치 갱신
                 map.addListener("center_changed", () => {
                   const center = map.getCenter();
                   if (center) {
                     setSelectedLocation({ lat: center.lat(), lng: center.lng() });
+                    if (markerRef.current) {
+                      markerRef.current.setPosition(center);
+                    }
                   }
                 });
               }
@@ -174,9 +194,6 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
         {/* 지도 영역 */}
         <div className="w-full h-full bg-gray-100 relative" id="map-container" ref={mapRef} />
         {/* 지도 위에 겹치는 툴팁 */}
-        <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999]">
-          <MapPin className="w-10 h-10 text-[#2a1c31] stroke-[#2a1c31] stroke-2 fill-transparent drop-shadow-lg" />
-        </div>
 
         {/* 하단 컨트롤 영역 */}
         <div className="absolute bottom-4 left-4 right-4 z-20 space-y-3">

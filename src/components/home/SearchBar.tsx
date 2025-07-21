@@ -20,7 +20,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onSearch }) => {
       </div>
       <div className="flex items-center bg-gray-100 rounded-xl px-4 py-2">
         <input
-          className="w-full bg-transparent outline-none text-base"
+          className="w-full bg-transparent outline-none text-base dark:text-gray-700"
           placeholder="예: 채린이랑 고깃집 갔던 날"
           value={value}
           onChange={e => onChange(e.target.value)}

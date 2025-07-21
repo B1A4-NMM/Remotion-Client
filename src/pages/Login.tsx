@@ -91,28 +91,28 @@ export default function Login() {
             onClick={() => handleDemo("traveler")}
             className="h-[48px] bg-white text-black hover:bg-gray-200 rounded-full justify-center items-center gap-3 px-4 py-2"
           >
-            <span>세계 여행자의 일기</span>
-          </Button>
-
-          <Button
-            onClick={() => handleDemo("lee")}
-            className="h-[48px] bg-white text-black hover:bg-gray-200 rounded-full justify-center items-center gap-3 px-4 py-2"
-          >
-            <span>이순신 장군의 난중일기</span>
+            <span>[Cominjg Soon] OOO의 일기</span>
           </Button>
 
           <Button
             onClick={() => handleDemo("harry")}
             className="h-[48px] bg-white text-black hover:bg-gray-200 rounded-full justify-center items-center gap-3 px-4 py-2"
           >
-            <span>해리포터의 일기</span>
+            <span>[Coming Soon] 해리포터의 일기</span>
+          </Button>
+
+          <Button
+            onClick={() => handleDemo("lee")}
+            className="h-[48px] bg-white text-black hover:bg-gray-200 rounded-full justify-center items-center gap-3 px-4 py-2"
+          >
+            <span>🌊 이순신 장군의 난중일기</span>
           </Button>
 
           <Button
             onClick={() => handleDemo("demo")}
             className="h-[48px] bg-white text-black hover:bg-gray-200 rounded-full justify-center items-center gap-3 px-4 py-2"
           >
-            <span>demo data</span>
+            <span>✈️ 갭이어 사회인의 일기</span>
           </Button>
         </div>
       </BottomPopup>

@@ -9,6 +9,7 @@ import StaticBlob from "@/components/Blob/StaticBlob";
 import { mapEmotionToColor } from "@/constants/emotionColors";
 import { useGetRelation } from "../api/queries/relation/useGetRelation";
 import { useTheme } from "@/components/theme-provider";
+import { useGetAuthTest } from "@/api/queries/auth/useGetAuthTest";
 
 export type ColorKey = "gray" | "gray2" | "blue" | "green" | "red" | "yellow";
 
@@ -36,6 +37,10 @@ interface ProcessedNode extends RelationNodeData {
 }
 
 const Relation = () => {
+  const { data: authData, isLoading, error } = useGetAuthTest();
+  const apiUser = authData?.user;
+  const nickname = apiUser?.nickname || '나';
+  
   const containerRef = useRef<HTMLDivElement | null>(null);
   const hasScrolledToMe = useRef(false);
   
@@ -102,7 +107,7 @@ const Relation = () => {
     // "나" 노드 생성
     const meNode: ProcessedNode = {
       id: 0,
-      name: "나",
+      name: nickname,
       affection: 0,
       count: 0,
       highestEmotion: "",

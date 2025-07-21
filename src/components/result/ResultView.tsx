@@ -238,7 +238,7 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
           {/* <h2 className="text-xl font-semibold text-gray-800 mt-[60px] mb-[20px]  px-4">
             오늘의 작은 실천
           </h2> */}
-          <TodoPreviewCard todos={reflectionTodos} />
+          <TodoPreviewCard todos={reflectionTodos} writtenDate={diaryContent?.writtenDate} />
         </div>
       )}
       {/* <motion.div
@@ -259,10 +259,7 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
       {/* </motion.div> */}
 
       {testType && (
-        <TestModal
-          type={convertWarningToTestType(testType)}
-          onClose={() => setTestType(null)}
-        />
+        <TestModal type={convertWarningToTestType(testType)} onClose={() => setTestType(null)} />
       )}
     </div>
   );

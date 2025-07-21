@@ -183,7 +183,11 @@ const Result: React.FC = () => {
       }}
     >
       {/* ✅ Header - 원래 위치 유지 */}
-      <ResultHeader writtenDate={finalDiaryContent.writtenDate || ""} />
+      <ResultHeader
+        writtenDate={finalDiaryContent.writtenDate || ""}
+        diaryId={Number(id)}
+        isBookmarked={false}
+      />
 
       <div>
         {/* ✅ Emotion Summary */}

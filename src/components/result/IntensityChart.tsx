@@ -216,7 +216,23 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
               </filter>
             </defs>
 
-            {/* 등선들 */}
+            {/* 양수 영역 채우기 (연한 초록) - 투명도 증가 */}
+            <path
+              d={createSmoothAreaPath(true)}
+              fill="url(#positiveGradient)"
+              stroke="none"
+              opacity="0.3"
+            />
+
+            {/* 음수 영역 채우기 (연한 빨강) - 투명도 증가 */}
+            <path
+              d={createSmoothAreaPath(false)}
+              fill="url(#negativeGradient)"
+              stroke="none"
+              opacity="0.3"
+            />
+
+            {/* 등선들 - 채워진 영역에서는 숨김 */}
             {[-2, -1, 0, 1, 2].map(level => {
               const y = centerY - (level * chartHeight) / 4;
               return (
@@ -228,13 +244,13 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
                   y2={y}
                   stroke="#9CA3AF"
                   strokeWidth="1"
-                  opacity="0.8"
+                  opacity="0.15"
                   strokeDasharray={level === 0 ? "none" : "2,2"}
                 />
               );
             })}
 
-            {/* 중심선 (0 기준선) */}
+            {/* 중심선 (0 기준선) - 채워진 영역에서는 숨김 */}
             <line
               x1={padding}
               y1={centerY}
@@ -242,7 +258,7 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
               y2={centerY}
               stroke="#9CA3AF"
               strokeWidth="2"
-              opacity="1"
+              opacity="0.3"
             />
 
             {/* 0 표시 */}
@@ -307,22 +323,6 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
                 부정
               </text>
             </g>
-
-            {/* 양수 영역 채우기 (연한 초록) - 투명도 증가 */}
-            <path
-              d={createSmoothAreaPath(true)}
-              fill="url(#positiveGradient)"
-              stroke="none"
-              opacity="0.3"
-            />
-
-            {/* 음수 영역 채우기 (연한 빨강) - 투명도 증가 */}
-            <path
-              d={createSmoothAreaPath(false)}
-              fill="url(#negativeGradient)"
-              stroke="none"
-              opacity="0.3"
-            />
 
             {/* 부드러운 선 그래프 */}
             <path

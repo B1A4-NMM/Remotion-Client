@@ -36,3 +36,11 @@ export const searchDiaries = async (q: string) => {
   console.log("[searchDiaries] 응답 데이터:", response.data);
   return response.data; // { diaries: [...], totalCount: N }
 };
+
+// 북마크된 일기들 가져오기
+export const getBookmarkDiaries = async (page: number = 0) => {
+  console.log("🌐 getBookmarkDiaries API 호출:", `/diary/bookmark?page=${page}`);
+  const response = await api.get(`/diary/bookmark?page=${page}`);
+  console.log("📥 북마크 API 응답:", response.data);
+  return response.data;
+};

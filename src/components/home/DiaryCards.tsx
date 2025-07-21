@@ -50,7 +50,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-[420px] mx-auto">
+    <div className="flex flex-col gap-3 w-full max-w-[420px] mx-auto">
       {diaries.map((mappedDiary, index) => {
         const images = mappedDiary.photoUrl
           ? Array.isArray(mappedDiary.photoUrl)

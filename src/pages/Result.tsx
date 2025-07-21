@@ -165,11 +165,9 @@ const Result: React.FC = () => {
       </div>
     );
   }
-  console.log(id);
 
   const finalDiaryContent = diaryContent || sampleDiary;
 
-  console.log(finalDiaryContent);
 
   return (
     <div

@@ -18,7 +18,6 @@ const ResultHeader: React.FC<ResultHeaderProps> = ({ writtenDate }) => {
 
   dayjs.locale("ko");
 
-  console.log(writtenDate);
 
   return (
     <div className="sticky mb-8 z-10 top-0 w-full bg-[#FAF6F4]/80 dark:bg-[#181718]/80 backdrop-blur-md rounded-b-3xl">

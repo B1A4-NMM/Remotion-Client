@@ -3,6 +3,8 @@
 import React from "react";
 import { Canvas } from "@react-three/fiber";
 import Blob from "../Blob/Blob";
+import { mapEmotionToColor } from "../../constants/emotionColors";
+import type { ColorKey } from "../Blob/Blob";
 
 interface EmotionSummaryProps {
   diaryContent: any;
@@ -16,7 +18,7 @@ const mapEmotionsWithIntensity = (diaryContent: any) => {
   // Map을 사용하여 감정별로 강도 합산
   const emotionMap = new Map<string, number>();
 
-  activityAnalysis.forEach(activity => {
+  activityAnalysis.forEach((activity: any) => {
     // 1. People의 interactions 감정 처리
     if (activity.peoples && Array.isArray(activity.peoples)) {
       activity.peoples.forEach((person: any) => {
@@ -66,6 +68,7 @@ const mapEmotionsWithIntensity = (diaryContent: any) => {
   return Array.from(emotionMap.entries()).map(([emotion, intensity]) => ({
     emotion,
     intensity,
+    color: mapEmotionToColor(emotion) as ColorKey,
   }));
 };
 
@@ -77,10 +80,9 @@ const extractTargets = (diaryContent: any) => {
   // Set을 사용하여 중복 자동 제거
   const targetSet = new Set<string>();
 
-  console.log("activityAnalysis", activityAnalysis);
 
   // peoples 배열에서 이름 추출
-  activityAnalysis.forEach(activity => {
+  activityAnalysis.forEach((activity: any) => {
     if (activity.peoples && Array.isArray(activity.peoples)) {
       activity.peoples.forEach((person: any) => {
         if (person.name && person.name !== "string") {
@@ -108,7 +110,7 @@ const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
       <p className="text-sm text-gray-500">하루의 감정</p>
       <div className="w-[130px] h-[130px]">
         <Canvas camera={{ position: [0, 0, 10], fov: 30 }}>
-          <Blob diaryContent={{ emotions }} />
+          <Blob emotions={emotions} />
         </Canvas>
       </div>
 

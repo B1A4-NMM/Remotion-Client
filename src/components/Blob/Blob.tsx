@@ -1,3 +1,4 @@
+// components/Blob.tsx 
 import React, { useRef, useMemo, useState, useEffect, useCallback } from "react";
 import { Mesh } from "three";
 import { useFrame } from "@react-three/fiber";
@@ -18,12 +19,18 @@ interface Emotion {
 }
 
 interface BlobProps {
-  emotions: Emotion[]; // ✅ diaryContent 대신 emotions 배열 받기
+  emotions: Emotion[]; // ✅ VirtualizedRelationNode에서 계산된 emotions 배열
+  scale?: number;
   id?: string;
   onContextLost?: () => void;
 }
 
-const Blob: React.FC<BlobProps> = ({ emotions, id, onContextLost }) => {
+const Blob: React.FC<BlobProps> = ({ 
+  emotions, 
+  scale = 1, 
+  id, 
+  onContextLost 
+}) => {
   const mesh = useRef<Mesh>(null);
   const [isActive, setIsActive] = useState(false);
   const contextPool = WebGLContextPool.getInstance();
@@ -49,7 +56,7 @@ const Blob: React.FC<BlobProps> = ({ emotions, id, onContextLost }) => {
     };
   }, [id]);
   
-  // ✅ hexToRgb 함수만 유지
+  // ✅ hexToRgb 유틸리티 함수만 유지
   const hexToRgb = useCallback((hex: string): [number, number, number] => {
     const r = parseInt(hex.slice(1, 3), 16) / 255;
     const g = parseInt(hex.slice(3, 5), 16) / 255;
@@ -57,8 +64,9 @@ const Blob: React.FC<BlobProps> = ({ emotions, id, onContextLost }) => {
     return [r, g, b];
   }, []);
 
-  // ✅ emotions 배열을 기반으로 색상 계산
-  const emotionColors = useMemo(() => {
+  // ✅ 받은 emotions 배열을 그대로 shader에 전달할 형태로 변환만 수행
+  const shaderColors = useMemo(() => {
+    // emotions 배열이 비어있는 경우 기본값
     if (!emotions || emotions.length === 0) {
       const grayRgb = hexToRgb(baseColors.gray);
       return {
@@ -71,15 +79,16 @@ const Blob: React.FC<BlobProps> = ({ emotions, id, onContextLost }) => {
       };
     }
 
-    const primaryEmotion = emotions[0];
-    const secondaryEmotion = emotions[1] || emotions[0];
-    const tertiaryEmotion = emotions[2] || emotions[0];
+    // ✅ VirtualizedRelationNode에서 계산된 색상과 강도를 그대로 사용
+    const emotion1 = emotions[0];
+    const emotion2 = emotions[1] || emotion1; // 두 번째가 없으면 첫 번째 재사용
+    const emotion3 = emotions[2] || emotion1; // 세 번째가 없으면 첫 번째 재사용
 
     return {
-      color1: hexToRgb(baseColors[primaryEmotion.color]),
-      color2: hexToRgb(baseColors[secondaryEmotion.color]),
-      color3: hexToRgb(baseColors[tertiaryEmotion.color]),
-      intensity1: primaryEmotion.intensity,
+      color1: hexToRgb(baseColors[emotion1.color]),
+      color2: hexToRgb(baseColors[emotion2.color]),
+      color3: hexToRgb(baseColors[emotion3.color]),
+      intensity1: emotion1.intensity,
       intensity2: emotions[1]?.intensity || 0.0,
       intensity3: emotions[2]?.intensity || 0.0,
     };
@@ -97,15 +106,15 @@ const Blob: React.FC<BlobProps> = ({ emotions, id, onContextLost }) => {
     u_colorIntensity3: { value: 0.0 },
   });
 
-  // 색상 업데이트
+  // ✅ shader에 색상 값 전달 (계산은 하지 않음)
   useEffect(() => {
-    uniforms.current.u_color1.value = emotionColors.color1;
-    uniforms.current.u_color2.value = emotionColors.color2;
-    uniforms.current.u_color3.value = emotionColors.color3;
-    uniforms.current.u_colorIntensity1.value = emotionColors.intensity1;
-    uniforms.current.u_colorIntensity2.value = emotionColors.intensity2;
-    uniforms.current.u_colorIntensity3.value = emotionColors.intensity3;
-  }, [emotionColors]);
+    uniforms.current.u_color1.value = shaderColors.color1;
+    uniforms.current.u_color2.value = shaderColors.color2;
+    uniforms.current.u_color3.value = shaderColors.color3;
+    uniforms.current.u_colorIntensity1.value = shaderColors.intensity1;
+    uniforms.current.u_colorIntensity2.value = shaderColors.intensity2;
+    uniforms.current.u_colorIntensity3.value = shaderColors.intensity3;
+  }, [shaderColors]);
 
   // 프레임 업데이트
   useFrame(state => {
@@ -114,12 +123,12 @@ const Blob: React.FC<BlobProps> = ({ emotions, id, onContextLost }) => {
     uniforms.current.u_intensity.value = 0.2 + 0.1 * Math.sin(t * 0.4);
   });
 
-  if (!isActive) {
+  if (!isActive && id) {
     return null;
   }
 
   return (
-    <mesh ref={mesh} scale={1.0} position={[0, 0, 0]}>
+    <mesh ref={mesh} scale={scale} position={[0, 0, 0]}>
       <icosahedronGeometry args={[2.4, 17]} />
       <shaderMaterial
         vertexShader={vertexShader}

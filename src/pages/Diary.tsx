@@ -119,30 +119,33 @@ const Diary = () => {
     return () => clearInterval(interval);
   }, [animationQueue.current.length, listening]);
 
-  const checkMicrophonePermission = async () => {
-    if (navigator.permissions) {
-      try {
-        const result = await navigator.permissions.query({ name: 'microphone' });
-        return result.state; // 'granted', 'prompt', 'denied'
-      } catch (err) {
-        return 'prompt';
-      }
+  const requestMicrophonePermission = async () => {
+    try {
+      // 명시적으로 마이크 권한 요청
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      // 권한을 받았으면 스트림을 즉시 중지 (Speech Recognition에서는 필요 없음)
+      stream.getTracks().forEach(track => track.stop());
+      
+      return true;
+    } catch (error) {
+      console.error('마이크 권한 요청 실패:', error);
+      return false;
     }
-    return 'prompt';
   };
   
   const handleMicClick = async () => {
-    const permission = await checkMicrophonePermission();
-    console.log("permission: ", permission);
-    if (permission === 'denied') {
-      // 사용자에게 브라우저 설정에서 권한을 허용하도록 안내
-      alert('마이크 권한이 차단되었습니다. 브라우저 설정에서 허용해주세요.');
-      return;
-    }
-    
     if (listening) {
       SpeechRecognition.stopListening();
     } else {
+      // 먼저 권한 확인 및 요청
+      const hasPermission = await requestMicrophonePermission();
+      
+      if (!hasPermission) {
+        alert('마이크 권한이 필요합니다. 브라우저 설정에서 허용해주세요.');
+        return;
+      }
+      
       resetTranscript();
       prevTranscriptRef.current = "";
       SpeechRecognition.startListening({ language: "ko-KR", continuous: true });

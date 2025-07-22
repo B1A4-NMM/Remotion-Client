@@ -40,6 +40,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
 }) => {
   const [openId, setOpenId] = useState<number | null>(null);
   const navigate = useNavigate();
+  console.log(diaries);
 
   if (!diaries || diaries.length === 0) {
     return <div className="w-full text-center py-8 text-gray-400">검색 결과가 없습니다.</div>;
@@ -225,7 +226,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                           r="6"
                           fill="#FF4444"
                           stroke="#CC0000"
-                          stroke-width="1"
+                          strokeWidth="1"
                         />
 
                         {/* 중앙 점 */}

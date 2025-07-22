@@ -16,6 +16,7 @@ const VirtualizedBlobCard: React.FC<VirtualizedBlobCardProps> = ({ diaryContent,
     getBlobEmotionsFromSimpleEmotions(diaryContent), 
     [diaryContent]
   );
+
   const [isActive, setIsActive] = useState(false);
   const [hasBeenVisible, setHasBeenVisible] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -54,7 +55,10 @@ const VirtualizedBlobCard: React.FC<VirtualizedBlobCardProps> = ({ diaryContent,
         }}
       >
         {isActive ? (
-          <Canvas>
+          <Canvas
+          style={{
+            backgroundColor: 'transparent',
+          }}>
             <Blob 
               emotions={processedEmotions} 
               id={`blob-${index}`}

@@ -245,7 +245,7 @@ const BottomNavi = ({
       </svg>
 
       {/* ✅ 클릭 영역을 정확한 아이콘 위치에 덧씌우기 */}
-      <div className="absolute bottom-0 left-0 right-0 flex justify-center items-center pr-20">
+      <div className="absolute -top-2 bottom-0 left-0 right-0 flex justify-center items-center pr-20">
         {/* 마이크 아이콘 버튼 */}
         <button
           className="w-[50px] h-[50px] rounded-full transition-all"

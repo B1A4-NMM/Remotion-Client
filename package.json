@@ -61,6 +61,7 @@
     "@types/node": "^24.0.4",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "@types/react-speech-recognition": "^3.9.6",
     "@types/three": "^0.178.1",
     "@types/youtube": "^0.1.2",
     "@typescript-eslint/eslint-plugin": "^8.35.0",

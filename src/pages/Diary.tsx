@@ -119,7 +119,27 @@ const Diary = () => {
     return () => clearInterval(interval);
   }, [animationQueue.current.length, listening]);
 
-  const handleMicClick = () => {
+  const checkMicrophonePermission = async () => {
+    if (navigator.permissions) {
+      try {
+        const result = await navigator.permissions.query({ name: 'microphone' });
+        return result.state; // 'granted', 'prompt', 'denied'
+      } catch (err) {
+        return 'prompt';
+      }
+    }
+    return 'prompt';
+  };
+  
+  const handleMicClick = async () => {
+    const permission = await checkMicrophonePermission();
+    
+    if (permission === 'denied') {
+      // 사용자에게 브라우저 설정에서 권한을 허용하도록 안내
+      alert('마이크 권한이 차단되었습니다. 브라우저 설정에서 허용해주세요.');
+      return;
+    }
+    
     if (listening) {
       SpeechRecognition.stopListening();
     } else {
@@ -128,6 +148,7 @@ const Diary = () => {
       SpeechRecognition.startListening({ language: "ko-KR", continuous: true });
     }
   };
+  
 
   const handleLocationClick = () => {
     setIsLocationActive(!isLocationActive);
@@ -198,6 +219,10 @@ const Diary = () => {
 
   const onSubmit = (data: any) => {
     // 제출된 일기 내용 저장
+    if (listening) {
+      SpeechRecognition.stopListening();
+    }
+
     const diaryContent = {
       content: data.content || "",
       writtenDate: date || dayjs().format("YYYY-MM-DD"),
@@ -250,13 +275,19 @@ const Diary = () => {
     return <p>⚠️ 브라우저가 음성 인식을 지원하지 않습니다.</p>;
   }
 
+  const onBackClick=()=>{
+    if (listening) {
+      SpeechRecognition.stopListening();
+    }
+  }
+
   // if (isSubmitting) return <Loading6 key={Date.now()} />;
   if (isSubmitting) return <Loading7 key={Date.now()} />;
 
   return (
     <>
       <div className="relative flex flex-col h-full border">
-        <DiaryTitle selectedDate={selectedDate} onCalendarClick={handleCalendarClick} />
+        <DiaryTitle selectedDate={selectedDate} onCalendarClick={handleCalendarClick} onBackClick={onBackClick} />
 
         {/* 달력 컴포넌트 */}
         <MonthlyCalendar

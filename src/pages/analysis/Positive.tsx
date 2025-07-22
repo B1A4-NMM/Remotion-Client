@@ -114,8 +114,9 @@ const Positive = () => {
         </section>
 
         <section className="bg-white rounded-3xl shadow-xl mb-4">
-          <div className="text-xl font-bold p-3 pb-5 pl-5 mt-10">
-            긍정적 감정에 가장 큰 영향을 준 사람 TOP 3
+          <div className="text-xl font-bold p-3 pb-5 pl-5 mt-3">
+            <h1>긍정적 감정에 </h1>
+            <h1>가장 큰 영향을 준 사람 TOP 3</h1>
           </div>
           <hr className="ml-4 mr-4" />
           {isLoading ? (

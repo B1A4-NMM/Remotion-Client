@@ -1,20 +1,24 @@
 import React from "react";
 import dayjs from "dayjs";
+import 'dayjs/locale/ko';
 import { useNavigate } from "react-router-dom";
 
 interface DiaryTitleProps {
   selectedDate: string;
   onCalendarClick: () => void;
+  onBackClick: () => void;
 }
 
-const DiaryTitle: React.FC<DiaryTitleProps> = ({ selectedDate, onCalendarClick }) => {
+const DiaryTitle: React.FC<DiaryTitleProps> = ({ selectedDate, onCalendarClick, onBackClick }) => {
   const navigate = useNavigate();
+  dayjs.locale('ko');
 
   const formatDate = (date: string) => {
-    return dayjs(date).format("YYYY년 M월 D일");
+    return dayjs(date).format("YYYY년 M월 D일 dddd");
   };
 
   const backHome = () => {
+    onBackClick();
     navigate(`/`);
   };
 

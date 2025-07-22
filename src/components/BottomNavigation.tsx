@@ -62,7 +62,7 @@ export default function BottomNavigation() {
                 ? path === "/analysis" || path==="/relation"
                   ? "white"
                   : "#B6B6B6"
-                : path === "/analysis" || path === "relation"
+                : path === "/analysis" || path === "/relation"
                   ? "black"
                   : "#B6B6B6"
             }

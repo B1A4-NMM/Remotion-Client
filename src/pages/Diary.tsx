@@ -119,39 +119,15 @@ const Diary = () => {
     return () => clearInterval(interval);
   }, [animationQueue.current.length, listening]);
 
-  const requestMicrophonePermission = async () => {
-    try {
-      // 명시적으로 마이크 권한 요청
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
-      // 권한을 받았으면 스트림을 즉시 중지 (Speech Recognition에서는 필요 없음)
-      stream.getTracks().forEach(track => track.stop());
-      
-      return true;
-    } catch (error) {
-      console.error('마이크 권한 요청 실패:', error);
-      return false;
-    }
-  };
-  
-  const handleMicClick = async () => {
+  const handleMicClick = () => {
     if (listening) {
       SpeechRecognition.stopListening();
     } else {
-      // 먼저 권한 확인 및 요청
-      const hasPermission = await requestMicrophonePermission();
-      
-      if (!hasPermission) {
-        alert('마이크 권한이 필요합니다. 브라우저 설정에서 허용해주세요.');
-        return;
-      }
-      
       resetTranscript();
       prevTranscriptRef.current = "";
       SpeechRecognition.startListening({ language: "ko-KR", continuous: true });
     }
   };
-  
 
   const handleLocationClick = () => {
     setIsLocationActive(!isLocationActive);
@@ -222,10 +198,6 @@ const Diary = () => {
 
   const onSubmit = (data: any) => {
     // 제출된 일기 내용 저장
-    if (listening) {
-      SpeechRecognition.stopListening();
-    }
-
     const diaryContent = {
       content: data.content || "",
       writtenDate: date || dayjs().format("YYYY-MM-DD"),
@@ -278,19 +250,13 @@ const Diary = () => {
     return <p>⚠️ 브라우저가 음성 인식을 지원하지 않습니다.</p>;
   }
 
-  const onBackClick=()=>{
-    if (listening) {
-      SpeechRecognition.stopListening();
-    }
-  }
-
   // if (isSubmitting) return <Loading6 key={Date.now()} />;
   if (isSubmitting) return <Loading7 key={Date.now()} />;
 
   return (
     <>
       <div className="relative flex flex-col h-full border">
-        <DiaryTitle selectedDate={selectedDate} onCalendarClick={handleCalendarClick} onBackClick={onBackClick} />
+        <DiaryTitle selectedDate={selectedDate} onCalendarClick={handleCalendarClick} />
 
         {/* 달력 컴포넌트 */}
         <MonthlyCalendar

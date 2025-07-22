@@ -61,7 +61,7 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
           <ChevronDown className={cn("h-5 w-5 transition-transform", isOpen && "rotate-180")}/>
         </button>
         {isOpen && (
-          <div className="absolute top-full left-0 right-0 z-50 mt-1 max-h-60 overflow-auto rounded-xl border bg-popover text-popover-foreground shadow-md select-dropdown-menu">
+          <div className="absolute top-full left-0 right-0 z-40 mt-1 max-h-60 overflow-auto rounded-xl border bg-popover text-popover-foreground shadow-md select-dropdown-menu">
             {options.map((option) => (
               <button
                 key={option.value}

@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import ActivityCardSlider from "./ActivityCardSlider";
 import Todos from "./Todo";
 import WarningTestBox from "../WariningTestBox";
-import TestModal from "../TestModal";
+import TestModal from "./Test/TestModal";
 import PeopleCard from "../home/PeopleCard";
 import ActivityAnalysisCard from "../home/ActivityAnalysisCard";
 import IntensityChart from "./IntensityChart";
@@ -169,9 +169,12 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
     };
 
     // 감지된 부정적인 감정 찾기
+    console.log("감정 데이터:", emotions);
     for (const emotion of emotions) {
+      console.log("체크 중인 감정:", emotion);
       for (const [keyword, type] of Object.entries(negativeEmotionMap)) {
         if (emotion.includes(keyword)) {
+          console.log("매칭됨:", emotion, "->", type);
           return type;
         }
       }
@@ -232,7 +235,13 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
         </div>
       )}
       {warningType && <WarningTestBox type={warningType} onClick={handleWarningClick} />}
-      {negativeEmotionType && <NegativeEmotionCard emotionType={negativeEmotionType} />}
+      {negativeEmotionType && (
+        <>
+          {/* 디버깅용 콘솔 로그 */}
+          {console.log("negativeEmotionType:", negativeEmotionType)}
+          <NegativeEmotionCard emotionType={negativeEmotionType} />
+        </>
+      )}
       {reflectionTodos.length > 0 && (
         <div className=" mb-6">
           {/* <h2 className="text-xl font-semibold text-gray-800 mt-[60px] mb-[20px]  px-4">
@@ -259,7 +268,15 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
       {/* </motion.div> */}
 
       {testType && (
-        <TestModal type={convertWarningToTestType(testType)} onClose={() => setTestType(null)} />
+        <TestModal
+          type={convertWarningToTestType(testType)}
+          onClose={() => setTestType(null)}
+          onFinish={score => {
+            console.log("🎯 테스트 완료! 점수:", score);
+            console.log("📝 테스트 타입:", testType);
+            setTestType(null);
+          }}
+        />
       )}
     </div>
   );

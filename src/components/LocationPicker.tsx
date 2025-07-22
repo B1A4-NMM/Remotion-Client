@@ -74,6 +74,24 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
                 markerRef.current = new window.google.maps.Marker({
                   position: currentLocation,
                   map,
+                  icon: {
+                    url:
+                      "data:image/svg+xml;charset=UTF-8," +
+                      encodeURIComponent(`
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <!-- 막대기 (아래 부분) - 회색 -->
+                          <rect x="18" y="20" width="4" height="16" fill="#666666" rx="2"/>
+                          
+                          <!-- 동그란 부분 (위쪽) - 빨간색 -->
+                          <circle cx="20" cy="16" r="8" fill="#FF4444" stroke="#CC0000" stroke-width="1"/>
+                          
+                          <!-- 중앙 점 -->
+                          <circle cx="20" cy="16" r="2" fill="white"/>
+                        </svg>
+                      `),
+                    scaledSize: new google.maps.Size(40, 40),
+                    anchor: new google.maps.Point(20, 40),
+                  },
                 });
 
                 // 지도 중심이 바뀔 때마다 마커 위치 갱신
@@ -107,6 +125,24 @@ const LocationPicker = ({ open, onClose, onLocationSelect }: LocationPickerProps
                 markerRef.current = new window.google.maps.Marker({
                   position: fallbackLatLng,
                   map,
+                  icon: {
+                    url:
+                      "data:image/svg+xml;charset=UTF-8," +
+                      encodeURIComponent(`
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <!-- 막대기 (아래 부분) - 회색 -->
+                          <rect x="18" y="20" width="4" height="16" fill="#666666" rx="2"/>
+                          
+                          <!-- 동그란 부분 (위쪽) - 빨간색 -->
+                          <circle cx="20" cy="16" r="8" fill="#FF4444" stroke="#CC0000" stroke-width="1"/>
+                          
+                          <!-- 중앙 점 -->
+                          <circle cx="20" cy="16" r="2" fill="white"/>
+                        </svg>
+                      `),
+                    scaledSize: new google.maps.Size(40, 40),
+                    anchor: new google.maps.Point(20, 40),
+                  },
                 });
 
                 // 지도 중심이 바뀔 때마다 마커 위치 갱신
@@ -234,7 +270,23 @@ const LocationPreview = ({ location }: LocationPreviewProps) => {
         />
         {/* 커스텀 툴팁 추가 */}
         <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-          <MapPin className="w-8 h-8 text-[#2a1c31] stroke-[#2a1c31] stroke-2 fill-transparent drop-shadow-lg" />
+          <svg
+            width="32"
+            height="32"
+            viewBox="0 0 32 32"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="drop-shadow-lg"
+          >
+            {/* 막대기 (아래 부분) - 회색 */}
+            <rect x="14" y="16" width="4" height="12" fill="#666666" rx="2" />
+
+            {/* 동그란 부분 (위쪽) - 빨간색 */}
+            <circle cx="16" cy="12" r="8" fill="#FF4444" stroke="#CC0000" stroke-width="1" />
+
+            {/* 중앙 점 */}
+            <circle cx="16" cy="12" r="2.5" fill="white" />
+          </svg>
         </div>
       </div>
     </div>

@@ -14,3 +14,7 @@ export interface Notification {
     photoPath? : string | null;
 
 }
+
+export interface NotiCount {
+    count : number ; 
+}

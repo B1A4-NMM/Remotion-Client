@@ -33,7 +33,7 @@ const Title = () => {
   return (
     <div className="w-full pt-8">
       {/* 메인 헤더 */}
-      <h1 className="text-3xl font-bold text-gray-900 pb-8">추천</h1>
+      <h1 className="text-3xl font-bold text-gray-900 pb-3">추천</h1>
 
       {/* 버튼 위치 - 3개 버튼 정렬 */}
       <div className="buttonContainer shadow-md">

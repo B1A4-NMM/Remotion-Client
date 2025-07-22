@@ -11,10 +11,11 @@ interface RoutineItem {
 
 interface Props {
   routines: RoutineItem[];
+  onRefresh: () => void;
 }
 
-const PersonalizedRoutineList = ({ routines }: Props) => {
-  const navigate = useNavigate();
+const PersonalizedRoutineList = ({ routines,onRefresh}: Props) => {
+  //const navigate = useNavigate();
   const [ localRoutines, setLocalRoutines ] = useState<RoutineItem[]>(routines);
   const { mutate } = usePatchRoutineById();
 
@@ -26,8 +27,9 @@ const PersonalizedRoutineList = ({ routines }: Props) => {
         prev.filter((item) => item.id !== routine.id )
         );
         
-        //루틴 추가 후 리다이렉트
-        navigate("/routine");
+        // //루틴 추가 후 리다이렉트
+        // navigate("/routine");
+        onRefresh();
       }
     });
   }

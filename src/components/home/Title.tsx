@@ -110,6 +110,7 @@ const Title: React.FC<TitleProps> = ({
                   />
                 </svg>
               </button>
+              
               {/* 검색 버튼 */}
               <button
                 className={`p-2 rounded-full border transition-colors box-shadow shadow-xl ${

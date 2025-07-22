@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import EmotionSummaryCard from "@/components/analysis/EmotionSummaryCard";
+import EmotionSummaryCardSkeleton from "@/components/skeleton/EmotionSummaryCardSkeleton";
 import StrengthGraph from "@/components/analysis/StrengthGraph";
+import StrengthGraphSkeleton from "@/components/skeleton/StrengthGraphSkeleton";
 import { Select } from "@/components/ui/select";
 import { ChevronRight, HelpCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -17,8 +19,17 @@ interface PeriodConfig {
 const Analysis = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>("daily");
   const [helpOpen, setHelpOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const helpRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  // 로딩 상태 시뮬레이션 (실제로는 API 호출 상태에 따라 결정)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [selectedPeriod]);
 
   // 바깥 클릭 시 도움말 닫기
   useEffect(() => {
@@ -98,12 +109,16 @@ const Analysis = () => {
           </div>
         </div>
         <div className="overflow-x-auto pb-2">
-          <EmotionSummaryCard
-            key={"부정"}
-            type={"부정"}
-            period={getPeriodConfig(selectedPeriod).days}
-            barCount={getPeriodConfig(selectedPeriod).barCount}
-          />
+          {isLoading ? (
+            <EmotionSummaryCardSkeleton />
+          ) : (
+            <EmotionSummaryCard
+              key={"부정"}
+              type={"부정"}
+              period={getPeriodConfig(selectedPeriod).days}
+              barCount={getPeriodConfig(selectedPeriod).barCount}
+            />
+          )}
         </div>
       </section>
 
@@ -116,12 +131,16 @@ const Analysis = () => {
           </div>
         </div>
         <div className="overflow-x-auto pb-2">
-          <EmotionSummaryCard
-            key={"긍정"}
-            type={"긍정"}
-            period={getPeriodConfig(selectedPeriod).days}
-            barCount={getPeriodConfig(selectedPeriod).barCount}
-          />
+          {isLoading ? (
+            <EmotionSummaryCardSkeleton />
+          ) : (
+            <EmotionSummaryCard
+              key={"긍정"}
+              type={"긍정"}
+              period={getPeriodConfig(selectedPeriod).days}
+              barCount={getPeriodConfig(selectedPeriod).barCount}
+            />
+          )}
         </div>
       </section>
 
@@ -133,7 +152,7 @@ const Analysis = () => {
             <ChevronRight className="text-gray-400" />
           </div>
         </div>
-        <StrengthGraph />
+        {isLoading ? <StrengthGraphSkeleton /> : <StrengthGraph />}
       </section>
     </div>
   );

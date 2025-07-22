@@ -17,58 +17,6 @@ import "../styles/resultCard.css";
 import "../styles/App.css";
 import PeopleCard from "@/components/home/PeopleCard";
 
-// ✅ 안전한 샘플 데이터
-const sampleDiary = {
-  id: 102,
-  userId: 1, // 소유자 ID 추가
-  writtenDate: "2025-07-14",
-  photoPath: [],
-  audioPath: null,
-  content: "일기를 매일 쓰는거는 쉬운 일이 아니다...",
-  latitude: null,
-  longitude: null,
-  analysis: {
-    activity_analysis: [
-      {
-        activity: "농구하기",
-        peoples: [
-          {
-            name: "도영",
-            interactions: {
-              emotion: ["string"],
-              emotion_intensity: [0],
-            },
-            name_intimacy: "0.9",
-          },
-        ],
-        self_emotions: {
-          emotion: ["string"],
-          emotion_intensity: [0],
-        },
-        state_emotions: {
-          emotion: ["string"],
-          emotion_intensity: [0],
-        },
-        problem: [
-          {
-            situation: "string",
-            approach: "string",
-            outcome: "string",
-            decision_code: "string",
-            conflict_response_code: "string",
-          },
-        ],
-        strength: "string",
-      },
-    ],
-    reflection: {
-      achievements: ["string"],
-      shortcomings: ["string"],
-      todo: ["string"],
-    },
-  },
-};
-
 const Result: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const token = localStorage.getItem("accessToken") || "";
@@ -166,16 +114,13 @@ const Result: React.FC = () => {
     );
   }
 
-  const finalDiaryContent = diaryContent || sampleDiary;
-
+  const finalDiaryContent = diaryContent || null;
 
   return (
     <div
-      className={`result-container  h-screen text-foreground transition-opacity duration-1000 ${
+      className={`result-container h-full text-foreground transition-opacity duration-1000 ${
         shouldFade ? "fade-transition" : ""
-      } ${isTouchDevice ? "overflow-y-auto scrollbar-hide touch-scroll" : "overflow-y-auto"} ${
-        isScrolling ? "scrolling" : ""
-      }`}
+      } ${isTouchDevice ? "scrollbar-hide touch-scroll" : ""} ${isScrolling ? "scrolling" : ""}`}
       style={{
         WebkitOverflowScrolling: isTouchDevice ? "touch" : "auto",
         scrollBehavior: "smooth",
@@ -183,25 +128,38 @@ const Result: React.FC = () => {
       }}
     >
       {/* ✅ Header - 원래 위치 유지 */}
-      <ResultHeader
-        writtenDate={finalDiaryContent.writtenDate || ""}
-        diaryId={Number(id)}
-        isBookmarked={false}
-      />
+      {finalDiaryContent && (
+        <ResultHeader
+          writtenDate={finalDiaryContent.writtenDate || ""}
+          diaryId={Number(id)}
+          isBookmarked={finalDiaryContent.isBookmarked || false}
+        />
+      )}
 
-      <div>
+      <div className="overflow-y-auto ">
         {/* ✅ Emotion Summary */}
-        <EmotionSummary diaryContent={finalDiaryContent} />
+        {isLoading ? (
+          <div className="flex flex-col items-center text-center space-y-[16px] mb-4">
+            <p className="text-sm text-gray-500">하루의 감정</p>
+            <div className="w-[130px] h-[130px] bg-gray-200 rounded-full animate-pulse opacity-10"></div>
+            <div className="w-32 h-6 bg-gray-200 rounded animate-pulse opacity-10"></div>
+            <div className="w-24 h-5 bg-gray-200 rounded animate-pulse opacity-10"></div>
+          </div>
+        ) : finalDiaryContent ? (
+          <EmotionSummary diaryContent={finalDiaryContent as any} />
+        ) : null}
 
         {/* ✅ Toggle */}
         <ResultToggle view={view} />
 
         {/* ✅ View */}
         {view === "record" ? (
-          <DiaryView diaryContent={finalDiaryContent} />
-        ) : (
-          <ResultView diaryContent={finalDiaryContent} isLoading={isLoading} />
-        )}
+          finalDiaryContent ? (
+            <DiaryView diaryContent={finalDiaryContent} />
+          ) : null
+        ) : finalDiaryContent ? (
+          <ResultView diaryContent={finalDiaryContent as any} isLoading={isLoading} />
+        ) : null}
       </div>
     </div>
   );

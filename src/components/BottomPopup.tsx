@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback,forwardRef,
+  useImperativeHandle,} from "react";
 import { useSpring, animated } from "@react-spring/web";
 
 type HeightOption = {
@@ -13,9 +14,16 @@ type BottomPopupProps = {
   heightOption?: HeightOption;
 };
 
-const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupProps) => {
+//닫기버튼 눌렀을 때 애니매이션 적용 
+export type BottomPopupHandle = {
+  close: () => void;
+};
+
+const BottomPopup = forwardRef<BottomPopupHandle,BottomPopupProps>(
+  ({ isOpen, onClose, children, heightOption }, ref) => {
   const [isInDOM, setIsInDOM] = useState(false);
   const [showOverlay, setShowOverlay] = useState(false);
+  const [shouldClose, setShouldClose] = useState(false); // 닫힘 예약 
 
   const bodyOverflowRef = useRef<string>(document.body.style.overflow);
   const topRef = useRef<string>(document.body.style.top);
@@ -23,12 +31,12 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
 
   const { heightPixel: _heightPixel, wrapChildren } = heightOption || {};
   const heightPixel = wrapChildren
-    ? Math.max(contentRef.current?.offsetHeight || 0, 400) // 최소 400px 보장
+    ? Math.max(contentRef.current?.offsetHeight || 0, 520) // 최소 400px 보장
     : _heightPixel || window.innerHeight * 0.8;
 
   const [springProps, api] = useSpring(() => ({
     height: "0px",
-    config: { tension: 300, friction: 30 },
+    config: { tension: 250, friction: 35 },
     onRest: {
       height: value => {
         // console.log("🎭 애니메이션 완료:", { value: value.value, isOpen });
@@ -39,10 +47,22 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
     },
   }));
 
-  const handleOverlayClick = useCallback(() => {
+  // const handleOverlayClick = useCallback(() => {
+  //   setShowOverlay(false);
+  //   onClose();
+  // }, [onClose]);
+
+  // ✅ 닫기용 함수 정의
+  const closeWithAnimation = () => {
     setShowOverlay(false);
-    onClose();
-  }, [onClose]);
+    setShouldClose(true);
+    api.start({ height: "0px" });
+  };
+
+  // ✅ 이 부분 추가!
+  useImperativeHandle(ref, () => ({
+    close: closeWithAnimation,
+  }));
 
   const handleContentClick = useCallback((e: React.MouseEvent) => e.stopPropagation(), []);
 
@@ -60,9 +80,9 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
       document.body.style.top = `-${currY}px`;
     } else {
       // console.log("❌ 모달 닫기 ");
-      api.start({ height: "0px" });
+      closeWithAnimation();
     }
-  }, [isOpen, api]);
+  }, [isOpen]);
 
   useEffect(() => {
     // console.log("🎭 애니메이션 제어:" );
@@ -88,7 +108,11 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
       {showOverlay && (
         <div
           className="absolute inset-0 bg-black bg-opacity-30 z-[99]"
-          onClick={handleOverlayClick}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              closeWithAnimation(); // ✅ 오버레이 클릭 시에도 부드럽게 닫힘
+            }
+          }}
         />
       )}
 
@@ -112,6 +136,7 @@ const BottomPopup = ({ isOpen, onClose, children, heightOption }: BottomPopupPro
       </animated.div>
     </>
   ) : null;
-};
+}
+);
 
 export default BottomPopup;

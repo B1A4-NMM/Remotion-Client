@@ -27,7 +27,9 @@ const HomeBar: React.FC<HomeBarProps> = ({
                 />
               </svg>
             </div>
-            <p className="text-[12px] text-[#85848f] text-center">연속 기록</p>
+            <p className="text-[12px] text-[#85848f] text-center whitespace-nowrap">
+              연속 기록
+            </p>
           </div>
           <p className="text-[16px] font-semibold text-black text-center">
             {continuousWritingDate}일
@@ -44,7 +46,7 @@ const HomeBar: React.FC<HomeBarProps> = ({
                 />
               </svg>
             </div>
-            <p className="text-[12px] text-muted-foreground text-center whitespace-nowrap">
+            <p className="text-[12px] text-[#85848f] text-center whitespace-nowrap">
               이 달의 감정
             </p>
           </div>
@@ -63,11 +65,11 @@ const HomeBar: React.FC<HomeBarProps> = ({
                 />
               </svg>
             </div>
-            <p className="text-[12px] text-muted-foreground text-center whitespace-nowrap">
+            <p className="text-[12px] text-[#85848f] text-center whitespace-nowrap">
               누적 하루뒤
             </p>
           </div>
-          <p className="text-[16px] font-semibold text-foreground text-center">
+          <p className="text-[16px] font-semibold text-black text-center">
             {totalDiaryCount}개
           </p>
         </div>

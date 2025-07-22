@@ -3,6 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import Blob from "../Blob/Blob";
 import {
   getBlobEmotionsFromSimpleEmotions,
+  getBlobEmotionsFromActivityAnalysis,
 } from "../../utils/activityEmotionUtils";
 
 interface EmotionSummaryProps {
@@ -16,6 +17,8 @@ const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
     if (Array.isArray(diaryContent?.emotions) && diaryContent.emotions.length) {
       return getBlobEmotionsFromSimpleEmotions(diaryContent);
     }
+    // ② 없으면 activity_analysis 기반 계산
+    return getBlobEmotionsFromActivityAnalysis(diaryContent);
   }, [diaryContent]);
 
   /* ---------- 2. 표시용 텍스트 ---------- */

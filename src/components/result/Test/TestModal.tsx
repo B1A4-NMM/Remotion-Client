@@ -1,18 +1,18 @@
 // components/TestModal.tsx
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "../components/ui/button";
-import { Card } from "../components/ui/card";
-import { Label } from "../components/ui/label";
-import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
-import { Progress } from "../components/ui/progress";
-import { PHQ_QUESTIONS, PHQ_OPTIONS } from "../constants/phq-9";
-import { GAD7_QUESTIONS, GAD7_OPTIONS } from "../constants/gad-7";
-import { STRESS_QUESTIONS, STRESS_OPTIONS } from "../constants/pss";
-import { TEST_INTRO } from "../constants/testIntro";
+import { Button } from "../../ui/button";
+import { Card } from "../../ui/card";
+import { Label } from "../../ui/label";
+import { RadioGroup, RadioGroupItem } from "../../ui/radio-group";
+import { Progress } from "../../ui/progress";
+import { PHQ_QUESTIONS, PHQ_OPTIONS } from "../../../constants/phq-9";
+import { GAD7_QUESTIONS, GAD7_OPTIONS } from "../../../constants/gad-7";
+import { STRESS_QUESTIONS, STRESS_OPTIONS } from "../../../constants/pss";
+import { TEST_INTRO } from "../../../constants/testIntro";
 import { X } from "lucide-react";
 import TestResult from "./TestResult";
-import { postTestComplete } from "../api/services/test";
+import { postTestComplete } from "../../../api/services/test";
 
 type IncomingType = "phq9" | "gad7" | "stress" | "depression" | "anxiety";
 
@@ -48,7 +48,8 @@ const TestModal = ({ type, onClose, onFinish }: TestModalProps) => {
   const progress = ((step + 1) / questions.length) * 100;
   const [mode, setMode] = useState<"intro" | "question" | "result">("intro");
   const [score, setScore] = useState(0);
-  console.log("✅ type 값:", type);
+  console.log("✅ TestModal type 값:", type);
+  console.log("✅ TestModal convertedType 값:", convertedType);
   const handleSelect = (value: number) => {
     const updated = [...answers];
     updated[step] = value;
@@ -64,8 +65,10 @@ const TestModal = ({ type, onClose, onFinish }: TestModalProps) => {
       setMode("result");
 
       // 테스트 결과를 서버로 전송
-      const apiTestType =
-        type === "depression" ? "depression" : type === "anxiety" ? "anxiety" : "stress";
+      const apiTestType = type === "phq9" ? "depression" : type === "gad7" ? "anxiety" : "stress";
+      console.log("🔍 handleNext에서 API 타입 결정:");
+      console.log("  - 원본 type:", type);
+      console.log("  - 결정된 apiTestType:", apiTestType);
       postTestComplete(apiTestType)
         .then(() => {
           console.log("테스트 완료 알림 전송 성공");

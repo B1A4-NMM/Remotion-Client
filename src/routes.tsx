@@ -7,7 +7,6 @@ import Diary from "./pages/Diary";
 import SearchPage from "./pages/SearchPage";
 import Result from "./pages/Result";
 // import Loading6 from "./components/Loading/Loading6";
-import Loading7 from "./components/Loading/Loading7";
 
 import Video from "./pages/Video";
 import Routine from "./pages/Routine";
@@ -89,15 +88,7 @@ export const routes = [
       </ProtectedRoute>
     ),
   },
-  { path: "/loading7", element: <Loading7 /> },
-  {
-    path: "/analysis",
-    element: (
-      <ProtectedRoute>
-        <Analysis />
-      </ProtectedRoute>
-    ),
-  },
+
   {
     path: "/video",
     element: (

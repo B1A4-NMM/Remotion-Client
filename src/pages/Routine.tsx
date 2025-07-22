@@ -99,7 +99,7 @@ const Routine = () => {
 
   const handleFolderClick = async (emotionTitle: string) => {
     const emotionKey = emotionTitle as RoutineItem["routineType"];
-    // console.log("🔥 폴더 클릭됨", emotionKey);
+    console.log("🔥 폴더 클릭됨", emotionKey);
 
     // 초기화
     setIsPopupOpen(false);
@@ -147,7 +147,7 @@ const Routine = () => {
   };
 
   return (
-    <div className="min-h-screen overflow-auto text-foreground bg-[#fdfaf8] dark:bg-transparent px-4 pb-8">
+    <div className="overflow-auto text-foreground bg-[#fdfaf8] dark:bg-transparent px-4 ">
       <Title />
 
       {/* 상단 제목 */}

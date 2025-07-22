@@ -9,12 +9,6 @@ import Title from "./components/analysis/Title";
 const HIDE_NAV_PATHS = ["/signup", "/login", "/diary", "/video", "/result", "/loading7"];
 const SHOW_TITLE_PATHS = ["/analysis", "/relation"];
 
-// ✅ 경로별 타이틀 매핑
-const TITLE_MAP: Record<string, string> = {
-  "/analysis": "감정 분석",
-  "/relation": "관계 분석",
-};
-
 export default function Layout() {
   const location = useLocation();
   const isPopupOpen = useBottomPopupStore(state => state.isOpen);
@@ -25,16 +19,17 @@ export default function Layout() {
 
   const shouldShowTitle = SHOW_TITLE_PATHS.includes(location.pathname);
 
-  // ✅ 현재 경로에 따른 타이틀 이름 결정
-  const getTitleName = (): string => {
-    return TITLE_MAP[location.pathname] || "페이지";
-  };
-
   return (
     <div className="w-full min-h-[100dvh] flex justify-center bg-[black] font-pretendard">
-      <div className="w-full max-w-[414px] flex flex-col relative bg-[#FAF6F4] dark:bg-gradient-to-b dark:from-[#181718] dark:via-[#181718] dark:to-[#4A3551] dark:text-white min-h-[100dvh] bg-fixed">
-        {/* ✅ 동적 타이틀 이름 적용 */}
-        {shouldShowTitle && <Title name={getTitleName()} isBackActive={false} back={""} />}
+      <div
+        className="w-full max-w-[414px] flex flex-col relative bg-[#FAF6F4] dark:bg-gradient-to-b dark:from-[#181718] dark:via-[#181718] dark:to-[#4A3551] dark:text-white min-h-[100dvh] bg-fixed"
+        style={{
+          backgroundAttachment: "fixed",
+          backgroundSize: "100% 100%",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        {shouldShowTitle && <Title name={"감정 분석"} isBackActive={false} back={""} />}
         <main className={`flex-1 h-full ${shouldShowNav ? "pb-[84px]" : ""}`}>
           <AnimatedOutlet />
           <Toaster

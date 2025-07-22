@@ -69,13 +69,22 @@ const Map: React.FC<MapProps> = _ => {
                 url:
                   "data:image/svg+xml;charset=UTF-8," +
                   encodeURIComponent(`
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" 
-                            fill="#2a1c31" stroke="#2a1c31" stroke-width="2"/>
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <!-- 막대기 (아래 부분) - 회색 -->
+                      <rect x="18" y="20" width="4" height="16" fill="#666666" rx="2"/>
+                      
+                      <!-- 동그란 부분 (위쪽) - 빨간색 -->
+                      <circle cx="20" cy="16" r="8" fill="#FF4444" stroke="#CC0000" stroke-width="1"/>
+                      
+                      <!-- 동그란 부분 내부 하이라이트 -->
+                      <circle cx="18" cy="14" r="3" fill="rgba(255,255,255,0.3)"/>
+                      
+                      <!-- 중앙 점 -->
+                      <circle cx="20" cy="16" r="2" fill="white"/>
                     </svg>
                   `),
-                scaledSize: new google.maps.Size(32, 32),
-                anchor: new google.maps.Point(16, 32),
+                scaledSize: new google.maps.Size(40, 40),
+                anchor: new google.maps.Point(20, 40),
               },
               title: "현재 위치",
             });
@@ -107,7 +116,7 @@ const Map: React.FC<MapProps> = _ => {
             bubble.style.width = "70px";
             bubble.style.height = "70px";
             bubble.style.background = "white";
-            bubble.style.border = "2px solid #ccc";
+            bubble.style.border = "2px solid white";
             bubble.style.borderRadius = "16px";
             bubble.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
             bubble.style.display = "flex";
@@ -181,7 +190,7 @@ const Map: React.FC<MapProps> = _ => {
             tailBorder.style.height = "0";
             tailBorder.style.borderLeft = "6px solid transparent";
             tailBorder.style.borderRight = "6px solid transparent";
-            tailBorder.style.borderTop = "6px solid #ccc";
+            tailBorder.style.borderTop = "6px solid white";
             tailBorder.style.zIndex = "0";
 
             // 꼬리 내부 (border와 같은 색상)
@@ -194,7 +203,7 @@ const Map: React.FC<MapProps> = _ => {
             tail.style.height = "0";
             tail.style.borderLeft = "5px solid transparent";
             tail.style.borderRight = "5px solid transparent";
-            tail.style.borderTop = "5px solid #ccc";
+            tail.style.borderTop = "5px solid white";
             tail.style.zIndex = "1";
 
             // 외부 래퍼
@@ -251,7 +260,7 @@ const Map: React.FC<MapProps> = _ => {
       {/* 지도 컨테이너 */}
       <div
         ref={mapRef}
-        className="bg-white rounded-2xl shadow overflow-hidden"
+        className="rounded-2xl shadow overflow-hidden"
         style={{ height: "calc(100vh - 250px)", minHeight: 150 }}
       />
     </div>

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import dayjs from "dayjs";
+import { useGetWrittenDays } from "../../api/queries/home/useGetWrittenDays";
 
 interface MonthlyCalendarProps {
   selectedDate: string;
@@ -25,6 +26,14 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
 }) => {
   const [currentMonth, setCurrentMonth] = useState(dayjs(selectedDate));
   const [calendarDays, setCalendarDays] = useState<(dayjs.Dayjs | null)[]>([]);
+
+  // 일기 쓴 날짜 가져오기
+  const { data: writtenDaysData } = useGetWrittenDays(
+    currentMonth.year(),
+    currentMonth.month() + 1
+  );
+
+  const writtenDays = writtenDaysData?.writtenDays || [];
 
   useEffect(() => {
     generateCalendarDays();
@@ -53,6 +62,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
 
   const handleDateClick = (date: dayjs.Dayjs) => {
     const formattedDate = date.format("YYYY-MM-DD");
+    console.log("🔍 MonthlyCalendar handleDateClick 호출됨:", formattedDate);
     onDateSelect(formattedDate);
     if (!disableOverlay) {
       onClose?.();
@@ -65,6 +75,14 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
 
   const goToNextMonth = () => {
     setCurrentMonth(prev => prev.add(1, "month"));
+  };
+
+  const goToPreviousYear = () => {
+    setCurrentMonth(prev => prev.subtract(1, "year"));
+  };
+
+  const goToNextYear = () => {
+    setCurrentMonth(prev => prev.add(1, "year"));
   };
 
   const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
@@ -89,75 +107,101 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className={
-              disableOverlay
-                ? "bg-white rounded-lg shadow-xl p-4"
-                : "absolute top-20 left-4 right-4 bg-white rounded-lg shadow-xl z-50 p-4"
-            }          >
+            className="absolute top-20 left-4 right-4 rounded-lg shadow-xl z-50 p-4 calendar-modal"
+          >
             {/* 달력 헤더 */}
             <div className="flex items-center justify-between mb-4">
-              <button
-                onClick={goToPreviousMonth}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors text-black dark:text-white"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-1">
+                {/* 년도 이전 버튼 */}
+                <button
+                  onClick={goToPreviousYear}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full transition-colors text-black dark:text-white"
+                  title="이전 년도"
+                >
+                  <div className="flex">
+                    <ChevronLeft className="w-4 h-4" />
+                    <ChevronLeft className="w-4 h-4 -ml-2" />
+                  </div>
+                </button>
+                {/* 월 이전 버튼 */}
+                <button
+                  onClick={goToPreviousMonth}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full transition-colors text-black dark:text-white"
+                  title="이전 월"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+              </div>
 
               <h2 className="text-lg font-semibold text-black dark:text-white">
                 {currentMonth.format("YYYY년 M월")}
               </h2>
 
-              <button
-                onClick={goToNextMonth}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors text-black dark:text-white"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-1">
+                {/* 월 다음 버튼 */}
+                <button
+                  onClick={goToNextMonth}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full transition-colors text-black dark:text-white"
+                  title="다음 월"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+                {/* 년도 다음 버튼 */}
+                <button
+                  onClick={goToNextYear}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full transition-colors text-black dark:text-white"
+                  title="다음 년도"
+                >
+                  <div className="flex">
+                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="w-4 h-4 -ml-2" />
+                  </div>
+                </button>
+              </div>
             </div>
 
             {/* 요일 헤더 */}
             <div className="grid grid-cols-7 gap-1 mb-2">
-              {weekDays.map((day, index) => (
+              {weekDays.map(day => (
                 <div
                   key={day}
-                  className={`text-center text-sm font-medium p-2 ${
-                    index === 0
-                      ? "text-red-500"
-                      : index === 6
-                        ? "text-blue-500"
-                        : "text-gray-600 dark:text-gray-300"
-                  }`}
+                  className="text-center text-sm font-medium text-gray-500 dark:text-gray-400 py-2"
                 >
                   {day}
                 </div>
               ))}
             </div>
 
-            {/* 날짜 그리드 */}
+            {/* 달력 그리드 */}
             <div className="grid grid-cols-7 gap-1">
               {calendarDays.map((day, index) => {
                 if (!day) {
-                  return <div key={index} className="p-2" />;
+                  return <div key={index} className="h-10" />;
                 }
 
                 const isSelected = day.format("YYYY-MM-DD") === selectedDate;
                 const isToday = day.isSame(dayjs(), "day");
-                const isSunday = day.day() === 0;
-                const isSaturday = day.day() === 6;
+                const isWrittenDay = writtenDays.includes(day.date());
 
                 return (
                   <button
-                    key={day.format("YYYY-MM-DD")}
+                    key={index}
                     onClick={() => handleDateClick(day)}
-                    className={`
-                      p-2 text-sm rounded-lg transition-colors relative text-black dark:text-white
-                      ${isSelected ? "bg-blue-500 text-white font-semibold" : "hover:bg-gray-100 dark:hover:bg-gray-700"}
-                      ${isToday && !isSelected ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 font-semibold" : ""}
-                      ${isSunday && !isSelected && !isToday ? "text-red-500" : ""}
-                      ${isSaturday && !isSelected && !isToday ? "text-blue-500" : ""}
-                    `}
+                    className={`relative h-10 rounded-lg transition-colors ${
+                      isSelected
+                        ? "bg-blue-800 text-white"
+                        : isToday
+                          ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                          : "hover:bg-gray-100 dark:hover:bg-gray-700 text-black dark:text-white"
+                    }`}
                   >
-                    {day.format("D")}
+                    <span className="text-sm">{day.date()}</span>
+                    {/* 일기 쓴 날짜 표시 */}
+                    {isWrittenDay && (
+                      <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
+                        <div className="w-1.5 h-1.5 bg-red-900 rounded-full"></div>
+                      </div>
+                    )}
                   </button>
                 );
               })}

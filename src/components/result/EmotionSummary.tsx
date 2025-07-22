@@ -6,7 +6,37 @@ import Blob from "../Blob/Blob";
 import { mapEmotionToColor, ColorKey } from "../../constants/emotionColors";
 
 interface EmotionSummaryProps {
-  diaryContent: any;
+  diaryContent: {
+    analysis?: {
+      activity_analysis?: Array<{
+        activity: string;
+        peoples?: Array<{
+          name: string;
+          interactions?: {
+            emotion: string[];
+            emotion_intensity: number[];
+          };
+          name_intimacy: string;
+        }>;
+        self_emotions?: {
+          emotion: string[];
+          emotion_intensity: number[];
+        };
+        state_emotions?: {
+          emotion: string[];
+          emotion_intensity: number[];
+        };
+        problem?: Array<{
+          situation: string;
+          approach: string;
+          outcome: string;
+          decision_code: string;
+          conflict_response_code: string;
+        }>;
+        strength: string;
+      }>;
+    };
+  };
 }
 
 interface Emotion {
@@ -14,20 +44,20 @@ interface Emotion {
   intensity: number;
 }
 
-// 감정과 강도를 매핑하는 함수 (중복 감정 합산)
-const mapEmotionsWithIntensity = (diaryContent: any) => {
+// 감정과 강도를 매핑하는 함수 (최적화된 버전)
+const mapEmotionsWithIntensity = (diaryContent: EmotionSummaryProps["diaryContent"]) => {
   const activityAnalysis = diaryContent?.analysis?.activity_analysis;
   if (!activityAnalysis || activityAnalysis.length === 0) return [];
 
   // Map을 사용하여 감정별로 강도 합산
   const emotionMap = new Map<string, number>();
 
-  activityAnalysis.forEach((activity: any) => {
+  activityAnalysis.forEach(activity => {
     // 1. People의 interactions 감정 처리
     if (activity.peoples && Array.isArray(activity.peoples)) {
-      activity.peoples.forEach((person: any) => {
+      activity.peoples.forEach(person => {
         const interactions = person.interactions;
-        if (interactions && interactions.emotion && interactions.emotion_intensity) {
+        if (interactions?.emotion && interactions?.emotion_intensity) {
           interactions.emotion.forEach((emotion: string, index: number) => {
             if (emotion && emotion !== "string") {
               const intensity = interactions.emotion_intensity[index] || 0;
@@ -72,16 +102,16 @@ const mapEmotionsWithIntensity = (diaryContent: any) => {
   }));
 };
 
-// 대상들을 하나의 배열로 합치는 함수 (중복 인물 제거)
-const extractTargets = (diaryContent: any) => {
+// 대상들을 하나의 배열로 합치는 함수 (최적화된 버전)
+const extractTargets = (diaryContent: EmotionSummaryProps["diaryContent"]) => {
   const activityAnalysis = diaryContent?.analysis?.activity_analysis;
   if (!activityAnalysis || activityAnalysis.length === 0) return [];
 
   const targetSet = new Set<string>();
 
-  activityAnalysis.forEach((activity: any) => {
+  activityAnalysis.forEach(activity => {
     if (activity.peoples && Array.isArray(activity.peoples)) {
-      activity.peoples.forEach((person: any) => {
+      activity.peoples.forEach(person => {
         if (person.name && person.name !== "string") {
           targetSet.add(person.name.trim());
         }
@@ -93,18 +123,48 @@ const extractTargets = (diaryContent: any) => {
 };
 
 const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
-  const rawEmotions = mapEmotionsWithIntensity(diaryContent);
-  const targets = extractTargets(diaryContent);
+  // 메모이제이션된 데이터 처리
+  const processedData = useMemo(() => {
+    if (!diaryContent) {
+      return {
+        emotions: [],
+        targets: [],
+        mainEmotions: "",
+        targetNames: "",
+      };
+    }
 
-  // ✅ 색상과 강도 계산
+    const rawEmotions = mapEmotionsWithIntensity(diaryContent);
+    const targets = extractTargets(diaryContent);
+
+    // 메인 감정들을 문자열로 변환 (표시용)
+    const mainEmotions = rawEmotions
+      .sort((a, b) => b.intensity - a.intensity)
+      .slice(0, 3)
+      .map(item => item.emotion)
+      .join(", ");
+
+    const targetNames = targets.join(", ");
+
+    return {
+      emotions: rawEmotions,
+      targets,
+      mainEmotions,
+      targetNames,
+    };
+  }, [diaryContent]);
+
+  // 색상과 강도 계산 (메모이제이션)
   const processedEmotions = useMemo((): Emotion[] => {
-    if (rawEmotions.length === 0) {
+    const { emotions } = processedData;
+
+    if (emotions.length === 0) {
       return [{ color: "gray", intensity: 1 }];
     }
 
     // 색상별로 강도 합산
     const colorMap = new Map<ColorKey, number>();
-    rawEmotions.forEach(({ emotion, intensity }) => {
+    emotions.forEach(({ emotion, intensity }) => {
       const color = mapEmotionToColor(emotion);
       colorMap.set(color, (colorMap.get(color) || 0) + intensity);
     });
@@ -125,51 +185,48 @@ const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
       .slice(0, 3)
       .map(([color, total]) => ({
         color,
-        intensity: total / totalIntensity
+        intensity: total / totalIntensity,
       }));
 
-    // ✅ 총합을 정확히 1.000으로 맞추기
+    // 총합을 정확히 1.000으로 맞추기
     const rounded = sortedResults.map(item => ({
       color: item.color,
-      intensity: Math.round(item.intensity * 1000) / 1000
+      intensity: Math.round(item.intensity * 1000) / 1000,
     }));
 
     const sum = rounded.reduce((acc, item) => acc + item.intensity, 0);
-    const diff = 1.000 - sum;
+    const diff = 1.0 - sum;
     if (Math.abs(diff) > 0.001 && rounded.length > 0) {
       rounded[0].intensity = Math.round((rounded[0].intensity + diff) * 1000) / 1000;
     }
 
     return rounded;
-  }, [rawEmotions]);
+  }, [processedData.emotions]);
 
-  // 메인 감정들을 문자열로 변환 (표시용)
-  const mainEmotions = rawEmotions
-    .sort((a, b) => b.intensity - a.intensity)
-    .slice(0, 3)
-    .map(item => item.emotion)
-    .join(", ");
-  
-  const targetNames = targets.join(", ");
+  // 데이터가 없을 때 early return
+  if (!diaryContent) {
+    return null;
+  }
+
+  const { mainEmotions, targetNames } = processedData;
 
   return (
     <div className="flex flex-col items-center text-center space-y-[16px] mb-4">
       <p className="text-sm text-gray-500">하루의 감정</p>
       <div className="w-[130px] h-[130px]">
-        <Canvas 
-          camera={{ position: [0, 0, 10], fov: 30 }}
-          gl={{ 
+        <Canvas
+          camera={{ position: [0, 0, 10], fov: 30 } as any}
+          gl={{
             antialias: true,
             alpha: true,
             powerPreference: "high-performance",
             preserveDrawingBuffer: true,
           }}
-          style={{ background: 'transparent' }}
+          style={{ background: "transparent" }}
           dpr={Math.min(window.devicePixelRatio, 2)}
         >
           <ambientLight intensity={0.6} />
           <pointLight position={[8, 8, 8]} intensity={0.4} />
-          {/* ✅ 처리된 emotions 배열을 직접 전달 */}
           <Blob emotions={processedEmotions} />
         </Canvas>
       </div>

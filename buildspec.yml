@@ -12,12 +12,12 @@ phases:
       - export VITE_GOOGLE_MAPS_API_KEY=$(aws ssm get-parameter --name "/harudew/VITE_GOOGLE_MAPS_API_KEY" --with-decryption --query "Parameter.Value" --output text)
       - export VITE_REDIRECT_URI=$(aws ssm get-parameter --name "/harudew/VITE_REDIRECT_URI" --query "Parameter.Value" --output text)
       - export VITE_VAPID_PUBLIC_KEY=$(aws ssm get-parameter --name "/harudew/VITE_VAPID_PUBLIC_KEY" --query "Parameter.Value" --output text)
-      - export REACT_APP_API_BASE_URL=$(aws ssm get-parameter --name "/harudew/REACT_APP_API_BASE_URL" --query "Parameter.Value" --output text)
       - echo Environment variables loaded successfully
       - echo "=== Environment Variables Debug ==="
       - echo "VITE_SOCIAL_AUTH_URL = $VITE_SOCIAL_AUTH_URL"
       - echo "VITE_GOOGLE_MAPS_API_KEY = [HIDDEN]"
       - echo "VITE_REDIRECT_URI = $VITE_REDIRECT_URI"
+      - echo "VITE_VAPID_PUBLIC_KEY = $VITE_VAPID_PUBLIC_KEY"
       - echo "All VITE_ variables:"
       - printenv | grep VITE || echo "No VITE_ variables found"
       - echo "=== End Debug ==="

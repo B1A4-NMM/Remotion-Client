@@ -38,7 +38,8 @@ const RelationshipChangeCard: React.FC<RelationshipChangeCardProps> = ({ people 
                     {index < increased.length - 1 ? "고, " : ""}
                     {index === increased.length - 1 && decreased.length > 0 ? "고, " : ""}
                     {index === increased.length - 1 && decreased.length === 0 ? "네요" : ""}
-                    {index === increased.length - 1 && decreased.length > 0 ? "" : ""} <br />
+                    {index === increased.length - 1 && decreased.length > 0 ? "" : ""}
+                    {index === increased.length - 1 && decreased.length > 0 ? <br /> : <br />}
                   </span>
                 ))}
               </p>
@@ -46,7 +47,13 @@ const RelationshipChangeCard: React.FC<RelationshipChangeCardProps> = ({ people 
 
             {decreased.length > 0 && (
               <p className="mb-2">
-                {increased.length > 0 ? "" : "오늘 일기로 <br/> "}
+                {increased.length > 0 ? (
+                  ""
+                ) : (
+                  <>
+                    오늘 일기로 <br />
+                  </>
+                )}
                 {decreased.map((person, index) => (
                   <span key={person.name}>
                     <span className="font-semibold" style={{ color: "#000" }}>
@@ -59,6 +66,7 @@ const RelationshipChangeCard: React.FC<RelationshipChangeCardProps> = ({ people 
                     내려갔
                     {index < decreased.length - 1 ? "고, " : ""}
                     {index === decreased.length - 1 ? "네요" : ""}
+                    {index < decreased.length - 1 ? <br /> : ""}
                   </span>
                 ))}
               </p>

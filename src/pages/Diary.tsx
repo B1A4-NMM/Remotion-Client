@@ -133,7 +133,7 @@ const Diary = () => {
   
   const handleMicClick = async () => {
     const permission = await checkMicrophonePermission();
-    
+    console.log("permission: ", permission);
     if (permission === 'denied') {
       // 사용자에게 브라우저 설정에서 권한을 허용하도록 안내
       alert('마이크 권한이 차단되었습니다. 브라우저 설정에서 허용해주세요.');

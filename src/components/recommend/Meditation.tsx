@@ -308,7 +308,7 @@ const Meditation = ({ type = 1, onClose }: MeditationProps) => {
           </div>
           
           {/* 단계별 안내 텍스트 - 화면 정중앙에 위치 */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+          <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center w-full">
             <div 
               className={`text-white text-xl font-light transition-all duration-700 ease-in-out ${
                 isTextVisible 

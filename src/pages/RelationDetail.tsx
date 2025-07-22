@@ -4,7 +4,7 @@ import { useGetRelationDetail } from "@/api/queries/home/useGetRelationDetail";
 import { RelationData } from "@/types/relation";
 import { motion } from "framer-motion";
 import { Calendar, MapPin, Activity, Heart, TrendingUp } from "lucide-react";
-import { mapEmotionToColor } from "@/constants/emotionColors";
+import { baseColors, mapEmotionToColor } from "@/constants/emotionColors";
 import type { ColorKey } from "@/components/Blob/Blob";
 import { Canvas } from "@react-three/fiber";
 import Blob from "@/components/Blob/Blob";
@@ -108,7 +108,7 @@ const RelationDetail = () => {
 
   // 가장 강한 감정의 색상 가져오기
   const strongestEmotion = analysis.emotionStats[0]?.emotion;
-  const strongestEmotionColor = strongestEmotion ? mapEmotionToColor(strongestEmotion) : "#95A5A6";
+  const strongestEmotionColor = strongestEmotion ? baseColors[mapEmotionToColor(strongestEmotion)] : "#95A5A6";
 
   const getRelationshipStatus = (score: number): string => {
     if (score >= 90) return "둘도 없는";
@@ -230,7 +230,7 @@ const RelationDetail = () => {
               <div key={emotion.emotion} className="flex items-center p-4 bg-gray-50 rounded-xl">
                 <div
                   className="w-16 h-16 rounded-full flex items-center justify-center mr-4"
-                  style={{ backgroundColor: mapEmotionToColor(emotion.emotion) }}
+                  style={{ backgroundColor: baseColors[mapEmotionToColor(emotion.emotion)] }}
                 >
                   <span className="text-white font-bold text-center">{emotion.emotion}</span>
                 </div>

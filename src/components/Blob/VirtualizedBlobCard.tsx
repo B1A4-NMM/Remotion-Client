@@ -54,7 +54,8 @@ const VirtualizedBlobCard: React.FC<VirtualizedBlobCardProps> = ({ diaryContent,
         }}
       >
         {isActive ? (
-          <Canvas>
+          <Canvas
+            camera={{position:[0,0,4]}}>
             <Blob 
               emotions={processedEmotions} 
               id={`blob-${index}`}

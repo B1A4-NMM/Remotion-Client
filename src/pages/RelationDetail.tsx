@@ -9,6 +9,7 @@ import type { ColorKey } from "@/components/Blob/Blob";
 import { Canvas } from "@react-three/fiber";
 import Blob from "@/components/Blob/Blob";
 import { useTheme } from "@/components/theme-provider";
+import dayjs from "dayjs";
 
 const RelationDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -125,6 +126,10 @@ const RelationDetail = () => {
   const gotoDiary=(id:number)=>{
     navigate(`/result/${id}?view=record`);
   }
+
+  const formatDate = (date: string) => {
+    return dayjs(date).format("YYYY년 M월 D일 dddd");
+  };
 
   return (
     <div className="min-h-screen">
@@ -261,13 +266,11 @@ const RelationDetail = () => {
                 <p className="text-gray-700 mb-4">{analysis.recentDiary.content}</p>
                 <div className="flex items-center justify-between text-sm text-gray-600">
                   <div className="flex items-center">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    {analysis.recentDiary.writtenDate}
+                    {formatDate(analysis.recentDiary.writtenDate)}
                   </div>
                   {analysis.recentDiary.latitude && analysis.recentDiary.longitude && (
                     <div className="flex items-center">
                       <MapPin className="w-4 h-4 mr-2" />
-                      위치 정보 있음
                     </div>
                   )}
                 </div>

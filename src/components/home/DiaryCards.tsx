@@ -117,7 +117,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               {/* 날짜 & 오른쪽 아이콘들 */}
               <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
                 <span className="text-xs text-gray-400">
-                  {dayjs(mappedDiary.date).format("YYYY년 MM월 DD일")}
+                  {dayjs(mappedDiary.date).format("YYYY년 M월 DD일")}
                 </span>
                 <div className="flex items-center gap-2">
                   {mappedDiary.bookmarked && (
@@ -242,7 +242,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               <hr className="border-t border-[#E5E5EA] mb-2" />
               <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
                 <span className="text-xs text-gray-400">
-                  {dayjs(mappedDiary.date).format("YYYY년 MM월 DD일")}
+                  {dayjs(mappedDiary.date).format("YYYY년 M월 DD일")}
                 </span>
                 <div className="flex items-center gap-2">
                   {mappedDiary.bookmarked && (
@@ -357,7 +357,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               <hr className="border-t border-[#E5E5EA] mb-2" />
               <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
                 <span className="text-xs text-gray-400">
-                  {dayjs(mappedDiary.date).format("YYYY년 MM월 DD일")}
+                  {dayjs(mappedDiary.date).format("YYYY년 M월 DD일")}
                 </span>
                 <div className="flex items-center gap-2">
                   {mappedDiary.bookmarked && (
@@ -451,7 +451,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               <hr className="border-t border-[#E5E5EA] mb-2" />
               <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
                 <span className="text-xs text-gray-400">
-                  {dayjs(mappedDiary.date).format("YYYY년 MM월 DD일")}
+                  {dayjs(mappedDiary.date).format("YYYY년 M월 DD일")}
                 </span>
                 <div className="flex items-center gap-2">
                   {mappedDiary.bookmarked && (
@@ -539,7 +539,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               <hr className="border-t border-[#E5E5EA] mb-2" />
               <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
                 <span className="text-xs text-gray-400">
-                  {dayjs(mappedDiary.date).format("YYYY년 MM월 DD일")}
+                  {dayjs(mappedDiary.date).format("YYYY년 M월 DD일")}
                 </span>
                 <div className="flex items-center gap-2">
                   {mappedDiary.bookmarked && (

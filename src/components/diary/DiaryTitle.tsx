@@ -11,7 +11,7 @@ const DiaryTitle: React.FC<DiaryTitleProps> = ({ selectedDate, onCalendarClick }
   const navigate = useNavigate();
 
   const formatDate = (date: string) => {
-    return dayjs(date).format("YYYY년 M월 D일");
+    return dayjs(date).format("YYYY년 M월 D일 dddd");
   };
 
   const backHome = () => {

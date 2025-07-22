@@ -48,14 +48,13 @@ const ResultHeader: React.FC<ResultHeaderProps> = ({
   dayjs.locale("ko");
 
   return (
-    <div className="sticky top-0 z-50 w-full bg-[#FAF6F4]/80 dark:bg-[#181718]/80 backdrop-blur-md">
+    <div className="sticky top-0 z-50 w-full bg-[#FAF6F4]/80 dark:bg-[#181718]/80 backdrop-blur-md shadow-sm rounded-2xl mb-8">
       <div className="w-full">
         <div className="flex items-start justify-between px-4 pt-6 pb-4 w-full">
           <div className="flex flex-col">
-            <span className="text-sm text-foreground mt-1">
-              {dayjs(writtenDate).format("YYYY년 M월 D일")}
-            </span>
-            <span className="text-sm text-foreground">{dayjs(writtenDate).format("dddd")}</span>
+            <h1 className="text-xl font-bold text-foreground mt-1">
+              {dayjs(writtenDate).format("YYYY년 M월 D일 dddd")}
+            </h1>
           </div>
 
           <div className="flex items-center gap-2">

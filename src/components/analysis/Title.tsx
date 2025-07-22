@@ -1,8 +1,10 @@
 import { ChevronLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import "@/styles/togle.css";
 
 const Title = ({name, isBackActive=false, back="/analysis"}:{name:string, isBackActive:boolean, back:string}) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const onClickHandler=()=>{
     navigate(back)
@@ -29,11 +31,18 @@ const Title = ({name, isBackActive=false, back="/analysis"}:{name:string, isBack
     return Math.max(reducedSize, minSize);
   }
 
+
+  const isRelation = location.pathname === "/relation";
+  const isAnalysis = location.pathname === "/analysis";
+
+  const handleTabClick = (tab: "analysis" | "relation") => {
+    navigate(`/${tab}`);
+  };
+
   return (
-    <>
-      <div className="w-full ">
-        {/* 메인 헤더 */}
-        <div className="flex items-center justify-between px-4 py-8 ">
+    <div className="sticky top-0 z-50 w-full bg-[#FAF6F4]/80 dark:bg-[#181718]/80 backdrop-blur-md shadow-sm rounded-2xl">
+      {/* 메인 헤더 */}
+        <div className="flex items-center justify-between px-4 pt-8 pb-4">
           {isBackActive? (
               <>
                 <div className="flex items-center">
@@ -50,46 +59,34 @@ const Title = ({name, isBackActive=false, back="/analysis"}:{name:string, isBack
               </>
           ):(
             <>
+            <div className="w-full">
               <h1 
                 className="font-bold text-gray-900 text-3xl"
               >
                 {name}
               </h1>
-              <div className="flex items-center gap-2">
+              <div className="buttonContainer2 shadow-md mt-3">
                 <button
-                  className="p-2 rounded-full text-foreground border border-border hover:bg-secondary focus:ring-2 focus:ring-primary transition-colors box-shadow shadow-xl"
-                  aria-label="검색"
-                  onClick={() => navigate("/analysis")}
+                  className={`button ${isRelation ? "active" : ""}`}
+                  onClick={() => handleTabClick("relation")}
+                  aria-label="관계 분석"
                 >
-                  
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chart-column-big-icon lucide-chart-column-big">
-                    <path d="M3 3v16a2 2 0 0 0 2 2h16"/>
-                    <rect x="15" y="5" width="4" height="12" rx="1"/><rect x="7" y="8" width="4" height="9" rx="1"/>
-                  </svg>
-
-                  </button>
-
-                  <button
-                  className="p-2 rounded-full text-foreground border border-border hover:bg-secondary focus:ring-2 focus:ring-primary transition-colors box-shadow shadow-xl"
-                  aria-label="검색"
-                  onClick={() => navigate("/relation")}
+                  관계 분석
+                </button>
+                <button
+                  className={`button ${isAnalysis ? "active" : ""}`}
+                  onClick={() => handleTabClick("analysis")}
+                  aria-label="감정 분석"
                 >
-                 
-                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chart-network-icon lucide-chart-network">
-                  <path d="m13.11 7.664 1.78 2.672"/>
-                  <path d="m14.162 12.788-3.324 1.424"/>
-                  <path d="m20 4-6.06 1.515"/>
-                  <path d="M3 3v16a2 2 0 0 0 2 2h16"/><circle cx="12" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="9" cy="15" r="2"/>
-                  </svg>
-
-                  </button>
-                </div>
-            </>
+                  감정 분석
+                </button>
+              </div>
+            </div>
+          </>
             
           )}
         </div>
-      </div>
-    </>
+    </div>
   );
 }
 

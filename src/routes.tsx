@@ -122,6 +122,14 @@ export const routes = [
     ),
   },
   {
+    path: "/analysis",
+    element: (
+      <ProtectedRoute>
+        <Analysis />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: "/analysis/strength",
     element: (
       <ProtectedRoute>

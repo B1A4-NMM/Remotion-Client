@@ -1,221 +1,69 @@
-// src/components/result/EmotionSummary.tsx
-
 import React, { useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import Blob from "../Blob/Blob";
-import { mapEmotionToColor, ColorKey } from "../../constants/emotionColors";
+import {
+  getBlobEmotionsFromSimpleEmotions,
+  getBlobEmotionsFromActivityAnalysis,
+} from "../../utils/activityEmotionUtils";
 
 interface EmotionSummaryProps {
-  diaryContent: {
-    analysis?: {
-      activity_analysis?: Array<{
-        activity: string;
-        peoples?: Array<{
-          name: string;
-          interactions?: {
-            emotion: string[];
-            emotion_intensity: number[];
-          };
-          name_intimacy: string;
-        }>;
-        self_emotions?: {
-          emotion: string[];
-          emotion_intensity: number[];
-        };
-        state_emotions?: {
-          emotion: string[];
-          emotion_intensity: number[];
-        };
-        problem?: Array<{
-          situation: string;
-          approach: string;
-          outcome: string;
-          decision_code: string;
-          conflict_response_code: string;
-        }>;
-        strength: string;
-      }>;
-    };
-  };
+  diaryContent: any; // 기존 타입은 그대로 유지
 }
-
-interface Emotion {
-  color: ColorKey;
-  intensity: number;
-}
-
-// 감정과 강도를 매핑하는 함수 (최적화된 버전)
-const mapEmotionsWithIntensity = (diaryContent: EmotionSummaryProps["diaryContent"]) => {
-  const activityAnalysis = diaryContent?.analysis?.activity_analysis;
-  if (!activityAnalysis || activityAnalysis.length === 0) return [];
-
-  // Map을 사용하여 감정별로 강도 합산
-  const emotionMap = new Map<string, number>();
-
-  activityAnalysis.forEach(activity => {
-    // 1. People의 interactions 감정 처리
-    if (activity.peoples && Array.isArray(activity.peoples)) {
-      activity.peoples.forEach(person => {
-        const interactions = person.interactions;
-        if (interactions?.emotion && interactions?.emotion_intensity) {
-          interactions.emotion.forEach((emotion: string, index: number) => {
-            if (emotion && emotion !== "string") {
-              const intensity = interactions.emotion_intensity[index] || 0;
-              emotionMap.set(emotion, (emotionMap.get(emotion) || 0) + intensity);
-            }
-          });
-        }
-      });
-    }
-
-    // 2. Self emotions 처리
-    if (activity.self_emotions) {
-      const selfEmotions = activity.self_emotions;
-      if (selfEmotions.emotion && selfEmotions.emotion_intensity) {
-        selfEmotions.emotion.forEach((emotion: string, index: number) => {
-          if (emotion && emotion !== "string") {
-            const intensity = selfEmotions.emotion_intensity[index] || 0;
-            emotionMap.set(emotion, (emotionMap.get(emotion) || 0) + intensity);
-          }
-        });
-      }
-    }
-
-    // 3. State emotions 처리
-    if (activity.state_emotions) {
-      const stateEmotions = activity.state_emotions;
-      if (stateEmotions.emotion && stateEmotions.emotion_intensity) {
-        stateEmotions.emotion.forEach((emotion: string, index: number) => {
-          if (emotion && emotion !== "string") {
-            const intensity = stateEmotions.emotion_intensity[index] || 0;
-            emotionMap.set(emotion, (emotionMap.get(emotion) || 0) + intensity);
-          }
-        });
-      }
-    }
-  });
-
-  // Map을 배열로 변환
-  return Array.from(emotionMap.entries()).map(([emotion, intensity]) => ({
-    emotion,
-    intensity,
-  }));
-};
-
-// 대상들을 하나의 배열로 합치는 함수 (최적화된 버전)
-const extractTargets = (diaryContent: EmotionSummaryProps["diaryContent"]) => {
-  const activityAnalysis = diaryContent?.analysis?.activity_analysis;
-  if (!activityAnalysis || activityAnalysis.length === 0) return [];
-
-  const targetSet = new Set<string>();
-
-  activityAnalysis.forEach(activity => {
-    if (activity.peoples && Array.isArray(activity.peoples)) {
-      activity.peoples.forEach(person => {
-        if (person.name && person.name !== "string") {
-          targetSet.add(person.name.trim());
-        }
-      });
-    }
-  });
-
-  return Array.from(targetSet);
-};
 
 const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
-  // 메모이제이션된 데이터 처리
-  const processedData = useMemo(() => {
-    if (!diaryContent) {
-      return {
-        emotions: [],
-        targets: [],
-        mainEmotions: "",
-        targetNames: "",
-      };
+  /* ---------- 1. Blob에 줄 emotions 계산 ---------- */
+  const processedEmotions = useMemo(() => {
+    // ① diaryContent.emotions 배열이 있으면 간단 계산
+    if (Array.isArray(diaryContent?.emotions) && diaryContent.emotions.length) {
+      return getBlobEmotionsFromSimpleEmotions(diaryContent);
     }
-
-    const rawEmotions = mapEmotionsWithIntensity(diaryContent);
-    const targets = extractTargets(diaryContent);
-
-    // 메인 감정들을 문자열로 변환 (표시용)
-    const mainEmotions = rawEmotions
-      .sort((a, b) => b.intensity - a.intensity)
-      .slice(0, 3)
-      .map(item => item.emotion)
-      .join(", ");
-
-    const targetNames = targets.join(", ");
-
-    return {
-      emotions: rawEmotions,
-      targets,
-      mainEmotions,
-      targetNames,
-    };
+    // ② 없으면 activity_analysis 기반 계산
+    return getBlobEmotionsFromActivityAnalysis(diaryContent);
   }, [diaryContent]);
 
-  // 색상과 강도 계산 (메모이제이션)
-  const processedEmotions = useMemo((): Emotion[] => {
-    const { emotions } = processedData;
-
-    if (emotions.length === 0) {
-      return [{ color: "gray", intensity: 1 }];
+  /* ---------- 2. 표시용 텍스트 ---------- */
+  const mainEmotions = useMemo(() => {
+    if (Array.isArray(diaryContent?.emotions) && diaryContent.emotions.length) {
+      return diaryContent.emotions
+        .map((e: any) => e.emotion)
+        .join(", ");
     }
-
-    // 색상별로 강도 합산
-    const colorMap = new Map<ColorKey, number>();
-    emotions.forEach(({ emotion, intensity }) => {
-      const color = mapEmotionToColor(emotion);
-      colorMap.set(color, (colorMap.get(color) || 0) + intensity);
+    const raw = diaryContent?.analysis?.activity_analysis ?? [];
+    if (!raw.length) return "";
+    const flat: string[] = [];
+    raw.forEach((a: any) => {
+      flat.push(...(a.self_emotions?.emotion ?? []));
+      flat.push(...(a.state_emotions?.emotion ?? []));
+      if (Array.isArray(a.peoples)) {
+        a.peoples.forEach((p: any) =>
+          flat.push(...(p.interactions?.emotion ?? []))
+        );
+      }
     });
-
-    // 여러 색상일 때 gray 제거
-    if (colorMap.size > 1) {
-      colorMap.delete("gray");
-    }
-
-    const totalIntensity = [...colorMap.values()].reduce((sum, val) => sum + val, 0);
-    if (totalIntensity === 0) {
-      return [{ color: "gray", intensity: 1 }];
-    }
-
-    // 강도순으로 정렬하고 상위 3개만 선택
-    const sortedResults = [...colorMap.entries()]
-      .sort((a, b) => b[1] - a[1])
+    return [...new Set(flat.filter((e) => e && e !== "string"))]
       .slice(0, 3)
-      .map(([color, total]) => ({
-        color,
-        intensity: total / totalIntensity,
-      }));
+      .join(", ");
+  }, [diaryContent]);
 
-    // 총합을 정확히 1.000으로 맞추기
-    const rounded = sortedResults.map(item => ({
-      color: item.color,
-      intensity: Math.round(item.intensity * 1000) / 1000,
-    }));
+  /* ---------- 3. 대상 인물 ---------- */
+  const targetNames = useMemo(() => {
+    const list: string[] = [];
+    diaryContent?.analysis?.activity_analysis?.forEach((a: any) => {
+      a.peoples?.forEach((p: any) => {
+        if (p.name && p.name !== "string") list.push(p.name.trim());
+      });
+    });
+    return [...new Set(list)].join(", ");
+  }, [diaryContent]);
 
-    const sum = rounded.reduce((acc, item) => acc + item.intensity, 0);
-    const diff = 1.0 - sum;
-    if (Math.abs(diff) > 0.001 && rounded.length > 0) {
-      rounded[0].intensity = Math.round((rounded[0].intensity + diff) * 1000) / 1000;
-    }
-
-    return rounded;
-  }, [processedData.emotions]);
-
-  // 데이터가 없을 때 early return
-  if (!diaryContent) {
-    return null;
-  }
-
-  const { mainEmotions, targetNames } = processedData;
-
+  /* ---------- 4. 렌더 ---------- */
   return (
     <div className="flex flex-col items-center text-center space-y-[16px] mb-4">
       <p className="text-sm text-gray-500">하루의 감정</p>
+
       <div className="w-[130px] h-[130px]">
         <Canvas
-          camera={{ position: [0, 0, 10], fov: 30 } as any}
+          camera={{ position: [0, 0, 10], fov: 30 }}
           gl={{
             antialias: true,
             alpha: true,
@@ -238,7 +86,9 @@ const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
       )}
 
       {targetNames && (
-        <p className="text-lg text-gray-500 line-clamp-2 leading-relaxed m-7">{targetNames}</p>
+        <p className="text-lg text-gray-500 line-clamp-2 leading-relaxed m-7">
+          {targetNames}
+        </p>
       )}
     </div>
   );

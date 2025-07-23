@@ -10,7 +10,7 @@ import FilePreview, { Attachment } from "@/components/diary/FilePreview";
 
 import DiaryTitle from "@/components/diary/DiaryTitle";
 import BottomNavi from "@/components/diary/BottomNavi";
-import MonthlyCalendar from "@/components/diary/MontlyCalendar";
+import MonthlyCalendar from "@/components/diary/MonthlyCalendar";
 import { toast } from "sonner";
 import MainLoading from "@/components/Loading/MainLoading";
 

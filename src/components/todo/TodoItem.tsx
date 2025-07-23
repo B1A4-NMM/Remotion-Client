@@ -9,7 +9,7 @@ import { useState } from "react";
 import BottomPopup from "@/components/BottomPopup";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
-import MonthlyCalendar from "@/components/diary/MontlyCalendar";
+import MonthlyCalendar from "@/components/diary/MonthlyCalendar";
 import { formatDate, parseDateStringToDate } from "@/utils/date";
 
 interface TodoItemProps {

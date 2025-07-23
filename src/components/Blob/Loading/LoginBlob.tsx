@@ -8,11 +8,7 @@ import fragmentShaderDark from "../fragmentShaderDark";
 import { baseColors } from "@/constants/emotionColors";
 import { useTheme } from "@/components/theme-provider";
 
-interface LoadingBlobProps {
-  isComplete?: boolean;
-}
-
-const LoadingBlob = ({ isComplete = false }: LoadingBlobProps) => {
+const LoadingBlob = () => {
   const mesh = useRef<Mesh>(null);
   const { theme } = useTheme();
   const isDark =
@@ -24,9 +20,6 @@ const LoadingBlob = ({ isComplete = false }: LoadingBlobProps) => {
   const [animationStartTime, setAnimationStartTime] = useState<number | null>(null);
   const [targetColors, setTargetColors] = useState<number[][]>([]);
   const [currentPhase, setCurrentPhase] = useState<"toColor" | "toWhite">("toColor");
-  const [targetScale, setTargetScale] = useState(1.7);
-  const [currentScale, setCurrentScale] = useState(1.7);
-  const [shouldStartShrinking, setShouldStartShrinking] = useState(false);
 
   // uniforms 생성 (처음에는 완전히 흰색)
   const uniforms = useMemo(
@@ -76,43 +69,13 @@ const LoadingBlob = ({ isComplete = false }: LoadingBlobProps) => {
   useEffect(() => {
     setTargetColors(generateRandomColors());
     setAnimationStartTime(Date.now());
-
-    // 1초 후에 블롭이 작아지면서 위치 이동
-    const timer = setTimeout(() => {
-      setTargetScale(0.9);
-      setShouldStartShrinking(true);
-    }, 1000);
-
-    return () => clearTimeout(timer);
   }, []);
-
-  // isComplete가 변경될 때 타겟 스케일 설정 (지연 후 확장 시작)
-  // useEffect(() => {
-  //   // isComplete 애니메이션 제거 - 멘트 완료 후 별도 애니메이션 없음
-  // }, [isComplete]);
 
   useFrame(state => {
     const t = state.clock.getElapsedTime();
     uniforms.u_time.value = t;
     uniforms.u_intensity.value = 0.2 + 0.1 * Math.sin(t * 0.9);
     const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
-
-    // 스케일 애니메이션 (1초 후에만 작아지는 애니메이션)
-    if (shouldStartShrinking && currentScale !== targetScale) {
-      const scaleDiff = targetScale - currentScale;
-      const scaleStep = scaleDiff * 0.015; // 더 부드러운 보간
-      setCurrentScale(prev => prev + scaleStep);
-
-      if (mesh.current) {
-        mesh.current.scale.setScalar(currentScale + scaleStep);
-      }
-    } else if (!shouldStartShrinking) {
-      // shouldStartShrinking이 false일 때는 초기 크기 유지
-      if (mesh.current && mesh.current.scale.x !== 1.2) {
-        mesh.current.scale.setScalar(1.2);
-        setCurrentScale(1.2);
-      }
-    }
 
     if (animationStartTime) {
       const elapsed = Date.now() - animationStartTime;
@@ -245,7 +208,7 @@ const LoadingBlob = ({ isComplete = false }: LoadingBlobProps) => {
   }, []);
 
   return (
-    <mesh ref={mesh} scale={currentScale} position={[0, 0, 0]}>
+    <mesh ref={mesh} scale={1.0} position={[0, 0, 0]}>
       <icosahedronGeometry args={[2, 16]} />
       <shaderMaterial vertexShader={vertexShader} fragmentShader={frag} uniforms={uniforms} />
     </mesh>

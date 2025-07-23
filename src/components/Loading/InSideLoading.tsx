@@ -3,20 +3,20 @@ import { useTheme } from "../theme-provider";
 import { motion } from "framer-motion";
 
 const phrases: string[] = [
-  "빨간색은 강한 부정적인 감정을 의미해요. ",
-  "파란색은 약한 부정적인 감정이에요. ",
-  "초록색은 강한 긍정적인 감정입니다.",
-  "노란색은 약한 긍정 감정이에요. ",
-  "원안의 감정 색이 섞이고 있어요",
+  "이슬 안에 감정 색이 섞이고 있어요",
+  "빨강은 강한 부정",
+  "파랑은 약한 부정",
+  "초록은 강한 긍정",
+  "노랑은 약한 긍정이에요",
 ];
 
 // 감정 색상 매핑
 const emotionColors = {
+  gray: "#DADADA", // 회색 - 중립
   red: "#F36B6B", // 빨간색 - 강한 부정
   blue: "#7DA7E3", // 파란색 - 약한 부정
   green: "#72C9A3", // 초록색 - 강한 긍정
   yellow: "#FFD47A", // 노란색 - 약한 긍정
-  gray: "#DADADA", // 회색 - 중립
 };
 
 const COLORS = ["#82e79f", "#fcbcba", "#f8e76c", "#70cfe4"];
@@ -27,7 +27,11 @@ interface CheckRef {
   currentAlpha: number;
 }
 
-const Loading6: React.FC = () => {
+interface Loading6Props {
+  onComplete?: (isComplete: boolean) => void;
+}
+
+const Loading6: React.FC<Loading6Props> = ({ onComplete }) => {
   const phrasesRef = useRef<SVGGElement | null>(null);
   const checksRef = useRef<CheckRef[]>([]);
   const colorMapRef = useRef<string[]>([]);
@@ -46,18 +50,20 @@ const Loading6: React.FC = () => {
 
     // 하나씩 쌓이는 타이머
     const phraseTimer = setInterval(() => {
-      if (visiblePhrases < phrases.length) {
-        setVisiblePhrases(prev => prev + 1);
-      }
-      // 모든 문구가 표시된 후에는 그대로 유지 (다시 처음부터 시작하지 않음)
-    }, 1500); // 1.5초마다 다음 문구 추가
+      setVisiblePhrases(prev => {
+        if (prev < phrases.length) {
+          return prev + 1;
+        }
+        return prev; // 모든 문구가 표시된 후에는 그대로 유지
+      });
+    }, 2500); // 1.5초마다 다음 문구 추가
 
     return () => clearInterval(phraseTimer);
-  }, [visiblePhrases]);
+  }, []); // 의존성 배열을 비워서 무한 루프 방지
 
   // 각 문구에 해당하는 감정 색상
   const getEmotionColor = (index: number) => {
-    const colorKeys = ["red", "blue", "green", "yellow", "gray"];
+    const colorKeys = ["gray", "red", "blue", "green", "yellow"];
     return emotionColors[colorKeys[index] as keyof typeof emotionColors] || emotionColors.gray;
   };
 
@@ -73,15 +79,20 @@ const Loading6: React.FC = () => {
         alignItems: "center",
         justifyContent: "center",
         background: " ",
+        WebkitTransform: "translateZ(0)", // 모바일 하드웨어 가속
+        transform: "translateZ(0)",
       }}
     >
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          height: 400,
-          width: 800,
+          height: "100%",
+          width: "100%",
+          maxHeight: "500px",
+          maxWidth: "800px",
           overflow: "hidden",
+          WebkitOverflowScrolling: "touch", // iOS 스크롤 최적화
         }}
       >
         <svg width="100%" height="100%">
@@ -90,28 +101,45 @@ const Loading6: React.FC = () => {
               <linearGradient id="linearGradient" x2="0" y2="1">
                 <stop stopColor="white" stopOpacity="0" offset="0%" />
                 <stop stopColor="white" stopOpacity="1" offset="10%" />
-                <stop stopColor="white" stopOpacity="1" offset="90%" />
+                <stop stopColor="white" stopOpacity="1" offset="100%" />
                 <stop stopColor="white" stopOpacity="0" offset="100%" />
               </linearGradient>
               <rect width="100%" height="100%" fill="url(#linearGradient)" />
             </mask>
+
+            {/* 완료 상태일 때의 반짝이는 효과 */}
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+              <feMerge>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
           </defs>
 
           <g style={{ mask: "url(#mask)" }}>
             <g ref={phrasesRef}>
               {/* 쌓이는 체크리스트 */}
               {phrases.slice(0, visiblePhrases).map((phrase, i) => {
-                const y = 40 + i * 60; // 간격을 좁게 조정
+                const y = 40 + i * 50; // 간격을 좁게 조정
                 const emotionColor = getEmotionColor(i);
                 return (
                   <motion.g
                     key={i}
                     initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                      scale: 1,
+                      filter: "drop-shadow(0 0 0px rgba(0,0,0,0))",
+                    }}
                     transition={{
                       duration: 0.6,
                       ease: "easeOut",
-                      delay: i * 0.1, // 각 문구마다 약간의 지연
+                      delay: i * 0.1,
+                      type: "spring", // 모바일에서 더 부드러운 애니메이션
+                      stiffness: 100,
+                      damping: 15,
                     }}
                   >
                     {/* 줄바꿈이 가능한 텍스트 */}
@@ -124,9 +152,73 @@ const Loading6: React.FC = () => {
                           lineHeight: "1.3",
                           wordWrap: "break-word",
                           overflow: "hidden",
+                          position: "relative",
                         }}
                       >
-                        {phrase}
+                        {phrase.split(/(빨강|파랑|초록|노랑)/).map((part, partIndex) => {
+                          if (part === "빨강") {
+                            return (
+                              <span key={partIndex}>
+                                <span
+                                  style={{
+                                    backgroundColor: `${emotionColors.red}80`,
+                                    color: "white",
+                                    padding: "2px 4px",
+                                    borderRadius: "5px",
+                                  }}
+                                >
+                                  {part}
+                                </span>
+                              </span>
+                            );
+                          } else if (part === "파랑") {
+                            return (
+                              <span key={partIndex}>
+                                <span
+                                  style={{
+                                    backgroundColor: `${emotionColors.blue}80`,
+                                    color: "white",
+                                    padding: "2px 4px",
+                                    borderRadius: "5px",
+                                  }}
+                                >
+                                  {part}
+                                </span>
+                              </span>
+                            );
+                          } else if (part === "초록") {
+                            return (
+                              <span key={partIndex}>
+                                <span
+                                  style={{
+                                    backgroundColor: `${emotionColors.green}80`,
+                                    color: "white",
+                                    padding: "2px 4px",
+                                    borderRadius: "5px",
+                                  }}
+                                >
+                                  {part}
+                                </span>
+                              </span>
+                            );
+                          } else if (part === "노랑") {
+                            return (
+                              <span key={partIndex}>
+                                <span
+                                  style={{
+                                    backgroundColor: `${emotionColors.yellow}CC`,
+                                    color: "black",
+                                    padding: "2px 4px",
+                                    borderRadius: "5px",
+                                  }}
+                                >
+                                  {part}
+                                </span>
+                              </span>
+                            );
+                          }
+                          return <span key={partIndex}>{part}</span>;
+                        })}
                       </div>
                     </foreignObject>
 
@@ -138,7 +230,12 @@ const Loading6: React.FC = () => {
                         r="12"
                         fill={emotionColor}
                         initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
+                        animate={{
+                          opacity: 1,
+                          fill: emotionColor,
+                          x: 0,
+                          y: 0,
+                        }}
                         transition={{
                           duration: 0.4,
                           ease: "easeOut",
@@ -157,10 +254,13 @@ const Loading6: React.FC = () => {
                         cy="16"
                         r="15"
                         fill="transparent"
-                        stroke="#E0E3EF"
-                        strokeWidth="1"
+                        stroke={isDark ? "#4CAF50" : "#E0E3EF"}
+                        strokeWidth={isDark ? "2" : "1"}
                         initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
+                        animate={{
+                          opacity: 1,
+                          stroke: "#E0E3EF",
+                        }}
                         transition={{
                           duration: 0.4,
                           ease: "easeOut",
@@ -178,7 +278,10 @@ const Loading6: React.FC = () => {
                         points="21.661,7.643 13.396,19.328 9.429,15.361 7.075,17.714 13.745,24.384 24.345,9.708"
                         fill="white"
                         initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
+                        animate={{
+                          opacity: 1,
+                          fill: "white",
+                        }}
                         transition={{
                           duration: 0.3,
                           ease: "easeOut",

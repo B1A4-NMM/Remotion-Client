@@ -29,9 +29,9 @@ export const getInfiniteDiaries = async (cursor: number = 0, limit: number = 10)
 };
 
 export const searchDiaries = async (q: string) => {
-  console.log("[searchDiaries] 검색 쿼리 파라미터 q:", q);
-  const response = await api.get("/diary/search", {
-    params: { q },
+  console.log("[searchDiaries] 검색 쿼리 파라미터 date:", q);
+  const response = await api.get("/diary/date", {
+    params: { date: q },
   });
   console.log("[searchDiaries] 응답 데이터:", response.data);
   return response.data; // { diaries: [...], totalCount: N }

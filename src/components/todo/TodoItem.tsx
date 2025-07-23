@@ -126,12 +126,14 @@ export default function TodoItem({ todo }: TodoItemProps) {
         onClose={() => setDatePickerOpen(false)}
         heightOption={{ wrapChildren: true }}
       >
-      <MonthlyCalendar
-        disableOverlay
-        selectedDate={todo.date}
-        onDateSelect={handleDateSelect}
-        showWrittenDays={false}
+      <div className="pt-2">
+        <MonthlyCalendar
+          disableOverlay
+          selectedDate={todo.date}
+          onDateSelect={handleDateSelect}
+          showWrittenDays={false}
         />
+      </div>
       </BottomPopup>
     </li>
   );

@@ -1,3 +1,4 @@
+import React from "react";
 import Login from "./pages/Login";
 import GetAccess from "./pages/GetAccess";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -6,6 +7,7 @@ import Home from "./pages/Home";
 import Diary from "./pages/Diary";
 import SearchPage from "./pages/SearchPage";
 import Result from "./pages/Result";
+import MainLoading from "./components/Loading/MainLoading";
 // import Loading6 from "./components/Loading/Loading6";
 
 import Video from "./pages/Video";
@@ -29,6 +31,14 @@ export const routes = [
     element: (
       <ProtectedRoute>
         <Home />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/loading",
+    element: (
+      <ProtectedRoute>
+        <MainLoading />
       </ProtectedRoute>
     ),
   },

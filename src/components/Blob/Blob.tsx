@@ -1,4 +1,4 @@
-// components/Blob.tsx 
+// components/Blob.tsx
 import React, { useRef, useMemo, useState, useEffect, useCallback } from "react";
 import { Mesh } from "three";
 import { useFrame } from "@react-three/fiber";
@@ -24,28 +24,25 @@ interface BlobProps {
   onContextLost?: () => void;
 }
 
-const Blob: React.FC<BlobProps> = ({ 
-  emotions, 
-  scale = 1, 
-  id, 
-  onContextLost 
-}) => {
+const Blob: React.FC<BlobProps> = ({ emotions, scale = 1, id, onContextLost }) => {
   const mesh = useRef<Mesh>(null);
   const [isActive, setIsActive] = useState(false);
   const contextPool = WebGLContextPool.getInstance();
-  
+
   const { theme } = useTheme();
-  
-  const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
   const frag = isDark ? fragmentShaderDark : fragmentShaderLight;
 
   // 컴포넌트 마운트 시 컨텍스트 요청
   useEffect(() => {
     if (!id) return;
-    
+
     const canRender = contextPool.requestContext(id);
     setIsActive(canRender);
-    
+
     if (!canRender) {
       onContextLost?.();
     }
@@ -54,7 +51,7 @@ const Blob: React.FC<BlobProps> = ({
       contextPool.releaseContext(id);
     };
   }, [id]);
-  
+
   // ✅ hexToRgb 유틸리티 함수만 유지
   const hexToRgb = useCallback((hex: string): [number, number, number] => {
     const r = parseInt(hex.slice(1, 3), 16) / 255;

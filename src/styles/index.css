@@ -90,8 +90,7 @@
     border-radius: 20px;
   }
   .dark .calendar-modal {
-    background-color: #181718 !important;
-    opacity: 0.4;
+    background-color: #29222B !important;
   }
 }
 
@@ -108,7 +107,6 @@
 
 .calendar-modal {
   background-color: #faf6f4 !important;
-  opacity: 0.4;
 }
 
 @layer base {

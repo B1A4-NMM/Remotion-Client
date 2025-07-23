@@ -115,8 +115,9 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="absolute top-20 left-4 right-4 rounded-lg shadow-xl z-50 p-4 calendar-modal"
-          >
+            className={`absolute top-20 left-4 right-4 rounded-lg z-50 p-4 calendar-modal ${
+              disableOverlay ? '' : 'shadow-xl'
+            }`}          >
             {/* 달력 헤더 */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-1">

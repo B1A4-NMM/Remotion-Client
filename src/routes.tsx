@@ -24,6 +24,7 @@ import Todos from "./pages/Todos";
 import Mypage from "./pages/Mypage";
 import Negative from "./pages/analysis/Negative";
 import Positive from "./pages/analysis/Positive";
+import Character from "./pages/analysis/Character";
 
 export const routes = [
   {
@@ -160,6 +161,14 @@ export const routes = [
     element: (
       <ProtectedRoute>
         <Positive />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/analysis/character",
+    element: (
+      <ProtectedRoute>
+        <Character />
       </ProtectedRoute>
     ),
   },

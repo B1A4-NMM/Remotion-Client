@@ -8,6 +8,8 @@ import SearchBar from "../components/home/SearchBar";
 import SearchCategories from "../components/home/SearchCategories";
 import { useQueryClient } from "@tanstack/react-query";
 import { useDeleteDiary } from "../api/queries/home/useDeleteDiary";
+import { useInfinitePhotos } from "@/api/queries/home/useInfinitePhotos";
+import PhotoMosaic from "@/components/home/PhotoMosaic";
 
 function mapApiDiaryToDiaryCard(apiDiary: {
   diaryId: number;
@@ -69,6 +71,17 @@ const SearchPage = () => {
     bookmarkData?.pages?.flatMap(page => page.item?.diaries?.map(mapApiDiaryToDiaryCard) ?? []) ??
     [];
 
+    const {
+      data: photoData,
+      isLoading: photoLoading,
+      fetchNextPage: fetchNextPhotoPage,
+      hasNextPage: hasNextPhotoPage,
+      isFetchingNextPage: isFetchingNextPhotoPage,
+    } = useInfinitePhotos();
+  
+    // 사진 데이터를 평면화
+    const allPhotos = photoData?.pages?.flatMap(page => page.photos) ?? [];
+
   console.log("📚 북마크 데이터 처리:");
   console.log("  - bookmarkData:", bookmarkData);
   console.log("  - bookmarkDiaries:", bookmarkDiaries);
@@ -113,6 +126,9 @@ const SearchPage = () => {
     } else if (category === "date") {
       console.log("📅 날짜 카테고리 선택됨");
       setInputValue(""); // 날짜 카테고리 선택 시 검색바 비움
+      setSearchQuery(""); // 검색 쿼리 초기화
+    }else if (category === "photo") {
+      setInputValue("사진 모아보기"); // 날짜 카테고리 선택 시 검색바 비움
       setSearchQuery(""); // 검색 쿼리 초기화
     } else {
       setInputValue(""); // 다른 카테고리 선택 시 검색바 초기화
@@ -161,21 +177,87 @@ const SearchPage = () => {
     }
   };
 
+  const renderSearchResults = () => {
+    if (!searchQuery && !selectedCategory) {
+      return null;
+    }
+  
+    switch (selectedCategory) {
+      case "bookmark":
+        return bookmarkLoading ? (
+          <div className="mt-4">
+            <DiaryCardsSkeleton />
+          </div>
+        ) : (
+          <div>
+            <DiaryCards diaries={bookmarkDiaries} onDeleteDiary={handleDeleteDiary} />
+            {/* 북마크 무한 스크롤 로딩 */}
+            {isFetchingNextBookmarkPage && (
+              <div className="mt-4">
+                <DiaryCardsSkeleton />
+              </div>
+            )}
+          </div>
+        );
+  
+      case "photo":
+        return (
+          <PhotoMosaic
+            photos={allPhotos}
+            onLoadMore={fetchNextPhotoPage}
+            hasNextPage={hasNextPhotoPage}
+            isFetchingNextPage={isFetchingNextPhotoPage}
+          />
+        );
+  
+      case "place":
+        // 장소 카테고리 처리 (향후 구현)
+        return (
+          <div className="mt-4 text-center text-gray-500">
+            장소별 일기 기능은 준비 중입니다.
+          </div>
+        );
+  
+      case "date":
+        // 날짜 카테고리의 경우 일반 검색과 동일하게 처리
+        return searchQuery && (
+          isLoading ? (
+            <div className="mt-4">
+              <DiaryCardsSkeleton />
+            </div>
+          ) : (
+            <DiaryCards diaries={currentDiaries} onDeleteDiary={handleDeleteDiary} />
+          )
+        );
+  
+      default:
+        // 일반 검색 또는 카테고리가 없는 경우
+        return searchQuery && (
+          isLoading ? (
+            <div className="mt-4">
+              <DiaryCardsSkeleton />
+            </div>
+          ) : (
+            <DiaryCards diaries={currentDiaries} onDeleteDiary={handleDeleteDiary} />
+          )
+        );
+    }
+  };
+  
+
   return (
     <div className="max-w-xl mx-auto text-foreground h-screen flex flex-col">
-      {/* 검색 바 */}
       <div className="flex-shrink-0">
         <SearchBar
           value={inputValue}
           onChange={setInputValue}
           onSearch={() => {
             setSearchQuery(inputValue);
-            setSelectedCategory(null); // 검색 시 카테고리 초기화
+            setSelectedCategory(null);
           }}
         />
       </div>
 
-      {/* 카테고리 - 검색 전 초기 상태에서만 표시 */}
       {!searchQuery && !selectedCategory && (
         <div className="flex-shrink-0">
           <SearchCategories
@@ -186,36 +268,8 @@ const SearchPage = () => {
         </div>
       )}
 
-      {/* 검색 결과 */}
       <div className="flex-1 overflow-y-auto px-4" onScroll={handleScroll}>
-        {selectedCategory === "bookmark" ? (
-          // 북마크 뷰
-          bookmarkLoading ? (
-            <div className="mt-4">
-              <DiaryCardsSkeleton />
-            </div>
-          ) : (
-            <div>
-              <DiaryCards diaries={bookmarkDiaries} onDeleteDiary={handleDeleteDiary} />
-              {/* 북마크 무한 스크롤 로딩 */}
-              {isFetchingNextBookmarkPage && (
-                <div className="mt-4">
-                  <DiaryCardsSkeleton />
-                </div>
-              )}
-            </div>
-          )
-        ) : (
-          // 일반 검색 뷰
-          searchQuery &&
-          (isLoading ? (
-            <div className="mt-4">
-              <DiaryCardsSkeleton />
-            </div>
-          ) : (
-            <DiaryCards diaries={currentDiaries} onDeleteDiary={handleDeleteDiary} />
-          ))
-        )}
+        {renderSearchResults()}
       </div>
     </div>
   );

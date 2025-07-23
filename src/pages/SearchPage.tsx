@@ -71,16 +71,16 @@ const SearchPage = () => {
     bookmarkData?.pages?.flatMap(page => page.item?.diaries?.map(mapApiDiaryToDiaryCard) ?? []) ??
     [];
 
-    const {
-      data: photoData,
-      isLoading: photoLoading,
-      fetchNextPage: fetchNextPhotoPage,
-      hasNextPage: hasNextPhotoPage,
-      isFetchingNextPage: isFetchingNextPhotoPage,
-    } = useInfinitePhotos();
-  
-    // 사진 데이터를 평면화
-    const allPhotos = photoData?.pages?.flatMap(page => page.photos) ?? [];
+  const {
+    data: photoData,
+    isLoading: photoLoading,
+    fetchNextPage: fetchNextPhotoPage,
+    hasNextPage: hasNextPhotoPage,
+    isFetchingNextPage: isFetchingNextPhotoPage,
+  } = useInfinitePhotos();
+
+  // 사진 데이터를 평면화
+  const allPhotos = photoData?.pages?.flatMap(page => page.photos) ?? [];
 
   console.log("📚 북마크 데이터 처리:");
   console.log("  - bookmarkData:", bookmarkData);
@@ -92,7 +92,18 @@ const SearchPage = () => {
   const currentDiaries =
     selectedCategory === "bookmark"
       ? bookmarkDiaries
-      : (data?.diaries?.map(mapApiDiaryToDiaryCard) ?? []);
+      : Array.isArray(data)
+        ? data.map(mapApiDiaryToDiaryCard)
+        : (data?.diaries?.map(mapApiDiaryToDiaryCard) ?? []);
+
+  // 디버깅 로그 추가
+  console.log("🔍 검색 데이터 디버깅:");
+  console.log("  - selectedCategory:", selectedCategory);
+  console.log("  - searchQuery:", searchQuery);
+  console.log("  - data:", data);
+  console.log("  - data?.diaries:", data?.diaries);
+  console.log("  - currentDiaries:", currentDiaries);
+  console.log("  - currentDiaries 길이:", currentDiaries.length);
 
   const handleDeleteDiary = (diaryId: number) => {
     deleteDiaryMutation.mutate(
@@ -119,7 +130,7 @@ const SearchPage = () => {
     // 북마크 카테고리 선택 시 검색바에 툴팁 표시
     if (category === "bookmark") {
       console.log("📚 북마크 카테고리 선택됨");
-      setInputValue("북마크된 일기 보여줘 임구철");
+      setInputValue("북마크된 일기 보여줘");
       setSearchQuery(""); // 검색 쿼리 초기화
       // 북마크 쿼리 무효화하여 새로 로드
       queryClient.invalidateQueries({ queryKey: ["bookmarkDiaries"] });
@@ -127,7 +138,7 @@ const SearchPage = () => {
       console.log("📅 날짜 카테고리 선택됨");
       setInputValue(""); // 날짜 카테고리 선택 시 검색바 비움
       setSearchQuery(""); // 검색 쿼리 초기화
-    }else if (category === "photo") {
+    } else if (category === "photo") {
       setInputValue("사진 모아보기"); // 날짜 카테고리 선택 시 검색바 비움
       setSearchQuery(""); // 검색 쿼리 초기화
     } else {
@@ -138,20 +149,26 @@ const SearchPage = () => {
 
   const handleDateSelect = (date: string) => {
     console.log("📅 SearchPage handleDateSelect 호출됨:", date);
-    // 날짜를 한국어 형식으로 변환
+    // 날짜를 YYYY-MM-DD 형식으로 변환 (API용)
     const dateObj = new Date(date);
     const year = dateObj.getFullYear();
-    const month = dateObj.getMonth() + 1;
-    const day = dateObj.getDate();
-    const koreanDate = `${year}년 ${month}월 ${day}일`;
-    console.log("📅 변환된 날짜:", koreanDate);
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    const formattedDate = `${year}-${month}-${day}`;
 
-    // 검색바에 날짜 입력하고 검색 실행
-    const searchText = `${koreanDate} 일기`;
-    console.log("📅 setInputValue 호출 전:", searchText);
-    setInputValue(searchText);
-    setSearchQuery(searchText);
-    console.log("📅 검색바 값 설정 및 검색 실행:", searchText);
+    // 검색바에 표시할 한국어 형식 (앞의 0 제거)
+    const displayMonth = String(parseInt(month));
+    const displayDay = String(parseInt(day));
+    const displayDate = `${year}년 ${displayMonth}월 ${displayDay}일 일기`;
+
+    console.log("📅 변환된 날짜:", formattedDate);
+    console.log("📅 표시용 날짜:", displayDate);
+
+    // 검색바에는 한국어 형식으로 표시, API에는 YYYY-MM-DD 형식으로 전송
+    setInputValue(displayDate);
+    setSearchQuery(formattedDate);
+    setSelectedCategory("date"); // 날짜 카테고리로 설정
+    console.log("📅 검색바 값 설정 및 검색 실행:", formattedDate);
   };
 
   // 무한 스크롤 처리
@@ -181,7 +198,7 @@ const SearchPage = () => {
     if (!searchQuery && !selectedCategory) {
       return null;
     }
-  
+
     switch (selectedCategory) {
       case "bookmark":
         return bookmarkLoading ? (
@@ -199,7 +216,7 @@ const SearchPage = () => {
             )}
           </div>
         );
-  
+
       case "photo":
         return (
           <PhotoMosaic
@@ -209,41 +226,40 @@ const SearchPage = () => {
             isFetchingNextPage={isFetchingNextPhotoPage}
           />
         );
-  
+
       case "place":
         // 장소 카테고리 처리 (향후 구현)
         return (
-          <div className="mt-4 text-center text-gray-500">
-            장소별 일기 기능은 준비 중입니다.
-          </div>
+          <div className="mt-4 text-center text-gray-500">장소별 일기 기능은 준비 중입니다.</div>
         );
-  
+
       case "date":
         // 날짜 카테고리의 경우 일반 검색과 동일하게 처리
-        return searchQuery && (
-          isLoading ? (
+        return (
+          searchQuery &&
+          (isLoading ? (
             <div className="mt-4">
               <DiaryCardsSkeleton />
             </div>
           ) : (
             <DiaryCards diaries={currentDiaries} onDeleteDiary={handleDeleteDiary} />
-          )
+          ))
         );
-  
+
       default:
         // 일반 검색 또는 카테고리가 없는 경우
-        return searchQuery && (
-          isLoading ? (
+        return (
+          searchQuery &&
+          (isLoading ? (
             <div className="mt-4">
               <DiaryCardsSkeleton />
             </div>
           ) : (
             <DiaryCards diaries={currentDiaries} onDeleteDiary={handleDeleteDiary} />
-          )
+          ))
         );
     }
   };
-  
 
   return (
     <div className="max-w-xl mx-auto text-foreground h-screen flex flex-col">

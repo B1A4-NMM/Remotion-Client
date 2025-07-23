@@ -29,9 +29,9 @@ export const getInfiniteDiaries = async (cursor: number = 0, limit: number = 10)
 };
 
 export const searchDiaries = async (q: string) => {
-  console.log("[searchDiaries] 검색 쿼리 파라미터 q:", q);
-  const response = await api.get("/diary/search", {
-    params: { q },
+  console.log("[searchDiaries] 검색 쿼리 파라미터 date:", q);
+  const response = await api.get("/diary/date", {
+    params: { date: q },
   });
   console.log("[searchDiaries] 응답 데이터:", response.data);
   return response.data; // { diaries: [...], totalCount: N }
@@ -57,5 +57,12 @@ export const getWrittenDays = async (year: number, month: number) => {
   console.log("🌐 getWrittenDays API 호출:", `/diary/writtenDays?year=${year}&month=${month}`);
   const response = await api.get(`/diary/writtenDays?year=${year}&month=${month}`);
   console.log("📥 일기 쓴 날짜 API 응답:", response.data);
+  return response.data;
+};
+
+export const getInfinitephotos = async (cursor: number = 0, limit: number = 10) => {
+  const response = await api.get("/diary/photos", {
+    params: { cursor, limit },
+  });
   return response.data;
 };

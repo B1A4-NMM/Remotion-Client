@@ -7,6 +7,9 @@ import { Select } from "@/components/ui/select";
 import { ChevronRight, HelpCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "@/styles/select.css";
+import AnimalCard from "@/components/aboutMe/Emotion/AnimalCard";
+import { useGetCharacter } from "@/api/queries/aboutme/useGetCharacter";
+import { useGetAuthTest } from "@/api/queries/auth/useGetAuthTest";
 
 type PeriodType = "daily" | "weekly" | "monthly";
 
@@ -22,6 +25,12 @@ const Analysis = () => {
   const [isLoading, setIsLoading] = useState(true);
   const helpRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  const authData = useGetAuthTest();
+  const apiUser = authData?.user;
+  const nickname = apiUser?.nickname || "하루뒤";
+
+  
 
   // 로딩 상태 시뮬레이션 (실제로는 API 호출 상태에 따라 결정)
   useEffect(() => {
@@ -63,8 +72,11 @@ const Analysis = () => {
     navigate(`/analysis/${type}`);
   };
 
+  const data=useGetCharacter();
+  const character = data.data?.character;
+
   return (
-    <div className="px-4  text-foreground min-h-screen space-y-10">
+    <div className="px-4 py-5 text-foreground min-h-screen space-y-10">
       {/* 기간 선택 드롭다운 */}
       <div className="flex justify-between gap-10">
         <div className="w-full bg-white rounded-xl z-40">
@@ -153,6 +165,16 @@ const Analysis = () => {
           </div>
         </div>
         {isLoading ? <StrengthGraphSkeleton /> : <StrengthGraph />}
+      </section>
+
+      <section className="bg-white rounded-xl shadow pt-6 pl-6 pr-6">
+        <div className="flex justify-between mb-5">
+          <h3 className="text-2xl font-semibold mb-2 text-gray-800">{nickname}님의 동물은</h3>
+          <div onClick={() => onClickHandler("character")} className="cursor-pointer">
+            <ChevronRight className="text-gray-400" />
+          </div>
+        </div>
+          <AnimalCard animalType={character} script="" isMain={true}/>
       </section>
     </div>
   );

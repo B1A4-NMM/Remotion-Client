@@ -130,6 +130,7 @@ export default function TodoItem({ todo }: TodoItemProps) {
         disableOverlay
         selectedDate={todo.date}
         onDateSelect={handleDateSelect}
+        showWrittenDays={false}
         />
       </BottomPopup>
     </li>

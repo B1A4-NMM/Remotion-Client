@@ -11,7 +11,7 @@ import { useDeleteDiary } from "../api/queries/home/useDeleteDiary";
 
 function mapApiDiaryToDiaryCard(apiDiary: {
   diaryId: number;
-  emotions?: Array<{ emotionType: string }>;
+  emotions?: Array<{ emotion: string; intensity: number }>;
   targets?: string[];
   activities?: string[];
   photoPath?: string | string[];
@@ -23,8 +23,8 @@ function mapApiDiaryToDiaryCard(apiDiary: {
 }) {
   return {
     id: apiDiary.diaryId,
-    emotion: apiDiary.emotions?.[0]?.emotionType || "",
-    emotions: apiDiary.emotions?.map(e => ({ emotion: e.emotionType, intensity: 1 })) || [],
+    emotion: apiDiary.emotions?.[0]?.emotion || "", // emotionType → emotion
+    emotions: apiDiary.emotions?.map(e => ({ emotion: e.emotion, intensity: e.intensity })) || [],
     targets: apiDiary.targets || [],
     activities: apiDiary.activities || [],
     photoUrl: Array.isArray(apiDiary.photoPath)

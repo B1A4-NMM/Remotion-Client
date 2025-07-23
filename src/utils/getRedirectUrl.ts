@@ -11,7 +11,7 @@ export const redirectStrategies : Record<
             `/todos?date=${noti.targetDate}`,
         RECAP: (noti) =>
             `/result/${noti.diaryId}`,
-        CHARACTER : () => "analysis/character",
+        CHARACTER : () => "/analysis/character",
         TODAY_COMMENT : () => ""
 };
 

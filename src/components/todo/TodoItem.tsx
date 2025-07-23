@@ -36,8 +36,6 @@ export default function TodoItem({ todo }: TodoItemProps) {
       return;
     }
 
-    if (trimmed === todo.content) return;
-
     setTodos(prev => prev.map(t => (t.id === todo.id ? { ...t, content: trimmed } : t)));
     updateTodoContent({ id: todo.id, data: { content: trimmed } });
   };

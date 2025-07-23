@@ -1,3 +1,4 @@
+import React from "react";
 import { useLocation } from "react-router-dom";
 import { useBottomPopupStore } from "./store/useBottomPopupStore";
 import BottomNavigation from "./components/BottomNavigation";
@@ -29,7 +30,13 @@ export default function Layout() {
           backgroundRepeat: "no-repeat",
         }}
       >
-        {shouldShowTitle && <Title name={"감정 분석"} isBackActive={false} back={""} />}
+        {shouldShowTitle && (
+          <Title
+            name={location.pathname === "/relation" ? "관계 분석" : "감정 분석"}
+            isBackActive={false}
+            back={""}
+          />
+        )}
         <main className={`flex-1 h-full ${shouldShowNav ? "pb-[84px]" : ""}`}>
           <AnimatedOutlet />
           <Toaster

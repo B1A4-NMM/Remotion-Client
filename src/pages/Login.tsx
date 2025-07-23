@@ -4,7 +4,7 @@ import BottomPopup from "@/components/BottomPopup";
 import kakao from "./../assets/img/kakao.svg";
 import google from "./../assets/img/google.svg";
 import { Canvas } from "@react-three/fiber";
-import LoadingBlob from "@/components/Blob/Loading/LodingBlob";
+import LoginBlob from "@/components/Blob/Loading/LoginBlob";
 import { demoLogin } from "@/api/services/auth";
 // import { useAuth } from "@/hooks/useAuth";
 // import { useNavigate } from "react-router-dom";
@@ -45,7 +45,8 @@ export default function Login() {
   return (
     <div className="relative min-h-screen h-full flex flex-col justify-center items-center px-4 text-foreground">
       <h1 className="text-2xl font-semibold mb-2 text-foreground text-center text-[#404040] dark:text-[#F5F5F5]">
-        하루를 기록하면<br />
+        하루를 기록하면
+        <br />
         내일이 달라지는 다이어리 <br />
       </h1>
       <h1 className="text-4xl font-semibold text-foreground text-center text-[#404040] dark:text-[#F5F5F5]">
@@ -55,7 +56,7 @@ export default function Login() {
       {/* 로고 */}
       <div className="w-40 h-40 m-10">
         <Canvas camera={{ position: [0, 0, 3], fov: 90 }}>
-          <LoadingBlob />
+          <LoginBlob />
         </Canvas>
       </div>
 

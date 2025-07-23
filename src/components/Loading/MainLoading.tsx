@@ -1,37 +1,86 @@
 import { Canvas } from "@react-three/fiber";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import LoadingBlob from "../Blob/Loading/LodingBlob";
 import InSideLoading from "./InSideLoading";
 
-const ANALYSIS_STEPS = [
-  "AI가 당신의 일기를 펼치고 있어요...",
-  "감정의 흐름을 따라가고 있습니다...",
-  "오늘의 특별한 순간을 포착 중...",
-  "곧 분석 결과를 보여드릴게요!",
-];
+const MainLoading = () => {
+  const [isComplete, setIsComplete] = useState(false);
+  const [shouldMoveBlob, setShouldMoveBlob] = useState(false);
 
-const Loading7 = () => {
-  const [step, setStep] = useState(0);
+  const handleLoadingComplete = (complete: boolean) => {
+    setIsComplete(complete);
+  };
 
-  useEffect(() => {
-    if (step < ANALYSIS_STEPS.length - 1) {
-      const t = setTimeout(() => setStep(step + 1), 1800);
-      return () => clearTimeout(t);
-    }
-  }, [step]);
+  // 1초 후에 블롭 위치 이동
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setShouldMoveBlob(true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center text-gray-900 relative overflow-hidden">
-      <div className="relative pointer-events-none mb-28 w-30 h-30">
+    <div className="h-[100vh] relative overflow-hidden ">
+      {/* 블롭 컨테이너 - 중앙에서 시작해서 위쪽으로 이동 */}
+      <div
+        className={`pointer-events-none transition-all duration-1000 ease-in-out absolute ${
+          shouldMoveBlob
+            ? "top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+            : "top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-70 h-70"
+        }`}
+        style={{
+          animation: "fadeIn 2s ease-out forwards",
+        }}
+      >
         <Canvas camera={{ position: [0, 0, 15], fov: 20 }}>
-          <LoadingBlob />
+          <LoadingBlob isComplete={isComplete} />
         </Canvas>
       </div>
-      <div className="relative w-[350px] h-[200px] mb-30">
-        <InSideLoading />
+
+      {/* 텍스트 컨테이너 - 블롭 기준으로 위치 조정 */}
+      <div className="absolute left-1/2 transform -translate-x-1/2 z-20 text-container ">
+        <InSideLoading onComplete={handleLoadingComplete} />
       </div>
+
+      <style>
+        {`
+          @keyframes fadeIn {
+            0% {
+              opacity: 0;
+            }
+            100% {
+              opacity: 1;
+            }
+          }
+          
+          /* 블롭 기준 위치 조정 */
+          .text-container {
+
+         
+            left: 65%;
+            height: 300px;
+          }
+          
+          /* 모바일 - 블롭과 더 가깝게 */
+          @media (max-width: 768px) {
+            .text-container {
+              top: 40%;
+              width: 100%;
+            }
+          }
+          
+          /* 데스크탑 - 블롭과 더 멀게 */
+          @media (min-width: 769px) {
+            .text-container {
+              top: 45%;
+              width: 100%;
+            }
+          }
+        `}
+      </style>
     </div>
   );
 };
 
-export default Loading7;
+export default MainLoading;

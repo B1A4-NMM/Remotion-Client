@@ -80,22 +80,23 @@ const RoutineModalContent = ({
      
 
       {/* ✅ 항상 하단에 고정되는 추가 입력창 */}
-      <div className="flex mt-4 gap-2 pt-2 border-t border-gray-300 dark:border-white/20">
+      <div className="flex grid grid-cols-4 mt-4 gap-2 pt-2 border-t border-gray-300 dark:border-white/20">
         <input
           type="text"
           value={newRoutine}
           onChange={e => setNewRoutine(e.target.value)}
           placeholder="루틴 추가하기"
-          className="flex-1 px-3 py-2 text-sm rounded
+          className="flex col-span-3 py-2 text-sm rounded
       border border-gray-300 bg-white text-black
       placeholder-gray-400
+      pl-3
       dark:border-white/30 dark:bg-white/10 dark:text-white
       dark:placeholder-white/60
       backdrop-blur-sm"
         />
         <button
           onClick={handleAdd}
-          className="px-4 py-2 rounded
+          className="col-span-1 rounded-sm`
       bg-black text-white hover:bg-gray-800
       dark:bg-white/20 dark:hover:bg-white/30
       dark:text-white

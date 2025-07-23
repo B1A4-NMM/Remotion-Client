@@ -37,7 +37,8 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   // 일기 쓴 날짜 가져오기
   const { data: writtenDaysData } = useGetWrittenDays(
     currentMonth.year(),
-    currentMonth.month() + 1
+    currentMonth.month() + 1,
+    { enabled: showWrittenDays }
   );
 
   const writtenDays = showWrittenDays ? writtenDaysData?.writtenDays || [] : [];

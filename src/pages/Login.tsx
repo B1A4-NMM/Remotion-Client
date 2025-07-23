@@ -92,7 +92,7 @@ export default function Login() {
       >
         <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
           <Button
-            onClick={() => handleDemo("traveler")}
+            onClick={() => handleDemo("anne")}
             className="h-[48px] bg-white text-black hover:bg-[#F36B6B] hover:text-white rounded-full justify-center items-center gap-3 px-4 py-2"
           >
             <span>[Coming Soon] 🙋🏻‍♀️ 안네의 일기</span>

@@ -22,10 +22,14 @@ interface MapProps {
   continuousWritingDate: number;
   emotionCountByMonth: number;
   totalDiaryCount: number;
+  initialCenter?: { // ✅ 초기 중심점 props 추가
+    lat: number;
+    lng: number;
+  } | null;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const Map: React.FC<MapProps> = _ => {
+const Map: React.FC<MapProps> = ({ initialCenter }) => {
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
@@ -44,59 +48,93 @@ const Map: React.FC<MapProps> = _ => {
 
       const fallbackCenter = { lat: 37.5665, lng: 126.978 };
 
+      // ✅ initialCenter가 있으면 우선 사용, 없으면 fallback 사용
+      const mapCenter = initialCenter || fallbackCenter;
+
       const map = new window.google.maps.Map(mapRef.current, {
-        center: fallbackCenter,
+        center: mapCenter,
         zoom: 14,
       });
 
       setMapInstance(map);
 
-      // ✅ 현재 위치 요청
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          position => {
-            const userLatLng = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            };
-
-            map.setCenter(userLatLng);
-
-            new window.google.maps.Marker({
-              position: userLatLng,
-              map,
-              icon: {
-                url:
-                  "data:image/svg+xml;charset=UTF-8," +
-                  encodeURIComponent(`
-                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <!-- 막대기 (아래 부분) - 회색 -->
-                      <rect x="18" y="20" width="4" height="16" fill="#666666" rx="2"/>
-                      
-                      <!-- 동그란 부분 (위쪽) - 빨간색 -->
-                      <circle cx="20" cy="16" r="8" fill="#FF4444" stroke="#CC0000" stroke-width="1"/>
-                      
-                      <!-- 동그란 부분 내부 하이라이트 -->
-                      <circle cx="18" cy="14" r="3" fill="rgba(255,255,255,0.3)"/>
-                      
-                      <!-- 중앙 점 -->
-                      <circle cx="20" cy="16" r="2" fill="white"/>
-                    </svg>
-                  `),
-                scaledSize: new google.maps.Size(40, 40),
-                anchor: new google.maps.Point(20, 40),
+        // ✅ initialCenter가 있으면 해당 위치에 마커 생성, 없으면 현재 위치 요청
+        if (initialCenter) {
+          // DiaryLocation에서 온 경우 해당 위치에 마커 표시
+          new window.google.maps.Marker({
+            position: initialCenter,
+            map,
+            icon: {
+              url:
+                "data:image/svg+xml;charset=UTF-8," +
+                encodeURIComponent(`
+                  <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- 막대기 (아래 부분) - 회색 -->
+                    <rect x="18" y="20" width="4" height="16" fill="#666666" rx="2"/>
+                    
+                    <!-- 동그란 부분 (위쪽) - 빨간색 -->
+                    <circle cx="20" cy="16" r="8" fill="#FF4444" stroke="#CC0000" stroke-width="1"/>
+                    
+                    <!-- 동그란 부분 내부 하이라이트 -->
+                    <circle cx="18" cy="14" r="3" fill="rgba(255,255,255,0.3)"/>
+                    
+                    <!-- 중앙 점 -->
+                    <circle cx="20" cy="16" r="2" fill="white"/>
+                  </svg>
+                `),
+              scaledSize: new google.maps.Size(40, 40),
+              anchor: new google.maps.Point(20, 40),
+            },
+            title: "일기 위치",
+          });
+        } else {
+          // 일반적인 Map 접근인 경우 현재 위치 요청
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              position => {
+                const userLatLng = {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude,
+                };
+  
+                map.setCenter(userLatLng);
+  
+                new window.google.maps.Marker({
+                  position: userLatLng,
+                  map,
+                  icon: {
+                    url:
+                      "data:image/svg+xml;charset=UTF-8," +
+                      encodeURIComponent(`
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <!-- 막대기 (아래 부분) - 회색 -->
+                          <rect x="18" y="20" width="4" height="16" fill="#666666" rx="2"/>
+                          
+                          <!-- 동그란 부분 (위쪽) - 빨간색 -->
+                          <circle cx="20" cy="16" r="8" fill="#FF4444" stroke="#CC0000" stroke-width="1"/>
+                          
+                          <!-- 동그간 부분 내부 하이라이트 -->
+                          <circle cx="18" cy="14" r="3" fill="rgba(255,255,255,0.3)"/>
+                          
+                          <!-- 중앙 점 -->
+                          <circle cx="20" cy="16" r="2" fill="white"/>
+                        </svg>
+                      `),
+                    scaledSize: new google.maps.Size(40, 40),
+                    anchor: new google.maps.Point(20, 40),
+                  },
+                  title: "현재 위치",
+                });
               },
-              title: "현재 위치",
-            });
-          },
-          error => {
-            setErrorMsg("현재 위치 정보를 가져올 수 없습니다.");
-            console.warn("⚠️ 위치 오류:", error.message);
+              error => {
+                setErrorMsg("현재 위치 정보를 가져올 수 없습니다.");
+                console.warn("⚠️ 위치 오류:", error.message);
+              }
+            );
+          } else {
+            setErrorMsg("이 브라우저에서는 위치 정보가 지원되지 않습니다.");
           }
-        );
-      } else {
-        setErrorMsg("이 브라우저에서는 위치 정보가 지원되지 않습니다.");
-      }
+        }
 
       // ✅ 마커 + 말풍선 생성 (API로 받은 markerDataList)
       (markerDataList?.result || []).forEach((markerData: ApiMarkerData) => {

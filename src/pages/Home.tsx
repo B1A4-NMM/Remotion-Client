@@ -6,7 +6,7 @@ import DiaryCards from "../components/home/DiaryCards";
 import DiaryCardsSkeleton from "../components/home/DiaryCardsSkeleton";
 import Title from "../components/home/Title";
 import Index from "../components/home/Index";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Map from "./Map";
 import HomeBar from "@/components/home/HomeBar";
 import { useTheme } from "@/components/theme-provider";
@@ -51,6 +51,7 @@ function mapApiDiaryToDiaryCard(apiDiary: any) {
 const Home = () => {
   const token = localStorage.getItem("accessToken") || "";
   const navigate = useNavigate();
+  const location = useLocation();
   const { theme } = useTheme();
   const isDark =
     theme === "dark" ||
@@ -58,21 +59,11 @@ const Home = () => {
 
   const [selectedDate, setSelectedDate] = useState<Date>(dayjs().toDate());
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [selectedTab, setSelectedTab] = useState<"list" | "map" | "search">("list");
+  const [selectedTab, setSelectedTab] = useState<"list" | "map" | "search">(
+    location.state?.selectedTab || "list"
+  );
 
-  const handleDateSelect = useCallback((date: Date) => {
-    const selected = dayjs(date);
-    const current = dayjs();
-
-    if (selected.isAfter(current, "day")) {
-      setErrorMessage("해당 날짜로는 이동할 수 없습니다.");
-      setTimeout(() => setErrorMessage(""), 3000);
-      return;
-    }
-
-    setSelectedDate(date);
-    setErrorMessage("");
-  }, []);
+  const initialCenter = location.state?.initialCenter || null;
 
   const queryClient = useQueryClient();
   const deleteDiaryMutation = useDeleteDiary();
@@ -187,6 +178,7 @@ const Home = () => {
             continuousWritingDate={continuousWritingDate}
             emotionCountByMonth={emotionCountByMonth}
             totalDiaryCount={totalDiaryCount}
+            initialCenter={initialCenter}
           />
         )}
       </div>

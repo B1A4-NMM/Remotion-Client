@@ -16,6 +16,11 @@ interface MonthlyCalendarProps {
    * wrapper so it can be embedded inside another component.
    */
   disableOverlay?: boolean;
+  /**
+   * Show the indicator for days that have diaries written.
+   * Defaults to true.
+   */
+  showWrittenDays?: boolean;
 }
 
 const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
@@ -24,6 +29,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   onClose,
   isOpen = true,
   disableOverlay = false,
+  showWrittenDays = true,
 }) => {
   const [currentMonth, setCurrentMonth] = useState(dayjs(selectedDate));
   const [calendarDays, setCalendarDays] = useState<(dayjs.Dayjs | null)[]>([]);
@@ -34,7 +40,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
     currentMonth.month() + 1
   );
 
-  const writtenDays = writtenDaysData?.writtenDays || [];
+  const writtenDays = showWrittenDays ? writtenDaysData?.writtenDays || [] : [];
 
   useEffect(() => {
     generateCalendarDays();

@@ -112,6 +112,7 @@ export default function TodoItem({ todo }: TodoItemProps) {
 
           <Button
             onClick={() => {
+              setSheetOpen(false);
               setDatePickerOpen(true);
             }}
             className="w-full"

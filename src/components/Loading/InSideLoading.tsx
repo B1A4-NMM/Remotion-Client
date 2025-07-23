@@ -48,10 +48,8 @@ const Loading6: React.FC = () => {
     const phraseTimer = setInterval(() => {
       if (visiblePhrases < phrases.length) {
         setVisiblePhrases(prev => prev + 1);
-      } else {
-        // 모든 문구가 표시된 후 다시 처음부터
-        setVisiblePhrases(0);
       }
+      // 모든 문구가 표시된 후에는 그대로 유지 (다시 처음부터 시작하지 않음)
     }, 1500); // 1.5초마다 다음 문구 추가
 
     return () => clearInterval(phraseTimer);

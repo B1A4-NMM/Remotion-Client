@@ -59,3 +59,10 @@ export const getWrittenDays = async (year: number, month: number) => {
   console.log("📥 일기 쓴 날짜 API 응답:", response.data);
   return response.data;
 };
+
+export const getInfinitephotos = async (cursor: number = 0, limit: number = 10) => {
+  const response = await api.get("/diary/photos", {
+    params: { cursor, limit },
+  });
+  return response.data;
+};

@@ -91,6 +91,18 @@ const BottomPopup = forwardRef<BottomPopupHandle, BottomPopupProps>(
       }
     }, [isInDOM, heightPixel]); // api 의존성 제거
 
+    // 애니메이션 완료 후 DOM에서 제거
+    useEffect(() => {
+      if (shouldClose && currentHeight === "0px") {
+        const timer = setTimeout(() => {
+          setIsInDOM(false);
+          setShouldClose(false);
+        }, 300); // transition 시간과 동일하게 설정
+
+        return () => clearTimeout(timer);
+      }
+    }, [shouldClose, currentHeight]);
+
     useEffect(() => {
       return () => {
         document.body.style.overflow = bodyOverflowRef.current;

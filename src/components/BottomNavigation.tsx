@@ -1,11 +1,17 @@
-import { useGetNotiCount } from "../api/queries/notifications/useGetNotiCount";
+import React, { useEffect } from "react";
+
+//import { useGetNotiCount } from "../api/queries/notifications/useGetNotiCount";
 import { Link, useLocation } from "react-router-dom";
 import dayjs from "dayjs";
 import { useTheme } from "./theme-provider";
 
+import { useNotiStore } from "@/store/useNotiStore";
+
 export default function BottomNavigation() {
-  const { data } = useGetNotiCount();
-  const count =data?.count ?? 0;
+  //const { data } = useGetNotiCount();
+  
+  const { count, fetchCount } = useNotiStore();
+  // const count =data?.count ?? 0;
 
   const location = useLocation();
   const path = location.pathname.toLowerCase();
@@ -15,6 +21,11 @@ export default function BottomNavigation() {
     theme === "dark" ||
     (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
+  useEffect(() => {
+    fetchCount(); // 최초 mount 시 서버에서 count 불러오기
+  }, []);
+  
+  
   return (
     <div className="fixed bottom-0 left-0 w-full max-w-md mx-auto z-40" style={{ minWidth: 0 }}>
       <div className="relative w-full" style={{ aspectRatio: "414/84" }}>

@@ -5,6 +5,9 @@ import NotificationCard from "./NotificationCard";
 import { Link } from "react-router-dom";
 import { useNotificationExpand } from "@/hooks/useNotificationExpand";
 import { getTop5Notifications } from "@/utils/sortNotificationPreview";
+import { useNotiStore } from "@/store/useNotiStore";
+import { patchNotification } from "@/api/services/notification";
+
 
 /* 상위 5개만 보여주는 컴포넌트 */
 
@@ -44,6 +47,16 @@ export default function NotificationPreview() {
               noti={noti}
               isExpanded={expandedId === noti.id}
               onToggleExpand={handleToggleExpand}
+              onRead={async () => {
+                if (!noti.read) {
+                  try {
+                    await patchNotification(noti.id);
+                    useNotiStore.getState().decreaseCount(); // ✅ 상태 감소
+                  } catch (err) {
+                    console.error("알림 읽음 처리 실패", err);
+                  }
+                }
+              }}
           />
             ))}
           </ul>

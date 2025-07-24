@@ -6,10 +6,11 @@ import { Canvas } from "@react-three/fiber";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import StaticBlob from "@/components/Blob/StaticBlob";
-import { mapEmotionToColor, ColorKey } from "@/constants/emotionColors";
+import { ColorKey } from "@/constants/emotionColors";
 import { useGetRelation } from "../api/queries/relation/useGetRelation";
 import { useTheme } from "@/components/theme-provider";
 import { useGetAuthTest } from "@/api/queries/auth/useGetAuthTest";
+import { getBlobEmotionsFromSimpleEmotions } from "@/utils/activityEmotionUtils";
 
 interface RelationEmotion {
   color: ColorKey;
@@ -17,11 +18,15 @@ interface RelationEmotion {
 }
 
 interface RelationNodeData {
-  affection: number;
-  count: number;
-  emotions: Array<{ emotion: string; intensity: number }>;
   id: number;
   name: string;
+  affection: number;
+  emotions: Array<{
+    emotion: string;
+    count: number;
+    intensity: number;
+  }>;
+  count: number;
 }
 
 interface ProcessedNode extends RelationNodeData {
@@ -52,34 +57,57 @@ const Relation = () => {
   const { data: relationData } = useGetRelation();
   const navigate = useNavigate();
 
-  // 감정 처리 함수
-  const processRelationEmotions = (data: RelationNodeData): RelationEmotion[] => {
-    const emotions: RelationEmotion[] = [];
+  // 감정 처리 함수 - activityEmotionUtils 사용
+  const processRelationEmotions = (data: RelationNodeData): Emotion[] => {
+    // 새로운 데이터 구조에서 emotions 배열을 getBlobEmotionsFromSimpleEmotions에 맞는 형태로 변환
+    const emotionData = {
+      emotions: data.emotions.map(e => ({
+        emotion: e.emotion,
+        intensity: e.intensity,
+      })),
+    };
 
-    if (data.emotions && data.emotions.length > 0) {
-      const primaryEmotion = data.emotions[0];
-      const primaryColor = mapEmotionToColor(primaryEmotion.emotion);
-      emotions.push({
-        color: primaryColor,
-        intensity: Math.min(primaryEmotion.intensity / 100, 1) || 0.7,
-      });
-    }
-
-    if (data.emotions && data.emotions.length > 1) {
-      const secondaryEmotion = data.emotions[1];
-      const secondaryColor = mapEmotionToColor(secondaryEmotion.emotion);
-      emotions.push({
-        color: secondaryColor,
-        intensity: 0.3,
-      });
-    }
-
-    if (emotions.length === 0) {
-      emotions.push({ color: "gray", intensity: 1 });
-    }
-
-    return emotions;
+    // activityEmotionUtils의 함수를 사용하여 감정 색상 계산
+    return getBlobEmotionsFromSimpleEmotions(emotionData);
   };
+
+  // 내 감정 처리 함수 - todayMyEmotions 용
+  const processMyEmotions = (
+    todayMyEmotions: Array<{ emotion: string; intensity: number }>
+  ): Emotion[] => {
+    const emotionData = {
+      emotions: todayMyEmotions,
+    };
+
+    return getBlobEmotionsFromSimpleEmotions(emotionData);
+  };
+
+  // 데이터 처리
+  const processedData = useMemo(() => {
+    if (!relationData?.relations?.relations) return [];
+
+    const relations = relationData.relations.relations.map((relation: RelationNodeData) => ({
+      ...relation,
+      emotions: processRelationEmotions(relation),
+      isMe: false,
+    }));
+
+    // 내 감정도 포함 (todayMyEmotions 사용)
+    const myEmotions = relationData.todayMyEmotions
+      ? processMyEmotions(relationData.todayMyEmotions)
+      : [{ color: "gray" as ColorKey, intensity: 1 }];
+
+    const me = {
+      id: -1, // 내 ID는 -1로 설정
+      name: nickname,
+      affection: 100, // 나 자신은 100
+      emotions: myEmotions,
+      count: 0,
+      isMe: true,
+    };
+
+    return [me, ...relations];
+  }, [relationData, nickname]);
 
   const isMobile = useMemo(() => {
     return (

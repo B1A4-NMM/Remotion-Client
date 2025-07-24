@@ -26,13 +26,13 @@ export type BottomPopupHandle = {
 
 const BottomPopup = forwardRef<BottomPopupHandle, BottomPopupProps>(
   ({ isOpen, onClose, children, heightOption }, ref) => {
+    console.log("🔍 BottomPopup 렌더링:", { isOpen, children });
+
     const [isInDOM, setIsInDOM] = useState(false);
     const [showOverlay, setShowOverlay] = useState(false);
     const [shouldClose, setShouldClose] = useState(false); // 닫힘 예약
     const [currentHeight, setCurrentHeight] = useState("0px"); // 현재 높이
 
-    const bodyOverflowRef = useRef<string>(document.body.style.overflow);
-    const topRef = useRef<string>(document.body.style.top);
     const contentRef = useRef<HTMLDivElement>(null);
 
     const { heightPixel: _heightPixel, wrapChildren } = heightOption || {};
@@ -58,9 +58,13 @@ const BottomPopup = forwardRef<BottomPopupHandle, BottomPopupProps>(
 
     // ✅ 닫기용 함수 정의
     const closeWithAnimation = useCallback(() => {
-      setShowOverlay(false);
+      setShowOverlay(false); // 오버레이 즉시 제거
       setShouldClose(true);
       setCurrentHeight("0px");
+
+      // body 스타일 즉시 복원 (오버레이 클릭 시 다른 요소들과 상호작용 가능하도록)
+      document.body.style.overflow = "auto";
+
       // onClose는 애니메이션 완료 후에 호출
     }, []);
 
@@ -81,11 +85,7 @@ const BottomPopup = forwardRef<BottomPopupHandle, BottomPopupProps>(
         setIsInDOM(true);
         setShowOverlay(true);
         setShouldClose(false); // 닫힘 상태 초기화
-        const currY = window.scrollY || 0;
-        bodyOverflowRef.current = document.body.style.overflow;
-        topRef.current = document.body.style.top;
         document.body.style.overflow = "hidden";
-        document.body.style.top = `-${currY}px`;
       } else if (isInDOM && !shouldClose) {
         // console.log("❌ 모달 닫기 ");
         closeWithAnimation();
@@ -109,8 +109,7 @@ const BottomPopup = forwardRef<BottomPopupHandle, BottomPopupProps>(
           setIsInDOM(false);
           setShouldClose(false);
           // body 스타일 복원
-          document.body.style.overflow = bodyOverflowRef.current;
-          document.body.style.top = topRef.current;
+          document.body.style.overflow = "auto";
         }, 300); // transition 시간과 동일하게 설정
 
         return () => clearTimeout(timer);
@@ -119,19 +118,42 @@ const BottomPopup = forwardRef<BottomPopupHandle, BottomPopupProps>(
 
     useEffect(() => {
       return () => {
-        document.body.style.overflow = bodyOverflowRef.current;
-        document.body.style.top = topRef.current;
+        // 컴포넌트 언마운트 시 body 스타일 복원
+        document.body.style.overflow = "auto";
       };
     }, []);
+
+    // isOpen이 false가 될 때 body 스타일 복원
+    useEffect(() => {
+      if (!isOpen && isInDOM) {
+        document.body.style.overflow = "auto";
+      }
+    }, [isOpen, isInDOM]);
+
+    console.log("🔍 BottomPopup DOM 렌더링:", { isInDOM, showOverlay, currentHeight });
+    console.log("🔍 BottomPopup children 렌더링:", children);
 
     return isInDOM ? (
       <>
         {showOverlay && (
           <div
             className="fixed inset-0 bg-black bg-opacity-30 z-[99]"
+            style={{
+              zIndex: shouldClose ? -1 : 99, // 닫힐 때 z-index를 낮춰서 다른 요소들이 클릭 가능하도록
+            }}
             onClick={e => {
               if (e.target === e.currentTarget) {
-                closeWithAnimation();
+                // 오버레이 클릭 시 즉시 닫기 (애니메이션 없이)
+                setShowOverlay(false);
+                setShouldClose(true);
+                setCurrentHeight("0px");
+                setIsInDOM(false);
+
+                // body 스타일 즉시 복원
+                document.body.style.overflow = "auto";
+
+                // 즉시 onClose 호출
+                onClose();
               }
             }}
           />
@@ -142,8 +164,10 @@ const BottomPopup = forwardRef<BottomPopupHandle, BottomPopupProps>(
             height: currentHeight,
             display: "block",
             transition: "height 0.3s ease-in-out",
+            zIndex: shouldClose ? -1 : 100, // 닫힐 때 z-index를 낮춰서 다른 요소들이 클릭 가능하도록
+            pointerEvents: shouldClose ? "none" : "auto", // 닫힐 때 클릭 이벤트 무시
           }}
-          className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[414px] z-[100] bg-[#FAF6F4] dark:bg-[#29222B] rounded-t-2xl overflow-y-auto shadow-xl"
+          className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[414px] bg-[#FAF6F4] dark:bg-[#29222B] rounded-t-2xl overflow-y-auto shadow-xl"
           onClick={handleContentClick}
         >
           {/* 상단 바 */}

@@ -214,8 +214,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer "
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4 h-[170px]">
-                <div className="col-span-1 h-full">
+              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4 h-[170px] ">
+                <div className="col-span-1 h-full max-h-[170px]">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
                 <div className="col-span-1 h-full flex items-center">

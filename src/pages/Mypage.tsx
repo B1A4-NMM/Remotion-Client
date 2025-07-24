@@ -173,7 +173,7 @@ export default function Mypage() {
 
         <div className="bg-card rounded-2xl shadow-lg p-6 mb-6 border cursor-pointer flex justify-between "
           onClick={()=>navigate("/faq")}>
-          <span className="text-xl font-semibold">FQA</span>
+          <span className="text-xl font-semibold">FAQ</span>
           <div className="text-sm text-muted-foreground flex justify-left mt-1">
             <span className="mt-[1px] ">자주 하는 질문</span> 
             <ChevronRight/>

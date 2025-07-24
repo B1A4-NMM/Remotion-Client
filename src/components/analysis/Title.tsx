@@ -2,6 +2,7 @@ import React from "react";
 import { ChevronLeft } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "@/styles/togle.css";
+import { useTheme } from "../theme-provider";
 
 const Title = ({
   name,
@@ -47,14 +48,19 @@ const Title = ({
     navigate(`/${tab}`);
   };
 
+  const { theme, setTheme } = useTheme();
+    const isDark =
+      theme === "dark" ||
+      (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
   return (
     <>
-      <div className="sticky top-0 z-50 w-full rounded-2xl">
+      <div className="sticky top-0 z-50 w-full rounded-2xl ">
         {/* 메인 헤더 */}
 
         {isBackActive ? (
           <>
-            <div className="flex justify-between items-center px-4 pt-8 pb-4">
+            <div className={`flex justify-between items-center px-4 pt-8 pb-4 ${isDark ? "bg-[#181718]" : "bg-[#FAF6F4]"}`}>
               <button onClick={onClickHandler} className="flex items-center gap-1">
                 <ChevronLeft className="size-8 text-gray-600" />
               </button>
@@ -65,16 +71,10 @@ const Title = ({
                 {name}
               </h1>
             </div>
-            <h1
-              className={`font-bold text-gray-900 ${getFontSizeClass(name.length)}`}
-              style={{ fontSize: `${getFontSize(name.length)}px` }}
-            >
-              {name}
-            </h1>
           </>
         ) : (
           <>
-            <div className="w-full bg-[#FAF6F4] dark:bg-[#181718] px-4 pt-8 pb-4">
+            <div className={`w-full px-4 pt-8 pb-4 ${isDark ? "bg-[#181718]" : "bg-[#FAF6F4]"}`}>
               <h1 className="font-bold text-gray-900 text-3xl">{name}</h1>
             </div>
             <div className="w-full">
@@ -84,14 +84,14 @@ const Title = ({
                   onClick={() => handleTabClick("relation")}
                   aria-label="관계 분석"
                 >
-                  관계 분석
+                  관계
                 </button>
                 <button
                   className={`button ${isAnalysis ? "active" : ""}`}
                   onClick={() => handleTabClick("analysis")}
                   aria-label="감정 분석"
                 >
-                  감정 분석
+                  감정
                 </button>
               </div>
             </div>

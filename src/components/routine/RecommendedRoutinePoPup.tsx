@@ -19,22 +19,19 @@ export default function RecommendedRoutinePopup({
   onAdd,
   onClose,
 }: RecommendedRoutinePopupProps) {
+  console.log("🔍 RecommendedRoutinePopup 렌더링됨:", { emotion, onAdd, onClose });
+
   //const { close } = useBottomPopupStore();
   const queryClient = useQueryClient();
 
   const { mutate: postRoutine } = usePostRoutineByType();
 
   const handleClick = (content: string) => {
-    // postRoutine(
-    //   { type:emotion,title },
-    //   {
-    //     onSuccess: () => {
-    //       onAdd(title); //화면에 반영
-    //       //바텀시트를 닫을 때 화면 갱신 , 여기서 하면 안됨
-    //     },
-    //   }
-    // );
+    console.log("🔍 RecommendedRoutinePopup 클릭됨:", content);
+    console.log("🔍 onClose 함수:", onClose);
+    // 루틴 추가 후 모달 닫기
     onAdd(content);
+    onClose();
   };
 
   //바텀시트를 닫을 때 invalidate 처리
@@ -64,8 +61,18 @@ export default function RecommendedRoutinePopup({
           {RECOMMENDED_ROUTINES[emotion].map((content, index) => (
             <li
               key={index}
-              className="cursor-pointer border border-gray-300 rounded px-3 py-2 hover:bg-gray-100"
-              onClick={() => handleClick(content)}
+              className="cursor-pointer border border-gray-300 rounded px-3 py-2 hover:bg-gray-100 transition-colors"
+              onClick={e => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log("🔍 RecommendedRoutinePopup 클릭됨:", content);
+                console.log("🔍 onClose 함수:", onClose);
+                handleClick(content);
+              }}
+              onMouseDown={e => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
             >
               {content}
             </li>

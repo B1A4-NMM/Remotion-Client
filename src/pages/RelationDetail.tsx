@@ -41,13 +41,14 @@ const RelationDetail = () => {
     
     // 감정별 count, 평균 intensity
     const emotionCounts: Record<string, { count: number; totalIntensity: number }> = {};
+    console.log(allEmotions);
     allEmotions.forEach((e: any) => {
       if (e.emotion && e.emotion !== '무난') { // '무난' 감정은 제외
         if (!emotionCounts[e.emotion]) {
           emotionCounts[e.emotion] = { count: 0, totalIntensity: 0 };
         }
-        emotionCounts[e.emotion].count += e.count || 0;
-        emotionCounts[e.emotion].totalIntensity += (e.intensity || 0) * (e.count || 0);
+        emotionCounts[e.emotion].count += e.totalCount || 0;
+        emotionCounts[e.emotion].totalIntensity += (e.totalIntensity || 0) * (e.totalCount || 0);
       }
     });
     
@@ -55,7 +56,7 @@ const RelationDetail = () => {
       .map(([emotion, stats]) => ({
         emotion,
         count: stats.count,
-        averageIntensity: stats.count ? stats.totalIntensity / stats.count : 0,
+        averageIntensity: stats.count ? stats.totalIntensity / (stats.count**2) : 0,
       }))
       .sort((a, b) => b.count - a.count);
 
@@ -249,7 +250,7 @@ const RelationDetail = () => {
                     <div>
                       <div className="font-bold text-gray-600">{emotion.count}번</div>
                       <div className="text-sm text-gray-600">
-                        평균 강도 {emotion.averageIntensity.toFixed(1)}
+                        평균 강도 {emotion.averageIntensity.toFixed(0)}
                       </div>
                     </div>
                   </div>

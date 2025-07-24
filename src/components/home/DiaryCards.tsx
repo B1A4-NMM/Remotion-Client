@@ -1,13 +1,9 @@
-import React, { useState, forwardRef } from "react";
-import { Canvas } from "@react-three/fiber";
-import Blob from "../Blob/Blob";
+import React, { useState } from "react";
 import BookmarkIcon from "../../assets/img/Bookmark.svg";
 import FilterIcon from "../../assets/img/Filter.svg";
 import DiaryActionModal from "./DiaryActionModal";
 import dayjs from "dayjs";
-import { useDeleteDiary } from "../../api/queries/home/useDeleteDiary";
 import { useNavigate } from "react-router-dom";
-import { MapPin } from "lucide-react";
 import VirtualizedBlobCard from "../Blob/VirtualizedBlobCard";
 
 interface Diary {
@@ -107,9 +103,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
       </div>
       <hr className="border-t border-[#E5E5EA] mb-3" />
       <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
-        <span className="text-xs text-gray-400">
-          {dayjs(diary.date).format("YYYY년 M월 DD일")}
-        </span>
+        <span className="text-xs text-gray-400">{dayjs(diary.date).format("YYYY년 M월 DD일")}</span>
         <div className="flex items-center gap-3">
           {diary.bookmarked && (
             <img src={BookmarkIcon} alt="북마크" className="w-5 h-5 cursor-pointer" />
@@ -153,11 +147,11 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               ? [mappedDiary.photoUrl]
               : []
           : [];
-        
+
         const filteredImages = images.filter(
           (img: string | null | undefined) => typeof img === "string" && img.trim() !== ""
         );
-        
+
         const isLast = index === diaries.length - 1;
         const hasMap = !!mappedDiary.map;
         const imageCount = filteredImages.length;
@@ -185,7 +179,9 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                       ? `${mappedDiary.emotions
                           .slice(0, 2)
                           .map(e => e.emotion)
-                          .join(", ")}${mappedDiary.emotions.length > 2 ? ` 외 ${mappedDiary.emotions.length - 2}가지 감정` : ""}`
+                          .join(
+                            ", "
+                          )}${mappedDiary.emotions.length > 2 ? ` 외 ${mappedDiary.emotions.length - 2}가지 감정` : ""}`
                       : "감정 없음"}
                   </div>
                   <div className="text-xs text-[#85848F] truncate">
@@ -237,9 +233,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
-                <div className="w-1/2 h-full">
-                  {renderBlobSection(mappedDiary, index)}
-                </div>
+                <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
                 <div className="col-span-1 h-full w-full flex items-center">
                   <img
                     src={filteredImages[0]}
@@ -263,27 +257,22 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
-                <div className="w-1/2 h-full">
-                  {renderBlobSection(mappedDiary, index)}
-                </div>
+                <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
                 <div className="grid grid-rows-2 gap-2 w-full">
                   <div className=" h-full">
                     <img
                       src={filteredImages[0]}
                       alt="diary-photo-0"
                       className="rounded-lg object-cover w-full h-full"
-                      />
-                  </div>                    
-                  <div className="h-full">
-                    {renderMapSection(mappedDiary)}
+                    />
                   </div>
+                  <div className="h-full">{renderMapSection(mappedDiary)}</div>
                 </div>
               </div>
               {renderFooter(mappedDiary)}
             </div>
           );
         }
-        
 
         // 케이스 5: Blob + 사진2 (사진 2개, 지도 없음)
         if (!hasMap && imageCount === 2) {
@@ -295,23 +284,21 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
-                <div className="w-1/2 h-full">
-                  {renderBlobSection(mappedDiary, index)}
-                </div>
+                <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
                 <div className="grid grid-rows-2 gap-2 h-full w-full">
                   <div className="h-full">
                     <img
                       src={filteredImages[0]}
                       alt="diary-photo-0"
                       className="rounded-lg object-cover w-full h-full"
-                      />
-                  </div>                    
+                    />
+                  </div>
                   <div className="h-full">
                     <img
-                        src={filteredImages[1]}
-                        alt="diary-photo-1"
-                        className="rounded-lg object-cover w-full h-full"
-                        />
+                      src={filteredImages[1]}
+                      alt="diary-photo-1"
+                      className="rounded-lg object-cover w-full h-full"
+                    />
                   </div>
                 </div>
               </div>
@@ -320,7 +307,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
           );
         }
 
-       // 케이스 6: Blob + 사진2 + 지도 (사진 2개, 지도 있음)
+        // 케이스 6: Blob + 사진2 + 지도 (사진 2개, 지도 있음)
         if (hasMap && imageCount === 2) {
           return (
             <div
@@ -330,13 +317,9 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
-                <div className="w-1/2 h-full">
-                  {renderBlobSection(mappedDiary, index)}
-                </div>
+                <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
                 <div className="col-span-1 grid grid-rows-2 gap-2 h-full">
-                  <div className="row-span-1 h-full">
-                    {renderMapSection(mappedDiary)}
-                  </div>
+                  <div className="row-span-1 h-full">{renderMapSection(mappedDiary)}</div>
                   <div className="grid grid-cols-2 gap-2 w-full">
                     <img
                       src={filteredImages[0]}
@@ -366,9 +349,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
-                <div className="w-1/2 h-full">
-                  {renderBlobSection(mappedDiary, index)}
-                </div>
+                <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
                 <div className="col-span-1 grid grid-rows-2 gap-2 h-full">
                   <div className="row-span-1">
                     <img
@@ -406,9 +387,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
-                <div className="w-1/2 h-full">
-                  {renderBlobSection(mappedDiary, index)}
-                </div>
+                <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
                 <div className="w-1/2 grid grid-cols-2 grid-rows-2 gap-2 h-full">
                   <img
                     src={filteredImages[0]}
@@ -425,16 +404,14 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                     alt="diary-photo-2"
                     className="aspect-square w-full rounded-lg object-cover h-full"
                   />
-                  <div className="aspect-square w-full h-full">
-                    {renderMapSection(mappedDiary)}
-                  </div>
+                  <div className="aspect-square w-full h-full">{renderMapSection(mappedDiary)}</div>
                 </div>
               </div>
               {renderFooter(mappedDiary)}
             </div>
           );
         }
-        
+
         // 케이스 9: Blob + 사진4 (사진 4개, 지도 없음)
         if (!hasMap && imageCount >= 4) {
           return (
@@ -445,9 +422,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
-                <div className="w-1/2 h-full">
-                  {renderBlobSection(mappedDiary, index)}
-                </div>
+                <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
                 <div className="w-1/2 grid grid-cols-2 grid-rows-2 gap-2 w-full">
                   <img
                     src={filteredImages[0]}
@@ -480,7 +455,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             </div>
           );
         }
-        
+
         // 케이스 10: Blob + 사진4 + 지도 (사진 4개, 지도 있음) - 마지막 2개 사진은 블러 처리 + +2 표시
         if (hasMap && imageCount >= 4) {
           return (
@@ -491,9 +466,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
-                <div className="w-1/2 h-full">
-                  {renderBlobSection(mappedDiary, index)}
-                </div>
+                <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
                 <div className="w-1/2 grid grid-cols-2 grid-rows-2 gap-2 w-full">
                   <img
                     src={filteredImages[0]}
@@ -505,9 +478,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                     alt="diary-photo-1"
                     className="aspect-square w-full rounded-lg object-cover h-full"
                   />
-                  <div className="aspect-square w-full h-full">
-                    {renderMapSection(mappedDiary)}
-                  </div>
+                  <div className="aspect-square w-full h-full">{renderMapSection(mappedDiary)}</div>
                   <div className="relative aspect-square w-full h-full">
                     <img
                       src={filteredImages[2]}

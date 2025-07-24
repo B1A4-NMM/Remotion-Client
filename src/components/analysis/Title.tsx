@@ -65,12 +65,6 @@ const Title = ({
                 {name}
               </h1>
             </div>
-            <h1
-              className={`font-bold text-gray-900 ${getFontSizeClass(name.length)}`}
-              style={{ fontSize: `${getFontSize(name.length)}px` }}
-            >
-              {name}
-            </h1>
           </>
         ) : (
           <>

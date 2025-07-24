@@ -104,8 +104,8 @@ export default function WeeklyCalendar({
 
           const finalColorClass =
             (isToday || isSelected) && weekday !== 0 && weekday !== 6
-              ? "text-white dark:text-black"
-              : baseColorClass;
+            ? "text-white dark:text-[#000]"
+            : baseColorClass;
 
           return (
             <div
@@ -143,7 +143,7 @@ export default function WeeklyCalendar({
                   {
                     "font-bold": isToday || isSelected,
                     "bg-[#404040] dark:bg-[#DADADA]" : isSelected,
-                    "bg-[#DADADA] dark:bg-white": isToday && !isSelected,
+                    "bg-[#909090] dark:bg-white": isToday && !isSelected,
                   },
                   finalColorClass
                 )}

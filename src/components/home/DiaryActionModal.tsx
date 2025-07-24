@@ -16,7 +16,6 @@ interface DiaryActionModalProps {
   open: boolean;
   setOpen: (v: boolean) => void;
   onDelete: () => void;
-  onToggleBookmark?: () => void;
   trigger: React.ReactNode;
   titleHidden?: boolean;
   diaryId: number;
@@ -27,7 +26,6 @@ const DiaryActionModal: React.FC<DiaryActionModalProps> = ({
   open,
   setOpen,
   onDelete,
-  onToggleBookmark,
   trigger,
   titleHidden = false,
   diaryId,
@@ -36,11 +34,15 @@ const DiaryActionModal: React.FC<DiaryActionModalProps> = ({
   const { mutate: patchBookmark } = usePatchDiaryBookmark();
 
   const handleToggleBookmark = () => {
+    console.log("🔍 handleToggleBookmark 호출:");
+    console.log("  - diaryId:", diaryId);
+    console.log("  - diaryId 타입:", typeof diaryId);
+    console.log("  - isBookmarked:", isBookmarked);
+
     patchBookmark(
-      { diaryId, isBookmarked: !isBookmarked },
+      { diaryId },
       {
         onSuccess: () => {
-          if (onToggleBookmark) onToggleBookmark();
           setOpen(false);
         },
         onError: error => {

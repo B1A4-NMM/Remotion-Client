@@ -7,42 +7,51 @@ import { useNavigate } from "react-router-dom";
 import VirtualizedBlobCard from "../Blob/VirtualizedBlobCard";
 
 interface Diary {
-  id: number;
-  emotion: string;
-  emotions: { emotion: string; intensity: number }[];
-  targets: string[];
-  activities: string[];
-  photoUrl: string | string[] | null;
-  map: { lat: number; lng: number } | null;
+  diaryId: number;
+  emotions?: Array<{ emotion: string; intensity: number }>;
+  targets?: string[];
+  activities?: string[];
+  photoPath?: string | string[];
+  latitude?: number;
+  longitude?: number;
   content: string;
-  date: string;
-  keywords: string[];
-  behaviors: string[];
-  bookmarked: boolean;
+  writtenDate: string;
+  title?: string;
+  relate_sentence?: string;
+  search_sentence?: string;
+  isBookmarked?: boolean;
 }
 
 interface DiaryCardsProps {
   diaries: Diary[];
   onDeleteDiary?: (diaryId: number) => void;
-  onToggleBookmark?: (diaryId: number) => void;
   lastItemRef?: (node: HTMLDivElement | null) => void;
 }
 
-const DiaryCards: React.FC<DiaryCardsProps> = ({
-  diaries,
-  onDeleteDiary,
-  onToggleBookmark,
-  lastItemRef,
-}) => {
+const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastItemRef }) => {
   const [openId, setOpenId] = useState<number | null>(null);
   const navigate = useNavigate();
-  console.log(diaries);
+  console.log("🔍 DiaryCards 컴포넌트:");
+  console.log("  - diaries:", diaries);
+  console.log("  - diaries[0]:", diaries[0]);
+  console.log("  - diaries[0]?.diaryId:", diaries[0]?.diaryId);
+  console.log("  - diaries[0]?.id:", (diaries[0] as any)?.id);
+  console.log("  - diaries[0]의 모든 키:", diaries[0] ? Object.keys(diaries[0]) : []);
 
   if (!diaries || diaries.length === 0) {
     return <div className="w-full text-center py-8 text-gray-400">검색 결과가 없습니다.</div>;
   }
 
   const handleCardClick = (diaryId: number) => {
+    console.log("🔍 handleCardClick 호출:");
+    console.log("  - diaryId:", diaryId);
+    console.log("  - diaryId 타입:", typeof diaryId);
+
+    if (!diaryId) {
+      console.error("❌ diaryId가 undefined입니다!");
+      return;
+    }
+
     navigate(`/result/${diaryId}?view=record`);
   };
 
@@ -59,7 +68,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
       </div>
       <div className="w-full h-full flex items-center justify-center rounded-full overflow-hidden mx-auto">
         <VirtualizedBlobCard
-          key={diary.id}
+          key={diary.diaryId}
           diaryContent={{ emotions: diary.emotions }}
           index={index}
         />
@@ -75,7 +84,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
   const renderMapSection = (diary: Diary) => (
     <div className="relative w-full h-full">
       <img
-        src={`https://maps.googleapis.com/maps/api/staticmap?center=${diary.map?.lat},${diary.map?.lng}&zoom=15&size=200x200&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
+        src={`https://maps.googleapis.com/maps/api/staticmap?center=${diary.latitude},${diary.longitude}&zoom=15&size=200x200&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
         alt="map-preview"
         className="rounded-lg object-cover w-full h-full"
       />
@@ -96,55 +105,139 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
     </div>
   );
 
-  const renderFooter = (diary: Diary) => (
-    <>
-      <div className="text-base text-gray-800 leading-relaxed break-words mb-4 line-clamp-4">
-        {diary.content}
-      </div>
-      <hr className="border-t border-[#E5E5EA] mb-3" />
-      <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
-        <span className="text-xs text-gray-400">{dayjs(diary.date).format("YYYY년 M월 DD일")}</span>
-        <div className="flex items-center gap-3">
-          {diary.bookmarked && (
-            <img src={BookmarkIcon} alt="북마크" className="w-5 h-5 cursor-pointer" />
-          )}
-          <DiaryActionModal
-            open={openId === diary.id}
-            setOpen={v => setOpenId(v ? diary.id : null)}
-            onDelete={() => {
-              if (onDeleteDiary) onDeleteDiary(diary.id);
-            }}
-            onToggleBookmark={() => {
-              if (onToggleBookmark) onToggleBookmark(diary.id);
-            }}
-            trigger={
-              <img
-                src={FilterIcon}
-                alt="필터"
-                className="w-5 h-5 cursor-pointer"
-                onClick={(e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
-                  e.stopPropagation();
-                  setOpenId(diary.id);
-                }}
-              />
-            }
-            titleHidden={true}
-            diaryId={diary.id}
-            isBookmarked={diary.bookmarked}
-          />
+  // relate_sentence를 형광색으로 표시하는 함수
+  const highlightRelateSentence = (content: string, relateSentence: string) => {
+    console.log("🔍 highlightRelateSentence 호출:");
+    console.log("  - content:", content);
+    console.log("  - relateSentence:", relateSentence);
+    console.log("  - relateSentence 타입:", typeof relateSentence);
+
+    if (!relateSentence || !content) {
+      console.log("  - 조건문에서 early return");
+      return content;
+    }
+
+    // 대소문자를 구분하지 않고 검색
+    const lowerContent = content.toLowerCase();
+    const lowerRelateSentence = relateSentence.toLowerCase();
+
+    const parts = [];
+    let lastIndex = 0;
+    let currentIndex = 0;
+
+    while ((currentIndex = lowerContent.indexOf(lowerRelateSentence, lastIndex)) !== -1) {
+      // 일치하지 않는 부분 추가
+      if (currentIndex > lastIndex) {
+        parts.push(content.substring(lastIndex, currentIndex));
+      }
+
+      // 하이라이트된 부분 추가
+      const highlighted = content.substring(currentIndex, currentIndex + relateSentence.length);
+      parts.push(
+        <span key={currentIndex} className="bg-green-300/40 text-black font-medium px-1 rounded">
+          {highlighted}
+        </span>
+      );
+
+      lastIndex = currentIndex + relateSentence.length;
+    }
+
+    // 마지막 부분 추가
+    if (lastIndex < content.length) {
+      parts.push(content.substring(lastIndex));
+    }
+
+    return <>{parts}</>;
+  };
+
+  const renderFooter = (diary: Diary) => {
+    console.log(
+      `Diary ${diary.diaryId} bookmarked:`,
+      diary.isBookmarked,
+      typeof diary.isBookmarked
+    );
+    console.log("🔍 renderFooter에서 diary 정보:");
+    console.log("  - diary:", diary);
+    console.log("  - diary.diaryId:", diary.diaryId);
+    console.log("  - diary.diaryId 타입:", typeof diary.diaryId);
+    console.log("  - diary의 모든 키:", Object.keys(diary));
+    console.log("  - diary의 모든 값:", Object.values(diary));
+
+    // diaryId가 undefined인지 확인
+    if (!diary.diaryId) {
+      console.error("❌ renderFooter에서 diary.diaryId가 undefined입니다!");
+      console.error("  - 전체 diary 객체:", diary);
+    }
+
+    return (
+      <>
+        <div className="text-base text-gray-800 leading-relaxed break-words mb-4 line-clamp-4">
+          {(() => {
+            console.log("🔍 renderFooter에서 diary 정보:");
+            console.log("  - diary.relate_sentence:", diary.relate_sentence);
+            console.log("  - diary.content:", diary.content);
+
+            return diary.relate_sentence
+              ? highlightRelateSentence(diary.content, diary.relate_sentence)
+              : diary.content;
+          })()}
         </div>
-      </div>
-    </>
-  );
+        <hr className="border-t border-[#E5E5EA] mb-3" />
+        <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
+          <span className="text-xs text-gray-400">
+            {dayjs(diary.writtenDate).format("YYYY년 M월 DD일")}
+          </span>
+          <div className="flex items-center gap-3">
+            {Boolean(diary.isBookmarked) && (
+              <img src={BookmarkIcon} alt="북마크" className="w-5 h-5 cursor-pointer" />
+            )}
+            <DiaryActionModal
+              open={openId === diary.diaryId}
+              setOpen={v => setOpenId(v ? diary.diaryId : null)}
+              onDelete={() => {
+                if (onDeleteDiary) onDeleteDiary(diary.diaryId);
+              }}
+              trigger={
+                <img
+                  src={FilterIcon}
+                  alt="필터"
+                  className="w-5 h-5 cursor-pointer"
+                  onClick={(e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+                    e.stopPropagation();
+                    setOpenId(diary.diaryId);
+                  }}
+                />
+              }
+              titleHidden={true}
+              diaryId={diary.diaryId}
+              isBookmarked={diary.isBookmarked || false}
+            />
+          </div>
+        </div>
+      </>
+    );
+  };
 
   return (
     <div className="flex flex-col gap-2 w-full max-w-[420px] mx-auto">
       {diaries.map((mappedDiary, index) => {
-        const images = mappedDiary.photoUrl
-          ? Array.isArray(mappedDiary.photoUrl)
-            ? mappedDiary.photoUrl.filter(img => typeof img === "string")
-            : typeof mappedDiary.photoUrl === "string"
-              ? [mappedDiary.photoUrl]
+        console.log(`🔍 mappedDiary[${index}]:`, mappedDiary);
+        console.log(`🔍 mappedDiary[${index}].diaryId:`, mappedDiary.diaryId);
+        console.log(`🔍 mappedDiary[${index}].id:`, (mappedDiary as any).id);
+        console.log(`🔍 mappedDiary[${index}]의 모든 키:`, Object.keys(mappedDiary));
+        console.log(`🔍 mappedDiary[${index}]의 모든 값:`, Object.values(mappedDiary));
+
+        // diaryId가 undefined인지 확인
+        if (!mappedDiary.diaryId) {
+          console.error(`❌ mappedDiary[${index}]의 diaryId가 undefined입니다!`);
+          console.error(`  - 전체 객체:`, mappedDiary);
+        }
+
+        const images = mappedDiary.photoPath
+          ? Array.isArray(mappedDiary.photoPath)
+            ? mappedDiary.photoPath.filter((img: string | unknown) => typeof img === "string")
+            : typeof mappedDiary.photoPath === "string"
+              ? [mappedDiary.photoPath]
               : []
           : [];
 
@@ -153,22 +246,34 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
         );
 
         const isLast = index === diaries.length - 1;
-        const hasMap = !!mappedDiary.map;
+        const hasMap = !!(mappedDiary.latitude && mappedDiary.longitude);
         const imageCount = filteredImages.length;
 
         // 케이스 1: Blob만 (사진 0개, 지도 없음)
         if (!hasMap && imageCount === 0) {
           return (
             <div
-              key={mappedDiary.id}
+              key={mappedDiary.diaryId}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
-              onClick={() => handleCardClick(mappedDiary.id)}
+              onClick={() => {
+                console.log("🔍 onClick 이벤트 (케이스 1):");
+                console.log("  - mappedDiary:", mappedDiary);
+                console.log("  - mappedDiary.diaryId:", mappedDiary.diaryId);
+                console.log("  - mappedDiary.id:", (mappedDiary as any).id);
+                console.log("  - mappedDiary의 모든 키:", Object.keys(mappedDiary));
+                console.log("  - mappedDiary의 모든 값:", Object.values(mappedDiary));
+
+                // diaryId가 없으면 id를 시도
+                const idToUse = mappedDiary.diaryId || (mappedDiary as any).id;
+                console.log("  - 사용할 ID:", idToUse);
+                handleCardClick(idToUse);
+              }}
             >
               <div className="flex gap-2 items-center rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] mb-4 p-4">
                 <div className="w-[70px] h-[70px] flex-shrink-0 flex items-center justify-center rounded-full overflow-hidden">
                   <VirtualizedBlobCard
-                    key={mappedDiary.id}
+                    key={mappedDiary.diaryId}
                     diaryContent={{ emotions: mappedDiary.emotions }}
                     index={index}
                   />
@@ -205,10 +310,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
         if (hasMap && imageCount === 0) {
           return (
             <div
-              key={mappedDiary.id}
+              key={mappedDiary.diaryId}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer "
-              onClick={() => handleCardClick(mappedDiary.id)}
+              onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
               <div className="grid grid-cols-2 gap-2 rounded-lg mb-4 h-[170px] ">
                 <div className="col-span-1 h-full max-h-[170px]">
@@ -227,10 +332,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
         if (!hasMap && imageCount === 1) {
           return (
             <div
-              key={mappedDiary.id}
+              key={mappedDiary.diaryId}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
-              onClick={() => handleCardClick(mappedDiary.id)}
+              onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
               <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
@@ -251,10 +356,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
         if (hasMap && imageCount === 1) {
           return (
             <div
-              key={mappedDiary.id}
+              key={mappedDiary.diaryId}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
-              onClick={() => handleCardClick(mappedDiary.id)}
+              onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
               <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
@@ -278,10 +383,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
         if (!hasMap && imageCount === 2) {
           return (
             <div
-              key={mappedDiary.id}
+              key={mappedDiary.diaryId}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
-              onClick={() => handleCardClick(mappedDiary.id)}
+              onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
               <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
@@ -311,10 +416,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
         if (hasMap && imageCount === 2) {
           return (
             <div
-              key={mappedDiary.id}
+              key={mappedDiary.diaryId}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
-              onClick={() => handleCardClick(mappedDiary.id)}
+              onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
               <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
@@ -343,10 +448,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
         if (!hasMap && imageCount === 3) {
           return (
             <div
-              key={mappedDiary.id}
+              key={mappedDiary.diaryId}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
-              onClick={() => handleCardClick(mappedDiary.id)}
+              onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
               <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
@@ -381,10 +486,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
         if (hasMap && imageCount === 3) {
           return (
             <div
-              key={mappedDiary.id}
+              key={mappedDiary.diaryId}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
-              onClick={() => handleCardClick(mappedDiary.id)}
+              onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
               <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
@@ -416,10 +521,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
         if (!hasMap && imageCount >= 4) {
           return (
             <div
-              key={mappedDiary.id}
+              key={mappedDiary.diaryId}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
-              onClick={() => handleCardClick(mappedDiary.id)}
+              onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
               <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
@@ -460,10 +565,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
         if (hasMap && imageCount >= 4) {
           return (
             <div
-              key={mappedDiary.id}
+              key={mappedDiary.diaryId}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer "
-              onClick={() => handleCardClick(mappedDiary.id)}
+              onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
               <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
@@ -499,10 +604,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
         // Fallback - 예외 상황
         return (
           <div
-            key={mappedDiary.id}
+            key={mappedDiary.diaryId}
             ref={isLast && lastItemRef ? lastItemRef : undefined}
             className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
-            onClick={() => handleCardClick(mappedDiary.id)}
+            onClick={() => handleCardClick(mappedDiary.diaryId)}
           >
             <div className="flex items-center justify-center h-24 text-gray-400">
               표시할 수 없는 조합입니다.

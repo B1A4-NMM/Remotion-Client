@@ -228,7 +228,7 @@ const Routine = () => {
             setShowRecommendation(false);
             setIsPopupOpen(false);
           }}
-          heightOption={{ heightPixel: 700 }}
+          heightOption={{ wrapChildren: true, heightPixel: 700 }}
         >
           {showRecommendation ? (
             <RecommendedRoutinePopup

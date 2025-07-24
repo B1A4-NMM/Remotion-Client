@@ -11,6 +11,7 @@ import { useGetRelation } from "../api/queries/relation/useGetRelation";
 import { useTheme } from "@/components/theme-provider";
 import { useGetAuthTest } from "@/api/queries/auth/useGetAuthTest";
 import { getBlobEmotionsFromSimpleEmotions } from "@/utils/activityEmotionUtils";
+import Index from "@/components/home/Index";
 
 interface RelationEmotion {
   color: ColorKey;
@@ -39,7 +40,7 @@ interface ProcessedNode extends RelationNodeData {
 }
 
 const Relation = () => {
-  const { data: authData, isLoading, error } = useGetAuthTest();
+  const { data: authData, error } = useGetAuthTest();
   const apiUser = authData?.user;
   const nickname = apiUser?.nickname || "나";
 
@@ -54,8 +55,13 @@ const Relation = () => {
   const [nodes, setNodes] = useState<ProcessedNode[]>([]);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
-  const { data: relationData } = useGetRelation();
+  const { data: relationData, isLoading } = useGetRelation();
   const navigate = useNavigate();
+
+  // relationData 변경 시 로그
+  useEffect(() => {
+    console.log("🔍 relationData 변경됨:", relationData);
+  }, [relationData]);
 
   // 감정 처리 함수 - activityEmotionUtils 사용
   const processRelationEmotions = (data: RelationNodeData): Emotion[] => {
@@ -251,6 +257,23 @@ const Relation = () => {
   // ✅ containerSize가 유효할 때만 Canvas 렌더링
   const canvasWidth = containerSize.width * 2;
   const canvasHeight = containerSize.height * 2;
+
+  // 데이터가 없을 때 Index 컴포넌트 표시
+  const hasNoData =
+    isLoading ||
+    !relationData?.relations?.relations ||
+    relationData.relations.relations.length === 0;
+
+  if (hasNoData) {
+    return (
+      <Index
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+        title="분석할 대상이 부족해요 "
+        subtitle="나만의 하루를 관계로 돌아보세요."
+        description="시작하려면 중앙의 '+' 버튼을 탭하세요."
+      />
+    );
+  }
 
   return (
     <div className="w-full h-full flex items-center justify-center overflow-auto relative">

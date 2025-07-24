@@ -167,7 +167,7 @@ const PhotoMosaic: React.FC<PhotoMosaicProps> = ({
             <div
               key={`${photo}-${index}`}
               ref={isLast ? lastPhotoRef : null}
-              className="relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] cursor-pointer"
+              className="relative w-full h-full overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] cursor-pointer"
               style={{
                 gridColumn: position.gridColumn,
                 gridRow: position.gridRow,
@@ -240,7 +240,6 @@ const PhotoMosaic: React.FC<PhotoMosaicProps> = ({
       {/* 사진이 없을 때 */}
       {photos.length === 0 && !isFetchingNextPage && (
         <div className="text-center py-16">
-          <div className="text-6xl mb-4">📷</div>
           <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
             아직 사진이 없습니다
           </h3>

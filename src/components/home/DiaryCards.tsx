@@ -236,11 +236,11 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4 h-[170px]">
-                <div className="col-span-1 h-full">
+              <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
+                <div className="w-1/2 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
-                <div className="col-span-1 h-full flex items-center">
+                <div className="col-span-1 h-full w-full flex items-center">
                   <img
                     src={filteredImages[0]}
                     alt="diary-photo-0"
@@ -262,12 +262,12 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4 h-[170px]">
-                <div className="col-span-1">
+              <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
+                <div className="w-1/2 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
-                <div className="grid grid-rows-2 gap-2 h-full">
-                  <div className="h-full">
+                <div className="grid grid-rows-2 gap-2 w-full">
+                  <div className=" h-full">
                     <img
                       src={filteredImages[0]}
                       alt="diary-photo-0"
@@ -294,11 +294,11 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4 h-[170px]">
-                <div className="col-span-1">
+              <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
+                <div className="w-1/2 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
-                <div className="grid grid-rows-2 gap-2 h-full">
+                <div className="grid grid-rows-2 gap-2 h-full w-full">
                   <div className="h-full">
                     <img
                       src={filteredImages[0]}
@@ -329,24 +329,24 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4 h-[170px]">
-                <div className="col-span-1 h-full">
+              <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
+                <div className="w-1/2 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
                 <div className="col-span-1 grid grid-rows-2 gap-2 h-full">
                   <div className="row-span-1 h-full">
                     {renderMapSection(mappedDiary)}
                   </div>
-                  <div className="grid grid-cols-2 gap-2 h-full">
+                  <div className="grid grid-cols-2 gap-2 w-full">
                     <img
                       src={filteredImages[0]}
                       alt="diary-photo-0"
-                      className="aspect-square rounded-lg object-cover w-full"
+                      className="aspect-square rounded-lg object-cover h-full"
                     />
                     <img
                       src={filteredImages[1]}
                       alt="diary-photo-1"
-                      className="aspect-square rounded-lg object-cover w-full"
+                      className="aspect-square rounded-lg object-cover h-full"
                     />
                   </div>
                 </div>
@@ -365,8 +365,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4 h-[170px]">
-                <div className="col-span-1 h-full">
+              <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
+                <div className="w-1/2 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
                 <div className="col-span-1 grid grid-rows-2 gap-2 h-full">
@@ -413,19 +413,19 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                   <img
                     src={filteredImages[0]}
                     alt="diary-photo-0"
-                    className="aspect-square w-full rounded-lg object-cover"
+                    className="aspect-square w-full rounded-lg object-cover h-full"
                   />
                   <img
                     src={filteredImages[1]}
                     alt="diary-photo-1"
-                    className="aspect-square w-full rounded-lg object-cover"
+                    className="aspect-square w-full rounded-lg object-cover h-full"
                   />
                   <img
                     src={filteredImages[2]}
                     alt="diary-photo-2"
-                    className="aspect-square w-full rounded-lg object-cover"
+                    className="aspect-square w-full rounded-lg object-cover h-full"
                   />
-                  <div className="aspect-square w-full">
+                  <div className="aspect-square w-full h-full">
                     {renderMapSection(mappedDiary)}
                   </div>
                 </div>
@@ -448,30 +448,30 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                 <div className="w-1/2 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
-                <div className="w-1/2 grid grid-cols-2 grid-rows-2 gap-2 h-full">
+                <div className="w-1/2 grid grid-cols-2 grid-rows-2 gap-2 w-full">
                   <img
                     src={filteredImages[0]}
                     alt="diary-photo-0"
-                    className="aspect-square w-full rounded-lg object-cover"
+                    className="aspect-square w-full rounded-lg object-cover h-full"
                   />
                   <img
                     src={filteredImages[1]}
                     alt="diary-photo-1"
-                    className="aspect-square w-full rounded-lg object-cover"
+                    className="aspect-square w-full rounded-lg object-cover h-full"
                   />
                   <img
                     src={filteredImages[2]}
                     alt="diary-photo-2"
-                    className="aspect-square w-full rounded-lg object-cover"
+                    className="aspect-square w-full rounded-lg object-cover h-full"
                   />
-                  <div className="relative aspect-square w-full">
+                  <div className="relative aspect-square w-full h-full">
                     <img
                       src={filteredImages[3]}
                       alt="diary-photo-3"
                       className="aspect-square w-full rounded-lg object-cover filter blur-sm"
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-40 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-lg font-bold">+{imageCount - 3}</span>
+                      <span className="text-white text-lg font-bold ">+{imageCount - 3}</span>
                     </div>
                   </div>
                 </div>
@@ -494,25 +494,25 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                 <div className="w-1/2 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
-                <div className="w-1/2 grid grid-cols-2 grid-rows-2 gap-2 h-full">
+                <div className="w-1/2 grid grid-cols-2 grid-rows-2 gap-2 w-full">
                   <img
                     src={filteredImages[0]}
                     alt="diary-photo-0"
-                    className="aspect-square w-full rounded-lg object-cover"
+                    className="aspect-square w-full rounded-lg object-cover h-full"
                   />
                   <img
                     src={filteredImages[1]}
                     alt="diary-photo-1"
-                    className="aspect-square w-full rounded-lg object-cover"
+                    className="aspect-square w-full rounded-lg object-cover h-full"
                   />
-                  <div className="aspect-square w-full">
+                  <div className="aspect-square w-full h-full">
                     {renderMapSection(mappedDiary)}
                   </div>
-                  <div className="relative aspect-square w-full">
+                  <div className="relative aspect-square w-full h-full">
                     <img
                       src={filteredImages[2]}
                       alt="diary-photo-2"
-                      className="aspect-square w-full rounded-lg object-cover filter blur-sm"
+                      className="aspect-square w-full rounded-lg object-cover filter blur-sm h-full"
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-40 rounded-lg flex items-center justify-center">
                       <span className="text-white text-lg font-bold">+{imageCount - 2}</span>

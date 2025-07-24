@@ -186,3 +186,7 @@ export interface EmotionAnalysisResponse {
   Self: EmotionAnalysisItem[];
   State: EmotionAnalysisItem[];
 }
+
+export interface WrittenDaysResponse {
+  writtenDays: number[];
+}

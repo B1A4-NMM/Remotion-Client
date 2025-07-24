@@ -24,7 +24,8 @@ interface WeeklyCalendarProps {
   }>;
 }
 
-const WEEKDAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+// Start week on Sunday
+const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
 export default function WeeklyCalendar({
   selectedDate,
@@ -33,7 +34,7 @@ export default function WeeklyCalendar({
   monthlyStatus,
 }: WeeklyCalendarProps) {
   const [currentWeekStart, setCurrentWeekStart] = useState(
-    startOfWeek(selectedDate, { weekStartsOn: 1 })
+    startOfWeek(selectedDate, { weekStartsOn: 0 })
   );
 
   const statusMap = useMemo(() => {
@@ -59,7 +60,7 @@ export default function WeeklyCalendar({
   useEffect(() => {
     const weekEnd = addDays(currentWeekStart, 7);
     if (selectedDate < currentWeekStart || selectedDate >= weekEnd) {
-      setCurrentWeekStart(startOfWeek(selectedDate, { weekStartsOn: 1 }));
+      setCurrentWeekStart(startOfWeek(selectedDate, { weekStartsOn: 0 }));
     }
   }, [selectedDate, currentWeekStart]);
 
@@ -75,9 +76,9 @@ export default function WeeklyCalendar({
             key={day}
             className={clsx(
               "text-[12px] font-medium text-center flex-1",
-              idx === 6
+              idx === 0
                 ? "text-[#F36B6B]"
-                : idx === 5
+                : idx === 6
                 ? "text-[#7DA7E3]"
                 : "text-black dark:text-white"
             )}
@@ -103,8 +104,8 @@ export default function WeeklyCalendar({
 
           const finalColorClass =
             (isToday || isSelected) && weekday !== 0 && weekday !== 6
-              ? "text-white dark:text-black"
-              : baseColorClass;
+            ? "text-white dark:text-[#000]"
+            : baseColorClass;
 
           return (
             <div
@@ -142,7 +143,7 @@ export default function WeeklyCalendar({
                   {
                     "font-bold": isToday || isSelected,
                     "bg-[#404040] dark:bg-[#DADADA]" : isSelected,
-                    "bg-[#DADADA] dark:bg-white": isToday && !isSelected,
+                    "bg-[#909090] dark:bg-white": isToday && !isSelected,
                   },
                   finalColorClass
                 )}

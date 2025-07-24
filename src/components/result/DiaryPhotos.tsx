@@ -1,5 +1,3 @@
-// src/components/result/DiaryPhotos.tsx
-
 import React from "react";
 
 interface DiaryPhotosProps {
@@ -13,59 +11,66 @@ const DiaryPhotos: React.FC<DiaryPhotosProps> = ({ photos }) => {
     switch (photos.length) {
       case 1:
         return (
-          <div className="w-full h-[332px]">
+          <div className="w-full aspect-square">
             <img
               src={photos[0]}
-              alt="Diary Photo"
-              className="object-cover w-full h-full rounded-2xl"
+              alt="Diary Photo 1"
+              className="object-cover w-full h-full rounded-xl"
             />
           </div>
         );
+
       case 2:
         return (
-          <div className="h-[332px] space-y-3">
+          <div className="w-full aspect-square grid grid-rows-2 gap-2">
             {photos.map((url, idx) => (
-              <div key={idx} className="h-[160px]">
                 <img
+                  key={idx}
                   src={url}
-                  alt={`Diary Photo ${idx}`}
-                  className="object-cover w-full h-full rounded-lg"
+                  alt={`Diary Photo ${idx + 1}`}
+                  className="object-cover w-full h-full rounded-xl"
                 />
-              </div>
             ))}
           </div>
         );
+
       case 3:
         return (
-          <div className="h-[332px] flex flex-col justify-between">
-            {/* 상단 2개 - 고정 높이 */}
-            <div className="grid grid-cols-2 gap-2 h-[160px]">
-              {photos.slice(1).map((url, idx) => (
-                <div key={idx + 1} className="h-[160px] w-full">
-                  <img
-                    src={url}
-                    alt={`Diary Photo ${idx + 2}`}
-                    className="object-cover w-full h-full rounded-lg"
-                  />
-                </div>
-              ))}
+          <div className="w-full grid grid-rows-[1fr_1fr] gap-1">
+            {/* Row 1: Two square images side by side */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="aspect-square w-full">
+                <img
+                  src={photos[0]}
+                  alt="Diary Photo 1"
+                  className="object-cover w-full h-full rounded-xl"
+                />
+              </div>
+              <div className="aspect-square w-full">
+                <img
+                  src={photos[1]}
+                  alt="Diary Photo 2"
+                  className="object-cover w-full h-full rounded-xl"
+                />
+              </div>
             </div>
 
-            {/* 하단 한개 - 고정 높이 */}
-            <div className="h-[160px] w-full">
+            {/* Row 2: One image full width, matching height of above images */}
+            <div className="w-full aspect-[2/1]">
               <img
-                src={photos[0]}
-                alt="Diary Photo 1"
+                src={photos[2]}
+                alt="Diary Photo 3"
                 className="object-cover w-full h-full rounded-xl"
               />
             </div>
           </div>
         );
+
       case 4:
         return (
-          <div className="h-[332px] grid grid-cols-2 gap-2">
+          <div className="w-full aspect-square grid grid-cols-2 gap-2">
             {photos.map((url, idx) => (
-              <div key={idx} className="h-[160px]">
+              <div key={idx} className="w-full aspect-square">
                 <img
                   src={url}
                   alt={`Diary Photo ${idx + 1}`}

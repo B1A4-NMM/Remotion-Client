@@ -1,4 +1,5 @@
 // components/diary/MonthlyCalendar.tsx
+
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -15,6 +16,11 @@ interface MonthlyCalendarProps {
    * wrapper so it can be embedded inside another component.
    */
   disableOverlay?: boolean;
+  /**
+   * Show the indicator for days that have diaries written.
+   * Defaults to true.
+   */
+  showWrittenDays?: boolean;
 }
 
 const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
@@ -23,6 +29,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   onClose,
   isOpen = true,
   disableOverlay = false,
+  showWrittenDays = true,
 }) => {
   const [currentMonth, setCurrentMonth] = useState(dayjs(selectedDate));
   const [calendarDays, setCalendarDays] = useState<(dayjs.Dayjs | null)[]>([]);
@@ -30,10 +37,11 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   // 일기 쓴 날짜 가져오기
   const { data: writtenDaysData } = useGetWrittenDays(
     currentMonth.year(),
-    currentMonth.month() + 1
+    currentMonth.month() + 1,
+    { enabled: showWrittenDays }
   );
 
-  const writtenDays = writtenDaysData?.writtenDays || [];
+  const writtenDays = showWrittenDays ? writtenDaysData?.writtenDays || [] : [];
 
   useEffect(() => {
     generateCalendarDays();
@@ -107,8 +115,9 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="absolute top-20 left-4 right-4 rounded-lg shadow-xl z-50 p-4 calendar-modal"
-          >
+            className={`absolute ${disableOverlay ? 'top-6' : 'top-20'} left-4 right-4 rounded-lg z-50 p-4 calendar-modal ${
+              disableOverlay ? '' : 'shadow-xl'
+            }`}          >
             {/* 달력 헤더 */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-1">

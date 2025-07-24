@@ -9,7 +9,7 @@ import { useState } from "react";
 import BottomPopup from "@/components/BottomPopup";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
-import MonthlyCalendar from "@/components/diary/MontlyCalendar";
+import MonthlyCalendar from "@/components/diary/MonthlyCalendar";
 import { formatDate, parseDateStringToDate } from "@/utils/date";
 
 interface TodoItemProps {
@@ -35,8 +35,6 @@ export default function TodoItem({ todo }: TodoItemProps) {
       deleteTodo(todo.id);
       return;
     }
-
-    if (trimmed === todo.content) return;
 
     setTodos(prev => prev.map(t => (t.id === todo.id ? { ...t, content: trimmed } : t)));
     updateTodoContent({ id: todo.id, data: { content: trimmed } });
@@ -114,6 +112,7 @@ export default function TodoItem({ todo }: TodoItemProps) {
 
           <Button
             onClick={() => {
+              setSheetOpen(false);
               setDatePickerOpen(true);
             }}
             className="w-full"
@@ -127,11 +126,14 @@ export default function TodoItem({ todo }: TodoItemProps) {
         onClose={() => setDatePickerOpen(false)}
         heightOption={{ wrapChildren: true }}
       >
-      <MonthlyCalendar
-        disableOverlay
-        selectedDate={todo.date}
-        onDateSelect={handleDateSelect}
+      <div className="pt-2">
+        <MonthlyCalendar
+          disableOverlay
+          selectedDate={todo.date}
+          onDateSelect={handleDateSelect}
+          showWrittenDays={false}
         />
+      </div>
       </BottomPopup>
     </li>
   );

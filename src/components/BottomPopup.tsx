@@ -39,9 +39,10 @@ const BottomPopup = forwardRef<BottomPopupHandle,BottomPopupProps>(
     config: { tension: 250, friction: 35 },
     onRest: {
       height: value => {
-        // console.log("🎭 애니메이션 완료:", { value: value.value, isOpen });
         if (value.value === "0px") {
           setIsInDOM(false);
+          setShouldClose(false);
+          onClose(); // ✅ 애니메이션 종료 후 부모에 닫힘 통보
         }
       },
     },
@@ -107,7 +108,7 @@ const BottomPopup = forwardRef<BottomPopupHandle,BottomPopupProps>(
     <>
       {showOverlay && (
         <div
-          className="absolute inset-0 bg-black bg-opacity-30 z-[99]"
+          className="fixed inset-0 bg-black bg-opacity-30 z-[99]"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               closeWithAnimation(); // ✅ 오버레이 클릭 시에도 부드럽게 닫힘
@@ -121,7 +122,7 @@ const BottomPopup = forwardRef<BottomPopupHandle,BottomPopupProps>(
           ...springProps,
           display: "block",
         }}
-        className="absolute bottom-0 left-0 w-full z-[100] bg-[#FAF6F4] dark:bg-[#29222B] rounded-t-2xl overflow-y-auto shadow-xl"
+        className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[414px] z-[100] bg-[#FAF6F4] dark:bg-[#29222B] rounded-t-2xl overflow-y-auto shadow-xl"
         onClick={handleContentClick}
       >
 

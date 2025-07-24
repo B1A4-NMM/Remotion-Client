@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Camera, Bookmark, Calendar } from "lucide-react";
-import MonthlyCalendar from "../diary/MontlyCalendar";
+import MonthlyCalendar from "../diary/MonthlyCalendar";
 import dayjs from "dayjs";
 
 interface SearchCategoriesProps {

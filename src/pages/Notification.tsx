@@ -4,7 +4,7 @@ import { useNotificationExpand } from "@/hooks/useNotificationExpand";
 import NotificationCard from "@/components/notification/NotificationCard"; 
 import { useNavigate } from "react-router-dom";
 
-type Tab =  "all" | " unread"; 
+type Tab = "all" | "unread"; 
 // TODO: 실제 앱에서는 isSubscribed를 Webpush context/prop 등에서 받아야 함
 const isSubscribed = true;
 

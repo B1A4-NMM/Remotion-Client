@@ -65,8 +65,9 @@ const BottomPopup = forwardRef<BottomPopupHandle, BottomPopupProps>(
       // body 스타일 즉시 복원 (닫기 버튼 클릭 시 다른 요소들과 상호작용 가능하도록)
       document.body.style.overflow = "auto";
 
-      // onClose는 애니메이션 완료 후에 호출
-    }, []);
+      // 즉시 onClose 호출 (오버레이 클릭과 동일하게)
+      onClose();
+    }, [onClose]);
 
     // ✅ 이 부분 추가!
     useImperativeHandle(ref, () => ({
@@ -105,7 +106,6 @@ const BottomPopup = forwardRef<BottomPopupHandle, BottomPopupProps>(
     useEffect(() => {
       if (shouldClose && currentHeight === "0px") {
         const timer = setTimeout(() => {
-          onClose(); // 애니메이션 완료 후 부모 컴포넌트에 닫힘 알림
           setIsInDOM(false);
           setShouldClose(false);
           // body 스타일 복원
@@ -114,7 +114,7 @@ const BottomPopup = forwardRef<BottomPopupHandle, BottomPopupProps>(
 
         return () => clearTimeout(timer);
       }
-    }, [shouldClose, currentHeight, onClose]);
+    }, [shouldClose, currentHeight]);
 
     useEffect(() => {
       return () => {

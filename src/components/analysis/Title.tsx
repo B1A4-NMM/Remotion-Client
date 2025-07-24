@@ -54,17 +54,17 @@ const Title = ({
 
         {isBackActive ? (
           <>
-            <div className="flex items-center">
+            <div className="flex justify-between items-center px-4 pt-8 pb-4">
               <button onClick={onClickHandler} className="flex items-center gap-1">
                 <ChevronLeft className="size-8 text-gray-600" />
               </button>
+              <h1
+                className={`font-bold text-gray-900 ${getFontSizeClass(name.length)}`}
+                style={{ fontSize: `${getFontSize(name.length)}px` }}
+              >
+                {name}
+              </h1>
             </div>
-            <h1
-              className={`font-bold text-gray-900 ${getFontSizeClass(name.length)}`}
-              style={{ fontSize: `${getFontSize(name.length)}px` }}
-            >
-              z{name}
-            </h1>
           </>
         ) : (
           <>

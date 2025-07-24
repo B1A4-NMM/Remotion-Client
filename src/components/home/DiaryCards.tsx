@@ -52,8 +52,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
 
   // 공통 컴포넌트들
   const renderBlobSection = (diary: Diary, index: number) => (
-    <div className="h-full w-[170px] max-h-[170px] rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center py-2">
-      <div className="text-base text-[#85848F] font-medium text-center mb-1">
+    <div className="h-full w-full max-w-[170px] max-h-[170px] rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center p-2">
+      <div className="text-base text-[#85848F] font-medium text-center mb-2">
         {diary.emotions && diary.emotions.length > 0
           ? `${diary.emotions
               .slice(0, 2)
@@ -68,7 +68,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
           index={index}
         />
       </div>
-      <div className="text-base text-[#85848F] text-center mt-1">
+      <div className="text-base text-[#85848F] text-center mt-2">
         {diary.targets && diary.targets.length > 0
           ? `${diary.targets.slice(0, 2).join(", ")}${diary.targets.length > 2 ? " 등" : ""}`
           : "나 혼자"}
@@ -102,15 +102,15 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
 
   const renderFooter = (diary: Diary) => (
     <>
-      <div className="text-base text-gray-800 leading-relaxed break-words mb-3 line-clamp-4">
+      <div className="text-base text-gray-800 leading-relaxed break-words mb-4 line-clamp-4">
         {diary.content}
       </div>
-      <hr className="border-t border-[#E5E5EA] mb-2" />
+      <hr className="border-t border-[#E5E5EA] mb-3" />
       <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
         <span className="text-xs text-gray-400">
           {dayjs(diary.date).format("YYYY년 M월 DD일")}
         </span>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {diary.bookmarked && (
             <img src={BookmarkIcon} alt="북마크" className="w-5 h-5 cursor-pointer" />
           )}
@@ -144,7 +144,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
   );
 
   return (
-    <div className="flex flex-col gap-3 w-full max-w-[420px] mx-auto">
+    <div className="flex flex-col gap-2 w-full max-w-[420px] mx-auto">
       {diaries.map((mappedDiary, index) => {
         const images = mappedDiary.photoUrl
           ? Array.isArray(mappedDiary.photoUrl)
@@ -168,10 +168,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-[20px] shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="flex gap-4 items-center rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] mb-4 py-[14px] px-[20px]">
+              <div className="flex gap-2 items-center rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] mb-4 p-4">
                 <div className="w-[70px] h-[70px] flex items-center justify-center rounded-full overflow-hidden">
                   <VirtualizedBlobCard
                     key={mappedDiary.id}
@@ -211,10 +211,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-[20px] shadow-md p-3 flex flex-col cursor-pointer "
+              className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer "
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-2" style={{ height: "170px"}}>
+              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4" style={{ height: "170px"}}>
                 <div className="col-span-1 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
@@ -233,10 +233,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-[20px] shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-2" style={{ height: "170px"}}>
+              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4" style={{ height: "170px"}}>
                 <div className="col-span-1 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
@@ -259,10 +259,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-[20px] shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-2" style={{ height: "170px"}}>
+              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4" style={{ height: "170px"}}>
                 {/* 왼쪽: Blob 섹션 */}
                 <div className="col-span-1">
                   {renderBlobSection(mappedDiary, index)}
@@ -294,10 +294,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-[20px] shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-2" style={{ height: "170px"}}>
+              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4" style={{ height: "170px"}}>
                 {/* 왼쪽: Blob 섹션 */}
                 <div className="col-span-1">
                   {renderBlobSection(mappedDiary, index)}
@@ -330,10 +330,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-[20px] shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-2" style={{ height: "170px" }}>
+              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4" style={{ height: "170px" }}>
                 <div className="col-span-0 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
@@ -368,14 +368,14 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-[20px] shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-2" style={{ height: "170px" }}>
+              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4" style={{ height: "170px" }}>
                 <div className="col-span-0 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
-                <div className="col-span-1 grid grid-rows-2 gap-2 h-full max-h-[170px] max-w-[170px]">
+                <div className="col-span-1 grid grid-rows-2 gap-2 h-full max-h-[170px] max-w-[170px] min-w-[170px]">
                   {/* 위쪽: 사진 1개 (가로로 긴 직사각형) */}
                   <div className="row-span-1">
                     <img
@@ -410,10 +410,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-[20px] shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="flex gap-2 rounded-lg mb-2 " style={{ height: "170px" }}>
+              <div className="flex gap-2 rounded-lg mb-4 " style={{ height: "170px" }}>
                 {/* 왼쪽: 고정된 Blob */}
                 <div className="w-[170px] h-full">
                   {renderBlobSection(mappedDiary, index)}
@@ -452,10 +452,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-[20px] shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="flex gap-2 rounded-lg mb-2 max-h-" style={{ height: "170px" }}>
+              <div className="flex gap-2 rounded-lg mb-4 max-h-" style={{ height: "170px" }}>
                 {/* 왼쪽: 고정된 Blob */}
                 <div className="w-[170px] h-full">
                   {renderBlobSection(mappedDiary, index)}
@@ -496,17 +496,17 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
             <div
               key={mappedDiary.id}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-[20px] shadow-md p-3 flex flex-col cursor-pointer"
+              className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer "
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="flex gap-2 rounded-lg mb-2 "  style={{ height: "170px" }}>
+              <div className="flex gap-2 rounded-lg mb-4 "  style={{ height: "170px"}}>
                 {/* 왼쪽: 고정된 Blob */}
                 <div className="w-[170px] h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
                 
                 {/* 오른쪽: 4분할 그리드 (2x2) */}
-                <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-2 max-h-[170px] max-w-[170px]">
+                <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-2 max-h-[170px] max-w-[170px] min-w-[170px]">
                   {/* 첫 번째: 사진 */}
                   <img
                     src={filteredImages[0]}
@@ -549,7 +549,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
           <div
             key={mappedDiary.id}
             ref={isLast && lastItemRef ? lastItemRef : undefined}
-            className="w-full bg-white rounded-[20px] shadow-md p-3 flex flex-col cursor-pointer"
+            className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
             onClick={() => handleCardClick(mappedDiary.id)}
           >
             <div className="flex items-center justify-center h-24 text-gray-400">

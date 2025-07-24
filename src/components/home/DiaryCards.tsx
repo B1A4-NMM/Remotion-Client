@@ -381,12 +381,12 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                     <img
                       src={filteredImages[1]}
                       alt="diary-photo-1"
-                      className="aspect-square rounded-lg object-cover w-full"
+                      className="aspect-square rounded-lg object-cover w-full h-full"
                     />
                     <img
                       src={filteredImages[2]}
                       alt="diary-photo-2"
-                      className="aspect-square rounded-lg object-cover w-full"
+                      className="aspect-square rounded-lg object-cover w-full h-full"
                     />
                   </div>
                 </div>

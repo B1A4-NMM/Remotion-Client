@@ -11,41 +11,6 @@ import { useDeleteDiary } from "../api/queries/home/useDeleteDiary";
 import { useInfinitePhotos } from "@/api/queries/home/useInfinitePhotos";
 import PhotoMosaic from "@/components/home/PhotoMosaic";
 
-function mapApiDiaryToDiaryCard(apiDiary: {
-  diaryId: number;
-  emotions?: Array<{ emotion: string; intensity: number }>;
-  targets?: string[];
-  activities?: string[];
-  photoPath?: string | string[];
-  latitude?: number;
-  longitude?: number;
-  content: string;
-  writtenDate: string;
-  isBookmarked?: boolean;
-}) {
-  return {
-    id: apiDiary.diaryId,
-    emotion: apiDiary.emotions?.[0]?.emotion || "", // emotionType → emotion
-    emotions: apiDiary.emotions?.map(e => ({ emotion: e.emotion, intensity: e.intensity })) || [],
-    targets: apiDiary.targets || [],
-    activities: apiDiary.activities || [],
-    photoUrl: Array.isArray(apiDiary.photoPath)
-      ? apiDiary.photoPath
-      : apiDiary.photoPath
-        ? [apiDiary.photoPath]
-        : [],
-    map:
-      apiDiary.latitude && apiDiary.longitude
-        ? { lat: apiDiary.latitude, lng: apiDiary.longitude }
-        : null,
-    content: apiDiary.content,
-    date: apiDiary.writtenDate,
-    keywords: [],
-    behaviors: [],
-    bookmarked: apiDiary.isBookmarked || false,
-  };
-}
-
 const SearchPage = () => {
   const [inputValue, setInputValue] = useState(""); // 입력창 값
   const [searchQuery, setSearchQuery] = useState(""); // 실제 검색 요청에 쓸 값
@@ -67,13 +32,10 @@ const SearchPage = () => {
   const deleteDiaryMutation = useDeleteDiary();
 
   // 북마크 데이터를 평면화
-  const bookmarkDiaries =
-    bookmarkData?.pages?.flatMap(page => page.item?.diaries?.map(mapApiDiaryToDiaryCard) ?? []) ??
-    [];
+  const bookmarkDiaries = bookmarkData?.pages?.flatMap(page => page.item?.diaries ?? []) ?? [];
 
   const {
     data: photoData,
-    isLoading: photoLoading,
     fetchNextPage: fetchNextPhotoPage,
     hasNextPage: hasNextPhotoPage,
     isFetchingNextPage: isFetchingNextPhotoPage,
@@ -93,17 +55,59 @@ const SearchPage = () => {
     selectedCategory === "bookmark"
       ? bookmarkDiaries
       : Array.isArray(data)
-        ? data.map(mapApiDiaryToDiaryCard)
-        : (data?.diaries?.map(mapApiDiaryToDiaryCard) ?? []);
+        ? data.flatMap(item => item.diaries || []) // Handles [{ diaries: [...] }]
+        : data?.diaries || []; // Handles { diaries: [...] } or single object
+
+  // API 응답을 DiaryCards에서 사용하는 형식으로 변환
+  const transformedDiaries = currentDiaries.map((diary: any) => {
+    console.log("🔍 변환 전 diary:", diary);
+    console.log("🔍 diary.id 값:", diary.id);
+    console.log("🔍 diary.id 타입:", typeof diary.id);
+
+    const transformed = {
+      diaryId: diary.id || diary.diaryId,
+      emotions: diary.emotions || diary.emotion,
+      targets: diary.targets,
+      activities: diary.activities,
+      photoPath: diary.photoUrl || diary.photoPath,
+      latitude: diary.map?.latitude || diary.latitude,
+      longitude: diary.map?.longitude || diary.longitude,
+      content: diary.content,
+      writtenDate: diary.date || diary.writtenDate,
+      title: diary.title,
+      relate_sentence: diary.relate_sentence,
+      search_sentence: diary.search_sentence,
+      isBookmarked: diary.bookmarked || diary.isBookmarked,
+    };
+
+    console.log("🔍 변환 후 diary:", transformed);
+    console.log("🔍 변환 후 diaryId:", transformed.diaryId);
+    return transformed;
+  });
+
+  console.log("🔍 SearchPage currentDiaries 디버깅:");
+  console.log("  - selectedCategory:", selectedCategory);
+  console.log("  - data:", data);
+  console.log("  - currentDiaries:", currentDiaries);
+  console.log("  - transformedDiaries:", transformedDiaries);
+  console.log("  - transformedDiaries[0]:", transformedDiaries[0]);
+  console.log("  - transformedDiaries[0]?.diaryId:", transformedDiaries[0]?.diaryId);
+  if (currentDiaries[0]) {
+    console.log("  - currentDiaries[0]의 모든 키:", Object.keys(currentDiaries[0]));
+    console.log("  - currentDiaries[0]의 모든 값:", Object.values(currentDiaries[0]));
+  }
 
   // 디버깅 로그 추가
   console.log("🔍 검색 데이터 디버깅:");
   console.log("  - selectedCategory:", selectedCategory);
   console.log("  - searchQuery:", searchQuery);
   console.log("  - data:", data);
-  console.log("  - data?.diaries:", data?.diaries);
+  console.log("  - data 타입:", typeof data);
+  console.log("  - Array.isArray(data):", Array.isArray(data));
   console.log("  - currentDiaries:", currentDiaries);
   console.log("  - currentDiaries 길이:", currentDiaries.length);
+  console.log("  - isLoading:", isLoading);
+  console.log("  - searchQuery 존재 여부:", !!searchQuery);
 
   const handleDeleteDiary = (diaryId: number) => {
     deleteDiaryMutation.mutate(
@@ -242,12 +246,17 @@ const SearchPage = () => {
               <DiaryCardsSkeleton />
             </div>
           ) : (
-            <DiaryCards diaries={currentDiaries} onDeleteDiary={handleDeleteDiary} />
+            <DiaryCards diaries={transformedDiaries} onDeleteDiary={handleDeleteDiary} />
           ))
         );
 
       default:
         // 일반 검색 또는 카테고리가 없는 경우
+        console.log("🔍 default 케이스 실행:");
+        console.log("  - searchQuery:", searchQuery);
+        console.log("  - isLoading:", isLoading);
+        console.log("  - currentDiaries:", currentDiaries);
+        console.log("  - currentDiaries 길이:", currentDiaries.length);
         return (
           searchQuery &&
           (isLoading ? (
@@ -255,7 +264,7 @@ const SearchPage = () => {
               <DiaryCardsSkeleton />
             </div>
           ) : (
-            <DiaryCards diaries={currentDiaries} onDeleteDiary={handleDeleteDiary} />
+            <DiaryCards diaries={transformedDiaries} onDeleteDiary={handleDeleteDiary} />
           ))
         );
     }

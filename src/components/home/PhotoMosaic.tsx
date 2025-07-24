@@ -208,11 +208,6 @@ const PhotoMosaic: React.FC<PhotoMosaicProps> = ({
                   </svg>
                 </div>
               </div>
-
-              {/* 사진 번호 표시 */}
-              <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
-                {index + 1}
-              </div>
             </div>
           );
         })}

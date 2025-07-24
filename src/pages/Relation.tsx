@@ -19,11 +19,9 @@ interface RelationEmotion {
 interface RelationNodeData {
   affection: number;
   count: number;
-  highestEmotion: string;
+  emotions: Array<{ emotion: string; intensity: number }>;
   id: number;
   name: string;
-  secondEmotion?: string;
-  emotions?: { emotion: string; intensity: number }[];
 }
 
 interface ProcessedNode extends RelationNodeData {
@@ -137,8 +135,7 @@ const Relation = () => {
       name: nickname,
       affection: 0,
       count: 0,
-      highestEmotion: "",
-      secondEmotion: "",
+      emotions: [{ emotion: "neutral", intensity: 1 }],
       x: centerX,
       y: centerY,
       radius: 80,

@@ -26,7 +26,8 @@ interface MonthlyCalendarProps {
   }>;
 }
 
-const WEEKDAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+// Week starts on Sunday
+const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
 export default function MonthlyCalendar({
   selectedDate,
@@ -48,8 +49,8 @@ export default function MonthlyCalendar({
     return map;
   }, [monthlyStatus]);
 
-  const start = startOfWeek(startOfMonth(selectedDate), { weekStartsOn: 1 });
-  const end = endOfWeek(endOfMonth(selectedDate), { weekStartsOn: 1 });
+  const start = startOfWeek(startOfMonth(selectedDate), { weekStartsOn: 0 });
+  const end = endOfWeek(endOfMonth(selectedDate), { weekStartsOn: 0 });
 
   const days = [];
   let current = start;
@@ -66,9 +67,9 @@ export default function MonthlyCalendar({
           key={day}
           className={clsx(
             "text-[12px] font-medium text-center",
-            idx === 6
+            idx === 0
               ? "text-[#F36B6B]"
-              : idx === 5
+              : idx === 6
               ? "text-[#7DA7E3]"
               : "text-black dark:text-white"
           )}
@@ -93,8 +94,8 @@ export default function MonthlyCalendar({
 
         const finalColorClass =
           (isToday || isSelected) && weekday !== 0 && weekday !== 6
-            ? "text-white"
-            : baseColorClass;
+          ? "text-white dark:text-[#000]"
+          : baseColorClass;
 
         const bgClass = isToday && isSelected
           ? "bg-black"
@@ -141,7 +142,7 @@ export default function MonthlyCalendar({
                 {
                   "font-bold": isToday || isSelected,
                   "bg-[#404040] dark:bg-[#DADADA]" : isSelected,
-                  "bg-[#DADADA] dark:bg-white": isToday && !isSelected,
+                  "bg-[#909090] dark:bg-white": isToday && !isSelected,
                 },
                 bgClass,
                 finalColorClass

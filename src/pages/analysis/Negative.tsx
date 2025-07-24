@@ -77,11 +77,11 @@ const Negative = () => {
 
   return (
     <div className="mb-10">
-      <Title name="부정적 감정" isBackActive={true} back="/analysis" />
+      <Title name="" isBackActive={true} back="/analysis" />
       <div className="px-4 py-8 text-foreground min-h-screen space-y-10">
         {/* 기간 선택 드롭다운 */}
         <div className="flex justify-center mb-8">
-          <div className="w-full bg-white rounded-xl z-50">
+          <div className="w-full bg-white rounded-xl z-40">
             <Select
               value={selectedPeriod}
               onValueChange={value => setSelectedPeriod(value as PeriodType)}

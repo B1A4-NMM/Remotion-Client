@@ -1,4 +1,4 @@
-import { useState, useEffect,useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { BottomPopupHandle } from "@/components/BottomPopup";
 
@@ -11,10 +11,10 @@ import BottomPopup from "@/components/BottomPopup";
 import RoutineModalContent from "@/components/routine/RoutineModalContent";
 import PersonalizedRoutineList from "@/components/routine/PersonalizedRoutineList";
 import RecommendedRoutinePopup from "@/components/routine/RecommendedRoutinePoPup";
+
 import { getTriggerRoutine, getRoutineByType } from "@/api/services/routine";
 import { RoutineItem } from "@/types/routine";
 import { useDeleteRoutineById } from "@/api/queries/routine/useDeleteRoutineById";
-import { R } from "node_modules/framer-motion/dist/types.d-D0HXPxHm";
 
 const Routine = () => {
   const queryClient = useQueryClient();
@@ -29,9 +29,11 @@ const Routine = () => {
     "depression"
   );
   const [showRecommendation, setShowRecommendation] = useState(false);
+
+  //바텀 팝업 상태 관리
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  
-  //닫기 버튼 눌렀을 때 애니매이션 적용 
+
+  //닫기 버튼 눌렀을 때 애니매이션 적용
   const popupRef = useRef<BottomPopupHandle>(null);
 
   // 서버에서 Trigger 루틴 조회
@@ -78,24 +80,29 @@ const Routine = () => {
 
   const handleDeleteRoutine = async (id: number) => {
     try {
+      // 즉시 UI에서 제거
+      setSelectedRoutines(prev => prev.filter(routine => routine.id !== id));
+
+      // 서버에서 삭제
       await deleteRoutineMutation.mutateAsync(id);
-      await refetchRoutine();
     } catch (err) {
       console.error("루틴 삭제 실패", err);
+      // 실패 시 UI 복원
+      await refetchRoutine();
     }
   };
 
   // 루틴 폴더 상태관리 위한 함수 - 1
-  const refreshTriggeredRoutines = async () => { 
-    try{
+  const refreshTriggeredRoutines = async () => {
+    try {
       const updated = await getTriggerRoutine();
       setTriggeredRoutines(updated);
-    }catch(err){
+    } catch (err) {
       console.error("루틴 생신 실패:", err);
     }
     // const data = await getTriggerRoutine();
     // setTriggeredRoutines(data);
-  } 
+  };
 
   const handleFolderClick = async (emotionTitle: string) => {
     const emotionKey = emotionTitle as RoutineItem["routineType"];
@@ -210,9 +217,10 @@ const Routine = () => {
             </p>
           </div>
         ) : (
-          <PersonalizedRoutineList 
-          routines={displayRoutines}
-          onRefresh= {refreshTriggeredRoutines} />
+          <PersonalizedRoutineList
+            routines={displayRoutines}
+            onRefresh={refreshTriggeredRoutines}
+          />
         );
       })()}
 
@@ -225,7 +233,7 @@ const Routine = () => {
             setShowRecommendation(false);
             setIsPopupOpen(false);
           }}
-          heightOption={{ heightPixel: 700 }}
+          heightOption={{ wrapChildren: true, heightPixel: 700 }}
         >
           {showRecommendation ? (
             <RecommendedRoutinePopup

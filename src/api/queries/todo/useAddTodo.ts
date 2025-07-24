@@ -7,6 +7,7 @@ export const useAddTodo = () => {
     mutationFn: ({ date, content }: { date: string; content: string }) => createTodo({ date, content }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todos'] });
+      queryClient.invalidateQueries({ queryKey: ['monthlyStatus'] });
     },
   });
 };

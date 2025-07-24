@@ -6,7 +6,7 @@ import DiaryCards from "../components/home/DiaryCards";
 import DiaryCardsSkeleton from "../components/home/DiaryCardsSkeleton";
 import Title from "../components/home/Title";
 import Index from "../components/home/Index";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Map from "./Map";
 import HomeBar from "@/components/home/HomeBar";
 import { useTheme } from "@/components/theme-provider";
@@ -26,31 +26,31 @@ const s3ToHttpUrl = (s3Path: string) =>
 // API 응답 → DiaryCards 변환
 function mapApiDiaryToDiaryCard(apiDiary: any) {
   return {
-    id: apiDiary.diaryId,
+    diaryId: apiDiary.diaryId,
     emotion: apiDiary.emotions?.[0]?.emotionType || "",
     emotions: apiDiary.emotions || [], // [{emotionType, intensity}] 배열 그대로 전달
     targets: apiDiary.targets,
     activities: apiDiary.activities,
-    photoUrl: Array.isArray(apiDiary.photoPath)
+    photoPath: Array.isArray(apiDiary.photoPath)
       ? apiDiary.photoPath.map(s3ToHttpUrl)
       : apiDiary.photoPath
         ? [s3ToHttpUrl(apiDiary.photoPath)]
         : [],
-    map:
-      apiDiary.latitude && apiDiary.longitude
-        ? { lat: apiDiary.latitude, lng: apiDiary.longitude }
-        : null,
+    latitude: apiDiary.latitude,
+    longitude: apiDiary.longitude,
     content: apiDiary.content,
-    date: apiDiary.writtenDate,
-    keywords: [],
-    behaviors: [],
-    bookmarked: apiDiary.isBookmarked,
+    writtenDate: apiDiary.writtenDate,
+    title: apiDiary.title,
+    relate_sentence: apiDiary.relate_sentence,
+    search_sentence: apiDiary.search_sentence,
+    isBookmarked: apiDiary.isBookmarked,
   };
 }
 
 const Home = () => {
   const token = localStorage.getItem("accessToken") || "";
   const navigate = useNavigate();
+  const location = useLocation();
   const { theme } = useTheme();
   const isDark =
     theme === "dark" ||
@@ -58,21 +58,11 @@ const Home = () => {
 
   const [selectedDate, setSelectedDate] = useState<Date>(dayjs().toDate());
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [selectedTab, setSelectedTab] = useState<"list" | "map" | "search">("list");
+  const [selectedTab, setSelectedTab] = useState<"list" | "map" | "search">(
+    location.state?.selectedTab || "list"
+  );
 
-  const handleDateSelect = useCallback((date: Date) => {
-    const selected = dayjs(date);
-    const current = dayjs();
-
-    if (selected.isAfter(current, "day")) {
-      setErrorMessage("해당 날짜로는 이동할 수 없습니다.");
-      setTimeout(() => setErrorMessage(""), 3000);
-      return;
-    }
-
-    setSelectedDate(date);
-    setErrorMessage("");
-  }, []);
+  const initialCenter = location.state?.initialCenter || null;
 
   const queryClient = useQueryClient();
   const deleteDiaryMutation = useDeleteDiary();
@@ -91,10 +81,8 @@ const Home = () => {
   };
 
   const handleToggleBookmark = (diaryId: number) => {
-    const diary = infiniteDiaries.find(d => d.id === diaryId);
-    if (!diary) return;
     patchBookmark.mutate(
-      { diaryId, isBookmarked: !diary.bookmarked },
+      { diaryId },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["infiniteDiaries"] });
@@ -173,7 +161,6 @@ const Home = () => {
                 <DiaryCards
                   diaries={infiniteDiaries}
                   onDeleteDiary={handleDeleteDiary}
-                  onToggleBookmark={handleToggleBookmark}
                   lastItemRef={lastDiaryRef}
                 />
               </>
@@ -187,6 +174,7 @@ const Home = () => {
             continuousWritingDate={continuousWritingDate}
             emotionCountByMonth={emotionCountByMonth}
             totalDiaryCount={totalDiaryCount}
+            initialCenter={initialCenter}
           />
         )}
       </div>

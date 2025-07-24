@@ -1,6 +1,7 @@
 // src/components/result/DiaryLocation.tsx
 
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 interface DiaryLocationProps {
   location: {
@@ -20,8 +21,23 @@ const DiaryLocation: React.FC<DiaryLocationProps> = ({ location }) => {
 
   const imageUrl = generateMapImageUrl(location.latitude, location.longitude);
 
+  const navigate=useNavigate();
+
+  const handleOnclick = () => {
+    navigate("/", { 
+      state: { 
+        selectedTab: "map",
+        initialCenter: {
+          lat: location.latitude,
+          lng: location.longitude
+        }
+      } 
+    });
+  };
+  
+
   return (
-    <div className="rounded-xl overflow-hidden shadow-lg border border-gray-200 relative">
+    <div className="rounded-xl overflow-hidden shadow-lg border border-gray-200 relative cursor-pointer">
       <img
         src={imageUrl}
         alt="Diary Location Map"
@@ -30,6 +46,7 @@ const DiaryLocation: React.FC<DiaryLocationProps> = ({ location }) => {
           console.error("지도 이미지 로딩 실패");
           (e.target as HTMLImageElement).src = "/placeholder-map.png";
         }}
+        onClick={handleOnclick}
       />
       {/* 커스텀 툴팁 */}
       <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">

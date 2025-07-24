@@ -10,9 +10,9 @@ import FilePreview, { Attachment } from "@/components/diary/FilePreview";
 
 import DiaryTitle from "@/components/diary/DiaryTitle";
 import BottomNavi from "@/components/diary/BottomNavi";
-import MonthlyCalendar from "@/components/diary/MontlyCalendar";
+import MonthlyCalendar from "@/components/diary/MonthlyCalendar";
 import { toast } from "sonner";
-import Loading7 from "@/components/Loading/MainLoading";
+import MainLoading from "@/components/Loading/MainLoading";
 
 const Diary = () => {
   const { date } = useParams();
@@ -251,12 +251,16 @@ const Diary = () => {
   }
 
   // if (isSubmitting) return <Loading6 key={Date.now()} />;
-  if (isSubmitting) return <Loading7 key={Date.now()} />;
+  if (isSubmitting) return <MainLoading key={Date.now()} />;
 
   return (
     <>
       <div className="relative flex flex-col h-full border">
-        <DiaryTitle selectedDate={selectedDate} onCalendarClick={handleCalendarClick} />
+        <DiaryTitle
+          selectedDate={selectedDate}
+          onCalendarClick={handleCalendarClick}
+          onBackClick={() => navigate("/")}
+        />
 
         {/* 달력 컴포넌트 */}
         <MonthlyCalendar

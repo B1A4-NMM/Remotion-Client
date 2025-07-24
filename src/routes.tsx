@@ -24,6 +24,10 @@ import Todos from "./pages/Todos";
 import Mypage from "./pages/Mypage";
 import Negative from "./pages/analysis/Negative";
 import Positive from "./pages/analysis/Positive";
+import Character from "./pages/analysis/Character";
+
+import FAQ from "./pages/FAQ";
+
 
 export const routes = [
   {
@@ -164,6 +168,14 @@ export const routes = [
     ),
   },
   {
+    path: "/analysis/character",
+    element: (
+      <ProtectedRoute>
+        <Character />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: "/mypage",
     element: (
       <ProtectedRoute>
@@ -184,6 +196,14 @@ export const routes = [
     element: (
       <ProtectedRoute>
         <Notifications />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/faq",
+    element: (
+      <ProtectedRoute>
+        <FAQ />
       </ProtectedRoute>
     ),
   },

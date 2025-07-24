@@ -1,9 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
 import Title from "@/components/analysis/Title";
 import { useGetRelationDetail } from "@/api/queries/home/useGetRelationDetail";
-import { RelationData } from "@/types/relation";
 import { motion } from "framer-motion";
-import { Calendar, MapPin, Activity, Heart, TrendingUp } from "lucide-react";
+import { Calendar, MapPin, Activity, TrendingUp } from "lucide-react";
 import { baseColors, mapEmotionToColor } from "@/constants/emotionColors";
 import type { ColorKey } from "@/components/Blob/Blob";
 import { Canvas } from "@react-three/fiber";
@@ -16,7 +15,7 @@ const RelationDetail = () => {
   const { data, isLoading } = useGetRelationDetail(id || "");
   const userName = "사용자";
 
-  const navigate= useNavigate();
+  const navigate = useNavigate();
 
   const { theme } = useTheme();
   const isDark =
@@ -62,12 +61,18 @@ const RelationDetail = () => {
     // 5. 최근 일기
     const recentDiary = (relationData.diaries || [])
       .slice()
-      .sort((a: any, b: any) => new Date(b.writtenDate).getTime() - new Date(a.writtenDate).getTime())[0];
+      .sort(
+        (a: any, b: any) => new Date(b.writtenDate).getTime() - new Date(a.writtenDate).getTime()
+      )[0];
 
     // 6. 만남 빈도 (월 평균)
     let meetingFrequency = 0;
     if (relationData.diaries && relationData.diaries.length > 1) {
-      const sortedDiaries = relationData.diaries.slice().sort((a: any, b: any) => new Date(a.writtenDate).getTime() - new Date(b.writtenDate).getTime());
+      const sortedDiaries = relationData.diaries
+        .slice()
+        .sort(
+          (a: any, b: any) => new Date(a.writtenDate).getTime() - new Date(b.writtenDate).getTime()
+        );
       const firstDate = new Date(sortedDiaries[0].writtenDate);
       const lastDate = new Date(sortedDiaries[sortedDiaries.length - 1].writtenDate);
       const dateRange = Math.abs(lastDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24);
@@ -108,7 +113,9 @@ const RelationDetail = () => {
 
   // 가장 강한 감정의 색상 가져오기
   const strongestEmotion = analysis.emotionStats[0]?.emotion;
-  const strongestEmotionColor = strongestEmotion ? baseColors[mapEmotionToColor(strongestEmotion)] : "#95A5A6";
+  const strongestEmotionColor = strongestEmotion
+    ? baseColors[mapEmotionToColor(strongestEmotion)]
+    : "#95A5A6";
 
   const getRelationshipStatus = (score: number): string => {
     if (score >= 90) return "둘도 없는";
@@ -123,9 +130,9 @@ const RelationDetail = () => {
     return "냉랭한";
   };
 
-  const gotoDiary=(id:number)=>{
+  const gotoDiary = (id: number) => {
     navigate(`/result/${id}?view=record`);
-  }
+  };
 
   const formatDate = (date: string) => {
     return dayjs(date).format("YYYY년 M월 D일 dddd");
@@ -145,10 +152,12 @@ const RelationDetail = () => {
           <div className="text-center mb-6">
             <div className="w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center">
               <Canvas className="w-full h-full">
-                <Blob emotions={analysis.emotionStats.slice(0, 3).map((e: any) => ({
-                  color: mapEmotionToColor(e.emotion) as ColorKey,
-                  intensity: e.averageIntensity || 1.0,
-                }))} />
+                <Blob
+                  emotions={analysis.emotionStats.slice(0, 3).map((e: any) => ({
+                    color: mapEmotionToColor(e.emotion) as ColorKey,
+                    intensity: e.averageIntensity || 1.0,
+                  }))}
+                />
               </Canvas>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
@@ -191,7 +200,6 @@ const RelationDetail = () => {
             transition={{ delay: 0.2 }}
             className="bg-white rounded-3xl shadow-xl p-6"
           >
-
             <div className="space-y-3">
               {analysis.topActivities.map(([activity, count]: [string, number], index: number) => (
                 <div
@@ -213,69 +221,67 @@ const RelationDetail = () => {
 
         {/* 감정 분석 */}
         <div>
-        <div className="flex items-center mb-3">
-          <TrendingUp className="w-6 h-6 text-black mr-3" />
-          <h3 className="text-xl font-bold text-gray-900">나눈 감정들</h3>
-        </div>
-          
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-white rounded-3xl shadow-xl p-6"
-        >
+          <div className="flex items-center mb-3">
+            <TrendingUp className="w-6 h-6 text-black mr-3" />
+            <h3 className="text-xl font-bold text-gray-900">나눈 감정들</h3>
+          </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            {analysis.emotionStats.slice(0, 6).map((emotion: any) => (
-              <div key={emotion.emotion} className="flex items-center p-4 bg-gray-50 rounded-xl">
-                <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center mr-4"
-                  style={{ backgroundColor: baseColors[mapEmotionToColor(emotion.emotion)] }}
-                >
-                  <span className="text-white font-bold text-center">{emotion.emotion}</span>
-                </div>
-                <div>
-                  <div className="font-bold text-gray-600">{emotion.count}번</div>
-                  <div className="text-sm text-gray-600">
-                    평균 강도 {emotion.averageIntensity.toFixed(1)}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-white rounded-3xl shadow-xl p-6"
+          >
+            <div className="grid grid-cols-2 gap-4">
+              {analysis.emotionStats.slice(0, 6).map((emotion: any) => (
+                <div key={emotion.emotion} className="flex items-center p-4 bg-gray-50 rounded-xl">
+                  <div
+                    className="w-16 h-16 rounded-full flex items-center justify-center mr-4"
+                    style={{ backgroundColor: baseColors[mapEmotionToColor(emotion.emotion)] }}
+                  >
+                    <span className="text-white font-bold text-center">{emotion.emotion}</span>
+                  </div>
+                  <div>
+                    <div className="font-bold text-gray-600">{emotion.count}번</div>
+                    <div className="text-sm text-gray-600">
+                      평균 강도 {emotion.averageIntensity.toFixed(1)}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </div>
 
         {/* 최근 추억 */}
         <div>
           {analysis.recentDiary && (
             <>
-          <div className="flex items-center mb-3">
-            <Calendar className="w-6 h-6 text-black mr-3" />
-              <h3 className="text-xl font-bold text-black">최근 함께한 순간</h3>
-            </div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="bg-white rounded-3xl shadow-xl p-6 cursor-pointer"
-              onClick={()=>gotoDiary(analysis.recentDiary.diaryId)}
-            >
-
-              <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6">
-                <p className="text-gray-700 mb-4">{analysis.recentDiary.content}</p>
-                <div className="flex items-center justify-between text-sm text-gray-600">
-                  <div className="flex items-center">
-                    {formatDate(analysis.recentDiary.writtenDate)}
-                  </div>
-                  {analysis.recentDiary.latitude && analysis.recentDiary.longitude && (
-                    <div className="flex items-center">
-                      <MapPin className="w-4 h-4 mr-2" />
-                    </div>
-                  )}
-                </div>
+              <div className="flex items-center mb-3">
+                <Calendar className="w-6 h-6 text-black mr-3" />
+                <h3 className="text-xl font-bold text-black">최근 함께한 순간</h3>
               </div>
-            </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+                className="bg-white rounded-3xl shadow-xl p-6 cursor-pointer"
+                onClick={() => gotoDiary(analysis.recentDiary.diaryId)}
+              >
+                <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6">
+                  <p className="text-gray-700 mb-4">{analysis.recentDiary.content}</p>
+                  <div className="flex items-center justify-between text-sm text-gray-600">
+                    <div className="flex items-center">
+                      {formatDate(analysis.recentDiary.writtenDate)}
+                    </div>
+                    {analysis.recentDiary.latitude && analysis.recentDiary.longitude && (
+                      <div className="flex items-center">
+                        <MapPin className="w-4 h-4 mr-2" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
             </>
           )}
         </div>

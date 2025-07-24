@@ -77,7 +77,7 @@ const Positive = () => {
 
   return (
     <div className="mb-10">
-      <Title name="긍정적 감정" isBackActive={true} back="/analysis" />
+      <Title name="" isBackActive={true} back="/analysis" />
       <div className="px-4 py-8 text-foreground min-h-screen space-y-10">
         {/* 기간 선택 드롭다운 */}
         <div className="flex justify-center mb-8">

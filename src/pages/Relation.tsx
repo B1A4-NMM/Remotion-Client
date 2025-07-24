@@ -146,7 +146,7 @@ const Relation = () => {
     relationArray.forEach((relation: RelationNodeData, index: number) => {
       const angle = (index * 2 * Math.PI) / relationArray.length;
       const baseDistance = 200;  
-      const affectionBonus = (relation.affection / 100) * 200; 
+      const affectionBonus = (relation.affection / 100) * 100; 
       const distance = baseDistance + affectionBonus;
       
       const baseRadius = 10;

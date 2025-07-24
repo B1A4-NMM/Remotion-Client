@@ -9,6 +9,7 @@ import { Canvas } from "@react-three/fiber";
 import Blob from "@/components/Blob/Blob";
 import { useTheme } from "@/components/theme-provider";
 import dayjs from "dayjs";
+import { getBlobEmotionsFromSimpleEmotions } from "@/utils/activityEmotionUtils";
 
 const RelationDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -30,23 +31,26 @@ const RelationDetail = () => {
 
     // 2. 활동 분석 (activities 필드 사용)
     const topActivities = (relationData.activities || [])
-      .sort((a: any, b: any) => b.count - a.count)
+      .filter((a: any) => a.content) // 빈 객체 필터링
+      .sort((a: any, b: any) => (b.count || 0) - (a.count || 0))
       .slice(0, 5)
-      .map((a: any) => [a.content, a.count]);
+      .map((a: any) => [a.content, a.count || 0]);
 
-    // 3. 감정 분석 (emotions: [{date, emotions: [{emotion, count, intensity}]}])
-    const allEmotions = (relationData.emotions || []).flatMap((day: any) =>
-      (day.emotions || []).map((e: any) => ({ ...e, date: day.date }))
-    );
+    // 3. 감정 분석 (emotions: [{emotion, count, intensity}]) - 구조 변경 대응
+    const allEmotions = relationData.emotions || [];
+    
     // 감정별 count, 평균 intensity
     const emotionCounts: Record<string, { count: number; totalIntensity: number }> = {};
     allEmotions.forEach((e: any) => {
-      if (!emotionCounts[e.emotion]) {
-        emotionCounts[e.emotion] = { count: 0, totalIntensity: 0 };
+      if (e.emotion && e.emotion !== '무난') { // '무난' 감정은 제외
+        if (!emotionCounts[e.emotion]) {
+          emotionCounts[e.emotion] = { count: 0, totalIntensity: 0 };
+        }
+        emotionCounts[e.emotion].count += e.count || 0;
+        emotionCounts[e.emotion].totalIntensity += (e.intensity || 0) * (e.count || 0);
       }
-      emotionCounts[e.emotion].count += e.count;
-      emotionCounts[e.emotion].totalIntensity += e.intensity;
     });
+    
     const emotionStats = Object.entries(emotionCounts)
       .map(([emotion, stats]) => ({
         emotion,
@@ -111,6 +115,9 @@ const RelationDetail = () => {
 
   console.log(analysis);
 
+  // activityEmotionUtils를 사용하여 Blob 감정 색상 계산
+  const blobEmotions = getBlobEmotionsFromSimpleEmotions({ emotions: data.emotions });
+  
   // 가장 강한 감정의 색상 가져오기
   const strongestEmotion = analysis.emotionStats[0]?.emotion;
   const strongestEmotionColor = strongestEmotion
@@ -152,12 +159,7 @@ const RelationDetail = () => {
           <div className="text-center mb-6">
             <div className="w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center">
               <Canvas className="w-full h-full">
-                <Blob
-                  emotions={analysis.emotionStats.slice(0, 3).map((e: any) => ({
-                    color: mapEmotionToColor(e.emotion) as ColorKey,
-                    intensity: e.averageIntensity || 1.0,
-                  }))}
-                />
+                <Blob emotions={blobEmotions} />
               </Canvas>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
@@ -188,70 +190,74 @@ const RelationDetail = () => {
         </motion.div>
 
         {/* 함께한 활동 */}
-        <div>
-          <div className="flex items-center mb-3">
-            <Activity className="w-6 h-6 text-black mr-3" />
-            <h3 className="text-xl font-bold text-gray-900">함께한 활동들</h3>
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-3xl shadow-xl p-6"
-          >
-            <div className="space-y-3">
-              {analysis.topActivities.map(([activity, count]: [string, number], index: number) => (
-                <div
-                  key={activity}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
-                >
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center mr-3">
-                      <span className="text-white font-bold text-sm">{index + 1}</span>
-                    </div>
-                    <span className="font-medium text-gray-600">{activity}</span>
-                  </div>
-                  <span className="text-gray-600">{count}번</span>
-                </div>
-              ))}
+        {analysis.topActivities.length > 0 && (
+          <div>
+            <div className="flex items-center mb-3">
+              <Activity className="w-6 h-6 text-black mr-3" />
+              <h3 className="text-xl font-bold text-gray-900">함께한 활동들</h3>
             </div>
-          </motion.div>
-        </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-3xl shadow-xl p-6"
+            >
+              <div className="space-y-3">
+                {analysis.topActivities.map(([activity, count]: [string, number], index: number) => (
+                  <div
+                    key={activity}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
+                  >
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center mr-3">
+                        <span className="text-white font-bold text-sm">{index + 1}</span>
+                      </div>
+                      <span className="font-medium text-gray-600">{activity}</span>
+                    </div>
+                    <span className="text-gray-600">{count}번</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        )}
 
         {/* 감정 분석 */}
-        <div>
-          <div className="flex items-center mb-3">
-            <TrendingUp className="w-6 h-6 text-black mr-3" />
-            <h3 className="text-xl font-bold text-gray-900">나눈 감정들</h3>
-          </div>
+        {analysis.emotionStats.length > 0 && (
+          <div>
+            <div className="flex items-center mb-3">
+              <TrendingUp className="w-6 h-6 text-black mr-3" />
+              <h3 className="text-xl font-bold text-gray-900">나눈 감정들</h3>
+            </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-white rounded-3xl shadow-xl p-6"
-          >
-            <div className="grid grid-cols-2 gap-4">
-              {analysis.emotionStats.slice(0, 6).map((emotion: any) => (
-                <div key={emotion.emotion} className="flex items-center p-4 bg-gray-50 rounded-xl">
-                  <div
-                    className="w-16 h-16 rounded-full flex items-center justify-center mr-4"
-                    style={{ backgroundColor: baseColors[mapEmotionToColor(emotion.emotion)] }}
-                  >
-                    <span className="text-white font-bold text-center">{emotion.emotion}</span>
-                  </div>
-                  <div>
-                    <div className="font-bold text-gray-600">{emotion.count}번</div>
-                    <div className="text-sm text-gray-600">
-                      평균 강도 {emotion.averageIntensity.toFixed(1)}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="bg-white rounded-3xl shadow-xl p-6"
+            >
+              <div className="grid grid-cols-2 gap-4">
+                {analysis.emotionStats.slice(0, 6).map((emotion: any) => (
+                  <div key={emotion.emotion} className="flex items-center p-4 bg-gray-50 rounded-xl">
+                    <div
+                      className="w-16 h-16 rounded-full flex items-center justify-center mr-4"
+                      style={{ backgroundColor: baseColors[mapEmotionToColor(emotion.emotion)] }}
+                    >
+                      <span className="text-white font-bold text-center">{emotion.emotion}</span>
+                    </div>
+                    <div>
+                      <div className="font-bold text-gray-600">{emotion.count}번</div>
+                      <div className="text-sm text-gray-600">
+                        평균 강도 {emotion.averageIntensity.toFixed(1)}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        )}
 
         {/* 최근 추억 */}
         <div>
@@ -318,23 +324,29 @@ const RelationDetail = () => {
               </span>
               번의 소중한 순간을 함께했습니다.
             </p>
-            <p>
-              가장 많이 함께한 활동은{" "}
-              <span
-                className="font-bold underline underline-offset-4"
-                style={{ textDecorationColor: strongestEmotionColor }}
-              >
-                {analysis.topActivities[0]?.[0]}
-              </span>
-              이며, 주로{" "}
-              <span
-                className="font-bold underline underline-offset-4"
-                style={{ textDecorationColor: strongestEmotionColor }}
-              >
-                {analysis.emotionStats[0]?.emotion}
-              </span>{" "}
-              감정을 많이 나누었네요.
-            </p>
+            {analysis.topActivities.length > 0 && (
+              <p>
+                가장 많이 함께한 활동은{" "}
+                <span
+                  className="font-bold underline underline-offset-4"
+                  style={{ textDecorationColor: strongestEmotionColor }}
+                >
+                  {analysis.topActivities[0]?.[0]}
+                </span>
+                {analysis.emotionStats.length > 0 && (
+                  <>
+                    이며, 주로{" "}
+                    <span
+                      className="font-bold underline underline-offset-4"
+                      style={{ textDecorationColor: strongestEmotionColor }}
+                    >
+                      {analysis.emotionStats[0]?.emotion}
+                    </span>{" "}
+                    감정을 많이 나누었네요.
+                  </>
+                )}
+              </p>
+            )}
             <p>
               친밀도 점수{" "}
               <span

@@ -11,6 +11,7 @@ import BottomPopup from "@/components/BottomPopup";
 import RoutineModalContent from "@/components/routine/RoutineModalContent";
 import PersonalizedRoutineList from "@/components/routine/PersonalizedRoutineList";
 import RecommendedRoutinePopup from "@/components/routine/RecommendedRoutinePoPup";
+
 import { getTriggerRoutine, getRoutineByType } from "@/api/services/routine";
 import { RoutineItem } from "@/types/routine";
 import { useDeleteRoutineById } from "@/api/queries/routine/useDeleteRoutineById";
@@ -28,6 +29,8 @@ const Routine = () => {
     "depression"
   );
   const [showRecommendation, setShowRecommendation] = useState(false);
+
+  //바텀 팝업 상태 관리
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   //닫기 버튼 눌렀을 때 애니매이션 적용

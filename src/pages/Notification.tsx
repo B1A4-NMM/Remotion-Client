@@ -4,6 +4,12 @@ import { useNotificationExpand } from "@/hooks/useNotificationExpand";
 import NotificationCard from "@/components/notification/NotificationCard"; 
 import { useNavigate } from "react-router-dom";
 
+// 알림 갯수 동기화
+
+import { useNotiStore } from "@/store/useNotiStore";
+import { patchNotification } from "@/api/services/notification";
+
+
 type Tab = "all" | "unread"; 
 // TODO: 실제 앱에서는 isSubscribed를 Webpush context/prop 등에서 받아야 함
 const isSubscribed = true;
@@ -100,6 +106,16 @@ export default function Notification() {
             noti={noti}
             isExpanded={expandedId === noti.id}
             onToggleExpand={handleToggleExpand}
+            onRead={async () => {
+              if (!noti.read) {
+                try {
+                  await patchNotification(noti.id);
+                  useNotiStore.getState().decreaseCount(); // ✅ 상태 동기화
+                } catch (err) {
+                  console.error("알림 읽음 처리 실패", err);
+                }
+              }
+            }}
             />
           ))}
         </ul>

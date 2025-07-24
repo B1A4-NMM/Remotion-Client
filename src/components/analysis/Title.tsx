@@ -84,14 +84,14 @@ const Title = ({
                   onClick={() => handleTabClick("relation")}
                   aria-label="관계 분석"
                 >
-                  관계 분석
+                  관계
                 </button>
                 <button
                   className={`button ${isAnalysis ? "active" : ""}`}
                   onClick={() => handleTabClick("analysis")}
                   aria-label="감정 분석"
                 >
-                  감정 분석
+                  감정
                 </button>
               </div>
             </div>

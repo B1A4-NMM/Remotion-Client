@@ -62,7 +62,7 @@ const BottomPopup = forwardRef<BottomPopupHandle, BottomPopupProps>(
       setShouldClose(true);
       setCurrentHeight("0px");
 
-      // body 스타일 즉시 복원 (오버레이 클릭 시 다른 요소들과 상호작용 가능하도록)
+      // body 스타일 즉시 복원 (닫기 버튼 클릭 시 다른 요소들과 상호작용 가능하도록)
       document.body.style.overflow = "auto";
 
       // onClose는 애니메이션 완료 후에 호출

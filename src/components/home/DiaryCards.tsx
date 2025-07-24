@@ -52,7 +52,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
 
   // 공통 컴포넌트들
   const renderBlobSection = (diary: Diary, index: number) => (
-    <div className="h-full w-full max-w-[170px] max-h-[170px] rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center p-2">
+    <div className="h-full w-full rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center p-2">
       <div className="text-base text-[#85848F] font-medium text-center mb-2">
         {diary.emotions && diary.emotions.length > 0
           ? `${diary.emotions
@@ -61,7 +61,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               .join(", ")}${diary.emotions.length > 2 ? " 등" : ""}`
           : "감정 없음"}
       </div>
-      <div className="w-full h-full max-w-[170px] max-h-[170px] flex items-center justify-center rounded-full overflow-hidden mx-auto">
+      <div className="w-full h-full flex items-center justify-center rounded-full overflow-hidden mx-auto">
         <VirtualizedBlobCard
           key={diary.id}
           diaryContent={{ emotions: diary.emotions }}
@@ -172,7 +172,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               onClick={() => handleCardClick(mappedDiary.id)}
             >
               <div className="flex gap-2 items-center rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] mb-4 p-4">
-                <div className="w-[70px] h-[70px] flex items-center justify-center rounded-full overflow-hidden">
+                <div className="w-[70px] h-[70px] flex-shrink-0 flex items-center justify-center rounded-full overflow-hidden">
                   <VirtualizedBlobCard
                     key={mappedDiary.id}
                     diaryContent={{ emotions: mappedDiary.emotions }}
@@ -214,11 +214,11 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer "
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4" style={{ height: "170px"}}>
+              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4 h-[170px]">
                 <div className="col-span-1 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
-                <div className="col-span-1 h-full flex items-center max-h-[170px]">
+                <div className="col-span-1 h-full flex items-center">
                   {renderMapSection(mappedDiary)}
                 </div>
               </div>
@@ -236,11 +236,11 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4" style={{ height: "170px"}}>
+              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4 h-[170px]">
                 <div className="col-span-1 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
-                <div className="col-span-1 h-full flex items-center max-h-[170px]">
+                <div className="col-span-1 h-full flex items-center">
                   <img
                     src={filteredImages[0]}
                     alt="diary-photo-0"
@@ -262,24 +262,21 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4" style={{ height: "170px"}}>
-                {/* 왼쪽: Blob 섹션 */}
+              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4 h-[170px]">
                 <div className="col-span-1">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
-                
-                {/* 오른쪽: 지도 + 사진을 세로로 배치 */}
-                <div className="grid grid-rows-2 gap-2 h-full max-h-[170px]">
-                  <div>
+                <div className="grid grid-rows-2 gap-2 h-full">
+                  <div className="h-full">
                     <img
                       src={filteredImages[0]}
                       alt="diary-photo-0"
                       className="rounded-lg object-cover w-full h-full"
                       />
                   </div>                    
-                      <div>
-                        {renderMapSection(mappedDiary)}
-                      </div>
+                  <div className="h-full">
+                    {renderMapSection(mappedDiary)}
+                  </div>
                 </div>
               </div>
               {renderFooter(mappedDiary)}
@@ -297,26 +294,25 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4" style={{ height: "170px"}}>
-                {/* 왼쪽: Blob 섹션 */}
+              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4 h-[170px]">
                 <div className="col-span-1">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
-                
-                {/* 오른쪽: 지도 + 사진을 세로로 배치 */}
-                <div className="grid grid-rows-2 gap-2 h-full max-h-[170px]">
-                  <div>
+                <div className="grid grid-rows-2 gap-2 h-full">
+                  <div className="h-full">
                     <img
                       src={filteredImages[0]}
                       alt="diary-photo-0"
                       className="rounded-lg object-cover w-full h-full"
                       />
                   </div>                    
-                  <img
-                      src={filteredImages[1]}
-                      alt="diary-photo-1"
-                      className="rounded-lg object-cover w-full h-full"
-                      />
+                  <div className="h-full">
+                    <img
+                        src={filteredImages[1]}
+                        alt="diary-photo-1"
+                        className="rounded-lg object-cover w-full h-full"
+                        />
+                  </div>
                 </div>
               </div>
               {renderFooter(mappedDiary)}
@@ -333,17 +329,15 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4" style={{ height: "170px" }}>
-                <div className="col-span-0 h-full">
+              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4 h-[170px]">
+                <div className="col-span-1 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
-                <div className="col-span-1 grid grid-rows-2 gap-2 h-full max-h-[170px] max-w-[170px]">
-                  {/* 위쪽: 지도 (가로로 긴 직사각형) */}
-                  <div className="row-span-1 ">
+                <div className="col-span-1 grid grid-rows-2 gap-2 h-full">
+                  <div className="row-span-1 h-full">
                     {renderMapSection(mappedDiary)}
                   </div>
-                  {/* 아래쪽: 사진 2개 (정사각형) */}
-                  <div className="grid grid-cols-2 gap-2 ">
+                  <div className="grid grid-cols-2 gap-2 h-full">
                     <img
                       src={filteredImages[0]}
                       alt="diary-photo-0"
@@ -371,12 +365,11 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4" style={{ height: "170px" }}>
-                <div className="col-span-0 h-full">
+              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4 h-[170px]">
+                <div className="col-span-1 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
-                <div className="col-span-1 grid grid-rows-2 gap-2 h-full max-h-[170px] max-w-[170px] min-w-[170px]">
-                  {/* 위쪽: 사진 1개 (가로로 긴 직사각형) */}
+                <div className="col-span-1 grid grid-rows-2 gap-2 h-full">
                   <div className="row-span-1">
                     <img
                       src={filteredImages[0]}
@@ -384,8 +377,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                       className="rounded-lg object-cover w-full h-full"
                     />
                   </div>
-                  {/* 아래쪽: 사진 2개 (정사각형) */}
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-2 h-full">
                     <img
                       src={filteredImages[1]}
                       alt="diary-photo-1"
@@ -413,14 +405,11 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="flex gap-2 rounded-lg mb-4 " style={{ height: "170px" }}>
-                {/* 왼쪽: 고정된 Blob */}
-                <div className="w-[170px] h-full">
+              <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
+                <div className="w-1/2 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
-                
-                {/* 오른쪽: 4분할 그리드 (2x2) */}
-                <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-2 max-h-[170px] max-w-[170px]">
+                <div className="w-1/2 grid grid-cols-2 grid-rows-2 gap-2 h-full">
                   <img
                     src={filteredImages[0]}
                     alt="diary-photo-0"
@@ -447,7 +436,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
         }
         
         // 케이스 9: Blob + 사진4 (사진 4개, 지도 없음)
-        if (!hasMap && imageCount === 4) {
+        if (!hasMap && imageCount >= 4) {
           return (
             <div
               key={mappedDiary.id}
@@ -455,14 +444,11 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="flex gap-2 rounded-lg mb-4 max-h-" style={{ height: "170px" }}>
-                {/* 왼쪽: 고정된 Blob */}
-                <div className="w-[170px] h-full">
+              <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
+                <div className="w-1/2 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
-                
-                {/* 오른쪽: 4분할 그리드 (2x2) */}
-                <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-2 max-h-[170px] max-w-[170px]">
+                <div className="w-1/2 grid grid-cols-2 grid-rows-2 gap-2 h-full">
                   <img
                     src={filteredImages[0]}
                     alt="diary-photo-0"
@@ -478,11 +464,16 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                     alt="diary-photo-2"
                     className="aspect-square w-full rounded-lg object-cover"
                   />
-                  <img
-                    src={filteredImages[3]}
-                    alt="diary-photo-3"
-                    className="aspect-square w-full rounded-lg object-cover"
-                  />
+                  <div className="relative aspect-square w-full">
+                    <img
+                      src={filteredImages[3]}
+                      alt="diary-photo-3"
+                      className="aspect-square w-full rounded-lg object-cover filter blur-sm"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-40 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-lg font-bold">+{imageCount - 3}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
               {renderFooter(mappedDiary)}
@@ -491,7 +482,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
         }
         
         // 케이스 10: Blob + 사진4 + 지도 (사진 4개, 지도 있음) - 마지막 2개 사진은 블러 처리 + +2 표시
-        if (hasMap && imageCount === 4) {
+        if (hasMap && imageCount >= 4) {
           return (
             <div
               key={mappedDiary.id}
@@ -499,34 +490,24 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer "
               onClick={() => handleCardClick(mappedDiary.id)}
             >
-              <div className="flex gap-2 rounded-lg mb-4 "  style={{ height: "170px"}}>
-                {/* 왼쪽: 고정된 Blob */}
-                <div className="w-[170px] h-full">
+              <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
+                <div className="w-1/2 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
-                
-                {/* 오른쪽: 4분할 그리드 (2x2) */}
-                <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-2 max-h-[170px] max-w-[170px] min-w-[170px]">
-                  {/* 첫 번째: 사진 */}
+                <div className="w-1/2 grid grid-cols-2 grid-rows-2 gap-2 h-full">
                   <img
                     src={filteredImages[0]}
                     alt="diary-photo-0"
                     className="aspect-square w-full rounded-lg object-cover"
                   />
-                  
-                  {/* 두 번째: 사진 */}
                   <img
                     src={filteredImages[1]}
                     alt="diary-photo-1"
                     className="aspect-square w-full rounded-lg object-cover"
                   />
-                  
-                  {/* 세 번째: 지도 */}
                   <div className="aspect-square w-full">
                     {renderMapSection(mappedDiary)}
                   </div>
-                  
-                  {/* 네 번째: 블러 처리된 이미지 + "+2" 표시 */}
                   <div className="relative aspect-square w-full">
                     <img
                       src={filteredImages[2]}
@@ -534,7 +515,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({
                       className="aspect-square w-full rounded-lg object-cover filter blur-sm"
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-40 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-lg font-bold">+2</span>
+                      <span className="text-white text-lg font-bold">+{imageCount - 2}</span>
                     </div>
                   </div>
                 </div>

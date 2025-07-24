@@ -29,12 +29,36 @@ export const getInfiniteDiaries = async (cursor: number = 0, limit: number = 10)
 };
 
 export const searchDiaries = async (q: string) => {
-  console.log("[searchDiaries] 검색 쿼리 파라미터 date:", q);
-  const response = await api.get("/diary/date", {
-    params: { date: q },
-  });
-  console.log("[searchDiaries] 응답 데이터:", response.data);
-  return response.data; // { diaries: [...], totalCount: N }
+  console.log("[searchDiaries] 검색 쿼리:", q);
+  console.log("[searchDiaries] 파라미터 타입:", typeof q);
+
+  // 날짜 형식인지 확인 (YYYY-MM-DD 또는 YYYY년 MM월 DD일)
+  const isDateQuery = /^\d{4}-\d{2}-\d{2}$/.test(q) || /^\d{4}년 \d{1,2}월 \d{1,2}일/.test(q);
+
+  if (isDateQuery) {
+    // 날짜 검색인 경우
+    console.log("[searchDiaries] 날짜 검색으로 인식");
+    const response = await api.get("/diary/date", {
+      params: { date: q },
+      paramsSerializer: params => {
+        const usp = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+          usp.append(key, String(value));
+        });
+        return usp.toString();
+      },
+    });
+    console.log("[searchDiaries] 날짜 검색 응답:", response.data);
+    return response.data;
+  } else {
+    // 일반 검색인 경우
+    console.log("[searchDiaries] 일반 검색으로 인식");
+    const response = await api.get("/diary/search", {
+      params: { q: q },
+    });
+    console.log("[searchDiaries] 일반 검색 응답:", response.data);
+    return response.data;
+  }
 };
 
 // 북마크된 일기들 가져오기

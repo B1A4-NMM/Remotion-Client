@@ -26,6 +26,9 @@ import Negative from "./pages/analysis/Negative";
 import Positive from "./pages/analysis/Positive";
 import Character from "./pages/analysis/Character";
 
+import FAQ from "./pages/FAQ";
+
+
 export const routes = [
   {
     path: "/",
@@ -193,6 +196,14 @@ export const routes = [
     element: (
       <ProtectedRoute>
         <Notifications />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/faq",
+    element: (
+      <ProtectedRoute>
+        <FAQ />
       </ProtectedRoute>
     ),
   },

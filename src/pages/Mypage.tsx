@@ -6,6 +6,8 @@ import { useGetAuthTest } from "@/api/queries/auth/useGetAuthTest";
 import kakao from "@/assets/img/kakao.svg";
 import google from "@/assets/img/google.svg";
 import Webpush from "@/components/Webpush";
+import { ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // 아이콘 컴포넌트들
 const SunIcon = ({ className }: { className?: string }) => (
@@ -51,6 +53,7 @@ export default function Mypage() {
   const { user, logout } = useUserStore();
   const { theme, setTheme } = useTheme();
   const { data: authData, isLoading, error } = useGetAuthTest();
+  const navigate= useNavigate();
 
   // API 데이터에서 사용자 정보 추출
   const apiUser = authData?.user;
@@ -168,6 +171,15 @@ export default function Mypage() {
 
         <Webpush />
 
+        <div className="bg-card rounded-2xl shadow-lg p-6 mb-6 border cursor-pointer flex justify-between "
+          onClick={()=>navigate("/faq")}>
+          <span className="text-xl font-semibold">FQA</span>
+          <div className="text-sm text-muted-foreground flex justify-left mt-1">
+            <span className="mt-[1px] ">자주 하는 질문</span> 
+            <ChevronRight/>
+          </div>
+        </div>
+
         {/* 로그아웃 버튼 */}
         <button
           onClick={logout}
@@ -175,6 +187,7 @@ export default function Mypage() {
         >
           로그아웃
         </button>
+
       </div>
     </div>
   );

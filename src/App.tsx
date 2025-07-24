@@ -6,6 +6,7 @@ import Layout from "./Layout";
 import { ThemeProvider } from "./components/theme-provider";
 import { AuthProvider } from "./contexts/AuthContext";
 import LogoutModal from "./components/LogoutModal";
+import TokenExpiryWarning from "./components/TokenExpiryWarning";
 import { useLogoutModalStore } from "./store/logoutModalStore";
 import { setLogoutModalStore } from "./api/axios";
 
@@ -40,6 +41,7 @@ export default function App() {
           </Routes>
         </AnimatePresence>
         <LogoutModal open={isOpen} onConfirm={handleLogoutConfirm} />
+        <TokenExpiryWarning />
       </ThemeProvider>
     </AuthProvider>
   );

@@ -148,9 +148,9 @@ const combination: Record<
 
 const Character = () => {
   const { data: animal, isLoading, isError } = useGetCharacter();
-  const authData = useGetAuthTest();
+  const {data:authData} = useGetAuthTest();
   const apiUser = authData?.user;
-  const nickname = apiUser?.nickname || "하루뒤";
+  const nickname = apiUser?.nickname ||"하루뒤";
 
   const harmony = combination[animal?.character]?.harmony;
   const description_h = combination[animal?.character]?.description_h;

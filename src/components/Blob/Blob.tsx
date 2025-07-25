@@ -25,6 +25,7 @@ interface BlobProps {
 }
 
 const Blob: React.FC<BlobProps> = ({ emotions, scale = 1, id, onContextLost }) => {
+  console.log(emotions);
   const mesh = useRef<Mesh>(null);
   const [isActive, setIsActive] = useState(false);
   const contextPool = WebGLContextPool.getInstance();

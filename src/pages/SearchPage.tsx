@@ -55,8 +55,8 @@ const SearchPage = () => {
     selectedCategory === "bookmark"
       ? bookmarkDiaries
       : Array.isArray(data)
-        ? data.flatMap(item => item.diaries || []) // Handles [{ diaries: [...] }]
-        : data?.diaries || []; // Handles { diaries: [...] } or single object
+        ? data // API 응답이 직접 배열인 경우
+        : data?.diaries || []; // API 응답이 { diaries: [...] } 형태인 경우
 
   // API 응답을 DiaryCards에서 사용하는 형식으로 변환
   const transformedDiaries = currentDiaries.map((diary: any) => {
@@ -65,23 +65,27 @@ const SearchPage = () => {
     console.log("🔍 diary.id 타입:", typeof diary.id);
 
     const transformed = {
-      diaryId: diary.id || diary.diaryId,
-      emotions: diary.emotions || diary.emotion,
-      targets: diary.targets,
-      activities: diary.activities,
-      photoPath: diary.photoUrl || diary.photoPath,
-      latitude: diary.map?.latitude || diary.latitude,
-      longitude: diary.map?.longitude || diary.longitude,
+      diaryId: diary.diaryId || diary.id,
+      emotions: diary.emotions || diary.emotion || [], // 배열 형태
+      targets: diary.targets || [], // 배열 형태
+      activities: diary.activities || [], // 배열 형태
+      photoPath: diary.photoPath || diary.photoUrl || [], // 배열 형태
+      latitude: diary.latitude,
+      longitude: diary.longitude,
       content: diary.content,
-      writtenDate: diary.date || diary.writtenDate,
+      writtenDate: diary.writtenDate || diary.date,
       title: diary.title,
       relate_sentence: diary.relate_sentence,
       search_sentence: diary.search_sentence,
-      isBookmarked: diary.bookmarked || diary.isBookmarked,
+      isBookmarked: diary.isBookmarked || diary.bookmarked,
     };
 
     console.log("🔍 변환 후 diary:", transformed);
     console.log("🔍 변환 후 diaryId:", transformed.diaryId);
+    console.log("🔍 변환 후 emotions:", transformed.emotions);
+    console.log("🔍 변환 후 targets:", transformed.targets);
+    console.log("🔍 변환 후 activities:", transformed.activities);
+    console.log("🔍 변환 후 photoPath:", transformed.photoPath);
     return transformed;
   });
 
@@ -98,16 +102,41 @@ const SearchPage = () => {
   }
 
   // 디버깅 로그 추가
-  console.log("🔍 검색 데이터 디버깅:");
+  console.log("🔍 SearchPage 데이터 흐름 디버깅:");
   console.log("  - selectedCategory:", selectedCategory);
   console.log("  - searchQuery:", searchQuery);
-  console.log("  - data:", data);
+  console.log("  - inputValue:", inputValue);
+  console.log("  - API 응답 data:", data);
   console.log("  - data 타입:", typeof data);
   console.log("  - Array.isArray(data):", Array.isArray(data));
-  console.log("  - currentDiaries:", currentDiaries);
-  console.log("  - currentDiaries 길이:", currentDiaries.length);
   console.log("  - isLoading:", isLoading);
   console.log("  - searchQuery 존재 여부:", !!searchQuery);
+
+  // API 응답 구조 분석
+  if (data) {
+    console.log("📊 API 응답 구조 분석:");
+    console.log("  - data 전체:", data);
+    console.log("  - data 키들:", Object.keys(data));
+
+    if (Array.isArray(data)) {
+      console.log("  - 배열 길이:", data.length);
+      data.forEach((item, index) => {
+        console.log(`  - 배열[${index}]:`, item);
+        console.log(`  - 배열[${index}] 키들:`, Object.keys(item || {}));
+        if (item?.diaries) {
+          console.log(`  - 배열[${index}] diaries 개수:`, item.diaries.length);
+        }
+      });
+    } else if (data.diaries) {
+      console.log("  - diaries 개수:", data.diaries.length);
+      console.log("  - 첫 번째 diary:", data.diaries[0]);
+    }
+  }
+
+  console.log("  - currentDiaries:", currentDiaries);
+  console.log("  - currentDiaries 길이:", currentDiaries.length);
+  console.log("  - transformedDiaries:", transformedDiaries);
+  console.log("  - transformedDiaries 길이:", transformedDiaries.length);
 
   const handleDeleteDiary = (diaryId: number) => {
     deleteDiaryMutation.mutate(

@@ -158,8 +158,9 @@ const RelationDetail = () => {
           className="bg-white rounded-3xl shadow-xl p-6"
         >
           <div className="text-center mb-6">
-            <div className="w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <Canvas className="w-full h-full">
+            <div className="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center dark:bg-gradient-to-b dark:from-[#f5f6fa] dark:to-[#e0e3ef] rounded-full">
+              <Canvas 
+                camera={{ position: [0, 0, 10], fov: 28 }}>
                 <Blob emotions={blobEmotions} />
               </Canvas>
             </div>

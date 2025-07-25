@@ -464,7 +464,35 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
               {isCompactMode ? (
                 // 좁은 화면에서의 레이아웃 - 스택 형태로 변경
                 <div style={{ height: 'auto' }} className="flex flex-col gap-2 rounded-lg mb-4">
-                  <div className="w-full h-[100px]">{renderBlobSection(mappedDiary, index)}</div>
+                  <div className="flex gap-2 items-center rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] p-4">
+                    <div className="w-[70px] h-[70px] flex-shrink-0 flex items-center justify-center rounded-full overflow-hidden">
+                      <VirtualizedBlobCard
+                        key={mappedDiary.diaryId}
+                        diaryContent={{ emotions: mappedDiary.emotions }}
+                        index={index}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[14px] font-medium text-gray-700 truncate">
+                        {mappedDiary.emotions && mappedDiary.emotions.length > 0
+                          ? `${mappedDiary.emotions
+                              .slice(0, 2)
+                              .map(e => e.emotion)
+                              .join(", ")}${mappedDiary.emotions.length > 2 ? ` 외 ${mappedDiary.emotions.length - 2}가지 감정` : ""}`
+                          : "감정 없음"}
+                      </div>
+                      <div className="text-xs text-[#85848F] truncate">
+                        {mappedDiary.targets && mappedDiary.targets.length > 0
+                          ? `${mappedDiary.targets.slice(0, 3).join(", ")}${mappedDiary.targets.length >= 4 ? " 등" : ""}`
+                          : "나혼자"}
+                      </div>
+                      <div className="text-xs text-[#85848F] truncate">
+                        {mappedDiary.activities && mappedDiary.activities.length > 0
+                          ? `${mappedDiary.activities.slice(0, 3).join(", ")}${mappedDiary.activities.length >= 3 ? " 등" : ""}`
+                          : "활동 없음"}
+                      </div>
+                    </div>
+                  </div>
                   <div className="w-full grid grid-cols-2 gap-2">
                     <div className="aspect-square w-full">
                       <LazyImage

@@ -24,8 +24,8 @@ const LoadingBlob = ({ isComplete = false }: LoadingBlobProps) => {
   const [animationStartTime, setAnimationStartTime] = useState<number | null>(null);
   const [targetColors, setTargetColors] = useState<number[][]>([]);
   const [currentPhase, setCurrentPhase] = useState<"toColor" | "toWhite">("toColor");
-  const [targetScale, setTargetScale] = useState(1.7);
-  const [currentScale, setCurrentScale] = useState(1.7);
+  const [targetScale, setTargetScale] = useState(2);
+  const [currentScale, setCurrentScale] = useState(2);
   const [shouldStartShrinking, setShouldStartShrinking] = useState(false);
 
   // uniforms 생성 (처음에는 완전히 흰색)
@@ -79,7 +79,7 @@ const LoadingBlob = ({ isComplete = false }: LoadingBlobProps) => {
 
     // 1초 후에 블롭이 작아지면서 위치 이동
     const timer = setTimeout(() => {
-      setTargetScale(0.9);
+      setTargetScale(1);
       setShouldStartShrinking(true);
     }, 1000);
 

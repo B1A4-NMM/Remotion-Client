@@ -87,7 +87,7 @@ const PeopleCard: React.FC<{ data?: AnalysisData }> = ({ data }) => {
 
   return (
     <div className="mb-6">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4 px-4">오늘 감정이 향한 사람들</h2>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-4 px-4">오늘 감정이 향한 사람들</h2>
       <Carousel items={cardList} />
     </div>
   );

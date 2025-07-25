@@ -44,9 +44,9 @@ const TodoPreviewCard: React.FC<TodoPreviewCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-md px-4 py-5">
+    <div className="bg-white rounded-2xl shadow-md px-5 py-5">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>
-      <ul className="flex flex-col divide-y divide-blue-500/40">
+      <ul className="flex flex-col divide-y divide-gray-300/50 dark:divide-gray-100/10">
         {todos.map((todo, index) => (
           <li key={index} className="flex items-center justify-between py-2">
             <div className="flex items-center gap-2 text-gray-800">

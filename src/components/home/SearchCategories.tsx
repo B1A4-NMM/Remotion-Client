@@ -80,6 +80,7 @@ const SearchCategories: React.FC<SearchCategoriesProps> = ({
         onDateSelect={handleDateSelect}
         onClose={() => setIsCalendarOpen(false)}
         isOpen={isCalendarOpen}
+        overlayTopClass="top-60"
       />
       {console.log("🔍 MonthlyCalendar props:", {
         selectedDate,

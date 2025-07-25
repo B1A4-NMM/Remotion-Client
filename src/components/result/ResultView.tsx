@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 import ActivityCardSlider from "./ActivityCardSlider";
 import Todos from "./Todo";
-import WarningTestBox from "../WariningTestBox";
+import WarningTestBox from "../WarningTestBox";
 import TestModal from "./Test/TestModal";
 import PeopleCard from "../home/PeopleCard";
 import ActivityAnalysisCard from "../home/ActivityAnalysisCard";
@@ -52,6 +52,14 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
       top: -(contentHeight - viewHeight + headerHeight),
       bottom: 0,
     };
+  };
+
+  const titles = {
+    emotionOfDay: "감정으로 보는 오늘 하루",
+    eventReport: "오늘의 사건 리포트",
+    emotionTimeline: "최근 감정 타임라인",
+    recoveryRoutine: "나만의 감정 회복 루틴",
+    relationshipChanges: "주변과의 관계 변화",
   };
 
   const activityAnalysis = diaryContent?.analysis?.activity_analysis ?? [];
@@ -206,72 +214,55 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
   // Pass activityAnalysis to ActivityAnalysisCard
   return (
     <div className="px-4">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-3 p-1">{titles.emotionOfDay}</h2>
       <ActivityAnalysisCard data={activityAnalysis} />
-      {/* <BrainEmotionMap activityAnalysis={activityAnalysis} /> */}
-      {peopleWithChanges.length > 0 && (
-        <>
-          <RelationshipChangeCard people={peopleWithChanges} />
-        </>
-      )}
-      {hasValidProblems && (
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mt-[30px] mb-[20px] px-4">
-            오늘의 사건 리포트
-          </h2>
 
-          <ConflictAnalysisCard conflicts={allProblems} />
+      {peopleWithChanges.length > 0 && (
+        <div className={activityAnalysis.length === 1 ? "mt-2" : "mt-16"}>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-3 p-1">{titles.relationshipChanges}</h2>
+          <RelationshipChangeCard people={peopleWithChanges} />
         </div>
       )}
 
+      {hasValidProblems && (
+        <>
+          <h2 className="text-2xl font-semibold text-gray-800 mt-8 mb-3 p-1">{titles.eventReport}</h2>
+          <ConflictAnalysisCard conflicts={allProblems} />
+        </>
+      )}
+
+      <h2 className="text-2xl font-semibold text-gray-800 mt-8 mb-3 p-1">{titles.emotionTimeline}</h2>
       <IntensityChart scores={beforeDiaryScores} diaryId={diaryId} />
+
+      {(reflectionTodos.length > 0 || warningType || (recommendRoutines && recommendRoutines.content) || negativeEmotionType) && (
+        <h2 className="text-2xl font-semibold text-gray-800 mt-8 mb-3 p-1">{titles.recoveryRoutine}</h2>
+      )}
+
       {recommendRoutines && recommendRoutines.content && (
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mt-[60px] mb-[20px] px-4">
-            나만의 감정 회복 루틴
-          </h2>
           <div className="px-4">
             <RoutineRecommendCard routines={[recommendRoutines]} />
           </div>
         </div>
       )}
+
       {warningType && <WarningTestBox type={warningType} onClick={handleWarningClick} />}
+
       {negativeEmotionType && (
-        <>
-          {/* 디버깅용 콘솔 로그 */}
-          {console.log("negativeEmotionType:", negativeEmotionType)}
-          <NegativeEmotionCard emotionType={negativeEmotionType} />
-        </>
+        <NegativeEmotionCard emotionType={negativeEmotionType} />
       )}
+
       {reflectionTodos.length > 0 && (
-        <div className=" mb-6">
-          {/* <h2 className="text-xl font-semibold text-gray-800 mt-[60px] mb-[20px]  px-4">
-            오늘의 작은 실천
-          </h2> */}
+        <div className="mb-6">
           <TodoPreviewCard todos={reflectionTodos} writtenDate={diaryContent?.writtenDate} />
         </div>
       )}
-      {/* <motion.div
-        ref={contentRef}
-        drag="y"
-        dragConstraints={calculateConstraints()}
-        dragElastic={0.1}
-        onDrag={handleDrag}
-        className="cursor-grab z-10 active:cursor-grabbing"
-        style={{
-          y: scrollY,
-          borderRadius: scrollY < -100 ? "0px" : "24px 24px 0 0",
-          minHeight: "100vh",
-        }}
-      >
-        {/* <ActivityCardSlider data={activityAnalysis} /> */}
-      {/* <Todos todos={todos} /> */}
-      {/* </motion.div> */}
 
       {testType && (
         <TestModal
           type={convertWarningToTestType(testType)}
           onClose={() => setTestType(null)}
-          onFinish={score => {
+          onFinish={(score) => {
             console.log("🎯 테스트 완료! 점수:", score);
             console.log("📝 테스트 타입:", testType);
             setTestType(null);

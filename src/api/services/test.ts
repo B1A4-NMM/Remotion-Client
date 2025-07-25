@@ -36,8 +36,6 @@ export const postDepressionTestComplete = async () => {
 // 통합 테스트 완료 알림 함수
 export const postTestComplete = async (testType: "stress" | "anxiety" | "depression") => {
   try {
-    console.log("🔍 postTestComplete 호출됨");
-    console.log("📤 전송할 테스트 타입:", testType);
 
     let endpoint = "";
     switch (testType) {
@@ -54,10 +52,8 @@ export const postTestComplete = async (testType: "stress" | "anxiety" | "depress
         throw new Error("유효하지 않은 테스트 타입입니다.");
     }
 
-    console.log("🌐 API 엔드포인트:", endpoint);
 
     const response = await api.post(endpoint);
-    console.log("📥 서버 응답:", response.data);
 
     return response.data;
   } catch (error) {

@@ -120,12 +120,12 @@ export default function Login() {
             <span>🌊 이순신 장군의 난중일기</span>
           </Button>
 
-          <Button
+          {/* <Button
             onClick={() => handleDemo("demo")}
             className="h-[48px] bg-white text-black hover:bg-[#FFD47A] hover:text-white rounded-full justify-center items-center gap-3 px-4 py-2"
           >
             <span>B1A4 아이들아 테스트는 여기서 하렴</span>
-          </Button>
+          </Button> */}
         </div>
       </BottomPopup>
     </div>

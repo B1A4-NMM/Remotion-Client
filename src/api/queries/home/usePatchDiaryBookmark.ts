@@ -8,12 +8,9 @@ export const usePatchDiaryBookmark = () => {
 
   return useMutation({
     mutationFn: ({ diaryId }: { diaryId: number }) => {
-      console.log("🔍 usePatchDiaryBookmark mutationFn 호출:");
-      console.log("  - diaryId:", diaryId);
       return patchDiaryBookmark(diaryId);
     },
     onSuccess: data => {
-      console.log("🔍 북마크 변경 성공:", data);
       queryClient.invalidateQueries({ queryKey: ["diaries"] });
       toast.success("북마크 상태가 변경되었습니다.", {
         duration: 2000,

@@ -56,7 +56,7 @@ const Loading6: React.FC<Loading6Props> = ({ onComplete }) => {
         }
         return prev; // 모든 문구가 표시된 후에는 그대로 유지
       });
-    }, 2500); // 1.5초마다 다음 문구 추가
+    }, 1300); // 1.5초마다 다음 문구 추가
 
     return () => clearInterval(phraseTimer);
   }, []); // 의존성 배열을 비워서 무한 루프 방지
@@ -126,33 +126,45 @@ const Loading6: React.FC<Loading6Props> = ({ onComplete }) => {
                 return (
                   <motion.g
                     key={i}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{
                       opacity: 1,
                       y: 0,
                       scale: 1,
-                      filter: "drop-shadow(0 0 0px rgba(0,0,0,0))",
                     }}
                     transition={{
-                      duration: 0.6,
-                      ease: "easeOut",
-                      delay: i * 0.1,
-                      type: "spring", // 모바일에서 더 부드러운 애니메이션
-                      stiffness: 100,
-                      damping: 15,
+                      duration: 0.8,
+                      ease: [0.25, 0.46, 0.45, 0.94], // iOS 호환성 좋은 이징
+                      delay: i * 0.2,
+                      type: "tween", // spring 대신 tween 사용
+                    }}
+                    style={{
+                      willChange: "transform, opacity", // iOS 성능 최적화
+                      WebkitTransform: "translateZ(0)", // 하드웨어 가속
+                      transform: "translateZ(0)",
                     }}
                   >
                     {/* 줄바꿈이 가능한 텍스트 */}
-                    <foreignObject x="50" y={y - 10} width="600" height="40">
-                      <div
+                    <foreignObject x="50" y={y - 15} width="600" height="50">
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          duration: 0.5,
+                          ease: [0.25, 0.46, 0.45, 0.94],
+                          delay: 0.2 + i * 0.2,
+                        }}
                         style={{
                           fontSize: "16px",
                           fontFamily: "Arial",
                           color: isDark ? "#ffffff" : "#000000",
                           lineHeight: "1.3",
                           wordWrap: "break-word",
-                          overflow: "hidden",
+                          overflow: "visible",
                           position: "relative",
+                          willChange: "transform, opacity",
+                          WebkitTransform: "translateZ(0)",
+                          transform: "translateZ(0)",
                         }}
                       >
                         {phrase.split(/(빨강|파랑|초록|노랑)/).map((part, partIndex) => {
@@ -219,7 +231,7 @@ const Loading6: React.FC<Loading6Props> = ({ onComplete }) => {
                           }
                           return <span key={partIndex}>{part}</span>;
                         })}
-                      </div>
+                      </motion.div>
                     </foreignObject>
 
                     <g transform={`translate(10 ${y - 15}) scale(.8)`}>
@@ -276,11 +288,11 @@ const Loading6: React.FC<Loading6Props> = ({ onComplete }) => {
                           checksRef.current[i].check = el;
                         }}
                         points="21.661,7.643 13.396,19.328 9.429,15.361 7.075,17.714 13.745,24.384 24.345,9.708"
-                        fill="white"
+                        fill={isDark ? "white" : "black"}
                         initial={{ opacity: 0 }}
                         animate={{
                           opacity: 1,
-                          fill: "white",
+                          fill: isDark ? "white" : "black",
                         }}
                         transition={{
                           duration: 0.3,

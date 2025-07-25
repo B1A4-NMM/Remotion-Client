@@ -14,7 +14,6 @@
 //     },
 
 //     onSuccess: (data, variables, context) => {
-//       console.log("루틴 추가 성공:", data);
 
 //       // 외부에서 전달된 onSuccess 실행 (예: refetch)
 //       try {

@@ -8,7 +8,6 @@ interface SearchBarProps {
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onSearch }) => {
-  console.log("🔍 SearchBar value prop:", value);
   return (
     <div
       className="bg-white rounded-bl-2xl rounded-br-2xl shadow-xl p-4 animate-slide-down-fade w-full mb-4"

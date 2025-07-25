@@ -48,7 +48,6 @@ export const getNegativeActData = async (period: string | number) => {
       period,
     },
   });
-  console.log("getNegativeActData", response.data);
   return response.data;
 };
 

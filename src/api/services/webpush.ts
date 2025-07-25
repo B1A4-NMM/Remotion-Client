@@ -14,7 +14,6 @@ export interface TestNotificationRequest {
 
 // 서버 API만 담당
 export const subscribeToWebpush = async (subscription: PushSubscription) => {
-  console.log("구독");
   return api.post("/webpush/subscribe", subscription);
 };
 

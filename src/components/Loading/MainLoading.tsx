@@ -15,7 +15,7 @@ const MainLoading = () => {
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setShouldMoveBlob(true);
-    }, 2000);
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, []);

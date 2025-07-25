@@ -106,7 +106,6 @@ const Routine = () => {
 
   const handleFolderClick = async (emotionTitle: string) => {
     const emotionKey = emotionTitle as RoutineItem["routineType"];
-    console.log("🔥 폴더 클릭됨", emotionKey);
 
     // 초기화
     setIsPopupOpen(false);
@@ -205,10 +204,6 @@ const Routine = () => {
           content: r.content || (r as any).content,
           onAdd: () => handleAddRoutine(r.content || (r as any).content),
         }));
-
-        // console.log("🔍 전체 루틴:", triggeredRoutines);
-        // console.log("🔍 선택된 필터:", selectedFilter);
-        // console.log("🔍 필터링된 루틴:", filteredRoutines);
 
         return displayRoutines.length === 0 ? (
           <div className="flex items-center justify-center px-7 min-h-[230px]">

@@ -62,7 +62,7 @@ export function highlightTargets(
     const underlineColor = getUnderlineColor(highestIntensityColor);
 
     return (
-      <span key={index} className={`inline-block mr-1 mb-1 font-semibold ${underlineColor}`}>
+      <span key={index} className={`inline-block mr-1 mb-1 font-bold ${underlineColor}`}>
         {target.name}
         {index < targets.length - 1 && ", "}
       </span>

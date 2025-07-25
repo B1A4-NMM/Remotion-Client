@@ -34,11 +34,6 @@ const DiaryActionModal: React.FC<DiaryActionModalProps> = ({
   const { mutate: patchBookmark } = usePatchDiaryBookmark();
 
   const handleToggleBookmark = () => {
-    console.log("🔍 handleToggleBookmark 호출:");
-    console.log("  - diaryId:", diaryId);
-    console.log("  - diaryId 타입:", typeof diaryId);
-    console.log("  - isBookmarked:", isBookmarked);
-
     patchBookmark(
       { diaryId },
       {

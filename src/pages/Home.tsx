@@ -130,7 +130,6 @@ const Home = () => {
   //   }
   // }, [homeLoading, diaries]);
 
-  // 데이터 확인용 console.log
 
   const todayDiary = todayData ? todayData : null;
 

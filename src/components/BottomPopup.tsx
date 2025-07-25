@@ -26,7 +26,6 @@ export type BottomPopupHandle = {
 
 const BottomPopup = forwardRef<BottomPopupHandle, BottomPopupProps>(
   ({ isOpen, onClose, children, heightOption }, ref) => {
-    console.log("🔍 BottomPopup 렌더링:", { isOpen, children });
 
     const [isInDOM, setIsInDOM] = useState(false);
     const [showOverlay, setShowOverlay] = useState(false);
@@ -79,25 +78,20 @@ const BottomPopup = forwardRef<BottomPopupHandle, BottomPopupProps>(
     }, []);
 
     useEffect(() => {
-      // console.log("🔄 isOpen 변화 감지:", { isOpen, currentIsInDOM: isInDOM });
 
       if (isOpen) {
-        // console.log("✅ 모달 열기 ");
         setIsInDOM(true);
         setShowOverlay(true);
         setShouldClose(false); // 닫힘 상태 초기화
         document.body.style.overflow = "hidden";
       } else if (isInDOM && !shouldClose) {
-        // console.log("❌ 모달 닫기 ");
         closeWithAnimation();
       }
     }, [isOpen, closeWithAnimation, isInDOM, shouldClose]);
 
     useEffect(() => {
-      // console.log("🎭 애니메이션 제어:" );
       if (isInDOM) {
         const dynamicHeight = getDynamicHeight();
-        // console.log(`🎭 애니메이션 시작: ${dynamicHeight}px로 확장`);
         setCurrentHeight(`${dynamicHeight}px`);
       }
     }, [isInDOM, children]); // children 변경 시 높이 재계산
@@ -130,8 +124,6 @@ const BottomPopup = forwardRef<BottomPopupHandle, BottomPopupProps>(
       }
     }, [isOpen, isInDOM]);
 
-    console.log("🔍 BottomPopup DOM 렌더링:", { isInDOM, showOverlay, currentHeight });
-    console.log("🔍 BottomPopup children 렌더링:", children);
 
     return isInDOM ? (
       <>

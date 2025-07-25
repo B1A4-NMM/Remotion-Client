@@ -63,19 +63,6 @@ const Analysis = () => {
   );
   const { data: characterData, isLoading: isCharacterLoading } = useGetCharacter();
 
-  // 데이터 디버깅 로그
-  console.log("🔍 Analysis 데이터 디버깅:");
-  console.log("  - selectedPeriod:", selectedPeriod);
-  console.log("  - period days:", getPeriodConfig(selectedPeriod).days);
-  console.log("  - negativeData:", negativeData);
-  console.log("  - positiveData:", positiveData);
-  console.log("  - strengthData:", strengthData);
-  console.log("  - characterData:", characterData);
-  console.log("  - isNegativeLoading:", isNegativeLoading);
-  console.log("  - isPositiveLoading:", isPositiveLoading);
-  console.log("  - isStrengthLoading:", isStrengthLoading);
-  console.log("  - isCharacterLoading:", isCharacterLoading);
-
   // 데이터 존재 여부 확인
   const hasNegativeData =
     negativeData &&
@@ -102,14 +89,6 @@ const Analysis = () => {
   const hasNoData = !hasNegativeData && !hasPositiveData && !hasStrengthData && !hasCharacterData;
   const isDataLoading =
     isNegativeLoading || isPositiveLoading || isStrengthLoading || isCharacterLoading;
-
-  console.log("🔍 데이터 존재 여부:");
-  console.log("  - hasNegativeData:", hasNegativeData);
-  console.log("  - hasPositiveData:", hasPositiveData);
-  console.log("  - hasStrengthData:", hasStrengthData);
-  console.log("  - hasCharacterData:", hasCharacterData);
-  console.log("  - hasNoData:", hasNoData);
-  console.log("  - isDataLoading:", isDataLoading);
 
   // 로딩 상태 시뮬레이션 (실제로는 API 호출 상태에 따라 결정)
   useEffect(() => {

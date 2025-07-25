@@ -44,7 +44,6 @@ api.interceptors.request.use(
     if (token) {
       // 토큰이 곧 만료될 예정이면 로그아웃
       if (isTokenExpiringSoon(token)) {
-        console.log("🔍 토큰이 곧 만료될 예정 - 로그아웃");
         localStorage.removeItem("accessToken");
         if (logoutModalStore && typeof logoutModalStore.openModal === "function") {
           logoutModalStore.openModal();
@@ -74,7 +73,6 @@ api.interceptors.response.use(
     });
 
     if (error.response?.status === 401) {
-      console.log("🔍 401 에러 감지 - 로그아웃 처리 시작");
       // 토큰 만료 또는 무효
       localStorage.removeItem("accessToken");
 

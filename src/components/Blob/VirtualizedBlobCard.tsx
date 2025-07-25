@@ -12,7 +12,6 @@ interface VirtualizedBlobCardProps {
 }
 
 const VirtualizedBlobCard: React.FC<VirtualizedBlobCardProps> = ({ diaryContent, index }) => {
-  console.log(diaryContent);
   const processedEmotions = useMemo(() => 
     getBlobEmotionsFromSimpleEmotions(diaryContent), 
     [diaryContent]

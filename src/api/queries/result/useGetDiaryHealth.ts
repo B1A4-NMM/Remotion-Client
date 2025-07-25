@@ -8,14 +8,10 @@ import { getDayDate } from "./../../services/getDayDate"; // 경로는 실제 �
  * @param period 조회할 기간(일)
  */
 export const useGetDiaryHealth = (id: string, period: number) => {
-  console.log("🌀 useGetDiaryHealth 호출됨");
-  console.log("📌 id:", id);
-  console.log("📅 period:", period);
 
   return useQuery({
     queryKey: ["mentalData", id, period],
     queryFn: () => {
-      console.log("🚀 queryFn 실행됨");
       return getDayDate(id, period);
     },
     enabled: !!id && !!period, // id와 period가 존재할 때만 실행

@@ -64,7 +64,6 @@ const EmotionCard = () => {
 
   const { data: EmotionAnalysis } = useGetEmotionAnalysis();
 
-  // console.log("EmotionAnalysis", EmotionAnalysis);
 
   if (isLoading) return <div>로딩 중...</div>;
   if (isError) return <div>캐릭터 정보를 불러오는 데 실패했습니다.</div>;

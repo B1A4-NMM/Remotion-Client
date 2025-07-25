@@ -29,7 +29,6 @@ interface TestResultProps {
 const TestResult = ({ type, score }: TestResultProps) => {
   const levels = LEVEL_MAP[type];
   const matched = levels.find(level => score <= level.max) ?? levels[levels.length - 1];
-  console.log("TESTRESULT");
 
   return (
     <div className="pt-6 max-w-xl mx-auto">

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
+import { useTheme } from "@/components/theme-provider";
 
 type RadarChartProps = {
   lastTypeCount: Record<string, number>; // 저번 달 데이터
@@ -24,10 +25,10 @@ const RadarChart = ({ lastTypeCount, currentTypeCount, onSelectCategory }: Radar
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  // 다크 모드 감지 - 실제 테마 확인
+  const { theme } = useTheme();
   const isDark =
-    document.documentElement.classList.contains("dark") ||
-    window.matchMedia("(prefers-color-scheme: dark)").matches;
+    theme === "dark" ||
+    (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   const numAxes = LABELS.length;
   const maxValue = 5;
@@ -183,30 +184,14 @@ const RadarChart = ({ lastTypeCount, currentTypeCount, onSelectCategory }: Radar
           onSelectCategory?.(label);
         });
 
-      const text = group
+      // ✅ const text 변수 제거하고 직접 체이닝으로 처리
+      group
         .append("text")
         .text(label)
         .attr("text-anchor", "middle")
         .attr("dy", "0.35em")
         .style("font-size", "14px")
         .attr("fill", isDark ? "#ffffff" : "#333333");
-
-      // const bbox = text.node()?.getBBox();
-      // if (!bbox) return;
-
-      // // 그림자가 있는 흰색 버튼
-      // group
-      //   .insert("rect", "text")
-      //   .attr("x", bbox.x - 8)
-      //   .attr("y", bbox.y - 4)
-      //   .attr("rx", 8)
-      //   .attr("ry", 8)
-      //   .attr("width", bbox.width + 16)
-      //   .attr("height", bbox.height + 8)
-      //   .attr("fill", "#ffffff")
-      //   .attr("stroke", "#e0e0e0")
-      //   .attr("stroke-width", 1)
-      //   .style("filter", "url(#drop-shadow)");
     });
 
     // 데이터 포인트 계산 함수
@@ -315,7 +300,7 @@ const RadarChart = ({ lastTypeCount, currentTypeCount, onSelectCategory }: Radar
       });
     }
 
-    // 📝 데이터 없음 메시지 (선택사항)
+    // 📝 데이터 없음 메시지 (다크 모드 대응)
     if (!hasLastData && !hasCurrentData) {
       svg
         .append("text")
@@ -324,10 +309,10 @@ const RadarChart = ({ lastTypeCount, currentTypeCount, onSelectCategory }: Radar
         .attr("text-anchor", "middle")
         .attr("dominant-baseline", "middle")
         .style("font-size", "16px")
-        .style("fill", "#9b9b9b")
+        .style("fill", isDark ? "#ffffff" : "#333333") // ✅ 다크 모드 대응
         .text("데이터가 없습니다");
     }
-  }, [lastTypeCount, currentTypeCount, hasLastData, hasCurrentData]);
+  }, [lastTypeCount, currentTypeCount, hasLastData, hasCurrentData, isDark]); // ✅ isDark 의존성 추가
 
   return (
     <div className="w-full flex flex-col items-center">
@@ -338,14 +323,26 @@ const RadarChart = ({ lastTypeCount, currentTypeCount, onSelectCategory }: Radar
             className="inline-block w-4 h-4 rounded-full"
             style={{ background: CURRENT_COLOR }}
           ></span>
-          <span className="text-sm font-medium text-gray-800">이번 달</span>
+          {/* ✅ 범례 텍스트도 다크 모드 대응 */}
+          <span 
+            className="text-sm font-medium" 
+            style={{ color: isDark ? "#ffffff" : "#333333" }}
+          >
+            이번 달
+          </span>
         </div>
         <div className="flex items-center gap-1">
           <span
             className="inline-block w-4 h-4 rounded-full"
             style={{ background: LAST_COLOR }}
           ></span>
-          <span className="text-sm font-medium text-gray-800">저번 달</span>
+          {/* ✅ 범례 텍스트도 다크 모드 대응 */}
+          <span 
+            className="text-sm font-medium" 
+            style={{ color: isDark ? "#ffffff" : "#333333" }}
+          >
+            저번 달
+          </span>
         </div>
       </div>
     </div>

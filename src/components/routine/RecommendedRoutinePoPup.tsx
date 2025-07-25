@@ -19,7 +19,6 @@ export default function RecommendedRoutinePopup({
   onAdd,
   onClose,
 }: RecommendedRoutinePopupProps) {
-  console.log("🔍 RecommendedRoutinePopup 렌더링됨:", { emotion, onAdd, onClose });
 
   //const { close } = useBottomPopupStore();
   const queryClient = useQueryClient();
@@ -27,8 +26,6 @@ export default function RecommendedRoutinePopup({
   const { mutate: postRoutine } = usePostRoutineByType();
 
   const handleClick = (content: string) => {
-    console.log("🔍 RecommendedRoutinePopup 클릭됨:", content);
-    console.log("🔍 onClose 함수:", onClose);
     // 루틴 추가 후 모달 닫기
     onAdd(content);
     onClose();
@@ -65,8 +62,6 @@ export default function RecommendedRoutinePopup({
               onClick={e => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log("🔍 RecommendedRoutinePopup 클릭됨:", content);
-                console.log("🔍 onClose 함수:", onClose);
                 handleClick(content);
               }}
               onMouseDown={e => {

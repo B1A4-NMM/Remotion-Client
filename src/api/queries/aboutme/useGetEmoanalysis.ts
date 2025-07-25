@@ -6,7 +6,6 @@ export const useGetEmotionAnalysis = () => {
   return useQuery({
     queryKey: ["EmotionAnalysis"],
     queryFn: () => {
-      console.log("useGetEmotionAnalysis - queryFn 실행");
       return getEmotionAnalysis();
     },
     staleTime: 1000 * 60 * 5,

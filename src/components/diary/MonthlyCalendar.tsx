@@ -76,7 +76,6 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
 
   const handleDateClick = (date: dayjs.Dayjs) => {
     const formattedDate = date.format("YYYY-MM-DD");
-    console.log("🔍 MonthlyCalendar handleDateClick 호출됨:", formattedDate);
     onDateSelect(formattedDate);
     if (!disableOverlay) {
       onClose?.();

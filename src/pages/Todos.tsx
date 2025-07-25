@@ -20,7 +20,6 @@ export default function TodosPage() {
   useEffect(() => {
     if (urlDate) {
       const parsed = parseDateStringToDate(urlDate); // 날짜 형식 파싱 함수 필요
-      console.log("url에서 파싱한 날짜:", parsed);
       setSelectedDate(parsed);
     }
   }, [urlDate]);

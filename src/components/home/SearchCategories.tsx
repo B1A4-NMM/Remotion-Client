@@ -44,8 +44,6 @@ const SearchCategories: React.FC<SearchCategoriesProps> = ({
   };
 
   const handleDateSelect = (date: string) => {
-    console.log("🔍 SearchCategories handleDateSelect 호출됨:", date);
-    console.log("🔍 onDateSelect prop 존재 여부:", !!onDateSelect);
     setSelectedDate(date);
     setIsCalendarOpen(false);
     onDateSelect?.(date);
@@ -82,11 +80,6 @@ const SearchCategories: React.FC<SearchCategoriesProps> = ({
         isOpen={isCalendarOpen}
         overlayTopClass="top-60"
       />
-      {console.log("🔍 MonthlyCalendar props:", {
-        selectedDate,
-        isCalendarOpen,
-        onDateSelect: typeof handleDateSelect,
-      })}
     </>
   );
 };

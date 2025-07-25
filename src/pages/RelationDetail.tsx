@@ -73,7 +73,6 @@ const RelationDetail = () => {
 
     // 감정별 count, 평균 intensity
     const emotionCounts: Record<string, { count: number; totalIntensity: number }> = {};
-    console.log(allEmotions);
     allEmotions.forEach((e: any) => {
       if (e.emotion && e.emotion !== "무난") {
         // '무난' 감정은 제외
@@ -146,8 +145,6 @@ const RelationDetail = () => {
 
   const analysis = analyzeRelation(data);
   if (!analysis) return null;
-
-  console.log(analysis);
 
   // activityEmotionUtils를 사용하여 Blob 감정 색상 계산
   const blobEmotions = getBlobEmotionsFromSimpleEmotions({ emotions: data.emotions });

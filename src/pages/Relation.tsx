@@ -58,10 +58,6 @@ const Relation = () => {
   const { data: relationData, isLoading } = useGetRelation();
   const navigate = useNavigate();
 
-  // relationData 변경 시 로그
-  useEffect(() => {
-    console.log("🔍 relationData 변경됨:", relationData);
-  }, [relationData]);
 
   // 감정 처리 함수 - activityEmotionUtils 사용
   const processRelationEmotions = (data: RelationNodeData): Emotion[] => {
@@ -187,7 +183,6 @@ const Relation = () => {
       const distance = baseDistance + affectionBonus;
     
       const baseRadius = 10;
-      console.log(relation.name+"'s COUNT!!!!: "+relation.count);
       
       // relationCount의 영향력을 높임: 15 → 30으로 증가
       const countRadius = (relation.count / 10) * 20;

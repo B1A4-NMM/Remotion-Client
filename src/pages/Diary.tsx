@@ -227,12 +227,9 @@ const Diary = () => {
       }
     });
 
-    console.log("📤 전송할 FormData 내용:");
     formData.forEach((value, key) => {
       if (key === "photos" && value instanceof File) {
-        console.log(`📎 ${key}:`, value.name, `(size: ${value.size} bytes)`);
       } else {
-        console.log(`📝 ${key}:`, value);
       }
     });
 

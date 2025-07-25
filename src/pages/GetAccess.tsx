@@ -11,7 +11,6 @@ export default function GetAccess() {
 
     if (token) {
       localStorage.setItem("accessToken", token);
-      console.log("토큰 저장됨:", token);
       navigate("/");
     } else {
       console.error("토큰 없음");

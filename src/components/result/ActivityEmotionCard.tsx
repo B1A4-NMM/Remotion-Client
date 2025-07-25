@@ -72,8 +72,8 @@ const ActivityEmotionCard: React.FC<ActivityEmotionCardProps> = ({ activityAnaly
   }
 
   return (
-    <div className="mb-6">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4 px-4">활동별 감정 분석</h2>
+    <div>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-3 p-1">활동별 감정 분석</h2>
 
       <div className="space-y-4">
         {activityAnalysis.map((activity, index) => (

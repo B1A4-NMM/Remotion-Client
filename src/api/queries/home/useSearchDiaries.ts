@@ -6,6 +6,6 @@ export const useSearchDiaries = (q: string, enabled: boolean) => {
     queryKey: ["searchDiaries", q],
     queryFn: () => searchDiaries(q),
     enabled: enabled && !!q,
-    staleTime: 0,
+    staleTime: 30 * 60 * 1000, // 5분
   });
 };

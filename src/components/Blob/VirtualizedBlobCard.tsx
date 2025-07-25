@@ -12,6 +12,7 @@ interface VirtualizedBlobCardProps {
 }
 
 const VirtualizedBlobCard: React.FC<VirtualizedBlobCardProps> = ({ diaryContent, index }) => {
+  console.log(diaryContent);
   const processedEmotions = useMemo(() => 
     getBlobEmotionsFromSimpleEmotions(diaryContent), 
     [diaryContent]
@@ -55,7 +56,16 @@ const VirtualizedBlobCard: React.FC<VirtualizedBlobCardProps> = ({ diaryContent,
       >
         {isActive ? (
           <Canvas
-            camera={{position:[0,0,4]}}>
+            camera={{ position: [0, 0, 10], fov: 30 }}
+            gl={{
+              antialias: true,
+              alpha: true,
+              powerPreference: "high-performance",
+              preserveDrawingBuffer: true,
+            }}
+            style={{ background: "transparent" }}
+            dpr={Math.min(window.devicePixelRatio, 2)}
+          >
             <Blob 
               emotions={processedEmotions} 
               id={`blob-${index}`}

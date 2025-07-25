@@ -13,8 +13,8 @@ const FolderCard = ({ title, subtitle, imageSrc, onClick }: FolderCardProps) => 
 
       {/* 텍스트 */}
       <div className="absolute top-[40px] left-[20px] text-black">
-        <div className="text-[14px] font-medium leading-tight">{title}</div>
-        <div className="text-[12px] font-light leading-snug mt-[6px] text-white whitespace-pre-wrap">
+        <div className="text-[14px] font-bold text-white leading-tight">{title}</div>
+        <div className="text-[12px] font-medium leading-snug mt-[6px] text-white  whitespace-pre-wrap">
           {subtitle}
         </div>
       </div>

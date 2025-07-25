@@ -157,7 +157,7 @@ const PeopleSection = ({ type, data, selectedPeriod }: PeopleSectionProps) => {
               <div
                 key={person.targetId}
                 className="
-                  bg-white border-2 border-gray-200
+                  bg-white border-2 border-gray-700
                   rounded-xl p-4 shadow-lg hover:shadow-xl
                   transition-all duration-300 hover:scale-105
                   transform cursor-pointer

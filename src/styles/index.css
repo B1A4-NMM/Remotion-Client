@@ -67,9 +67,6 @@
     background: rgba(255, 255, 255, 0.15) !important;
     color: #fff !important;
     backdrop-filter: blur(16px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.25);
-    border-radius: 20px;
   }
   /* 텍스트 색상 일괄 조정 */
   .dark .text-black,

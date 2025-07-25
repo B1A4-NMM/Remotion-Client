@@ -13,6 +13,7 @@ import { useGetAuthTest } from "@/api/queries/auth/useGetAuthTest";
 import { useNegativeData, usePositiveData } from "@/api/queries/aboutme/useMentalData";
 import { useGetStrengthPeriod } from "@/api/queries/aboutme/useGetStrength";
 import Index from "@/components/home/Index";
+import { useUserStore } from "@/store/userStore";
 
 type PeriodType = "daily" | "weekly" | "monthly";
 
@@ -26,12 +27,15 @@ const Analysis = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>("daily");
   const [helpOpen, setHelpOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { user, logout } = useUserStore();
+
   const helpRef = useRef<HTMLDivElement>(null);
+  
   const navigate = useNavigate();
 
   const authData = useGetAuthTest();
   const apiUser = authData?.user;
-  const nickname = apiUser?.nickname || "하루뒤";
+  const nickname = apiUser?.nickname || user?.name ||"하루뒤";
 
   const periodConfigs: Record<PeriodType, PeriodConfig> = {
     daily: { days: 7, barCount: 7, label: "일간 (7일)" },

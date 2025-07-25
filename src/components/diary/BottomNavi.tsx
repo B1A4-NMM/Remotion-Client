@@ -4,29 +4,67 @@ interface BottomNaviProps {
   onMicClick: () => void;
   onLocationClick: () => void;
   onImageClick: () => void;
-  onSaveClick: () => void; // 저장 버튼 핸들러 추가
+  onSaveClick: () => void;
   isListening: boolean;
   isPhotoActive: boolean;
   isLocationActive: boolean;
-  isSaveEnabled: boolean; // 저장 버튼 활성화 상태 추가
+  isSaveEnabled: boolean;
 }
 
 const BottomNavi = ({
   onMicClick,
   onLocationClick,
   onImageClick,
-  onSaveClick, // 저장 버튼 핸들러
+  onSaveClick,
   isListening,
   isPhotoActive,
   isLocationActive,
-  isSaveEnabled, // 저장 버튼 활성화 상태
+  isSaveEnabled,
 }: BottomNaviProps) => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const rafRef = useRef<number | null>(null);
 
-  // 부드러운 키보드 높이 업데이트
+  // 동적 기준 높이 관리용
+  const baseHeightRef = useRef<number>(0);
+  const isKeyboardOpenRef = useRef<boolean>(false);
+
+  // 플랫폼 감지
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+  // 키보드 높이 제한 계산
+  const getMaxKeyboardHeight = () => {
+    const screenHeight = window.innerHeight;
+    // 안드로이드: 화면 높이의 25%, iOS: 50%
+    const maxRatio = isAndroid ? 0.25 : 0.5;
+    return Math.floor(screenHeight * maxRatio);
+  };
+
+  // 기준 높이 업데이트
+  const updateBaseHeight = () => {
+    if (!isKeyboardOpenRef.current) {
+      baseHeightRef.current = window.innerHeight;
+    }
+  };
+
+  // 부드러운 키보드 높이 업데이트 (제한 적용)
   const updateKeyboardHeight = (newHeight: number) => {
+    const maxHeight = getMaxKeyboardHeight();
+    const limitedHeight = Math.min(newHeight, maxHeight);
+    
+    // 키보드 상태 추적
+    const wasKeyboardOpen = isKeyboardOpenRef.current;
+    isKeyboardOpenRef.current = limitedHeight > 0;
+    
+    // 키보드가 완전히 내려갔을 때 기준 높이 재설정
+    if (wasKeyboardOpen && !isKeyboardOpenRef.current) {
+      setTimeout(() => {
+        updateBaseHeight();
+      }, 300); // 애니메이션 완료 후
+    }
+
+
     setIsTransitioning(true);
 
     if (rafRef.current) {
@@ -34,30 +72,45 @@ const BottomNavi = ({
     }
 
     rafRef.current = requestAnimationFrame(() => {
-      setKeyboardHeight(newHeight);
+      setKeyboardHeight(limitedHeight);
       setTimeout(() => setIsTransitioning(false), 100);
     });
   };
 
   useEffect(() => {
-    const initialHeight = window.innerHeight;
+    // 초기 기준 높이 설정
+    baseHeightRef.current = window.innerHeight;
     let timeoutId: NodeJS.Timeout;
 
-    // Visual Viewport API를 사용한 키보드 감지 (스무스 처리)
+    // Visual Viewport API를 사용한 키보드 감지 (플랫폼별 처리)
     const handleViewportChange = () => {
       if (window.visualViewport) {
         const viewportHeight = window.visualViewport.height;
         const windowHeight = window.innerHeight;
-        const newKeyboardHeight = Math.max(0, windowHeight - viewportHeight);
+        let newKeyboardHeight = Math.max(0, windowHeight - viewportHeight);
+
+        // 안드로이드에서는 더 보수적으로 계산
+        if (isAndroid) {
+          // 안드로이드에서는 키보드 높이에서 일정 값을 차감
+          newKeyboardHeight = Math.max(0, newKeyboardHeight - 20);
+          
+          // 최소 임계값을 더 높게 설정
+          const threshold = 50;
+          if (newKeyboardHeight < threshold) {
+            newKeyboardHeight = 0;
+          }
+        }
 
         // 최소 임계값 설정 (작은 변화 무시)
-        const threshold = 10;
+        const threshold = isAndroid ? 50 : 10;
         if (Math.abs(newKeyboardHeight - keyboardHeight) > threshold) {
           console.log("🎹 키보드 높이 (Visual Viewport):", {
+            platform: isAndroid ? 'Android' : isIOS ? 'iOS' : 'Other',
             newKeyboardHeight,
             previousHeight: keyboardHeight,
             viewportHeight,
             windowHeight,
+            maxAllowedHeight: getMaxKeyboardHeight(),
             isKeyboardOpen: newKeyboardHeight > 50,
           });
 
@@ -79,31 +132,44 @@ const BottomNavi = ({
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
         const currentHeight = window.innerHeight;
-        const heightDiff = Math.max(0, initialHeight - currentHeight);
+        let heightDiff = Math.max(0, initialHeight - currentHeight);
+
+        // 안드로이드에서는 더 엄격한 기준 적용
+        const minKeyboardHeight = isAndroid ? 200 : 150;
+        
+        if (isAndroid && heightDiff > 0) {
+          // 안드로이드에서는 키보드 높이에서 추가로 차감
+          heightDiff = Math.max(0, heightDiff - 30);
+        }
 
         console.log("🎹 키보드 높이 (Window Resize):", {
+          platform: isAndroid ? 'Android' : isIOS ? 'iOS' : 'Other',
           heightDiff,
           initialHeight,
           currentHeight,
-          isKeyboardOpen: heightDiff > 150,
+          maxAllowedHeight: getMaxKeyboardHeight(),
+          isKeyboardOpen: heightDiff > minKeyboardHeight,
         });
 
-        setKeyboardHeight(heightDiff > 150 ? heightDiff : 0);
-      }, 16); // 50ms → 16ms (60fps에 맞춤)
+        setKeyboardHeight(heightDiff > minKeyboardHeight ? heightDiff : 0);
+      }, 16);
     };
 
-    // Input focus 이벤트로 키보드 감지 (스마트 감지)
+    // Input focus 이벤트로 키보드 감지 (플랫폼별 처리)
     const handleFocusIn = (event: FocusEvent) => {
       const target = event.target as HTMLElement;
       const isTextInput = target.tagName === "INPUT" || target.tagName === "TEXTAREA";
 
       if (isTextInput) {
-        console.log("🎯 텍스트 입력 포커스 됨:", target.tagName);
+        console.log("🎯 텍스트 입력 포커스 됨:", target.tagName, `(${isAndroid ? 'Android' : isIOS ? 'iOS' : 'Other'})`);
         setIsTransitioning(true);
 
-        // 스테이지별 감지 시도
+        // 안드로이드에서는 더 짧은 간격으로 감지 시도
+        const maxAttempts = isAndroid ? 3 : 5;
+        const baseInterval = isAndroid ? 150 : 100;
+
         const attemptDetection = (attempt: number) => {
-          if (attempt > 5) return; // 최대 5번 시도
+          if (attempt > maxAttempts) return;
 
           setTimeout(() => {
             if (window.visualViewport) {
@@ -112,7 +178,7 @@ const BottomNavi = ({
               handleWindowResize();
             }
             attemptDetection(attempt + 1);
-          }, attempt * 100); // 점진적으로 늘어나는 간격
+          }, attempt * baseInterval);
         };
 
         attemptDetection(1);
@@ -125,16 +191,17 @@ const BottomNavi = ({
 
       if (isTextInput) {
         console.log("🎯 텍스트 입력 포커스 해제됨");
+        const delay = isAndroid ? 200 : 150;
         setTimeout(() => {
           updateKeyboardHeight(0);
-        }, 150);
+        }, delay);
       }
     };
 
     // 이벤트 리스너 등록
     if (window.visualViewport) {
-      window.visualViewport.addEventListener("resize", handleViewportChange); // 즉시 처리
-      window.visualViewport.addEventListener("scroll", handleViewportScroll); // 디바운싱 처리
+      window.visualViewport.addEventListener("resize", handleViewportChange);
+      window.visualViewport.addEventListener("scroll", handleViewportScroll);
     }
 
     window.addEventListener("resize", handleWindowResize);
@@ -155,7 +222,8 @@ const BottomNavi = ({
       document.removeEventListener("focusin", handleFocusIn);
       document.removeEventListener("focusout", handleFocusOut);
     };
-  }, []);
+  }, [keyboardHeight, isAndroid, isIOS]);
+
   return (
     <div
       className={`fixed left-1/2 w-full max-w-[414px] h-[84px] z-50 flex justify-center ${
@@ -164,23 +232,25 @@ const BottomNavi = ({
           : "transition-all duration-75 ease-linear"
       }`}
       style={{
-        bottom: `max(${Math.max(0, keyboardHeight)}px, env(keyboard-inset-height, 0px))`, // 키보드 높이에서 50px 빼기
-
-        transform: `translateX(-50%) ${keyboardHeight > 0 ? "translateY(10px)" : ""}`, // -10px → 10px로 변경 (아래로)
-        // 추가 보장: 최소한 화면에 보이도록
+        bottom: `max(${Math.max(0, keyboardHeight)}px, env(keyboard-inset-height, 0px))`,
+        transform: `translateX(-50%) ${keyboardHeight > 0 ? "translateY(10px)" : ""}`,
         position: "fixed",
         zIndex: 9999,
+        // 안전장치: 최소 높이 보장 (화면을 완전히 벗어나지 않도록)
+        minHeight: "84px",
       }}
       data-keyboard-height={keyboardHeight}
+      data-platform={isAndroid ? 'android' : isIOS ? 'ios' : 'other'}
+      data-max-keyboard-height={getMaxKeyboardHeight()}
     >
-      {/* ✅ SVG는 절대 그대로 유지 */}
+      {/* SVG와 버튼들은 기존과 동일 */}
       <svg
         width="178"
         height="72"
         viewBox="0 0 178 72"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="relative z-10" // z-index 명시
+        className="relative z-10"
       >
         <g filter="url(#filter0_d_548_3742)">
           <rect
@@ -244,23 +314,19 @@ const BottomNavi = ({
         </defs>
       </svg>
 
-      {/* ✅ 클릭 영역을 정확한 아이콘 위치에 덧씌우기 */}
       <div className="absolute -top-2 bottom-0 left-0 right-0 flex justify-center items-center pr-20">
-        {/* 마이크 아이콘 버튼 */}
         <button
           className="w-[50px] h-[50px] rounded-full transition-all"
           onClick={onMicClick}
           style={{ zIndex: 30 }}
         />
 
-        {/* 카메라 아이콘 버튼 */}
         <button
           className="w-[50px] h-[50px] rounded-full cursor-pointer flex items-center justify-center transition-all"
           onClick={onImageClick}
           style={{ zIndex: 30 }}
         />
 
-        {/* 위치 아이콘 버튼 */}
         <button
           className="w-[50px] h-[50px] rounded-full transition-all"
           onClick={onLocationClick}
@@ -268,7 +334,6 @@ const BottomNavi = ({
         />
       </div>
 
-      {/* 저장 버튼 - 조건부 스타일 적용 */}
       <button
         className={`flex items-center justify-center w-fit text-lg rounded-full px-5 mt-2 mb-6 transition-all duration-300 font-medium ${
           isSaveEnabled
@@ -281,7 +346,6 @@ const BottomNavi = ({
       >
         저장
       </button>
-
     </div>
   );
 };

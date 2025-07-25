@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import BookmarkIcon from "../../assets/img/Bookmark.svg";
 import FilterIcon from "../../assets/img/Filter.svg";
 import DiaryActionModal from "./DiaryActionModal";
@@ -31,6 +31,17 @@ interface DiaryCardsProps {
 const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastItemRef }) => {
   const [openId, setOpenId] = useState<number | null>(null);
   const navigate = useNavigate();
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  
+  // 윈도우 크기 변화 감지
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // 화면 크기에 따른 레이아웃 모드 결정
+  const isCompactMode = windowWidth < 360;
 
   // 고정 높이 상수
   const CARD_CONTENT_HEIGHT = 170;
@@ -146,13 +157,13 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
 
   // 공통 컴포넌트들
   const renderBlobSection = (diary: Diary, index: number) => (
-    <div className="h-full w-full min-w-[170px] max-w-[170px] rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center p-2 overflow-hidden">
-      <div className="text-base text-[#85848F] font-medium text-center mb-2">
+    <div className={`h-full w-full rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center p-2 overflow-hidden ${isCompactMode ? 'min-w-0' : 'min-w-[170px] max-w-[170px]'}`}>
+      <div className={`${isCompactMode ? 'text-sm' : 'text-base'} text-[#85848F] font-medium text-center mb-2`}>
         {diary.emotions && diary.emotions.length > 0
           ? `${diary.emotions
-              .slice(0, 2)
+              .slice(0, isCompactMode ? 1 : 2)
               .map(e => e.emotion)
-              .join(", ")}${diary.emotions.length > 2 ? " 등" : ""}`
+              .join(", ")}${diary.emotions.length > (isCompactMode ? 1 : 2) ? " 등" : ""}`
           : "감정 없음"}
       </div>
       <div className="w-full h-full flex items-center justify-center rounded-full overflow-hidden mx-auto">
@@ -162,9 +173,9 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
           index={index}
         />
       </div>
-      <div className="text-base text-[#85848F] text-center mt-2">
+      <div className={`${isCompactMode ? 'text-sm' : 'text-base'} text-[#85848F] text-center mt-2`}>
         {diary.targets && diary.targets.length > 0
-          ? `${diary.targets.slice(0, 2).join(", ")}${diary.targets.length > 2 ? " 등" : ""}`
+          ? `${diary.targets.slice(0, isCompactMode ? 1 : 2).join(", ")}${diary.targets.length > (isCompactMode ? 1 : 2) ? " 등" : ""}`
           : "나 혼자"}
       </div>
     </div>
@@ -453,33 +464,65 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
-              <div 
-                className="flex gap-2 rounded-lg mb-4" 
-                style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
-              >
-                <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
-                <div className="grid grid-rows-2 gap-2 h-full">
-                  <div className="h-full">
+              {isCompactMode ? (
+                // 좁은 화면에서의 레이아웃 - 스택 형태로 변경
+                <div style={{ height: 'auto' }} className="flex flex-col gap-2 rounded-lg mb-4">
+                  <div className="w-full h-[100px]">{renderBlobSection(mappedDiary, index)}</div>
+                  <div className="w-full grid grid-cols-2 gap-2">
+                    <div className="aspect-square w-full">
+                      <LazyImage
+                        src={filteredImages[0]}
+                        alt="diary-photo-0"
+                        className="rounded-lg object-cover w-full h-full"
+                      />
+                    </div>
+                    <div className="aspect-square w-full">
+                      <LazyImage
+                        src={filteredImages[1]}
+                        alt="diary-photo-1"
+                        className="rounded-lg object-cover w-full h-full"
+                      />
+                    </div>
+                  </div>
+                  <div className="w-full h-[100px]">
                     <LazyMap diary={mappedDiary} />
                   </div>
-                  <div className="grid grid-cols-2 gap-2 w-full">
-                    <LazyImage
-                      src={filteredImages[0]}
-                      alt="diary-photo-0"
-                      className="aspect-square rounded-lg object-cover h-full"
-                    />
-                    <LazyImage
-                      src={filteredImages[1]}
-                      alt="diary-photo-1"
-                      className="aspect-square rounded-lg object-cover h-full"
-                    />
+                </div>
+              ) : (
+                // 일반 화면에서의 레이아웃
+                <div 
+                  className="flex gap-2 rounded-lg mb-4" 
+                  style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
+                >
+                  <div className="w-1/2 h-full flex-shrink-0">{renderBlobSection(mappedDiary, index)}</div>
+                  <div className="w-1/2 grid grid-rows-2 gap-2 h-full min-w-0">
+                    <div className="h-full min-h-0">
+                      <LazyMap diary={mappedDiary} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 h-full min-h-0">
+                      <div className="min-w-0 min-h-0">
+                        <LazyImage
+                          src={filteredImages[0]}
+                          alt="diary-photo-0"
+                          className="aspect-square rounded-lg object-cover h-full w-full"
+                        />
+                      </div>
+                      <div className="min-w-0 min-h-0">
+                        <LazyImage
+                          src={filteredImages[1]}
+                          alt="diary-photo-1"
+                          className="aspect-square rounded-lg object-cover h-full w-full"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
               {renderFooter(mappedDiary)}
             </div>
           );
         }
+
 
         // 케이스 7: Blob + 사진3 (사진 3개, 지도 없음)
         if (!hasMap && imageCount === 3) {

@@ -547,90 +547,6 @@ const RelationDetail = () => {
           </div>
         )}
 
-        {/* 최근 추억 */}
-        <div>
-          {analysis.recentDiary && (
-            <>
-              <div className="flex items-center mb-3">
-                <Calendar className="w-6 h-6 text-black mr-3" />
-                <h3 className="text-xl font-bold text-black">최근 함께한 순간</h3>
-              </div>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-                className="bg-white rounded-3xl shadow-xl p-6 cursor-pointer"
-                onClick={() => gotoDiary(analysis.recentDiary.diaryId)}
-              >
-                <div className="rounded-xl ">
-                  <div className="overflow-hidden">
-                    <motion.div
-                      initial={false}
-                      animate={{
-                        height: showFullContent ? "auto" : "9rem",
-                        opacity: 1,
-                      }}
-                      transition={{
-                        height: { duration: 0.4, ease: "easeInOut" },
-                        opacity: { duration: 0.3 },
-                      }}
-                      className="relative"
-                    >
-                      <p className="text-black mb-4">{analysis.recentDiary.content}</p>
-                    </motion.div>
-                  </div>
-
-                  {/* 더보기 버튼 */}
-                  {analysis.recentDiary.content.length > 150 && (
-                    <div className="relative mb-4">
-                      <AnimatePresence>
-                        {!showFullContent && (
-                          <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.3 }}
-                            className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-gray-50 to-transparent pointer-events-none"
-                          ></motion.div>
-                        )}
-                      </AnimatePresence>
-                      <motion.button
-                        onClick={e => {
-                          e.stopPropagation();
-                          setShowFullContent(!showFullContent);
-                        }}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        transition={{ duration: 0.2 }}
-                        className="relative z-10 w-full py-2 px-4 bg-gray-100 rounded-lg text-sm text-gray-700   transition-all duration-200 flex items-center justify-center gap-2"
-                      >
-                        <motion.div
-                          animate={{ rotate: showFullContent ? 180 : 0 }}
-                          transition={{ duration: 0.3, ease: "easeInOut" }}
-                        >
-                          <ChevronDown className="w-4 h-4" />
-                        </motion.div>
-                        <span>{showFullContent ? "접기" : "더보기"}</span>
-                      </motion.button>
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between text-sm ">
-                    <div className="flex items-center">
-                      {formatDate(analysis.recentDiary.writtenDate)}
-                    </div>
-                    {analysis.recentDiary.latitude && analysis.recentDiary.longitude && (
-                      <div className="flex items-center">
-                        <MapPin className="w-4 h-4 mr-2" />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            </>
-          )}
-        </div>
-
         {/* 관계 분석 결론 */}
         <div>
           <div className="flex items-center mb-3">
@@ -727,6 +643,91 @@ const RelationDetail = () => {
             </div>
           </motion.div>
         </div>
+
+        {/* 최근 추억 */}
+        <div>
+          {analysis.recentDiary && (
+            <>
+              <div className="flex items-center mb-3">
+                <Calendar className="w-6 h-6 text-black mr-3" />
+                <h3 className="text-xl font-bold text-black">최근 함께한 순간</h3>
+              </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+                className="bg-white rounded-3xl shadow-xl p-6 cursor-pointer"
+                onClick={() => gotoDiary(analysis.recentDiary.diaryId)}
+              >
+                <div className="rounded-xl ">
+                  <div className="overflow-hidden">
+                    <motion.div
+                      initial={false}
+                      animate={{
+                        height: showFullContent ? "auto" : "9rem",
+                        opacity: 1,
+                      }}
+                      transition={{
+                        height: { duration: 0.4, ease: "easeInOut" },
+                        opacity: { duration: 0.3 },
+                      }}
+                      className="relative"
+                    >
+                      <p className="text-black mb-4">{analysis.recentDiary.content}</p>
+                    </motion.div>
+                  </div>
+
+                  {/* 더보기 버튼 */}
+                  {analysis.recentDiary.content.length > 150 && (
+                    <div className="relative mb-4">
+                      <AnimatePresence>
+                        {!showFullContent && (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-gray-50 to-transparent pointer-events-none"
+                          ></motion.div>
+                        )}
+                      </AnimatePresence>
+                      <motion.button
+                        onClick={e => {
+                          e.stopPropagation();
+                          setShowFullContent(!showFullContent);
+                        }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        transition={{ duration: 0.2 }}
+                        className="relative z-10 w-full py-2 px-4 bg-gray-100 rounded-lg text-sm text-gray-700   transition-all duration-200 flex items-center justify-center gap-2"
+                      >
+                        <motion.div
+                          animate={{ rotate: showFullContent ? 180 : 0 }}
+                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                        </motion.div>
+                        <span>{showFullContent ? "접기" : "더보기"}</span>
+                      </motion.button>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between text-sm ">
+                    <div className="flex items-center">
+                      {formatDate(analysis.recentDiary.writtenDate)}
+                    </div>
+                    {analysis.recentDiary.latitude && analysis.recentDiary.longitude && (
+                      <div className="flex items-center">
+                        <MapPin className="w-4 h-4 mr-2" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </div>
+
       </div>
     </div>
   );

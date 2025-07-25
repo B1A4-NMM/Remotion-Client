@@ -290,13 +290,13 @@ const Relation = () => {
     <div className="w-full h-full flex items-center justify-center overflow-auto relative">
       <div
         ref={containerRef}
-        className="w-full h-full max-w-[95vw] max-h-[95vh] overflow-auto relative"
+        className="w-full h-full max-w-[95vw] max-h-[95vh] overflow-auto relative "
       >
         <motion.div
           drag
           dragMomentum={false}
           dragElastic={0.1}
-          className="relative"
+          className="relative "
           style={{
             width: canvasWidth,
             height: canvasHeight,
@@ -392,9 +392,6 @@ const Relation = () => {
               }}
               dpr={mobileSettings.dpr} // ✅ 최적화된 DPR
             >
-              <ambientLight intensity={0.6} />
-              <pointLight position={[0, 0, 500]} intensity={0.4} />
-
               {/* ✅ 1:1 좌표 매핑 */}
               {nodes.map(node => (
                 <group
@@ -424,12 +421,27 @@ const Relation = () => {
                 top: node.y - node.radius,
                 width: node.radius * 2,
                 height: node.radius * 2,
-                zIndex: node.isMe ? 20 : 10,
                 pointerEvents: "auto",
               }}
               onClick={() => handleNodeClick(node)}
               className="cursor-pointer"
             >
+              {/* 1. bg-gradient - 가장 뒤 (최하위) */}
+              <div 
+                className="blob-container dark:bg-gradient-to-b dark:from-[#f5f6fa] dark:to-[#e0e3ef] rounded-full"
+                style={{
+                  position: "absolute",
+                  left:node.isMe? -2: -10,
+                  top: node.isMe? -2 :-11,
+                  width: node.isMe? node.radius * 2.1 :node.radius * 2.75,
+                  height: node.isMe? node.radius * 2.1 : node.radius * 2.75,
+                  zIndex: 1, // 가장 낮은 z-index
+                }}
+              />
+              
+              {/* 2. Canvas는 별도 위치에서 z-index: 5 정도로 설정 */}
+              
+              {/* 3. 글자 오버레이 - 가장 앞 (최상위) */}
               <div
                 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center font-medium whitespace-nowrap pointer-events-none select-none"
                 style={{
@@ -445,13 +457,14 @@ const Relation = () => {
                   textShadow: isDark
                     ? "1px 1px 2px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.5)"
                     : "1px 1px 2px rgba(255,255,255,0.9), 0 0 4px rgba(255,255,255,0.6)",
-                  zIndex: 10,
+                  zIndex: 10, // 가장 높은 z-index
                 }}
               >
                 {node.name}
               </div>
             </div>
           ))}
+
         </motion.div>
       </div>
     </div>

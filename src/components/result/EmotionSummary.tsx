@@ -3,7 +3,6 @@ import { Canvas } from "@react-three/fiber";
 import Blob from "../Blob/Blob";
 import {
   getBlobEmotionsFromSimpleEmotions,
-  getBlobEmotionsFromActivityAnalysis,
 } from "../../utils/activityEmotionUtils";
 
 interface EmotionSummaryProps {
@@ -13,12 +12,7 @@ interface EmotionSummaryProps {
 const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
   /* ---------- 1. Blob에 줄 emotions 계산 ---------- */
   const processedEmotions = useMemo(() => {
-    // ① diaryContent.emotions 배열이 있으면 간단 계산
-    if (Array.isArray(diaryContent?.emotions) && diaryContent.emotions.length) {
-      return getBlobEmotionsFromSimpleEmotions(diaryContent);
-    }
-    // ② 없으면 activity_analysis 기반 계산
-    return getBlobEmotionsFromActivityAnalysis(diaryContent);
+    return getBlobEmotionsFromSimpleEmotions(diaryContent);
   }, [diaryContent]);
 
   /* ---------- 2. 표시용 텍스트 ---------- */
@@ -61,9 +55,10 @@ const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
     <div className="flex flex-col items-center text-center space-y-[16px] mb-4">
       <p className="text-sm text-gray-500">하루의 감정</p>
 
-      <div className="w-[130px] h-[130px]">
+      {/* <div className="blob-container w-[130px] h-[130px]"> */}
+      <div className="blob-container dark:bg-gradient-to-b dark:from-[#f5f6fa] dark:to-[#e0e3ef] rounded-full w-[150px] h-[150px]">
         <Canvas
-          camera={{ position: [0, 0, 10], fov: 30 }}
+          camera={{ position: [0, 0, 10], fov: 28 }}
           gl={{
             antialias: true,
             alpha: true,
@@ -73,8 +68,6 @@ const EmotionSummary: React.FC<EmotionSummaryProps> = ({ diaryContent }) => {
           style={{ background: "transparent" }}
           dpr={Math.min(window.devicePixelRatio, 2)}
         >
-          <ambientLight intensity={0.6} />
-          <pointLight position={[8, 8, 8]} intensity={0.4} />
           <Blob emotions={processedEmotions} />
         </Canvas>
       </div>

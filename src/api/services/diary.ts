@@ -13,11 +13,13 @@ export const postDiary = async (formData: FormData) => {
   return response.data;
 };
 
-export const patchDiaryBookmark = async (diaryId: number, isBookmarked: boolean) => {
-  const response = await api.patch(`/diary/bookmark/${diaryId}`, {
-    id: diaryId,
-    isBookmarked,
-  });
+export const patchDiaryBookmark = async (diaryId: number) => {
+  console.log("🔍 patchDiaryBookmark 호출:");
+  console.log("  - diaryId:", diaryId);
+  console.log("  - URL:", `/diary/bookmark/${diaryId}`);
+
+  const response = await api.patch(`/diary/bookmark/${diaryId}`);
+  console.log("  - 응답:", response.data);
   return response.data;
 };
 

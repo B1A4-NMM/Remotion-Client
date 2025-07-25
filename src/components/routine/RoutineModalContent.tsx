@@ -75,7 +75,13 @@ const RoutineModalContent = ({
       )}
 
       {/* ✅ 항상 하단에 고정되는 추가 입력창 */}
-      <div className="flex grid grid-cols-4 mt-4 gap-2 pt-2 border-t border-gray-300 dark:border-white/20">
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          handleAdd();
+        }}
+        className="flex grid grid-cols-4 mt-4 gap-2 pt-2 border-t border-gray-300 dark:border-white/20"
+      >
         <input
           type="text"
           value={newRoutine}
@@ -90,7 +96,7 @@ const RoutineModalContent = ({
       backdrop-blur-sm"
         />
         <button
-          onClick={handleAdd}
+          type="submit"
           className="col-span-1 rounded-sm`
       bg-black text-white hover:bg-gray-800
       dark:bg-white/20 dark:hover:bg-white/30
@@ -99,7 +105,7 @@ const RoutineModalContent = ({
         >
           추가
         </button>
-      </div>
+      </form>
     </div>
   );
 };

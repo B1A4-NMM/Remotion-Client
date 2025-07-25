@@ -7,16 +7,23 @@ export const usePatchDiaryBookmark = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ diaryId, isBookmarked }: { diaryId: number; isBookmarked: boolean }) =>
-      patchDiaryBookmark(diaryId, isBookmarked),
-    onSuccess: () => {
+    mutationFn: ({ diaryId }: { diaryId: number }) => {
+      console.log("🔍 usePatchDiaryBookmark mutationFn 호출:");
+      console.log("  - diaryId:", diaryId);
+      return patchDiaryBookmark(diaryId);
+    },
+    onSuccess: data => {
+      console.log("🔍 북마크 변경 성공:", data);
       queryClient.invalidateQueries({ queryKey: ["diaries"] });
       toast.success("북마크 상태가 변경되었습니다.", {
         duration: 2000,
       });
     },
     onError: (error: any) => {
-      console.error("북마크 변경 실패:", error);
+      console.error("🔍 북마크 변경 실패:", error);
+      console.error("  - 에러 타입:", typeof error);
+      console.error("  - 에러 메시지:", error?.message);
+      console.error("  - 에러 응답:", error?.response);
       toast.error("북마크 변경에 실패했습니다.", {
         duration: 2000,
       });

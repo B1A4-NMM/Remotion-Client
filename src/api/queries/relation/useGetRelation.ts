@@ -6,5 +6,10 @@ export const useGetRelation = () => {
   return useQuery({
     queryKey: ["relation"],
     queryFn: getRelation,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 };

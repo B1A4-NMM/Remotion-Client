@@ -80,10 +80,15 @@ const Routine = () => {
 
   const handleDeleteRoutine = async (id: number) => {
     try {
+      // 즉시 UI에서 제거
+      setSelectedRoutines(prev => prev.filter(routine => routine.id !== id));
+
+      // 서버에서 삭제
       await deleteRoutineMutation.mutateAsync(id);
-      await refetchRoutine();
     } catch (err) {
       console.error("루틴 삭제 실패", err);
+      // 실패 시 UI 복원
+      await refetchRoutine();
     }
   };
 
@@ -228,7 +233,7 @@ const Routine = () => {
             setShowRecommendation(false);
             setIsPopupOpen(false);
           }}
-          heightOption={{ heightPixel: 700 }}
+          heightOption={{ wrapChildren: true, heightPixel: 700 }}
         >
           {showRecommendation ? (
             <RecommendedRoutinePopup

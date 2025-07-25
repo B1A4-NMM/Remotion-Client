@@ -226,10 +226,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
             ? highlightRelateSentence(diary.content, diary.relate_sentence)
             : diary.content}
         </div>
-        <hr className="border-t border-[#E5E5EA] mb-3" />
+        <hr className="border-t border-[#E5E5EA] dark:border-[#656565] mb-3" />
         <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
-          <span className="text-xs text-gray-400">
-            {dayjs(diary.writtenDate).format("YYYY년 M월 DD일")}
+          <span className="text-xs text-gray-400 dark:text-[#B6B6B6]">
+            {dayjs(diary.writtenDate).format("YYYY년 M월 D일")}
           </span>
           <div className="flex items-center gap-3">
             {Boolean(diary.isBookmarked) && (

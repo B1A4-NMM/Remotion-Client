@@ -85,9 +85,7 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
   if (!data || data.length === 0) {
     return (
       <div className="flex h-48 w-full items-center justify-center rounded-lg border border-dashed">
-        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-          데이터가 없습니다
-        </p>
+        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">데이터가 없습니다</p>
       </div>
     );
   }
@@ -214,7 +212,11 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
     date: item.date,
     value: item.intensity,
   }));
-  const maxValue = 100;
+
+  // 데이터에서 최대값 계산 (상대적 스케일링을 위해)
+  const maxValue = isGroup
+    ? Math.max(...groupedData.flatMap(item => groupTypes.map(type => item[type] || 0)), 10) // 최소값 10 보장
+    : Math.max(...chartData.map(item => item.value), 10); // 최소값 10 보장
 
   if (isGroup) {
     return (
@@ -234,8 +236,8 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
         <ChartContainer config={chartConfig} className="h-full w-full mt-3">
           <BarChart
             data={groupedData}
-            height={154}
-            margin={{ top: 25, right: 10, left: 0, bottom: -10 }}
+            height={100}
+            margin={{ top: 15, right: 10, left: 0, bottom: -10 }}
             barCategoryGap="20%"
             barGap={2}
           >
@@ -277,8 +279,6 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
       </div>
     );
   }
-
-  
 };
 
 export default MentalChart;

@@ -21,6 +21,11 @@ interface MonthlyCalendarProps {
    * Defaults to true.
    */
   showWrittenDays?: boolean;
+  /**
+   * Optional CSS class to control the top position of the calendar overlay.
+   * Useful when the component is rendered under a search bar.
+   */
+  overlayTopClass?: string;
 }
 
 const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
@@ -30,6 +35,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   isOpen = true,
   disableOverlay = false,
   showWrittenDays = true,
+  overlayTopClass,
 }) => {
   const [currentMonth, setCurrentMonth] = useState(dayjs(selectedDate));
   const [calendarDays, setCalendarDays] = useState<(dayjs.Dayjs | null)[]>([]);
@@ -115,9 +121,12 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className={`absolute ${disableOverlay ? 'top-6' : 'top-20'} left-4 right-4 rounded-lg z-50 p-4 calendar-modal ${
+            className={`absolute ${
+              overlayTopClass ?? (disableOverlay ? 'top-6' : 'top-20')
+            } left-4 right-4 rounded-lg z-50 p-4 calendar-modal ${
               disableOverlay ? '' : 'shadow-xl'
-            }`}          >
+            }`}          
+          >
             {/* 달력 헤더 */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-1">

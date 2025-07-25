@@ -6,12 +6,12 @@ export const useGetWrittenDays = (
   month: number,
   options?: Partial<
     UseQueryOptions<{ writtenDays: number[] }, Error, { writtenDays: number[] }, readonly unknown[]>
-  >,
+  >
 ) => {
-    return useQuery({
+  return useQuery({
     queryKey: ["writtenDays", year, month],
     queryFn: () => getWrittenDays(year, month),
-    // staleTime: 5 * 60 * 1000, // 5분
+
     enabled: options?.enabled ?? true,
     ...options,
   });

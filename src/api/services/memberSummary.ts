@@ -8,7 +8,6 @@ export const getMemberSummary = async (days: number = 3): Promise<MemberSummaryR
       days, // 검색 기간 파라미터 추가
     },
   });
-  // console.log("📦 Member Summary Response:", response.data);
 
   return response.data;
 };

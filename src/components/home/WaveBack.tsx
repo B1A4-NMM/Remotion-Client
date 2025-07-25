@@ -58,7 +58,6 @@ const mapEmotionToColor = (emotion: string): ColorKey => {
 const Waveback: React.FC<WavebackProps> = ({ diaryContent }) => {
   const [emotions, setEmotions] = useState<Emotion[]>([]);
 
-  console.log(diaryContent);
   // 감정 데이터 처리
   const processDiaryContentEmotions = (): Emotion[] => {
     if (!diaryContent) {
@@ -107,7 +106,6 @@ const Waveback: React.FC<WavebackProps> = ({ diaryContent }) => {
       });
     }
 
-    console.log("처리된 모든 감정들: ", allEmotions);
   
     if (allEmotions.length === 0) {
       return [{ color: "gray1" as ColorKey, intensity: 1 }];
@@ -140,13 +138,11 @@ const Waveback: React.FC<WavebackProps> = ({ diaryContent }) => {
   useEffect(() => {
     const processedEmotions = processDiaryContentEmotions();
     setEmotions(processedEmotions);
-    console.log("최종 감정 배열:", processedEmotions);
   }, [diaryContent]);
 
   // 감정에 따른 색상 계산
   // 다중 감정 색상 계산 (수정된 함수)
   const getWaveColors = () => {
-    console.log("현재 emotions 상태:", emotions);
     
     if (emotions.length === 0) {
       return {
@@ -201,7 +197,6 @@ const Waveback: React.FC<WavebackProps> = ({ diaryContent }) => {
       color4: waveColors[3]
     };
     
-    console.log("다중 감정 색상 결과:", result);
     return result;
   };
 

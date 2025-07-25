@@ -131,7 +131,6 @@ diaryContent,
         });
         }
 
-        console.log("allEmotions",allEmotions);
         if (allEmotions.length === 0) {
             return [{ color: "gray1" as ColorKey, intensity: 1 }];
         }
@@ -161,7 +160,6 @@ diaryContent,
     // diaryContent가 변경될 때마다 감정 분석 실행
     useEffect(() => {
         const processedEmotions = processDiaryContentEmotions();
-        console.log("processedEmotions",processedEmotions);
         setEmotions(processedEmotions);
     }, [diaryContent]);
 

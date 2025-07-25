@@ -83,7 +83,6 @@ const getEmotionCSSClass = (emotion: string): string => {
   };
 
 const ActivityCard: React.FC<ActivityCardProps> = ({ card, index }) => {
-  console.log(card);
   return (
     <motion.div
       className="w-full bg-white/10 backdrop-blur-lg rounded-3xl p-6"

@@ -27,13 +27,9 @@ const ResultHeader: React.FC<ResultHeaderProps> = ({
   }, [isBookmarked]);
 
   const handleBookmark = () => {
-    console.log("🔖 북마크 클릭됨");
-    console.log("📝 diaryId:", diaryId);
-    console.log("📌 현재 isBookmarked:", localBookmarked);
 
     if (diaryId !== undefined) {
       const newBookmarkedState = !localBookmarked;
-      console.log("🚀 API 호출 시작:", { diaryId, isBookmarked: newBookmarkedState });
 
       // 로컬 상태 먼저 업데이트 (즉시 UI 반영)
       setLocalBookmarked(newBookmarkedState);

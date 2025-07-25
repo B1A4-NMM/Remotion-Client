@@ -18,7 +18,6 @@ const sampleNoti = {
 };
 
 const url = getRedirectUrl(sampleNoti);
-console.log(url);
 if (url !== '/todos?date=2024-05-01') {
   throw new Error(`Unexpected URL: ${url}`);
 }

@@ -104,15 +104,6 @@ const BottomNavi = ({
         // 최소 임계값 설정 (작은 변화 무시)
         const threshold = isAndroid ? 50 : 10;
         if (Math.abs(newKeyboardHeight - keyboardHeight) > threshold) {
-          console.log("🎹 키보드 높이 (Visual Viewport):", {
-            platform: isAndroid ? 'Android' : isIOS ? 'iOS' : 'Other',
-            newKeyboardHeight,
-            previousHeight: keyboardHeight,
-            viewportHeight,
-            windowHeight,
-            maxAllowedHeight: getMaxKeyboardHeight(),
-            isKeyboardOpen: newKeyboardHeight > 50,
-          });
 
           updateKeyboardHeight(newKeyboardHeight);
         }
@@ -142,15 +133,6 @@ const BottomNavi = ({
           heightDiff = Math.max(0, heightDiff - 30);
         }
 
-        console.log("🎹 키보드 높이 (Window Resize):", {
-          platform: isAndroid ? 'Android' : isIOS ? 'iOS' : 'Other',
-          heightDiff,
-          initialHeight,
-          currentHeight,
-          maxAllowedHeight: getMaxKeyboardHeight(),
-          isKeyboardOpen: heightDiff > minKeyboardHeight,
-        });
-
         setKeyboardHeight(heightDiff > minKeyboardHeight ? heightDiff : 0);
       }, 16);
     };
@@ -161,7 +143,6 @@ const BottomNavi = ({
       const isTextInput = target.tagName === "INPUT" || target.tagName === "TEXTAREA";
 
       if (isTextInput) {
-        console.log("🎯 텍스트 입력 포커스 됨:", target.tagName, `(${isAndroid ? 'Android' : isIOS ? 'iOS' : 'Other'})`);
         setIsTransitioning(true);
 
         // 안드로이드에서는 더 짧은 간격으로 감지 시도
@@ -190,7 +171,6 @@ const BottomNavi = ({
       const isTextInput = target.tagName === "INPUT" || target.tagName === "TEXTAREA";
 
       if (isTextInput) {
-        console.log("🎯 텍스트 입력 포커스 해제됨");
         const delay = isAndroid ? 200 : 150;
         setTimeout(() => {
           updateKeyboardHeight(0);

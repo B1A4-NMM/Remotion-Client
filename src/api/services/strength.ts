@@ -13,6 +13,5 @@ export const getStrengthPeriod = async (year: string, month: string): Promise<St
       month,
     },
   });
-  console.log("getStrengthPeriod", response.data);
   return response.data;
 };

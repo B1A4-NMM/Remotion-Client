@@ -8,9 +8,6 @@ import api from "../axios";
  * @returns 감정 통계 데이터
  */
 export const getDayDate = async (id: string, period: number) => {
-  console.log("📊 걍 데이터 요청 중...");
-  console.log("📝 id:", id);
-  console.log("📅 period:", period);
 
   const response = await api.get(`/diary/date/emotion/${id}`, {
     params: { period },
@@ -23,6 +20,5 @@ export const getDayDate = async (id: string, period: number) => {
     },
   });
 
-  console.log("✅재벌 :", response.data);
   return response.data;
 };

@@ -113,8 +113,6 @@ const processDiaryContentEmotions = (): Emotion[] => {
       });
     }
   
-
-    console.log("처리된 모든 감정들: ", allEmotions);
   
     if (allEmotions.length === 0) {
       return [{ color: "gray1" as ColorKey, intensity: 1 }];

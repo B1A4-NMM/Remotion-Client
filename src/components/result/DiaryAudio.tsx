@@ -39,7 +39,6 @@ const DiaryAudio: React.FC<DiaryAudioProps> = ({ audio }) => {
         sourceRef.current.connect(analyserRef.current);
         analyserRef.current.connect(audioContextRef.current.destination);
   
-        console.log("Web Audio API 초기화 완료");
       } catch (error) {
         console.error("Web Audio API 초기화 실패:", error);
       }

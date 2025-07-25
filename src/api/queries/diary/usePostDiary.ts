@@ -10,7 +10,6 @@ export const usePostDiary = (options?: UseMutationOptions<any, unknown, FormData
     ...options, // ✅ 외부 옵션 먼저 병합
 
     mutationFn: async variables => {
-      console.log("postDiary 호출됨", variables);
       const response = await postDiary(variables);
 
       return response;

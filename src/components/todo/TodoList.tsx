@@ -18,7 +18,6 @@ export default function TodoList() {
   useEffect(() => {
     if (!fetchedTodos) return;
 
-    console.log(" fetchedTodos:", fetchedTodos);
     if (Array.isArray(fetchedTodos)) {
       setTodos(fetchedTodos);
     } else {

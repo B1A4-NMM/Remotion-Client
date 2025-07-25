@@ -92,15 +92,15 @@ const ConflictAnalysisCard: React.FC<ConflictAnalysisCardProps> = ({
 
     // 하이라이트할 키워드들 정의
     const keywords = [
-      { text: conflict.situation, className: "bg-blue-200 dark:bg-blue-900 dark:text-blue-200 px-1 rounded" },
+      { text: conflict.situation, className: "bg-blue-200 dark:bg-blue-800/50 px-1 rounded" },
       {
         text: getResponseTypeDisplay(conflict.conflict_response_code),
-        className: "bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 px-1 rounded",
+        className: "bg-yellow-200 dark:bg-yellow-800/50 px-1 rounded",
       },
-      { text: conflict.outcome, className: "bg-green-200 dark:bg-green-900 dark:text-green-200 px-1 rounded" },
-      { text: conflict.approach, className: "bg-purple-200 dark:bg-purple-900 dark:text-purple-200 px-1 rounded" },
+      { text: conflict.outcome, className: "bg-green-200 dark:bg-green-800/50 px-1 rounded" },
+      { text: conflict.approach, className: "bg-purple-200 dark:bg-purple-800/50 px-1 rounded" },
       // 원본 conflict_response_code도 추가 (변환된 텍스트와 함께)
-      { text: conflict.conflict_response_code, className: "bg-orange-200 dark:bg-orange-900 dark:text-orange-200 px-1 rounded" },
+      { text: conflict.conflict_response_code, className: "bg-orange-200 dark:bg-orange-800/50 px-1 rounded" },
     ];
 
     // 텍스트에서 키워드 위치 찾기

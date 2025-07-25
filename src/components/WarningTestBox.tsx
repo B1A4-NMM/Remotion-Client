@@ -16,7 +16,7 @@ const typeToMessage: Record<string, string> = {
 
 const WarningTestBox = ({ type, onClick }: WarningTestBoxProps) => {
   return (
-    <div className="bg-[#ffffff] dark:bg-white mb-5 p-5 rounded-2xl text-black dark:text-white shadow-md">
+    <div className="bg-[#ffffff] dark:bg-white p-5 rounded-2xl text-black dark:text-white shadow-md">
       <p className="mb-3 text-base whitespace-pre-line">{typeToMessage[type]}</p>
       <Button
         onClick={() => onClick(type)}

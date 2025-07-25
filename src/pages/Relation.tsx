@@ -189,7 +189,11 @@ const Relation = () => {
       const baseRadius = 10;
       const affectionRadius = (relation.affection / 100) * 15;
       const radius = Math.max(25, Math.min(50, baseRadius + affectionRadius));
-      const scale = Math.max(8, Math.min(20, radius / 2.5)); // radius 25-50 → scale 8-20
+      const scale = Math.max(8, Math.min(20, radius / 2.5));  // radius 25-50 → scale 8-20
+
+      if(relation.name==="None"){
+        relation.name="누군가";
+      }
 
       const node: ProcessedNode = {
         ...relation,

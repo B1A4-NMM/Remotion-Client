@@ -129,10 +129,10 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
 
             return (
               <span key={person.name}>
+                {idx > 0 && <br />}
                 {highlightTargets([{ name: displayName, colorKey: "blue" }])}
                 에게 {highlightEmotions(emotions)}을{" "}
-                {isLast ? (hasSelfOrStateEmotions ? "느꼈고" : "느꼈던") : "느꼈고,"}
-                {!isLast && <br />}
+                {isLast ? (hasSelfOrStateEmotions ? "느꼈고," : "느꼈던") : "느꼈고,"}
               </span>
             );
           });
@@ -143,6 +143,7 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
             const displayNames = peopleWithoutEmotions.map(person => person.name);
             noEmotionLine = (
               <span key="no-emotion-people">
+                <br />
                 {highlightTargets(displayNames.map(name => ({ name, colorKey: "blue" })))}와
                 함께했고
               </span>
@@ -160,8 +161,8 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
           if (selfEmotions.length > 0) {
             additionalEmotions.push(
               <span key="self-emotions">
-                <br /> 스스로는 {highlightEmotions(selfEmotions)}
-                {stateEmotions.length > 0 ? "고" : "을"}
+                <br /> 스스로에게는 {highlightEmotions(selfEmotions)}을 느꼈어요.{" "}
+                {stateEmotions.length > 0 ? "" : ""}
               </span>
             );
           }
@@ -177,7 +178,7 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
 
           if (additionalEmotions.length > 0) {
             allLines.push(...additionalEmotions);
-            allLines.push(<span key="emotion-end"> 느꼈어요.</span>);
+            allLines.push(<span key="emotion-end"> 느낀 날이었네요.</span>);
           } else {
             // 감정이 없는 경우 "그런 하루였어요" 추가
             allLines.push(<span key="no-emotion-end"> 그런 하루였어요.</span>);
@@ -247,7 +248,7 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
               <div className="text-gray-800 text-base leading-relaxed">
                 {highlightActivity(activity)}에서 <br />
                 {highlightTargets([{ name: displayName, colorKey: "blue" }])}에게{" "}
-                {hasPersonEmotions ? <>{highlightEmotions(emotions)}을 느꼈고</> : <>함께했고</>}
+                {hasPersonEmotions ? <>{highlightEmotions(emotions)}을 느꼈고,</> : <>함께했고</>}
                 {hasSelfEmotions && (
                   <>
                     {" "}
@@ -345,10 +346,10 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
 
             return (
               <span key={person.name}>
+                {idx > 0 && <br />}
                 {highlightTargets([{ name: displayName, colorKey: "blue" }])}
                 에게 {highlightEmotions(emotions)}을{" "}
-                {isLast ? (hasSelfOrStateEmotions ? "느꼈고" : "느꼈던") : "느꼈고,"}
-                {!isLast && <br />}
+                {isLast ? (hasSelfOrStateEmotions ? "느꼈고," : "느꼈던") : "느꼈고,"}
               </span>
             );
           });
@@ -376,8 +377,9 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
           if (selfEmotions.length > 0) {
             additionalEmotions.push(
               <span key="self-emotions">
-                <br /> 스스로는 {highlightEmotions(selfEmotions)}
-                {stateEmotions.length > 0 ? "고" : "을"}
+                <br />
+                스스로는 {highlightEmotions(selfEmotions)}을{" "}
+                {stateEmotions.length > 0 ? "느꼈어요. " : ""}
               </span>
             );
           }
@@ -385,8 +387,16 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
           if (stateEmotions.length > 0) {
             additionalEmotions.push(
               <span key="state-emotions">
-                {selfEmotions.length > 0 ? "" : ""}
-                <br /> 전체적으로 {highlightEmotions(stateEmotions)}의 분위기를
+                {selfEmotions.length > 0 ? (
+                  <>
+                    <br />
+                  </>
+                ) : (
+                  <>
+                    <br />
+                  </>
+                )}
+                전체적으로 {highlightEmotions(stateEmotions)}의 분위기를
               </span>
             );
           }
@@ -470,7 +480,8 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
                 )}
                 {selfEmotions.length > 0 && (
                   <>
-                    <br /> 스스로는 {highlightEmotions(selfEmotions)}을
+                    <br />
+                    스스로는 {highlightEmotions(selfEmotions)}을
                   </>
                 )}
                 {stateEmotions.length > 0 && (
@@ -537,6 +548,7 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
             <span key={activityName + idx} className="text-base">
               {highlightActivity(activityName)}에서 {emotionElements}
               {idx < emotionOnlyActivities.length - 1 ? ", " : ""}
+              {idx < emotionOnlyActivities.length - 1 && <br />}
             </span>
           );
         });
@@ -591,6 +603,7 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
             <span key={activityName + idx} className="text-base">
               {highlightActivity(activityName)}에서 {emotionElements}
               {idx < emotionOnlyActivities.length - 1 ? ", " : ""}
+              {idx < emotionOnlyActivities.length - 1 && <br />}
             </span>
           );
         });

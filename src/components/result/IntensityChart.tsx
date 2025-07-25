@@ -68,8 +68,8 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
   // 데이터의 최대/최소값에 따라 패딩 조정
   const hasHighValues = maxValue > 80; // 높은 값이 있으면 더 많은 공간 필요
 
-  const topPadding = hasHighValues ? 100 : 80; // 위쪽 툴팁 공간 (동적 조정) - 더 늘림
-  const bottomPadding = hasHighValues ? 100 : 80; // 아래쪽 툴팁 공간 (동적 조정) - 더 늘림
+  const topPadding = hasHighValues ? 120 : 80; // 수치가 높을 때 툴팁 공간 확보
+  const bottomPadding = hasHighValues ? 120 : 80; // 수치가 높을 때 툴팁 공간 확보
 
   // 적응적 중심선 위치 계산
   // 0의 위치를 직접 조절하는 함수
@@ -186,7 +186,7 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
   };
 
   return (
-    <div className="mb-4 pt-4 overflow-visible">
+    <div className="mt-3 mb-6 overflow-visible">
       <div
         className="rounded-2xl shadow-lg p-4 overflow-visible bg-white dark:bg-gray-800"
       >
@@ -275,18 +275,18 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
             <g>
               {/* 긍정 뱃지 (왼쪽 위) */}
               <rect
-                x={padding - 10}
+                x={padding - 15}
                 y={topPadding - 60}
-                width="35"
+                width="40"
                 height="30"
-                rx="15"
-                ry="15"
+                rx="10"
+                ry="10"
                 fill="#a5dfc1"
                 stroke="#a5dfc1"
                 strokeWidth="1"
               />
               <text
-                x={padding + 8}
+                x={padding + 6}
                 y={topPadding - 40}
                 textAnchor="middle"
                 fontSize="12"
@@ -304,15 +304,15 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
                 y={topPadding + chartHeight + 30}
                 width="40"
                 height="30"
-                rx="15"
-                ry="15"
+                rx="10"
+                ry="10"
                 fill="rgba(252, 165, 165, 0.9)"
                 stroke="rgba(252, 165, 165, 1)"
                 strokeWidth="1"
               />
               <text
-                x={padding + 5}
-                y={topPadding + chartHeight + 49}
+                x={padding + 6}
+                y={topPadding + chartHeight + 50}
                 textAnchor="middle"
                 fontSize="12"
                 fill="white"
@@ -393,9 +393,9 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
                           : `M ${x - 5} ${y + 19} L ${x} ${y + 12} L ${x + 5} ${y + 19} Z`
                       }
                       fill={isCurrentDiary ? "#b5daff" : "rgba(255, 255, 255, 0.98)"}
-                      stroke={isCurrentDiary ? "#b5daff" : "rgba(0, 0, 0, 0.12)"}
-                      strokeWidth={isCurrentDiary ? "1.5" : "1"}
+                      stroke="none"
                       filter="url(#softShadow)"
+                      className="dark:stroke-none"
                     />
 
                     {/* 날짜 텍스트 */}

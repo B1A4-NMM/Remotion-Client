@@ -91,34 +91,16 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
   };
 
   const todos = diaryContent?.analysis?.todos ?? [];
-
-  // reflection에서 todo 데이터 추출
   const reflectionTodos = diaryContent?.analysis?.reflection?.todo ?? [];
-
-  // recommendRoutine 데이터 추출
   const recommendRoutines = diaryContent?.recommendRoutine ?? [];
-
-  // problem 데이터 추출 (모든 activity의 problem을 수집하고 null 체크)
   const allProblems = activityAnalysis.flatMap((activity: any) => activity.problem || []);
-
-  // problem 중 하나라도 null 값이 있는지 확인
   const hasValidProblems = allProblems.some(
     (problem: any) => problem && problem.situation && problem.situation !== "None"
   );
-
-  // beforeDiaryScores 데이터 추출
   const beforeDiaryScores = diaryContent?.beforeDiaryScores?.scores ?? [];
-
-  // diaryId 추출
   const diaryId = diaryContent?.id;
-
-  // people 데이터 추출
   const people = diaryContent?.people ?? [];
-
-  // 변화가 있는 사람들만 필터링
   const peopleWithChanges = people.filter((person: any) => person.changeScore !== 0);
-
-  // beforeDiaryScores 데이터 콘솔에 출력
 
   const convertWarningToTestType = (warning: "stress" | "anxiety" | "depression") => {
     switch (warning) {
@@ -131,12 +113,10 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
     }
   };
 
-  // 경고 데이터 확인
   const getWarningType = () => {
     if (!diaryContent) return null;
     const { anxietyWarning, depressionWarning, stressWarning } = diaryContent;
 
-    // 우선순위: depression > anxiety > stress
     if (depressionWarning) return "depression";
     if (anxietyWarning) return "anxiety";
     if (stressWarning) return "stress";
@@ -149,17 +129,14 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
     setTestType(type);
   };
 
-  // 부정적인 감정 감지 함수
   const getNegativeEmotionType = () => {
     if (!diaryContent) return null;
 
-    // 감정 분석 데이터에서 부정적인 감정 확인
     const emotions = activityAnalysis.flatMap((activity: any) => [
       ...(activity.self_emotions?.emotion || []),
       ...(activity.state_emotions?.emotion || []),
     ]);
 
-    // 부정적인 감정 키워드 매핑
     const negativeEmotionMap: Record<
       string,
       "stress" | "anxiety" | "depression" | "sadness" | "anger"
@@ -176,7 +153,6 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
       불안함: "anxiety",
     };
 
-    // 감지된 부정적인 감정 찾기
     console.log("감정 데이터:", emotions);
     for (const emotion of emotions) {
       console.log("체크 중인 감정:", emotion);
@@ -193,79 +169,120 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
 
   const negativeEmotionType = getNegativeEmotionType();
 
+  // 루틴 섹션에 포함될 컴포넌트들이 있는지 확인
+  const hasRecoveryRoutineSection = 
+    (reflectionTodos.length > 0) || 
+    warningType || 
+    (recommendRoutines && recommendRoutines.content) || 
+    negativeEmotionType;
+
   if (isLoading) {
-    // 스켈레톤 로딩 UI
     return (
       <div className="space-y-8 p-6">
-        {/* 감정 차트 자리 */}
         <SkeletonBlock className="w-full h-32 mb-4" />
-        {/* 카드 자리 */}
         <div className="flex space-x-4">
           <SkeletonBlock className="flex-1 h-40" />
           <SkeletonBlock className="flex-1 h-40" />
         </div>
-        {/* 텍스트 자리 */}
         <SkeletonBlock className="w-2/3 h-6 mt-8" />
         <SkeletonBlock className="w-1/2 h-6" />
       </div>
     );
   }
 
-  // Pass activityAnalysis to ActivityAnalysisCard
   return (
     <div className="px-4">
-      {activityAnalysis.length === 0 ?
-      (
-        <div/>
-      ):
-      (
-        <>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-3 p-1">{titles.emotionOfDay}</h2>
-          <ActivityAnalysisCard data={activityAnalysis} />
-        </>
-      )}
+      {/* ✅ CSS Grid 컨테이너로 모든 섹션을 감싸기 */}
+      <div className="grid grid-cols-1 gap-8 auto-rows-max">
+        
+        {/* 1. 감정으로 보는 오늘 하루 섹션 */}
+        {activityAnalysis.length > 0 && (
+          <section className="grid-item">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-3 p-1">
+              {titles.emotionOfDay}
+            </h2>
+            <ActivityAnalysisCard data={activityAnalysis} />
+          </section>
+        )}
 
-      {peopleWithChanges.length > 0 && (
-        <div className={activityAnalysis.length === 1 ? "mt-2" : "mt-16"}>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-3 p-1">{titles.relationshipChanges}</h2>
-          <RelationshipChangeCard people={peopleWithChanges} />
-        </div>
-      )}
+        {/* 2. 주변과의 관계 변화 섹션 */}
+        {peopleWithChanges.length > 0 && (
+          <section className="grid-item">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-3 p-1">
+              {titles.relationshipChanges}
+            </h2>
+            <RelationshipChangeCard people={peopleWithChanges} />
+          </section>
+        )}
 
-      {hasValidProblems && (
-        <>
-          <h2 className="text-2xl font-semibold text-gray-800 mt-8 mb-3 p-1">{titles.eventReport}</h2>
-          <ConflictAnalysisCard conflicts={allProblems} />
-        </>
-      )}
+        {/* 3. 오늘의 사건 리포트 섹션 */}
+        {hasValidProblems && (
+          <section className="grid-item">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-3 p-1">
+              {titles.eventReport}
+            </h2>
+            <ConflictAnalysisCard conflicts={allProblems} />
+          </section>
+        )}
 
-      <h2 className="text-2xl font-semibold text-gray-800 mt-8 mb-3 p-1">{titles.emotionTimeline}</h2>
-      <IntensityChart scores={beforeDiaryScores} diaryId={diaryId} />
+        {/* 4. 최근 감정 타임라인 섹션 (항상 표시) */}
+        <section className="grid-item">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-3 p-1">
+            {titles.emotionTimeline}
+          </h2>
+          <IntensityChart scores={beforeDiaryScores} diaryId={diaryId} />
+        </section>
 
-      {(reflectionTodos.length > 0 || warningType || (recommendRoutines && recommendRoutines.content) || negativeEmotionType) && (
-        <h2 className="text-2xl font-semibold text-gray-800 mt-8 mb-3 p-1">{titles.recoveryRoutine}</h2>
-      )}
+        {/* 5. 나만의 감정 회복 루틴 섹션 */}
+        {hasRecoveryRoutineSection && (
+          <section className="grid-item">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-3 p-1">
+              {titles.recoveryRoutine}
+            </h2>
+            
+            {/* 루틴 섹션 내부도 Grid로 구성하여 일관된 간격 유지 */}
+            <div className="grid grid-cols-1 gap-6 auto-rows-max">
+              
+              {/* 루틴 추천 카드 */}
+              {recommendRoutines && recommendRoutines.content && (
+                <div className="grid-item">
+                  <div className="px-4">
+                    <RoutineRecommendCard routines={[recommendRoutines]} />
+                  </div>
+                </div>
+              )}
 
-      {recommendRoutines && recommendRoutines.content && (
-        <div className="mb-6">
-          <div className="px-4">
-            <RoutineRecommendCard routines={[recommendRoutines]} />
-          </div>
-        </div>
-      )}
+              {/* 경고 테스트 박스 */}
+              {warningType && (
+                <div className="grid-item">
+                  <WarningTestBox type={warningType} onClick={handleWarningClick} />
+                </div>
+              )}
 
-      {warningType && <WarningTestBox type={warningType} onClick={handleWarningClick} />}
+              {/* 부정적 감정 카드 */}
+              {negativeEmotionType && (
+                <div className="grid-item">
+                  <NegativeEmotionCard emotionType={negativeEmotionType} />
+                </div>
+              )}
 
-      {negativeEmotionType && (
-        <NegativeEmotionCard emotionType={negativeEmotionType} />
-      )}
+              {/* Todo 미리보기 카드 */}
+              {reflectionTodos.length > 0 && (
+                <div className="grid-item">
+                  <TodoPreviewCard 
+                    todos={reflectionTodos} 
+                    writtenDate={diaryContent?.writtenDate} 
+                  />
+                </div>
+              )}
+              
+            </div>
+          </section>
+        )}
+        
+      </div>
 
-      {reflectionTodos.length > 0 && (
-        <div className="mb-6">
-          <TodoPreviewCard todos={reflectionTodos} writtenDate={diaryContent?.writtenDate} />
-        </div>
-      )}
-
+      {/* 테스트 모달 (Grid 외부에 위치) */}
       {testType && (
         <TestModal
           type={convertWarningToTestType(testType)}

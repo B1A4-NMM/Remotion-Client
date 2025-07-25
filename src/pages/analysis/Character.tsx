@@ -27,7 +27,7 @@ const combination: Record<
   강아지: {
     harmony: "펭귄",
     description_h:
-      "강아지의 섬세한 배려는 펭귄의 조용한 외로움을 자연스럽게 감싸고 치유합니다.",
+      "강아지의 섬세한 배려는 물범의 조용한 외로움을 자연스럽게 감싸고 치유합니다.",
     disHarmony: "여우",
     description_d:
       "강아지의 즉각적인 배려는 여우에게는 조심스러움 없이 들이대는 부담으로 느껴질 수 있습니다.",
@@ -160,7 +160,7 @@ const Character = () => {
   return (
     <>
     <Title name="캐릭터" isBackActive={true}  back="/analysis"/>
-      <div className="px-4 py-5 text-foreground min-h-screen space-y-10 ">
+      <div className="px-4 py-5 text-foreground min-h-screen space-y-3 ">
         <section className="bg-white rounded-xl shadow pt-6 pl-6 pr-6">
           <div className="flex justify-between mb-5">
             <h3 className="text-2xl font-semibold mb-2 text-gray-800">{nickname}님의 동물은</h3>
@@ -176,7 +176,7 @@ const Character = () => {
         (
           <>
             <div className="text-2xl font-bold pt-10">다른 동물들과의 궁합</div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 w-full">
               <div className="bg-white rounded-2xl shadow-sm">
                 <AnimalCard animalType={harmony} script={description_h} />
               </div>

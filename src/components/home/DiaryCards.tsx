@@ -31,33 +31,122 @@ interface DiaryCardsProps {
 const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastItemRef }) => {
   const [openId, setOpenId] = useState<number | null>(null);
   const navigate = useNavigate();
-  console.log("🔍 DiaryCards 컴포넌트:");
-  console.log("  - diaries:", diaries);
-  console.log("  - diaries[0]:", diaries[0]);
-  console.log("  - diaries[0]?.diaryId:", diaries[0]?.diaryId);
-  console.log("  - diaries[0]?.id:", (diaries[0] as any)?.id);
-  console.log("  - diaries[0]의 모든 키:", diaries[0] ? Object.keys(diaries[0]) : []);
+
+  // 고정 높이 상수
+  const CARD_CONTENT_HEIGHT = 170;
 
   if (!diaries || diaries.length === 0) {
     return <div className="w-full text-center py-8 text-gray-400">검색 결과가 없습니다.</div>;
   }
 
   const handleCardClick = (diaryId: number) => {
-    console.log("🔍 handleCardClick 호출:");
-    console.log("  - diaryId:", diaryId);
-    console.log("  - diaryId 타입:", typeof diaryId);
-
     if (!diaryId) {
       console.error("❌ diaryId가 undefined입니다!");
       return;
     }
-
     navigate(`/result/${diaryId}?view=record`);
+  };
+
+  // Skeleton 컴포넌트들
+  const ImageSkeleton = ({ className }: { className?: string }) => (
+    <div className={`bg-gray-200 animate-pulse rounded-lg ${className}`} />
+  );
+
+  const MapSkeleton = ({ className }: { className?: string }) => (
+    <div className={`relative bg-gray-200 animate-pulse rounded-lg ${className}`}>
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+        <div className="w-6 h-6 bg-gray-300 rounded-full animate-pulse" />
+      </div>
+    </div>
+  );
+
+  // LazyImage 컴포넌트 완성
+  const LazyImage = ({ 
+    src, 
+    alt, 
+    className 
+  }: { 
+    src: string; 
+    alt: string; 
+    className: string; 
+  }) => {
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [hasError, setHasError] = useState(false);
+
+    return (
+      <div className={`relative ${className}`}>
+        {!isLoaded && !hasError && <ImageSkeleton className="absolute inset-0" />}
+        <img
+          src={src}
+          alt={alt}
+          className={`${className} transition-opacity duration-200 ${
+            isLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+          onLoad={() => setIsLoaded(true)}
+          onError={() => setHasError(true)}
+          loading="lazy"
+        />
+        {hasError && (
+          <div className={`${className} bg-gray-100 flex items-center justify-center`}>
+            <span className="text-gray-400 text-sm">이미지 없음</span>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // LazyMap 컴포넌트 추가
+  const LazyMap = ({ diary }: { diary: Diary }) => {
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [hasError, setHasError] = useState(false);
+
+    if (!diary.latitude || !diary.longitude) {
+      return <MapSkeleton className="w-full h-full" />;
+    }
+
+    const mapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${diary.latitude},${diary.longitude}&zoom=15&size=200x200&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
+
+    return (
+      <div className="relative w-full h-full">
+        {!isLoaded && !hasError && <MapSkeleton className="absolute inset-0" />}
+        <img
+          src={mapUrl}
+          alt="map-preview"
+          className={`rounded-lg object-cover w-full h-full transition-opacity duration-200 ${
+            isLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+          onLoad={() => setIsLoaded(true)}
+          onError={() => setHasError(true)}
+          loading="lazy"
+        />
+        {isLoaded && (
+          <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="drop-shadow-lg"
+            >
+              <rect x="10" y="12" width="4" height="10" fill="#666666" rx="2" />
+              <circle cx="12" cy="10" r="6" fill="#FF4444" stroke="#CC0000" strokeWidth="1" />
+              <circle cx="12" cy="10" r="2" fill="white" />
+            </svg>
+          </div>
+        )}
+        {hasError && (
+          <div className="w-full h-full bg-gray-100 flex items-center justify-center rounded-lg">
+            <span className="text-gray-400 text-sm">지도 로딩 실패</span>
+          </div>
+        )}
+      </div>
+    );
   };
 
   // 공통 컴포넌트들
   const renderBlobSection = (diary: Diary, index: number) => (
-    <div className="h-full w-full rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center p-2">
+    <div className="h-full w-full min-w-[170px] max-w-[170px] rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center p-2 overflow-hidden">
       <div className="text-base text-[#85848F] font-medium text-center mb-2">
         {diary.emotions && diary.emotions.length > 0
           ? `${diary.emotions
@@ -81,43 +170,12 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
     </div>
   );
 
-  const renderMapSection = (diary: Diary) => (
-    <div className="relative w-full h-full">
-      <img
-        src={`https://maps.googleapis.com/maps/api/staticmap?center=${diary.latitude},${diary.longitude}&zoom=15&size=200x200&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
-        alt="map-preview"
-        className="rounded-lg object-cover w-full h-full"
-      />
-      <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="drop-shadow-lg"
-        >
-          <rect x="10" y="12" width="4" height="10" fill="#666666" rx="2" />
-          <circle cx="12" cy="10" r="6" fill="#FF4444" stroke="#CC0000" strokeWidth="1" />
-          <circle cx="12" cy="10" r="2" fill="white" />
-        </svg>
-      </div>
-    </div>
-  );
-
   // relate_sentence를 형광색으로 표시하는 함수
   const highlightRelateSentence = (content: string, relateSentence: string) => {
-    console.log("🔍 highlightRelateSentence 호출:");
-    console.log("  - content:", content);
-    console.log("  - relateSentence:", relateSentence);
-    console.log("  - relateSentence 타입:", typeof relateSentence);
-
     if (!relateSentence || !content) {
-      console.log("  - 조건문에서 early return");
       return content;
     }
 
-    // 대소문자를 구분하지 않고 검색
     const lowerContent = content.toLowerCase();
     const lowerRelateSentence = relateSentence.toLowerCase();
 
@@ -126,12 +184,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
     let currentIndex = 0;
 
     while ((currentIndex = lowerContent.indexOf(lowerRelateSentence, lastIndex)) !== -1) {
-      // 일치하지 않는 부분 추가
       if (currentIndex > lastIndex) {
         parts.push(content.substring(lastIndex, currentIndex));
       }
 
-      // 하이라이트된 부분 추가
       const highlighted = content.substring(currentIndex, currentIndex + relateSentence.length);
       parts.push(
         <span key={currentIndex} className="bg-green-300/40 text-black font-medium px-1 rounded">
@@ -142,7 +198,6 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
       lastIndex = currentIndex + relateSentence.length;
     }
 
-    // 마지막 부분 추가
     if (lastIndex < content.length) {
       parts.push(content.substring(lastIndex));
     }
@@ -151,19 +206,6 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
   };
 
   const renderFooter = (diary: Diary) => {
-    console.log(
-      `Diary ${diary.diaryId} bookmarked:`,
-      diary.isBookmarked,
-      typeof diary.isBookmarked
-    );
-    console.log("🔍 renderFooter에서 diary 정보:");
-    console.log("  - diary:", diary);
-    console.log("  - diary.diaryId:", diary.diaryId);
-    console.log("  - diary.diaryId 타입:", typeof diary.diaryId);
-    console.log("  - diary의 모든 키:", Object.keys(diary));
-    console.log("  - diary의 모든 값:", Object.values(diary));
-
-    // diaryId가 undefined인지 확인
     if (!diary.diaryId) {
       console.error("❌ renderFooter에서 diary.diaryId가 undefined입니다!");
       console.error("  - 전체 diary 객체:", diary);
@@ -172,15 +214,9 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
     return (
       <>
         <div className="text-base text-gray-800 leading-relaxed break-words mb-4 line-clamp-4">
-          {(() => {
-            console.log("🔍 renderFooter에서 diary 정보:");
-            console.log("  - diary.relate_sentence:", diary.relate_sentence);
-            console.log("  - diary.content:", diary.content);
-
-            return diary.relate_sentence
-              ? highlightRelateSentence(diary.content, diary.relate_sentence)
-              : diary.content;
-          })()}
+          {diary.relate_sentence
+            ? highlightRelateSentence(diary.content, diary.relate_sentence)
+            : diary.content}
         </div>
         <hr className="border-t border-[#E5E5EA] mb-3" />
         <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
@@ -219,15 +255,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
   };
 
   return (
-    <div className="flex flex-col gap-2 w-full max-w-[420px] mx-auto">
+    <div className="flex flex-col gap-2 w-full max-w-[420px] mx-auto" style={{ containerType: 'inline-size' }}>
       {diaries.map((mappedDiary, index) => {
-        console.log(`🔍 mappedDiary[${index}]:`, mappedDiary);
-        console.log(`🔍 mappedDiary[${index}].diaryId:`, mappedDiary.diaryId);
-        console.log(`🔍 mappedDiary[${index}].id:`, (mappedDiary as any).id);
-        console.log(`🔍 mappedDiary[${index}]의 모든 키:`, Object.keys(mappedDiary));
-        console.log(`🔍 mappedDiary[${index}]의 모든 값:`, Object.values(mappedDiary));
-
-        // diaryId가 undefined인지 확인
         if (!mappedDiary.diaryId) {
           console.error(`❌ mappedDiary[${index}]의 diaryId가 undefined입니다!`);
           console.error(`  - 전체 객체:`, mappedDiary);
@@ -257,16 +286,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
               ref={isLast && lastItemRef ? lastItemRef : undefined}
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => {
-                console.log("🔍 onClick 이벤트 (케이스 1):");
-                console.log("  - mappedDiary:", mappedDiary);
-                console.log("  - mappedDiary.diaryId:", mappedDiary.diaryId);
-                console.log("  - mappedDiary.id:", (mappedDiary as any).id);
-                console.log("  - mappedDiary의 모든 키:", Object.keys(mappedDiary));
-                console.log("  - mappedDiary의 모든 값:", Object.values(mappedDiary));
-
-                // diaryId가 없으면 id를 시도
                 const idToUse = mappedDiary.diaryId || (mappedDiary as any).id;
-                console.log("  - 사용할 ID:", idToUse);
                 handleCardClick(idToUse);
               }}
             >
@@ -284,9 +304,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
                       ? `${mappedDiary.emotions
                           .slice(0, 2)
                           .map(e => e.emotion)
-                          .join(
-                            ", "
-                          )}${mappedDiary.emotions.length > 2 ? ` 외 ${mappedDiary.emotions.length - 2}가지 감정` : ""}`
+                          .join(", ")}${mappedDiary.emotions.length > 2 ? ` 외 ${mappedDiary.emotions.length - 2}가지 감정` : ""}`
                       : "감정 없음"}
                   </div>
                   <div className="text-xs text-[#85848F] truncate">
@@ -312,15 +330,18 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
             <div
               key={mappedDiary.diaryId}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer "
+              className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-lg mb-4 h-[170px] ">
-                <div className="col-span-1 h-full max-h-[170px]">
+              <div 
+                className="grid grid-cols-2 gap-2 rounded-lg mb-4" 
+                style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
+              >
+                <div className="col-span-1 h-full">
                   {renderBlobSection(mappedDiary, index)}
                 </div>
                 <div className="col-span-1 h-full flex items-center">
-                  {renderMapSection(mappedDiary)}
+                  <LazyMap diary={mappedDiary} />
                 </div>
               </div>
               {renderFooter(mappedDiary)}
@@ -337,10 +358,13 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
-              <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
+              <div 
+                className="flex gap-2 rounded-lg mb-4" 
+                style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
+              >
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
-                <div className="col-span-1 h-full w-full flex items-center">
-                  <img
+                <div className="w-1/2 h-full flex items-center">
+                  <LazyImage
                     src={filteredImages[0]}
                     alt="diary-photo-0"
                     className="rounded-lg object-cover w-full h-full"
@@ -361,17 +385,22 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
-              <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
+              <div 
+                className="flex gap-2 rounded-lg mb-4" 
+                style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
+              >
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
                 <div className="grid grid-rows-2 gap-2 w-full">
-                  <div className=" h-full">
-                    <img
+                  <div className="h-full">
+                    <LazyImage
                       src={filteredImages[0]}
                       alt="diary-photo-0"
                       className="rounded-lg object-cover w-full h-full"
                     />
                   </div>
-                  <div className="h-full">{renderMapSection(mappedDiary)}</div>
+                  <div className="h-full">
+                    <LazyMap diary={mappedDiary} />
+                  </div>
                 </div>
               </div>
               {renderFooter(mappedDiary)}
@@ -388,18 +417,21 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
-              <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
+              <div 
+                className="flex gap-2 rounded-lg mb-4" 
+                style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
+              >
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
                 <div className="grid grid-rows-2 gap-2 h-full w-full">
                   <div className="h-full">
-                    <img
+                    <LazyImage
                       src={filteredImages[0]}
                       alt="diary-photo-0"
                       className="rounded-lg object-cover w-full h-full"
                     />
                   </div>
                   <div className="h-full">
-                    <img
+                    <LazyImage
                       src={filteredImages[1]}
                       alt="diary-photo-1"
                       className="rounded-lg object-cover w-full h-full"
@@ -421,17 +453,22 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
-              <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
+              <div 
+                className="flex gap-2 rounded-lg mb-4" 
+                style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
+              >
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
-                <div className="col-span-1 grid grid-rows-2 gap-2 h-full">
-                  <div className="row-span-1 h-full">{renderMapSection(mappedDiary)}</div>
+                <div className="grid grid-rows-2 gap-2 h-full">
+                  <div className="h-full">
+                    <LazyMap diary={mappedDiary} />
+                  </div>
                   <div className="grid grid-cols-2 gap-2 w-full">
-                    <img
+                    <LazyImage
                       src={filteredImages[0]}
                       alt="diary-photo-0"
                       className="aspect-square rounded-lg object-cover h-full"
                     />
-                    <img
+                    <LazyImage
                       src={filteredImages[1]}
                       alt="diary-photo-1"
                       className="aspect-square rounded-lg object-cover h-full"
@@ -453,23 +490,26 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
-              <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
+              <div 
+                className="flex gap-2 rounded-lg mb-4" 
+                style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
+              >
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
-                <div className="col-span-1 grid grid-rows-2 gap-2 h-full">
-                  <div className="row-span-1">
-                    <img
+                <div className="grid grid-rows-2 gap-2 h-full">
+                  <div className="h-full">
+                    <LazyImage
                       src={filteredImages[0]}
                       alt="diary-photo-0"
                       className="rounded-lg object-cover w-full h-full"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-2 h-full">
-                    <img
+                    <LazyImage
                       src={filteredImages[1]}
                       alt="diary-photo-1"
                       className="aspect-square rounded-lg object-cover w-full h-full"
                     />
-                    <img
+                    <LazyImage
                       src={filteredImages[2]}
                       alt="diary-photo-2"
                       className="aspect-square rounded-lg object-cover w-full h-full"
@@ -491,25 +531,30 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
-              <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
+              <div 
+                className="flex gap-2 rounded-lg mb-4" 
+                style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
+              >
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
                 <div className="w-1/2 grid grid-cols-2 grid-rows-2 gap-2 h-full">
-                  <img
+                  <LazyImage
                     src={filteredImages[0]}
                     alt="diary-photo-0"
                     className="aspect-square w-full rounded-lg object-cover h-full"
                   />
-                  <img
+                  <LazyImage
                     src={filteredImages[1]}
                     alt="diary-photo-1"
                     className="aspect-square w-full rounded-lg object-cover h-full"
                   />
-                  <img
+                  <LazyImage
                     src={filteredImages[2]}
                     alt="diary-photo-2"
                     className="aspect-square w-full rounded-lg object-cover h-full"
                   />
-                  <div className="aspect-square w-full h-full">{renderMapSection(mappedDiary)}</div>
+                  <div className="aspect-square w-full h-full">
+                    <LazyMap diary={mappedDiary} />
+                  </div>
                 </div>
               </div>
               {renderFooter(mappedDiary)}
@@ -526,32 +571,35 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
-              <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
+              <div 
+                className="flex gap-2 rounded-lg mb-4" 
+                style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
+              >
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
-                <div className="w-1/2 grid grid-cols-2 grid-rows-2 gap-2 w-full">
-                  <img
+                <div className="w-1/2 grid grid-cols-2 grid-rows-2 gap-2">
+                  <LazyImage
                     src={filteredImages[0]}
                     alt="diary-photo-0"
                     className="aspect-square w-full rounded-lg object-cover h-full"
                   />
-                  <img
+                  <LazyImage
                     src={filteredImages[1]}
                     alt="diary-photo-1"
                     className="aspect-square w-full rounded-lg object-cover h-full"
                   />
-                  <img
+                  <LazyImage
                     src={filteredImages[2]}
                     alt="diary-photo-2"
                     className="aspect-square w-full rounded-lg object-cover h-full"
                   />
                   <div className="relative aspect-square w-full h-full">
-                    <img
+                    <LazyImage
                       src={filteredImages[3]}
                       alt="diary-photo-3"
-                      className="aspect-square w-full rounded-lg object-cover filter blur-sm"
+                      className="aspect-square w-full rounded-lg object-cover filter blur-sm h-full"
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-40 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-lg font-bold ">+{imageCount - 3}</span>
+                      <span className="text-white text-lg font-bold">+{imageCount - 3}</span>
                     </div>
                   </div>
                 </div>
@@ -561,31 +609,36 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
           );
         }
 
-        // 케이스 10: Blob + 사진4 + 지도 (사진 4개, 지도 있음) - 마지막 2개 사진은 블러 처리 + +2 표시
+        // 케이스 10: Blob + 사진4 + 지도 (사진 4개, 지도 있음)
         if (hasMap && imageCount >= 4) {
           return (
             <div
               key={mappedDiary.diaryId}
               ref={isLast && lastItemRef ? lastItemRef : undefined}
-              className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer "
+              className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
-              <div className="flex gap-2 rounded-lg mb-4 h-[170px]">
+              <div 
+                className="flex gap-2 rounded-lg mb-4" 
+                style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
+              >
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
-                <div className="w-1/2 grid grid-cols-2 grid-rows-2 gap-2 w-full">
-                  <img
+                <div className="w-1/2 grid grid-cols-2 grid-rows-2 gap-2">
+                  <LazyImage
                     src={filteredImages[0]}
                     alt="diary-photo-0"
                     className="aspect-square w-full rounded-lg object-cover h-full"
                   />
-                  <img
+                  <LazyImage
                     src={filteredImages[1]}
                     alt="diary-photo-1"
                     className="aspect-square w-full rounded-lg object-cover h-full"
                   />
-                  <div className="aspect-square w-full h-full">{renderMapSection(mappedDiary)}</div>
+                  <div className="aspect-square w-full h-full">
+                    <LazyMap diary={mappedDiary} />
+                  </div>
                   <div className="relative aspect-square w-full h-full">
-                    <img
+                    <LazyImage
                       src={filteredImages[2]}
                       alt="diary-photo-2"
                       className="aspect-square w-full rounded-lg object-cover filter blur-sm h-full"

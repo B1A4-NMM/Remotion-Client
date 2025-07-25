@@ -157,17 +157,17 @@ const Analysis = () => {
   }
 
   return (
-    <div className="px-4 py-5 text-foreground min-h-screen space-y-10">
+    <div className="px-4 py-5 text-foreground min-h-screen space-y-6">
       {/* 기간 선택 드롭다운 - 감정 데이터가 있을 때만 표시 */}
       {(hasNegativeData || hasPositiveData) && (
         <div className="flex justify-between gap-10">
-          <div className="w-full bg-white rounded-xl z-40">
+          <div className="w-80 bg-white rounded-xl z-40 ">
             <Select
               value={selectedPeriod}
               onValueChange={value => setSelectedPeriod(value as PeriodType)}
               options={periodOptions}
               placeholder="기간을 선택하세요"
-              className="text-base "
+              className="text-base h-10"
             />
           </div>
           {/* 도움말 버튼 */}
@@ -194,14 +194,14 @@ const Analysis = () => {
 
       {/* 부정적 감정 - 데이터가 있을 때만 표시 */}
       {hasNegativeData && (
-        <section className="bg-white rounded-xl shadow p-6">
+        <section className="bg-white rounded-xl shadow p-5">
           <div className="flex justify-between mb-5">
-            <h3 className="text-2xl font-semibold mb-2 text-gray-800">부정적 감정</h3>
+            <h3 className="text-[21px] font-semibold mb-2 text-gray-800">부정적 감정</h3>
             <div onClick={() => onClickHandler("부정")} className="cursor-pointer">
               <ChevronRight className="text-gray-400" />
             </div>
           </div>
-          <div className="overflow-x-auto pb-2">
+          <div className="overflow-x-auto ">
             {isLoading ? (
               <EmotionSummaryCardSkeleton />
             ) : (
@@ -218,9 +218,9 @@ const Analysis = () => {
 
       {/* 긍정적 감정 - 데이터가 있을 때만 표시 */}
       {hasPositiveData && (
-        <section className="bg-white rounded-xl shadow p-6">
+        <section className="bg-white rounded-xl shadow p-5">
           <div className="flex justify-between mb-5">
-            <h3 className="text-2xl font-semibold mb-2 text-gray-800">긍정적 감정</h3>
+            <h3 className="text-[21px] font-semibold mb-2 text-gray-800">긍정적 감정</h3>
             <div onClick={() => onClickHandler("긍정")} className="cursor-pointer">
               <ChevronRight className="text-gray-400" />
             </div>
@@ -242,9 +242,9 @@ const Analysis = () => {
 
       {/* 강점 - 데이터가 있을 때만 표시 */}
       {hasStrengthData && (
-        <section className="bg-white rounded-xl shadow p-6">
+        <section className="bg-white rounded-xl shadow p-5">
           <div className="flex justify-between mb-5">
-            <h3 className="text-2xl font-semibold mb-2 text-gray-800">강점 그래프</h3>
+            <h3 className="text-[21px] font-semibold mb-2 text-gray-800">강점 그래프</h3>
             <div onClick={() => onClickHandler("Strength")} className="cursor-pointer">
               <ChevronRight className="text-gray-400" />
             </div>
@@ -255,9 +255,11 @@ const Analysis = () => {
 
       {/* 캐릭터 - 데이터가 있을 때만 표시 */}
       {hasCharacterData && (
-        <section className="bg-white rounded-xl shadow pt-6 pl-6 pr-6">
+        <section className="bg-white rounded-xl shadow pt-5 pl-5 pr-5">
           <div className="flex justify-between mb-5">
-            <h3 className="text-2xl font-semibold mb-2 text-gray-800">{nickname}님의 동물은</h3>
+            <h3 className="text-[21px] font-semibold mb-2 text-gray-800">
+              {nickname}님의 마음 속 동물
+            </h3>
             <div onClick={() => onClickHandler("character")} className="cursor-pointer">
               <ChevronRight className="text-gray-400" />
             </div>

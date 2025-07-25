@@ -93,7 +93,7 @@ const Negative = () => {
         </div>
 
         <section className="bg-white rounded-xl shadow p-6">
-          <div className="text-xl font-bold p-3">
+          <div className="text-xl font-bold pb-4">
             {getPeriodConfig(selectedPeriod).label}별 부정적 감정 수치
           </div>
           {isLoading ? (

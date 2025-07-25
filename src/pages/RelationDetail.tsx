@@ -2,18 +2,50 @@ import { useNavigate, useParams } from "react-router-dom";
 import Title from "@/components/analysis/Title";
 import { useGetRelationDetail } from "@/api/queries/home/useGetRelationDetail";
 import { motion } from "framer-motion";
-import { Calendar, MapPin, Activity, TrendingUp } from "lucide-react";
+import {
+  Activity,
+  TrendingUp,
+  Calendar,
+  MapPin,
+  Utensils,
+  Coffee,
+  Video,
+  Music,
+  Gamepad2,
+  ShoppingBag,
+  Plane,
+  Camera,
+  BookOpen,
+  Briefcase,
+  Phone,
+  MessageCircle,
+  Home,
+  Gift,
+  Star,
+  Trees,
+  Car,
+  Mail,
+  Heart,
+  Sun,
+  Moon,
+  ChevronUp,
+  ChevronDown,
+  BarChart,
+} from "lucide-react";
 import { baseColors, mapEmotionToColor } from "@/constants/emotionColors";
-import type { ColorKey } from "@/components/Blob/Blob";
 import { Canvas } from "@react-three/fiber";
 import Blob from "@/components/Blob/Blob";
 import { useTheme } from "@/components/theme-provider";
 import dayjs from "dayjs";
 import { getBlobEmotionsFromSimpleEmotions } from "@/utils/activityEmotionUtils";
+import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
 
 const RelationDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { data, isLoading } = useGetRelationDetail(id || "");
+  const { data, isLoading, error } = useGetRelationDetail(id || "");
+  const [showAllActivities, setShowAllActivities] = useState(false);
+  const [showFullContent, setShowFullContent] = useState(false);
   const userName = "사용자";
 
   const navigate = useNavigate();
@@ -38,12 +70,13 @@ const RelationDetail = () => {
 
     // 3. 감정 분석 (emotions: [{emotion, count, intensity}]) - 구조 변경 대응
     const allEmotions = relationData.emotions || [];
-    
+
     // 감정별 count, 평균 intensity
     const emotionCounts: Record<string, { count: number; totalIntensity: number }> = {};
     console.log(allEmotions);
     allEmotions.forEach((e: any) => {
-      if (e.emotion && e.emotion !== '무난') { // '무난' 감정은 제외
+      if (e.emotion && e.emotion !== "무난") {
+        // '무난' 감정은 제외
         if (!emotionCounts[e.emotion]) {
           emotionCounts[e.emotion] = { count: 0, totalIntensity: 0 };
         }
@@ -51,12 +84,12 @@ const RelationDetail = () => {
         emotionCounts[e.emotion].totalIntensity += (e.totalIntensity || 0) * (e.totalCount || 0);
       }
     });
-    
+
     const emotionStats = Object.entries(emotionCounts)
       .map(([emotion, stats]) => ({
         emotion,
         count: stats.count,
-        averageIntensity: stats.count ? stats.totalIntensity / (stats.count**2) : 0,
+        averageIntensity: stats.count ? stats.totalIntensity / stats.count ** 2 : 0,
       }))
       .sort((a, b) => b.count - a.count);
 
@@ -118,7 +151,7 @@ const RelationDetail = () => {
 
   // activityEmotionUtils를 사용하여 Blob 감정 색상 계산
   const blobEmotions = getBlobEmotionsFromSimpleEmotions({ emotions: data.emotions });
-  
+
   // 가장 강한 감정의 색상 가져오기
   const strongestEmotion = analysis.emotionStats[0]?.emotion;
   const strongestEmotionColor = strongestEmotion
@@ -133,7 +166,7 @@ const RelationDetail = () => {
     if (score >= 50) return "좋은";
     if (score >= 40) return "보통의";
     if (score >= 30) return "알아가는";
-    if (score >= 20) return "서먹한";
+    if (score >= 20) return "조금은 아쉬운";
     if (score >= 10) return "어색한";
     return "냉랭한";
   };
@@ -146,47 +179,271 @@ const RelationDetail = () => {
     return dayjs(date).format("YYYY년 M월 D일 dddd");
   };
 
+  // 감정 분석 헬퍼 함수들
+  const isMostlyPositive = (emotionStats: any[]) => {
+    const positiveEmotions = ["감사", "존경", "신뢰", "애정", "친밀", "유대", "사랑", "공감"];
+    const positiveCount = emotionStats.filter(e => positiveEmotions.includes(e.emotion)).length;
+    return positiveCount > emotionStats.length / 2;
+  };
+
+  const isMostlyNegative = (emotionStats: any[]) => {
+    const negativeEmotions = [
+      "질투",
+      "시기",
+      "분노",
+      "짜증",
+      "실망",
+      "억울",
+      "속상",
+      "상처",
+      "배신감",
+      "경멸",
+      "거부감",
+      "불쾌",
+    ];
+    const negativeCount = emotionStats.filter(e => negativeEmotions.includes(e.emotion)).length;
+    return negativeCount > emotionStats.length / 2;
+  };
+
+  // 활동에 맞는 아이콘 매핑 함수
+  const getActivityIcon = (activity: string) => {
+    const activityLower = activity.toLowerCase();
+
+    // 식사 관련
+    if (
+      activityLower.includes("식사") ||
+      activityLower.includes("밥") ||
+      activityLower.includes("음식") ||
+      activityLower.includes("저녁") ||
+      activityLower.includes("아침") ||
+      activityLower.includes("점심")
+    )
+      return Utensils;
+    if (
+      activityLower.includes("커피") ||
+      activityLower.includes("카페") ||
+      activityLower.includes("차")
+    )
+      return Coffee;
+
+    // 엔터테인먼트
+    if (
+      activityLower.includes("영화") ||
+      activityLower.includes("드라마") ||
+      activityLower.includes("연극")
+    )
+      return Video;
+    if (
+      activityLower.includes("음악") ||
+      activityLower.includes("노래") ||
+      activityLower.includes("연주")
+    )
+      return Music;
+    if (activityLower.includes("게임") || activityLower.includes("놀이")) return Gamepad2;
+    if (
+      activityLower.includes("독서") ||
+      activityLower.includes("책") ||
+      activityLower.includes("읽기")
+    )
+      return BookOpen;
+
+    // 활동/운동
+    if (
+      activityLower.includes("운동") ||
+      activityLower.includes("스포츠") ||
+      activityLower.includes("체육")
+    )
+      return Activity;
+    if (
+      activityLower.includes("산책") ||
+      activityLower.includes("걷기") ||
+      activityLower.includes("산보")
+    )
+      return Trees;
+    if (activityLower.includes("수영") || activityLower.includes("바다")) return Trees;
+
+    // 쇼핑/구매
+    if (
+      activityLower.includes("쇼핑") ||
+      activityLower.includes("구매") ||
+      activityLower.includes("장보기")
+    )
+      return ShoppingBag;
+
+    // 여행/이동
+    if (activityLower.includes("여행") || activityLower.includes("관광")) return Plane;
+    if (
+      activityLower.includes("운전") ||
+      activityLower.includes("차") ||
+      activityLower.includes("이동")
+    )
+      return Car;
+    if (
+      activityLower.includes("배") ||
+      activityLower.includes("선박") ||
+      activityLower.includes("항해")
+    )
+      return Plane;
+
+    // 기록/사진
+    if (
+      activityLower.includes("사진") ||
+      activityLower.includes("카메라") ||
+      activityLower.includes("촬영")
+    )
+      return Camera;
+    if (
+      activityLower.includes("일기") ||
+      activityLower.includes("글쓰기") ||
+      activityLower.includes("기록")
+    )
+      return BookOpen;
+
+    // 업무/학업
+    if (
+      activityLower.includes("공부") ||
+      activityLower.includes("학습") ||
+      activityLower.includes("수업")
+    )
+      return BookOpen;
+    if (
+      activityLower.includes("업무") ||
+      activityLower.includes("회사") ||
+      activityLower.includes("일")
+    )
+      return Briefcase;
+    if (
+      activityLower.includes("회의") ||
+      activityLower.includes("상의") ||
+      activityLower.includes("논의")
+    )
+      return MessageCircle;
+
+    // 소통
+    if (
+      activityLower.includes("전화") ||
+      activityLower.includes("통화") ||
+      activityLower.includes("연락")
+    )
+      return Phone;
+    if (
+      activityLower.includes("메시지") ||
+      activityLower.includes("채팅") ||
+      activityLower.includes("대화")
+    )
+      return MessageCircle;
+    if (activityLower.includes("편지") || activityLower.includes("서신")) return Mail;
+
+    // 장소
+    if (
+      activityLower.includes("집") ||
+      activityLower.includes("홈") ||
+      activityLower.includes("가정")
+    )
+      return Home;
+    if (activityLower.includes("학교") || activityLower.includes("교실")) return BookOpen;
+    if (activityLower.includes("병원") || activityLower.includes("의원")) return Activity;
+    if (
+      activityLower.includes("교회") ||
+      activityLower.includes("성당") ||
+      activityLower.includes("기도")
+    )
+      return Star;
+
+    // 특별한 날/이벤트
+    if (
+      activityLower.includes("선물") ||
+      activityLower.includes("기념") ||
+      activityLower.includes("생일")
+    )
+      return Gift;
+    if (
+      activityLower.includes("축하") ||
+      activityLower.includes("파티") ||
+      activityLower.includes("경축")
+    )
+      return Star;
+    if (activityLower.includes("결혼") || activityLower.includes("예식")) return Heart;
+
+    // 감정/상태
+    if (
+      activityLower.includes("휴식") ||
+      activityLower.includes("쉬기") ||
+      activityLower.includes("휴가")
+    )
+      return Sun;
+    if (activityLower.includes("잠") || activityLower.includes("수면")) return Moon;
+    if (activityLower.includes("고민") || activityLower.includes("생각")) return Star;
+
+    // 기타
+    if (activityLower.includes("청소") || activityLower.includes("정리")) return Home;
+    if (activityLower.includes("요리") || activityLower.includes("조리")) return Utensils;
+    if (activityLower.includes("빨래") || activityLower.includes("세탁")) return Home;
+    if (activityLower.includes("수리") || activityLower.includes("고치기")) return Activity;
+
+    // 기본 아이콘들
+    return Activity;
+  };
+
   return (
     <div className="min-h-screen">
-      <Title name={data?.targetName + "과 함께한 시간"} isBackActive={true} back="/relation" />
+      <Title name="" isBackActive={true} back="/relation" />
 
-      <div className="max-w-4xl mx-auto px-4 space-y-10">
+      <div className="max-w-4xl mx-auto px-4 space-y-6">
         {/* 관계 요약 카드 */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-3xl shadow-xl p-6"
+          className="opacity-80 rounded-3xl shadow-xl   "
         >
-          <div className="text-center mb-6">
-            <div className="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center dark:bg-gradient-to-b dark:from-[#f5f6fa] dark:to-[#e0e3ef] rounded-full">
-              <Canvas 
-                camera={{ position: [0, 0, 10], fov: 28 }}>
-                <Blob emotions={blobEmotions} />
-              </Canvas>
+          <div className={`flex gap-8  rounded-2xl p-3 ${isDark ? "bg-[#4A3551]/30" : "bg-white"}`}>
+            {/* 왼쪽: Blob(사진) + 이름 */}
+            <div
+              className={`flex flex-col items-center dark:border-gray-800 rounded-2xl p-2 ${isDark ? "bg-white" : "bg-[#FAF6F4]"}`}
+            >
+              <div className="w-32 h-32 rounded-2xl flex items-center justify-center overflow-hidden mb-4 mt-3 ">
+                <Canvas className="w-full h-full">
+                  <Blob emotions={blobEmotions} />
+                </Canvas>
+              </div>
+              <div className="flex flex-col items-center">
+                {/* <div className="text-sm text-white font-medium">함께한 사람</div> */}
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white text-center mt-1">
+                  {analysis.targetName}
+                </h2>
+              </div>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              {analysis.targetName}과의 관계
-            </h2>
-            <div className="text-6xl font-bold text-blue-600 mb-2">{analysis.intimacyScore}</div>
-            <div className="text-gray-800">친밀도 점수</div>
-          </div>
 
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div className="bg-gray-50 rounded-xl p-4">
-              <div className="text-2xl font-bold text-gray-600">{analysis.totalDiaries}</div>
-              <div className="text-sm text-gray-600">함께한 순간</div>
-            </div>
-            <div className="bg-gray-50 rounded-xl p-4">
-              <div className="text-2xl font-bold text-gray-600">
-                {analysis.topActivities.length}
+            {/* 오른쪽: 친밀도 점수 + 통계 */}
+            <div className="flex-1 flex flex-col justify-between">
+              {/* 친밀도 점수 (강조) */}
+              <div className="text-center mt-8 flex flex-col justify-end">
+                <div className="text-lg font-medium text-gray-800 dark:text-white">친밀도 점수</div>
+                <div className={`text-4xl font-bold mb-2`}>{analysis.intimacyScore}</div>
               </div>
-              <div className="text-sm text-gray-600">공유한 활동</div>
-            </div>
-            <div className="bg-gray-50 rounded-xl p-4">
-              <div className="text-2xl font-bold text-gray-600">
-                {Math.round(analysis.meetingFrequency)}
+              {/* 통계 정보 */}
+              <div className="rounded-xl p-4 ">
+                <div className="space-y-2 text-base">
+                  <div className="flex justify-between items-center py-1 ">
+                    <span className="text-gray-800 dark:text-white font-medium">함께한 순간</span>
+                    <span className="text-gray-800 dark:text-white font-bold">
+                      {analysis.totalDiaries}회
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center py-1 ">
+                    <span className="text-gray-800 dark:text-white font-medium">공유 활동</span>
+                    <span className="text-gray-800 dark:text-white font-bold">
+                      {analysis.topActivities.length}개
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center py-1">
+                    <span className="text-gray-800 dark:text-white font-medium">월 평균</span>
+                    <span className="text-gray-800 dark:text-white font-bold">
+                      {Math.round(analysis.meetingFrequency)}회 만남
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="text-sm text-gray-600">월 평균 만남</div>
             </div>
           </div>
         </motion.div>
@@ -203,24 +460,48 @@ const RelationDetail = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white rounded-3xl shadow-xl p-6"
+              className="bg-white rounded-2xl shadow-md px-4 py-5"
             >
-              <div className="space-y-3">
-                {analysis.topActivities.map(([activity, count]: [string, number], index: number) => (
-                  <div
-                    key={activity}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
-                  >
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center mr-3">
-                        <span className="text-white font-bold text-sm">{index + 1}</span>
+              {/* <h3 className="text-lg font-semibold text-gray-800 mb-4">함께한 활동들</h3> */}
+              <ul className={`flex flex-col divide-y `}>
+                {(showAllActivities
+                  ? analysis.topActivities
+                  : analysis.topActivities.slice(0, 3)
+                ).map(([activity, count]: [string, number], index: number) => {
+                  const ActivityIcon = getActivityIcon(activity);
+                  return (
+                    <li key={activity} className="flex items-center justify-between py-2">
+                      <div className="flex items-center gap-2 text-gray-800">
+                        <div className={`w-5 h-5 rounded flex items-center justify-center `}>
+                          <ActivityIcon className="w-3 h-3 text-black dark:text-white" />
+                        </div>
+                        <span className="text-base">{activity}</span>
                       </div>
-                      <span className="font-medium text-gray-600">{activity}</span>
-                    </div>
-                    <span className="text-gray-600">{count}번</span>
-                  </div>
-                ))}
-              </div>
+                      <span className="text-black dark:text-gray-300 font-medium">{count}번</span>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              {/* 더보기 버튼 */}
+              {analysis.topActivities.length > 3 && (
+                <button
+                  onClick={() => setShowAllActivities(!showAllActivities)}
+                  className="w-full mt-3 py-2 text-sm text-gray-600 hover:text-gray-800 flex items-center justify-center gap-1 transition-colors"
+                >
+                  {showAllActivities ? (
+                    <>
+                      <span>접기</span>
+                      <ChevronUp className="w-4 h-4" />
+                    </>
+                  ) : (
+                    <>
+                      <span>더보기 ({analysis.topActivities.length - 3}개 더)</span>
+                      <ChevronDown className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              )}
             </motion.div>
           </div>
         )}
@@ -239,20 +520,25 @@ const RelationDetail = () => {
               transition={{ delay: 0.4 }}
               className="bg-white rounded-3xl shadow-xl p-6"
             >
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-4 gap-6">
                 {analysis.emotionStats.slice(0, 6).map((emotion: any) => (
-                  <div key={emotion.emotion} className="flex items-center p-4 bg-gray-50 rounded-xl">
+                  <div key={emotion.emotion} className="flex flex-col items-center space-y-3">
+                    {/* 동그란 원 안에 감정 */}
                     <div
-                      className="w-16 h-16 rounded-full flex items-center justify-center mr-4"
-                      style={{ backgroundColor: baseColors[mapEmotionToColor(emotion.emotion)] }}
+                      className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg relative overflow-hidden group hover:scale-105 transition-all duration-300"
+                      style={{
+                        background: `linear-gradient(135deg, ${baseColors[mapEmotionToColor(emotion.emotion)]} 0%, ${baseColors[mapEmotionToColor(emotion.emotion)]}dd 100%)`,
+                      }}
                     >
-                      <span className="text-white font-bold text-center">{emotion.emotion}</span>
+                      {/* 내부 하이라이트 효과 */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full"></div>
+                      <span className="text-gray-600 font-semibold text-center text-sm leading-tight relative z-10 drop-shadow-sm">
+                        {emotion.emotion}
+                      </span>
                     </div>
-                    <div>
-                      <div className="font-bold text-gray-600">{emotion.count}번</div>
-                      <div className="text-sm text-gray-600">
-                        평균 강도 {emotion.averageIntensity.toFixed(0)}
-                      </div>
+                    {/* 세로 정렬된 정보 */}
+                    <div className="text-center space-y-1">
+                      <div className=" text-gray-800 text-base">{emotion.count}회</div>
                     </div>
                   </div>
                 ))}
@@ -276,9 +562,60 @@ const RelationDetail = () => {
                 className="bg-white rounded-3xl shadow-xl p-6 cursor-pointer"
                 onClick={() => gotoDiary(analysis.recentDiary.diaryId)}
               >
-                <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6">
-                  <p className="text-gray-700 mb-4">{analysis.recentDiary.content}</p>
-                  <div className="flex items-center justify-between text-sm text-gray-600">
+                <div className="rounded-xl ">
+                  <div className="overflow-hidden">
+                    <motion.div
+                      initial={false}
+                      animate={{
+                        height: showFullContent ? "auto" : "9rem",
+                        opacity: 1,
+                      }}
+                      transition={{
+                        height: { duration: 0.4, ease: "easeInOut" },
+                        opacity: { duration: 0.3 },
+                      }}
+                      className="relative"
+                    >
+                      <p className="text-black mb-4">{analysis.recentDiary.content}</p>
+                    </motion.div>
+                  </div>
+
+                  {/* 더보기 버튼 */}
+                  {analysis.recentDiary.content.length > 150 && (
+                    <div className="relative mb-4">
+                      <AnimatePresence>
+                        {!showFullContent && (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-gray-50 to-transparent pointer-events-none"
+                          ></motion.div>
+                        )}
+                      </AnimatePresence>
+                      <motion.button
+                        onClick={e => {
+                          e.stopPropagation();
+                          setShowFullContent(!showFullContent);
+                        }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        transition={{ duration: 0.2 }}
+                        className="relative z-10 w-full py-2 px-4 bg-gray-100 rounded-lg text-sm text-gray-700   transition-all duration-200 flex items-center justify-center gap-2"
+                      >
+                        <motion.div
+                          animate={{ rotate: showFullContent ? 180 : 0 }}
+                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                        </motion.div>
+                        <span>{showFullContent ? "접기" : "더보기"}</span>
+                      </motion.button>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between text-sm ">
                     <div className="flex items-center">
                       {formatDate(analysis.recentDiary.writtenDate)}
                     </div>
@@ -295,79 +632,101 @@ const RelationDetail = () => {
         </div>
 
         {/* 관계 분석 결론 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className="rounded-3xl shadow-xl p-6"
-          style={
-            {
-              "--bg-color": strongestEmotionColor,
-              backgroundColor: `color-mix(in srgb, var(--bg-color) 15%, transparent)`,
-            } as React.CSSProperties
-          }
-        >
-          <h3 className="text-2xl font-bold mb-6 text-center text-black">관계 분석 결과</h3>
-          <div className="space-y-4 text-lg leading-relaxed text-black">
-            <p>
-              {userName}님은{" "}
-              <span
-                className="font-bold underline underline-offset-4"
-                style={{ textDecorationColor: strongestEmotionColor }}
-              >
-                {analysis.targetName}
-              </span>
-              과 지금까지{" "}
-              <span
-                className="font-bold underline underline-offset-4"
-                style={{ textDecorationColor: strongestEmotionColor }}
-              >
-                {analysis.totalDiaries}
-              </span>
-              번의 소중한 순간을 함께했습니다.
-            </p>
-            {analysis.topActivities.length > 0 && (
-              <p>
-                가장 많이 함께한 활동은{" "}
-                <span
-                  className="font-bold underline underline-offset-4"
-                  style={{ textDecorationColor: strongestEmotionColor }}
-                >
-                  {analysis.topActivities[0]?.[0]}
-                </span>
-                {analysis.emotionStats.length > 0 && (
-                  <>
-                    이며, 주로{" "}
-                    <span
-                      className="font-bold underline underline-offset-4"
-                      style={{ textDecorationColor: strongestEmotionColor }}
-                    >
-                      {analysis.emotionStats[0]?.emotion}
-                    </span>{" "}
-                    감정을 많이 나누었네요.
-                  </>
-                )}
-              </p>
-            )}
-            <p>
-              친밀도 점수{" "}
-              <span
-                className="font-bold underline underline-offset-4"
-                style={{ textDecorationColor: strongestEmotionColor }}
-              >
-                {analysis.intimacyScore}
-              </span>
-              점으로 보아,{" "}
-              <span
-                className="font-bold underline underline-offset-4"
-                style={{ textDecorationColor: strongestEmotionColor }}
-              >
-                {getRelationshipStatus(analysis.intimacyScore)}
-              </span>{" "}
-              관계를 유지하고 있습니다!
-            </p>
+        <div>
+          <div className="flex items-center mb-3">
+            <BarChart className="w-6 h-6 text-black mr-3" />
+            <h3 className="text-xl font-bold text-gray-900">관계 분석 리포트</h3>
           </div>
-        </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="bg-white rounded-3xl shadow-xl p-6"
+          >
+            <div className="space-y-4 text-[17px] leading-relaxed text-black">
+              <p>
+                <span
+                  className="font-bold px-1 rounded dark:bg-opacity-90 text-gray-700"
+                  style={{
+                    backgroundColor: `${strongestEmotionColor}A0`,
+                  }}
+                >
+                  {analysis.targetName}
+                </span>
+                님과{" "}
+                <span
+                  className="font-bold px-1 rounded dark:bg-opacity-90 text-gray-700"
+                  style={{
+                    backgroundColor: `${strongestEmotionColor}A0`,
+                  }}
+                >
+                  {analysis.totalDiaries}
+                </span>
+                번의 순간을 기록했어요.
+              </p>
+
+              {/* {analysis.emotionStats.length > 0 && (
+                <p>
+                  그 시간 속에서 느낀 감정들은 주로{" "}
+                  <span
+                    className="font-bold px-1 rounded"
+                    style={{
+                      backgroundColor: `${strongestEmotionColor}30`,
+                    }}
+                  >
+                    {analysis.emotionStats
+                      .map(e => e.emotion)
+                      .slice(0, 2)
+                      .join(", ")}
+                  </span>
+                  였어요.
+                  {isMostlyPositive(analysis.emotionStats)
+                    ? " 전반적으로 따뜻하고 긍정적인 분위기가 느껴졌어요."
+                    : isMostlyNegative(analysis.emotionStats)
+                      ? " 감정의 파동이 다소 크고, 신중함이 엿보였어요."
+                      : " 다양한 감정들이 오갔고, 관계에 깊이가 느껴졌어요."}
+                </p>
+              )} */}
+
+              {analysis.topActivities.length > 0 && (
+                <p>
+                  특히{" "}
+                  <span
+                    className="font-bold px-1 rounded dark:bg-opacity-90 text-gray-700"
+                    style={{
+                      backgroundColor: `${strongestEmotionColor}A0`,
+                    }}
+                  >
+                    {analysis.topActivities[0][0]}
+                  </span>{" "}
+                  활동에서 많은 시간을 함께 보냈답니다.
+                </p>
+              )}
+
+              <p>
+                현재 두 사람의 친밀도는{" "}
+                <span
+                  className="font-bold px-1 rounded dark:bg-opacity-90 text-gray-700"
+                  style={{
+                    backgroundColor: `${strongestEmotionColor}A0`,
+                  }}
+                >
+                  {analysis.intimacyScore}
+                </span>
+                점으로, <br />
+                <span
+                  className="font-bold px-1 rounded dark:bg-opacity-90 text-gray-700"
+                  style={{
+                    backgroundColor: `${strongestEmotionColor}A0`,
+                  }}
+                >
+                  {getRelationshipStatus(analysis.intimacyScore)}
+                </span>{" "}
+                관계를 이어가고 있어요.
+              </p>
+            </div>
+          </motion.div>
+        </div>
       </div>
     </div>
   );

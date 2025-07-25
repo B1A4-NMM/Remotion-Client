@@ -1,9 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import {
-  useMentalData,
-  useNegativeData,
-  usePositiveData,
-} from "@/api/queries/aboutme/useMentalData";
+import { useNegativeData, usePositiveData } from "@/api/queries/aboutme/useMentalData";
 import EmotionSummaryCardSkeleton from "../skeleton/EmotionSummaryCardSkeleton";
 import MentalChart from "../aboutMe/Mental/MentalChart";
 
@@ -42,10 +38,7 @@ const EmotionSummaryCard = ({ type, period, barCount }: EmotionSummaryCardProps)
     const data = extractDateData(query.data, type);
 
     return (
-      <div
-        onClick={() => navigate(`/analysis/${type}`)}
-        className="min-w-[160px] p-4 cursor-pointer"
-      >
+      <div onClick={() => navigate(`/analysis/${type}`)} className="cursor-pointer">
         {isLoading ? (
           <EmotionSummaryCardSkeleton />
         ) : (

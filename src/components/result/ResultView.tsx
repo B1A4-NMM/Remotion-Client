@@ -153,12 +153,9 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
       불안함: "anxiety",
     };
 
-    console.log("감정 데이터:", emotions);
     for (const emotion of emotions) {
-      console.log("체크 중인 감정:", emotion);
       for (const [keyword, type] of Object.entries(negativeEmotionMap)) {
         if (emotion.includes(keyword)) {
-          console.log("매칭됨:", emotion, "->", type);
           return type;
         }
       }
@@ -286,11 +283,9 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
       {testType && (
         <TestModal
           type={convertWarningToTestType(testType)}
-          onClose={() => setTestType(null)}
+          onClose={() => setTestType(null)} // 닫기 버튼 클릭 시에만 모달 닫기
           onFinish={(score) => {
-            console.log("🎯 테스트 완료! 점수:", score);
-            console.log("📝 테스트 타입:", testType);
-            setTestType(null);
+            // 결과를 확인한 후 사용자가 "닫기" 버튼을 눌러야 모달이 닫힘
           }}
         />
       )}

@@ -313,11 +313,8 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
 
       if (peoples && peoples.length > 0) {
         // 대상이 있는 경우
-        console.log(`🔍 Activity: ${activity}, People count: ${peoples.length}`);
-        console.log(`🔍 Peoples:`, peoples);
 
         if (peoples.length >= 2) {
-          console.log(`🔍 Processing as multiple people (${peoples.length} people)`);
           // 1-1. 2명 이상인 경우
 
           const validPeoples = peoples.filter(person => person !== null);

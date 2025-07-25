@@ -214,8 +214,16 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
   // Pass activityAnalysis to ActivityAnalysisCard
   return (
     <div className="px-4">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-3 p-1">{titles.emotionOfDay}</h2>
-      <ActivityAnalysisCard data={activityAnalysis} />
+      {activityAnalysis.length === 0 ?
+      (
+        <div/>
+      ):
+      (
+        <>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-3 p-1">{titles.emotionOfDay}</h2>
+          <ActivityAnalysisCard data={activityAnalysis} />
+        </>
+      )}
 
       {peopleWithChanges.length > 0 && (
         <div className={activityAnalysis.length === 1 ? "mt-2" : "mt-16"}>

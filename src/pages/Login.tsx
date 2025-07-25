@@ -93,17 +93,24 @@ export default function Login() {
       >
         <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
           <Button
+            onClick={() => handleDemo("namul")}
+            className="h-[48px] bg-white text-black hover:bg-[#F36B6B] hover:text-white rounded-full justify-center items-center gap-3 px-4 py-2"
+          >
+            <span>🐶 댕댕이 나물이의 일기</span>
+          </Button>
+
+          <Button
             onClick={() => handleDemo("anne")}
             className="h-[48px] bg-white text-black hover:bg-[#F36B6B] hover:text-white rounded-full justify-center items-center gap-3 px-4 py-2"
           >
-            <span>[Coming Soon] 🙋🏻‍♀️ 안네의 일기</span>
+            <span>🙋🏻‍♀️ 안네의 일기</span>
           </Button>
 
           <Button
             onClick={() => handleDemo("harry")}
             className="h-[48px] bg-white text-black hover:bg-[#72C9A3] hover:text-white rounded-full justify-center items-center gap-3 px-4 py-2"
           >
-            <span>[Coming Soon] 🪄 해리포터의 일기</span>
+            <span>🪄 해리포터의 일기</span>
           </Button>
 
           <Button

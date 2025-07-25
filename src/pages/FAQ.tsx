@@ -60,7 +60,7 @@ const FAQ = () => {
     {
         question: '감정 타임라인이 무엇인가요?',
         answer: `감정 타임라인은 4일 전부터 해당 일기를 작성한 시점까지의 감정 변화를 나타내는 그래프입니다. 
-        그래프가 0점을 기준으로 위로 올라가 있다면 해당 날자의 일기는 전반저긍로 긍정적이었다는 의미이며, 아래로 내려가 있다면 그날은 전반적으로 부정적인 감정을 느꼈다는 의미입니다.
+        그래프가 0점을 기준으로 위로 올라가 있다면 해당 날자의 일기는 전반적으로 긍정적이었다는 의미이며, 아래로 내려가 있다면 그날은 전반적으로 부정적인 감정을 느꼈다는 의미입니다.
         `
     },
     {
@@ -115,7 +115,7 @@ const FAQ = () => {
             {/* 질문 부분 (Q) - 클릭 가능한 헤더 */}
             <div
               onClick={() => toggleFAQ(index)}
-              className='bg-white cursor-pointer p-4 mt-4 flex justify-between'
+              className='bg-white cursor-pointer p-4 mt-4 flex justify-between border border-gray-700'
             >
               <span>Q. {faq.question}</span>
               <span style={{ 
@@ -128,7 +128,7 @@ const FAQ = () => {
             
             {/* 답변 부분 (A) - 드롭다운 콘텐츠 */}
             {openIndexes.includes(index) && (
-              <div className='bg-white p-4 mb-4'
+              <div className='bg-white p-4 mb-4 border border-gray-700'
               style={{ whiteSpace: 'pre-line' }}>
                 <strong>A.</strong> {faq.answer}
               </div>

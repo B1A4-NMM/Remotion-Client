@@ -22,7 +22,7 @@ const YouTubeBoard: React.FC<YouTubeBoardProps> = ({}) => {
   const lastMoveTime = useRef<number>(0);
   const lastX = useRef<number>(0);
 
-  const { data, isLoading, isError } = useGetVideo(10);
+  const { data, isLoading, isError } = useGetVideo(7);
   const navigate = useNavigate();
   const { theme } = useTheme();
   
@@ -182,7 +182,7 @@ const YouTubeBoard: React.FC<YouTubeBoardProps> = ({}) => {
       <section className="bg-white rounded-xl shadow p-6 mt-5">
         <div className="text-center">
           <p className="text-lg font-semibold mb-2">추천할 영상이 없습니다</p>
-          <p className="text-sm">오늘의 일기를 작성하면 영상이 준비됩니다.</p>
+          <p className="text-sm">일주일 내로 작성한 일기가 있다면 영상이 준비됩니다.</p>
         </div>
       </section>
     );

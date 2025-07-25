@@ -290,7 +290,8 @@ const Map: React.FC<MapProps> = ({ initialCenter }) => {
             mapInstance.setZoom(5);
           }
         }}
-        className="absolute top-4 right-4 z-50 bg-[#FAF6F4] dark:bg-[#4A3551] shadow-lg rounded-lg px-3 py-2 text-sm font-medium text-black dark:text-black transition-colors"
+        className="absolute top-3 z-50 bg-[#FAF6F4] dark:bg-[#4A3551] shadow-lg rounded-lg px-3 py-2 text-sm font-medium text-black dark:text-black transition-colors"
+        style={{ right: "60px" }}
       >
         줌아웃
       </button>

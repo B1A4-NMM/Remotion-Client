@@ -100,128 +100,88 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
       const highestColor = getHighestIntensityColor(item);
 
       if (peoples && peoples.length > 0) {
-        const person = peoples[0];
-        const emotions = person.interactions.emotion || [];
-        const selfEmotions = self_emotions.emotion || [];
-        const stateEmotions = state_emotions.emotion || [];
-
-        // 각 감정 데이터의 존재 여부 확인
-        const hasPersonEmotions = emotions.length > 0;
-        const hasSelfEmotions = selfEmotions.length > 0;
-        const hasStateEmotions = stateEmotions.length > 0;
-
-        return [
-          <div
-            className="bg-white rounded-2xl shadow pl-8 pr-5 pt-5 pb-5 text-left h-full flex flex-col justify-center"
-            key="single-activity"
-          >
-            <div className="w-6 h-6 mb-6 mx-auto">
-              <svg
-                width="20"
-                height="16"
-                viewBox="0 0 20 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-full h-full"
-              >
-                <path
-                  d="M15.5859 15.1758C14.4141 15.1758 13.418 14.7656 12.5977 13.9453C11.7773 13.125 11.3672 12.1289 11.3672 10.957C11.3672 10.7617 11.3867 10.3125 11.4258 9.60938C11.4648 8.86719 11.6406 7.98828 11.9531 6.97266C12.3047 5.95703 12.8516 4.84375 13.5938 3.63281C14.375 2.38281 15.4883 1.17188 16.9336 0H19.6875C18.9062 0.78125 18.2422 1.5625 17.6953 2.34375C17.1875 3.125 16.7578 3.84766 16.4062 4.51172C16.0156 5.25391 15.7422 5.99609 15.5859 6.73828C16.7578 6.73828 17.7539 7.14844 18.5742 7.96875C19.3945 8.78906 19.8047 9.78516 19.8047 10.957C19.8047 12.1289 19.3945 13.125 18.5742 13.9453C17.7539 14.7656 16.7578 15.1758 15.5859 15.1758ZM4.21875 15.1758C3.04688 15.1758 2.05078 14.7656 1.23047 13.9453C0.410156 13.125 0 12.1289 0 10.957C0 10.7617 0.0195312 10.3125 0.0585938 9.60938C0.0976562 8.86719 0.273438 7.98828 0.585938 6.97266C0.898438 5.95703 1.42578 4.84375 2.16797 3.63281C2.94922 2.38281 4.0625 1.17188 5.50781 0H8.26172C7.48047 0.78125 6.81641 1.5625 6.26953 2.34375C5.76172 3.125 5.35156 3.84766 5.03906 4.51172C4.64844 5.25391 4.375 5.99609 4.21875 6.73828C5.39062 6.73828 6.36719 7.14844 7.14844 7.96875C7.96875 8.78906 8.37891 9.78516 8.37891 10.957C8.37891 12.1289 7.96875 13.125 7.14844 13.9453C6.36719 14.7656 5.39062 15.1758 4.21875 15.1758Z"
-                  fill={baseColors[highestColor]}
-                />
-              </svg>
-            </div>
-            <div className="text-gray-800 text-base leading-relaxed">
-              {highlightActivity(activity)}에서 <br />
-              {highlightTargets([{ name: person.name, colorKey: "blue" }])}에게{" "}
-              {hasPersonEmotions ? <>{highlightEmotions(emotions)}을 느꼈고</> : <>함께했고</>}
-              {hasSelfEmotions && (
-                <>
-                  {" "}
-                  <br />
-                  나에게는 {highlightEmotions(selfEmotions)}을 느끼고
-                </>
-              )}
-              {hasStateEmotions && (
-                <>
-                  {" "}
-                  <br />
-                  전체적으로 {highlightEmotions(stateEmotions)}의 분위기를 느꼈어요.
-                </>
-              )}
-              {!hasStateEmotions && (hasPersonEmotions || hasSelfEmotions) && <>느꼈어요.</>}
-            </div>
-          </div>,
-        ];
-      } else {
-        // 대상이 없는 경우도 처리
-        const selfEmotions = self_emotions?.emotion || [];
-        const stateEmotions = state_emotions?.emotion || [];
-        const allEmotions = [...selfEmotions, ...stateEmotions];
-
-        if (allEmotions.length > 0) {
-          return [
-            <div
-              className="bg-white rounded-2xl shadow pl-8 pr-5 pt-5 pb-5 text-left h-full flex flex-col justify-center"
-              key="single-activity-no-target"
-            >
-              <div className="w-6 h-6 mb-6 mx-auto">
-                <svg
-                  width="20"
-                  height="16"
-                  viewBox="0 0 20 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-full h-full"
-                >
-                  <path
-                    d="M15.5859 15.1758C14.4141 15.1758 13.418 14.7656 12.5977 13.9453C11.7773 13.125 11.3672 12.1289 11.3672 10.957C11.3672 10.7617 11.3867 10.3125 11.4258 9.60938C11.4648 8.86719 11.6406 7.98828 11.9531 6.97266C12.3047 5.95703 12.8516 4.84375 13.5938 3.63281C14.375 2.38281 15.4883 1.17188 16.9336 0H19.6875C18.9062 0.78125 18.2422 1.5625 17.6953 2.34375C17.1875 3.125 16.7578 3.84766 16.4062 4.51172C16.0156 5.25391 15.7422 5.99609 15.5859 6.73828C16.7578 6.73828 17.7539 7.14844 18.5742 7.96875C19.3945 8.78906 19.8047 9.78516 19.8047 10.957C19.8047 12.1289 19.3945 13.125 18.5742 13.9453C17.7539 14.7656 16.7578 15.1758 15.5859 15.1758ZM4.21875 15.1758C3.04688 15.1758 2.05078 14.7656 1.23047 13.9453C0.410156 13.125 0 12.1289 0 10.957C0 10.7617 0.0195312 10.3125 0.0585938 9.60938C0.0976562 8.86719 0.273438 7.98828 0.585938 6.97266C0.898438 5.95703 1.42578 4.84375 2.16797 3.63281C2.94922 2.38281 4.0625 1.17188 5.50781 0H8.26172C7.48047 0.78125 6.81641 1.5625 6.26953 2.34375C5.76172 3.125 5.35156 3.84766 5.03906 4.51172C4.64844 5.25391 4.375 5.99609 4.21875 6.73828C5.39062 6.73828 6.36719 7.14844 7.14844 7.96875C7.96875 8.78906 8.37891 9.78516 8.37891 10.957C8.37891 12.1289 7.96875 13.125 7.14844 13.9453C6.36719 14.7656 5.39062 15.1758 4.21875 15.1758Z"
-                    fill={baseColors[highestColor]}
-                  />
-                </svg>
-              </div>
-              <div className="text-gray-800 text-base leading-relaxed text-left">
-                오늘 {highlightActivity(activity)}에서 <br /> {highlightEmotions(allEmotions)}을
-                느꼈어요.
-              </div>
-            </div>,
-          ];
-        }
-      }
-    }
-
-    // 활동별로 카드 생성
-    for (const item of validData) {
-      const { activity, peoples, self_emotions, state_emotions } = item;
-      const highestColor = getHighestIntensityColor(item);
-
-      if (peoples && peoples.length > 0) {
-        // 대상이 있는 경우
+        // 여러 명의 사람이 있는 경우와 1명인 경우를 구분
         if (peoples.length >= 2) {
-          // 1-1. 2명 이상인 경우
-
+          // 여러 명인 경우 - 기존 다중 처리 로직 사용
           const validPeoples = peoples.filter(person => person !== null);
-          const peopleLines = validPeoples.map((person, idx) => {
+
+          // 전체 분위기 감정 추가 (먼저 정의)
+          const stateEmotions = state_emotions?.emotion || [];
+          const selfEmotions = self_emotions?.emotion || [];
+
+          // 감정이 있는 사람과 없는 사람 분리
+          const peopleWithEmotions = validPeoples.filter(
+            person => person.interactions?.emotion && person.interactions.emotion.length > 0
+          );
+          const peopleWithoutEmotions = validPeoples.filter(
+            person => !person.interactions?.emotion || person.interactions.emotion.length === 0
+          );
+
+          // 감정이 있는 사람들 처리
+          const emotionLines = peopleWithEmotions.map((person, idx) => {
             const emotions = person.interactions?.emotion || [];
-            const hasEmotions = emotions.length > 0;
-            const isLast = idx === validPeoples.length - 1;
+            const isLast = idx === peopleWithEmotions.length - 1;
+            const hasSelfOrStateEmotions = selfEmotions.length > 0 || stateEmotions.length > 0;
+
+            // 대상이 'none'이지만 감정이 있는 경우 '누군가'로 변경
+            const displayName =
+              person.name === "none" && emotions.length > 0 ? "누군가" : person.name;
 
             return (
               <span key={person.name}>
-                {highlightTargets([{ name: person.name, colorKey: "blue" }])}
-                {hasEmotions ? (
-                  <>
-                    에게 {highlightEmotions(emotions)}을 {isLast ? "느꼈던" : "느꼈고,"}
-                    <br />
-                  </>
-                ) : (
-                  <>
-                    와 {isLast ? "함께했던" : "함께했고,"}
-                    <br />
-                  </>
-                )}
+                {highlightTargets([{ name: displayName, colorKey: "blue" }])}
+                에게 {highlightEmotions(emotions)}을{" "}
+                {isLast ? (hasSelfOrStateEmotions ? "느꼈고" : "느꼈던") : "느꼈고,"}
+                {!isLast && <br />}
               </span>
             );
           });
+
+          // 감정이 없는 사람들 처리
+          let noEmotionLine = null;
+          if (peopleWithoutEmotions.length > 0) {
+            const displayNames = peopleWithoutEmotions.map(person => person.name);
+            noEmotionLine = (
+              <span key="no-emotion-people">
+                {highlightTargets(displayNames.map(name => ({ name, colorKey: "blue" })))}와
+                함께했고
+              </span>
+            );
+          }
+
+          // 모든 라인 결합
+          const allLines = [...emotionLines];
+          if (noEmotionLine) {
+            allLines.push(noEmotionLine);
+          }
+
+          // 전체 분위기 감정 추가
+          const additionalEmotions = [];
+          if (selfEmotions.length > 0) {
+            additionalEmotions.push(
+              <span key="self-emotions">
+                <br /> 스스로는 {highlightEmotions(selfEmotions)}
+                {stateEmotions.length > 0 ? "고" : "을"}
+              </span>
+            );
+          }
+
+          if (stateEmotions.length > 0) {
+            additionalEmotions.push(
+              <span key="state-emotions">
+                {selfEmotions.length > 0 ? "" : ""}
+                <br /> 전체적으로 {highlightEmotions(stateEmotions)}의 분위기를
+              </span>
+            );
+          }
+
+          if (additionalEmotions.length > 0) {
+            allLines.push(...additionalEmotions);
+            allLines.push(<span key="emotion-end"> 느꼈어요.</span>);
+          } else {
+            // 감정이 없는 경우 "그런 하루였어요" 추가
+            allLines.push(<span key="no-emotion-end"> 그런 하루였어요.</span>);
+          }
 
           cards.push(
             <div
@@ -245,7 +205,223 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
               </div>
               <div className="text-gray-800 text-base leading-relaxed text-left">
                 오늘 {highlightActivity(activity)}에서
-                <br /> {peopleLines as React.ReactNode[]} 그런 하루였어요.
+                <br /> {allLines as React.ReactNode[]}
+              </div>
+            </div>
+          );
+        } else {
+          // 1명인 경우 - 기존 로직 유지
+          const person = peoples[0];
+          const emotions = person.interactions.emotion || [];
+          const selfEmotions = self_emotions.emotion || [];
+          const stateEmotions = state_emotions.emotion || [];
+
+          // 각 감정 데이터의 존재 여부 확인
+          const hasPersonEmotions = emotions.length > 0;
+          const hasSelfEmotions = selfEmotions.length > 0;
+          const hasStateEmotions = stateEmotions.length > 0;
+
+          // 대상이 'none'이지만 감정이 있는 경우 '누군가'로 변경
+          const displayName = person.name === "none" && hasPersonEmotions ? "누군가" : person.name;
+
+          cards.push(
+            <div
+              className="bg-white rounded-2xl shadow pl-8 pr-5 pt-5 pb-5 text-left h-full flex flex-col justify-center"
+              key="single-activity-single-person"
+            >
+              <div className="w-6 h-6 mb-6 mx-auto">
+                <svg
+                  width="20"
+                  height="16"
+                  viewBox="0 0 20 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-full h-full"
+                >
+                  <path
+                    d="M15.5859 15.1758C14.4141 15.1758 13.418 14.7656 12.5977 13.9453C11.7773 13.125 11.3672 12.1289 11.3672 10.957C11.3672 10.7617 11.3867 10.3125 11.4258 9.60938C11.4648 8.86719 11.6406 7.98828 11.9531 6.97266C12.3047 5.95703 12.8516 4.84375 13.5938 3.63281C14.375 2.38281 15.4883 1.17188 16.9336 0H19.6875C18.9062 0.78125 18.2422 1.5625 17.6953 2.34375C17.1875 3.125 16.7578 3.84766 16.4062 4.51172C16.0156 5.25391 15.7422 5.99609 15.5859 6.73828C16.7578 6.73828 17.7539 7.14844 18.5742 7.96875C19.3945 8.78906 19.8047 9.78516 19.8047 10.957C19.8047 12.1289 19.3945 13.125 18.5742 13.9453C17.7539 14.7656 16.7578 15.1758 15.5859 15.1758ZM4.21875 15.1758C3.04688 15.1758 2.05078 14.7656 1.23047 13.9453C0.410156 13.125 0 12.1289 0 10.957C0 10.7617 0.0195312 10.3125 0.0585938 9.60938C0.0976562 8.86719 0.273438 7.98828 0.585938 6.97266C0.898438 5.95703 1.42578 4.84375 2.16797 3.63281C2.94922 2.38281 4.0625 1.17188 5.50781 0H8.26172C7.48047 0.78125 6.81641 1.5625 6.26953 2.34375C5.76172 3.125 5.35156 3.84766 5.03906 4.51172C4.64844 5.25391 4.375 5.99609 4.21875 6.73828C5.39062 6.73828 6.36719 7.14844 7.14844 7.96875C7.96875 8.78906 8.37891 9.78516 8.37891 10.957C8.37891 12.1289 7.96875 13.125 7.14844 13.9453C6.36719 14.7656 5.39062 15.1758 4.21875 15.1758Z"
+                    fill={baseColors[highestColor]}
+                  />
+                </svg>
+              </div>
+              <div className="text-gray-800 text-base leading-relaxed">
+                {highlightActivity(activity)}에서 <br />
+                {highlightTargets([{ name: displayName, colorKey: "blue" }])}에게{" "}
+                {hasPersonEmotions ? <>{highlightEmotions(emotions)}을 느꼈고</> : <>함께했고</>}
+                {hasSelfEmotions && (
+                  <>
+                    {" "}
+                    <br />
+                    나에게는 {highlightEmotions(selfEmotions)}을 느끼고
+                  </>
+                )}
+                {hasStateEmotions && (
+                  <>
+                    {" "}
+                    <br />
+                    전체적으로 {highlightEmotions(stateEmotions)}의 분위기를 느꼈어요.
+                  </>
+                )}
+                {!hasStateEmotions && (hasPersonEmotions || hasSelfEmotions) && <>느꼈어요.</>}
+              </div>
+            </div>
+          );
+        }
+      } else {
+        // 대상이 없는 경우도 처리
+        const selfEmotions = self_emotions?.emotion || [];
+        const stateEmotions = state_emotions?.emotion || [];
+        const allEmotions = [...selfEmotions, ...stateEmotions];
+
+        if (allEmotions.length > 0) {
+          cards.push(
+            <div
+              className="bg-white rounded-2xl shadow pl-8 pr-5 pt-5 pb-5 text-left h-full flex flex-col justify-center"
+              key="single-activity-no-target"
+            >
+              <div className="w-6 h-6 mb-6 mx-auto">
+                <svg
+                  width="20"
+                  height="16"
+                  viewBox="0 0 20 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-full h-full"
+                >
+                  <path
+                    d="M15.5859 15.1758C14.4141 15.1758 13.418 14.7656 12.5977 13.9453C11.7773 13.125 11.3672 12.1289 11.3672 10.957C11.3672 10.7617 11.3867 10.3125 11.4258 9.60938C11.4648 8.86719 11.6406 7.98828 11.9531 6.97266C12.3047 5.95703 12.8516 4.84375 13.5938 3.63281C14.375 2.38281 15.4883 1.17188 16.9336 0H19.6875C18.9062 0.78125 18.2422 1.5625 17.6953 2.34375C17.1875 3.125 16.7578 3.84766 16.4062 4.51172C16.0156 5.25391 15.7422 5.99609 15.5859 6.73828C16.7578 6.73828 17.7539 7.14844 18.5742 7.96875C19.3945 8.78906 19.8047 9.78516 19.8047 10.957C19.8047 12.1289 19.3945 13.125 18.5742 13.9453C17.7539 14.7656 16.7578 15.1758 15.5859 15.1758ZM4.21875 15.1758C3.04688 15.1758 2.05078 14.7656 1.23047 13.9453C0.410156 13.125 0 12.1289 0 10.957C0 10.7617 0.0195312 10.3125 0.0585938 9.60938C0.0976562 8.86719 0.273438 7.98828 0.585938 6.97266C0.898438 5.95703 1.42578 4.84375 2.16797 3.63281C2.94922 2.38281 4.0625 1.17188 5.50781 0H8.26172C7.48047 0.78125 6.81641 1.5625 6.26953 2.34375C5.76172 3.125 5.35156 3.84766 5.03906 4.51172C4.64844 5.25391 4.375 5.99609 4.21875 6.73828C5.39062 6.73828 6.36719 7.14844 7.14844 7.96875C7.96875 8.78906 8.37891 9.78516 8.37891 10.957C8.37891 12.1289 7.96875 13.125 7.14844 13.9453C6.36719 14.7656 5.39062 15.1758 4.21875 15.1758Z"
+                    fill={baseColors[highestColor]}
+                  />
+                </svg>
+              </div>
+              <div className="text-gray-800 text-base leading-relaxed text-left">
+                오늘 {highlightActivity(activity)}에서 <br /> {highlightEmotions(allEmotions)}을
+                느꼈어요.
+              </div>
+            </div>
+          );
+        }
+      }
+      return cards; // Return the cards generated for the single activity case
+    }
+
+    // 활동별로 카드 생성
+    for (const item of validData) {
+      const { activity, peoples, self_emotions, state_emotions } = item;
+      const highestColor = getHighestIntensityColor(item);
+
+      if (peoples && peoples.length > 0) {
+        // 대상이 있는 경우
+        console.log(`🔍 Activity: ${activity}, People count: ${peoples.length}`);
+        console.log(`🔍 Peoples:`, peoples);
+
+        if (peoples.length >= 2) {
+          console.log(`🔍 Processing as multiple people (${peoples.length} people)`);
+          // 1-1. 2명 이상인 경우
+
+          const validPeoples = peoples.filter(person => person !== null);
+
+          // 전체 분위기 감정 추가 (먼저 정의)
+          const stateEmotions = state_emotions?.emotion || [];
+          const selfEmotions = self_emotions?.emotion || [];
+
+          // 감정이 있는 사람과 없는 사람 분리
+          const peopleWithEmotions = validPeoples.filter(
+            person => person.interactions?.emotion && person.interactions.emotion.length > 0
+          );
+          const peopleWithoutEmotions = validPeoples.filter(
+            person => !person.interactions?.emotion || person.interactions.emotion.length === 0
+          );
+
+          // 감정이 있는 사람들 처리
+          const emotionLines = peopleWithEmotions.map((person, idx) => {
+            const emotions = person.interactions?.emotion || [];
+            const isLast = idx === peopleWithEmotions.length - 1;
+            const hasSelfOrStateEmotions = selfEmotions.length > 0 || stateEmotions.length > 0;
+
+            // 대상이 'none'이지만 감정이 있는 경우 '누군가'로 변경
+            const displayName =
+              person.name === "none" && emotions.length > 0 ? "누군가" : person.name;
+
+            return (
+              <span key={person.name}>
+                {highlightTargets([{ name: displayName, colorKey: "blue" }])}
+                에게 {highlightEmotions(emotions)}을{" "}
+                {isLast ? (hasSelfOrStateEmotions ? "느꼈고" : "느꼈던") : "느꼈고,"}
+                {!isLast && <br />}
+              </span>
+            );
+          });
+
+          // 감정이 없는 사람들 처리
+          let noEmotionLine = null;
+          if (peopleWithoutEmotions.length > 0) {
+            const displayNames = peopleWithoutEmotions.map(person => person.name);
+            noEmotionLine = (
+              <span key="no-emotion-people">
+                {highlightTargets(displayNames.map(name => ({ name, colorKey: "blue" })))}와
+                함께했고
+              </span>
+            );
+          }
+
+          // 모든 라인 결합
+          const allLines = [...emotionLines];
+          if (noEmotionLine) {
+            allLines.push(noEmotionLine);
+          }
+
+          // 전체 분위기 감정 추가
+          const additionalEmotions = [];
+          if (selfEmotions.length > 0) {
+            additionalEmotions.push(
+              <span key="self-emotions">
+                <br /> 스스로는 {highlightEmotions(selfEmotions)}
+                {stateEmotions.length > 0 ? "고" : "을"}
+              </span>
+            );
+          }
+
+          if (stateEmotions.length > 0) {
+            additionalEmotions.push(
+              <span key="state-emotions">
+                {selfEmotions.length > 0 ? "" : ""}
+                <br /> 전체적으로 {highlightEmotions(stateEmotions)}의 분위기를
+              </span>
+            );
+          }
+
+          if (additionalEmotions.length > 0) {
+            allLines.push(...additionalEmotions);
+            allLines.push(<span key="emotion-end"> 느꼈어요.</span>);
+          } else {
+            // 감정이 없는 경우 "그런 하루였어요" 추가
+            allLines.push(<span key="no-emotion-end"> 그런 하루였어요.</span>);
+          }
+
+          cards.push(
+            <div
+              className="bg-white rounded-2xl shadow pl-10 pr-5 pt-5 pb-5 text-left h-full flex flex-col justify-center"
+              key={activity}
+            >
+              <div className="w-6 h-6 mb-6 mx-auto">
+                <svg
+                  width="20"
+                  height="16"
+                  viewBox="0 0 20 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-full h-full"
+                >
+                  <path
+                    d="M15.5859 15.1758C14.4141 15.1758 13.418 14.7656 12.5977 13.9453C11.7773 13.125 11.3672 12.1289 11.3672 10.957C11.3672 10.7617 11.3867 10.3125 11.4258 9.60938C11.4648 8.86719 11.6406 7.98828 11.9531 6.97266C12.3047 5.95703 12.8516 4.84375 13.5938 3.63281C14.375 2.38281 15.4883 1.17188 16.9336 0H19.6875C18.9062 0.78125 18.2422 1.5625 17.6953 2.34375C17.1875 3.125 16.7578 3.84766 16.4062 4.51172C16.0156 5.25391 15.7422 5.99609 15.5859 6.73828C16.7578 6.73828 17.7539 7.14844 18.5742 7.96875C19.3945 8.78906 19.8047 9.78516 19.8047 10.957C19.8047 12.1289 19.3945 13.125 18.5742 13.9453C17.7539 14.7656 16.7578 15.1758 15.5859 15.1758ZM4.21875 15.1758C3.04688 15.1758 2.05078 14.7656 1.23047 13.9453C0.410156 13.125 0 12.1289 0 10.957C0 10.7617 0.0195312 10.3125 0.0585938 9.60938C0.0976562 8.86719 0.273438 7.98828 0.585938 6.97266C0.898438 5.95703 1.42578 4.84375 2.16797 3.63281C2.94922 2.38281 4.0625 1.17188 5.50781 0H8.26172C7.48047 0.78125 6.81641 1.5625 6.26953 2.34375C5.76172 3.125 5.35156 3.84766 5.03906 4.51172C4.64844 5.25391 4.375 5.99609 4.21875 6.73828C5.39062 6.73828 6.36719 7.14844 7.14844 7.96875C7.96875 8.78906 8.37891 9.78516 8.37891 10.957C8.37891 12.1289 7.96875 13.125 7.14844 13.9453C6.36719 14.7656 5.39062 15.1758 4.21875 15.1758Z"
+                    fill={baseColors[highestColor]}
+                  />
+                </svg>
+              </div>
+              <div className="text-gray-800 text-base leading-relaxed text-left">
+                오늘 {highlightActivity(activity)}에서
+                <br /> {allLines as React.ReactNode[]}
               </div>
             </div>
           );
@@ -257,6 +433,12 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
           const emotions = person.interactions?.emotion || [];
           const selfEmotions = self_emotions?.emotion || [];
           const stateEmotions = state_emotions?.emotion || [];
+
+          // displayName 설정 (none인 경우 "누군가"로 변경)
+          let displayName = person.name;
+          if (person.name === "none" && emotions.length > 0) {
+            displayName = "누군가";
+          }
 
           cards.push(
             <div
@@ -280,7 +462,7 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
               </div>
               <div className="text-gray-800 text-base leading-relaxed text-left">
                 오늘 {highlightActivity(activity)}에서는 <br />
-                {highlightTargets([{ name: person.name, colorKey: "blue" }])}와{" "}
+                {highlightTargets([{ name: displayName, colorKey: "blue" }])}와{" "}
                 {emotions.length > 0 ? (
                   <>{highlightEmotions(emotions)}을 느꼈어요.</>
                 ) : (
@@ -349,6 +531,16 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
 
         const highestColor = maxIntensityEmotion ? mapEmotionToColor(maxIntensityEmotion) : "blue";
 
+        const combined = emotionOnlyActivities.map(({ activity: activityName, emotions }, idx) => {
+          const emotionElements = highlightEmotions(emotions);
+          return (
+            <span key={activityName + idx} className="text-base">
+              {highlightActivity(activityName)}에서 {emotionElements}
+              {idx < emotionOnlyActivities.length - 1 ? ", " : ""}
+            </span>
+          );
+        });
+
         cards.push(
           <div
             className="bg-white rounded-2xl shadow pl-10 pr-5 pt-5 pb-5 text-center h-full flex flex-col justify-center"
@@ -393,12 +585,15 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
 
         const highestColor = maxIntensityEmotion ? mapEmotionToColor(maxIntensityEmotion) : "blue";
 
-        const combined = emotionOnlyActivities.map(({ activity, emotions }, idx) => (
-          <span key={activity + idx} className="text-base">
-            {highlightActivity(activity)}에서 {highlightEmotions(emotions)}
-            {idx < emotionOnlyActivities.length - 1 ? ", " : ""}
-          </span>
-        ));
+        const combined = emotionOnlyActivities.map(({ activity: activityName, emotions }, idx) => {
+          const emotionElements = highlightEmotions(emotions);
+          return (
+            <span key={activityName + idx} className="text-base">
+              {highlightActivity(activityName)}에서 {emotionElements}
+              {idx < emotionOnlyActivities.length - 1 ? ", " : ""}
+            </span>
+          );
+        });
 
         cards.push(
           <div
@@ -421,7 +616,7 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
               </svg>
             </div>
             <div className="text-gray-800 text-base leading-relaxed">
-              그 이외에 {combined}을 느꼈어요.
+              그 이외에 {combined as React.ReactNode[]}을 느꼈어요.
             </div>
           </div>
         );

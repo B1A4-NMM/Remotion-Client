@@ -64,12 +64,9 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
   );
 
   const MapSkeleton = ({ className }: { className?: string }) => (
-    <div className={`relative bg-gray-200 animate-pulse rounded-lg ${className}`}>
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-        <div className="w-6 h-6 bg-gray-300 rounded-full animate-pulse" />
-      </div>
-    </div>
+    <div className={`bg-gray-200 animate-pulse rounded-lg ${className}`} />
   );
+  
 
   // LazyImage 컴포넌트 완성
   const LazyImage = ({ 
@@ -157,7 +154,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
 
   // 공통 컴포넌트들
   const renderBlobSection = (diary: Diary, index: number) => (
-    <div className={`h-full w-full rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center p-2 overflow-hidden ${isCompactMode ? 'min-w-0' : 'min-w-[170px] max-w-[170px]'}`}>
+    <div className={`h-full w-full rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center p-2 overflow-hidden ${isCompactMode ? 'min-w-0' : 'min-w-[120px] max-w-[170px]'}`}>
       <div className={`${isCompactMode ? 'text-sm' : 'text-base'} text-[#85848F] font-medium text-center mb-2`}>
         {diary.emotions && diary.emotions.length > 0
           ? `${diary.emotions

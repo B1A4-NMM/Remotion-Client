@@ -197,12 +197,12 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
             {/* 그라데이션 정의 */}
             <defs>
               <linearGradient id="positiveGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="rgba(134, 239, 172, 0.4)" />
+                <stop offset="0%" stopColor="rgba(134, 239, 172, 0.9)" />
                 {/* <stop offset="100%" stopColor="rgba(134, 239, 172, 0.1)" /> */}
               </linearGradient>
               <linearGradient id="negativeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                 {/* <stop offset="0%" stopColor="rgba(252, 165, 165, 0.1)" /> */}
-                <stop offset="100%" stopColor="rgba(252, 165, 165, 0.4)" />
+                <stop offset="100%" stopColor="rgba(252, 165, 165, 0.9)" />
               </linearGradient>
               <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#6B7280" />

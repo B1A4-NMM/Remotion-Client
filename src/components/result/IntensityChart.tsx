@@ -186,7 +186,7 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
   };
 
   return (
-    <div className="mt-3 mb-6 overflow-visible">
+    <div className="mt-3 overflow-visible">
       <div
         className="rounded-2xl shadow-lg p-4 overflow-visible bg-white dark:bg-gray-800"
       >

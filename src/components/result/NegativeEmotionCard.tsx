@@ -92,7 +92,7 @@ const NegativeEmotionCard: React.FC<NegativeEmotionCardProps> = ({ emotionType }
   const emotion = emotionMessages[emotionType];
 
   return (
-    <div className="bg-[#ffffff] dark:bg-white p-1 rounded-2xl mb-5 text-black dark:text-white shadow-md dark:border-gray-600">
+    <div className="bg-[#ffffff] dark:bg-white p-1 rounded-2xl text-black dark:text-white shadow-md dark:border-gray-600">
       <div className="p-4 rounded-2xl">
         <div className="flex items-center mb-2">
           <Play className="w-5 h-5 text-[#ef7c80] dark:text-purple-400 mr-2" />

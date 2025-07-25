@@ -1,4 +1,5 @@
 // components/result/WarningTestBox.tsx
+
 import React from "react";
 import { Button } from "./ui/button";
 
@@ -15,7 +16,7 @@ const typeToMessage: Record<string, string> = {
 
 const WarningTestBox = ({ type, onClick }: WarningTestBoxProps) => {
   return (
-    <div className="bg-[#ffffff] dark:bg-[#4A3551] p-4 mt-4 rounded-lg mb-4 text-black dark:text-white shadow-md">
+    <div className="bg-[#ffffff] dark:bg-[#4A3551] p-4 rounded-lg text-black dark:text-white shadow-md">
       <p className="mb-3 text-base whitespace-pre-line">{typeToMessage[type]}</p>
       <Button
         onClick={() => onClick(type)}

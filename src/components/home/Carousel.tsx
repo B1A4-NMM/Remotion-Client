@@ -141,8 +141,11 @@ const Carousel: React.FC<CarouselProps> = ({ items }) => {
           {items.map((_, idx) => (
             <button
               key={idx}
-              className={`w-2 h-2 rounded-full ${current === idx ? "bg-gray-800" : "bg-gray-300"}`}
-              onClick={() => setCurrent(idx)}
+              className={`w-2 h-2 rounded-full ${
+                current === idx
+                  ? "bg-gray-800 dark:bg-gray-200"
+                  : "bg-gray-300 dark:bg-gray-500"
+              }`}              onClick={() => setCurrent(idx)}
               aria-label={`Go to slide ${idx + 1}`}
             />
           ))}

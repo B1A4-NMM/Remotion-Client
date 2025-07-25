@@ -18,7 +18,7 @@ const RelationshipChangeCard: React.FC<RelationshipChangeCardProps> = ({ people 
   const decreased = people.filter(person => person.changeScore < 0);
 
   return (
-    <div className=" mb-6 mt-[50px]">
+    <div className="mb-6 mt-[60px]">
       <Link to="/relation" className="block">
         <div className="border border-gray-300 rounded-lg bg-gray-50/50 p-4 hover:bg-gray-50/50 cursor-pointer transition-colors">
           <div className="text-gray-700 leading-relaxed ">

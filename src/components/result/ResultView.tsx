@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 import ActivityCardSlider from "./ActivityCardSlider";
 import Todos from "./Todo";
-import WarningTestBox from "../WariningTestBox";
+import WarningTestBox from "../WarningTestBox";
 import TestModal from "./Test/TestModal";
 import PeopleCard from "../home/PeopleCard";
 import ActivityAnalysisCard from "../home/ActivityAnalysisCard";
@@ -214,19 +214,16 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
         </>
       )}
       {hasValidProblems && (
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mt-[30px] mb-[20px] px-4">
-            오늘의 사건 리포트
-          </h2>
-
+        <>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-3 p-1">오늘의 사건 리포트</h2>
           <ConflictAnalysisCard conflicts={allProblems} />
-        </div>
+        </>
       )}
 
       <IntensityChart scores={beforeDiaryScores} diaryId={diaryId} />
       {recommendRoutines && recommendRoutines.content && (
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mt-[60px] mb-[20px] px-4">
+          <h2 className="text-2xl font-semibold text-gray-800 mt-[60px] mb-3 px-1">
             나만의 감정 회복 루틴
           </h2>
           <div className="px-4">

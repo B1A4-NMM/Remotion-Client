@@ -689,7 +689,7 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
 
   return (
     <div className="mb-6">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4 px-4">감정으로 보는 오늘 하루</h2>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-3 p-1">감정으로 보는 오늘 하루</h2>
       <Carousel items={cardList} />
     </div>
   );

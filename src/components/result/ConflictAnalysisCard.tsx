@@ -92,15 +92,15 @@ const ConflictAnalysisCard: React.FC<ConflictAnalysisCardProps> = ({
 
     // 하이라이트할 키워드들 정의
     const keywords = [
-      { text: conflict.situation, className: "bg-blue-200 px-1 rounded" },
+      { text: conflict.situation, className: "bg-blue-200 dark:bg-blue-900 dark:text-blue-200 px-1 rounded" },
       {
         text: getResponseTypeDisplay(conflict.conflict_response_code),
-        className: "bg-yellow-200 px-1 rounded",
+        className: "bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 px-1 rounded",
       },
-      { text: conflict.outcome, className: "bg-green-200 px-1 rounded" },
-      { text: conflict.approach, className: "bg-purple-200 px-1 rounded" },
+      { text: conflict.outcome, className: "bg-green-200 dark:bg-green-900 dark:text-green-200 px-1 rounded" },
+      { text: conflict.approach, className: "bg-purple-200 dark:bg-purple-900 dark:text-purple-200 px-1 rounded" },
       // 원본 conflict_response_code도 추가 (변환된 텍스트와 함께)
-      { text: conflict.conflict_response_code, className: "bg-orange-200 px-1 rounded" },
+      { text: conflict.conflict_response_code, className: "bg-orange-200 dark:bg-orange-900 dark:text-orange-200 px-1 rounded" },
     ];
 
     // 텍스트에서 키워드 위치 찾기
@@ -157,16 +157,16 @@ const ConflictAnalysisCard: React.FC<ConflictAnalysisCardProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md px-4 py-5">
-      <div className="space-y-4">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md px-3 py-3">
+      <div className="space-y-2">
         {validConflicts.map((conflict, index) => {
           const templateText = getConflictTemplate(conflict);
 
           if (!templateText) return null; // templateText가 null이면 렌더링하지 않음
 
           return (
-            <div key={index} className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
-              <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+            <div key={index} className="bg-gray-50 dark:bg-black/20 rounded-lg p-4">
+              <p className="text-base text-gray-700 dark:text-gray-100 leading-relaxed">
                 {renderHighlightedText(templateText, conflict)}
               </p>
             </div>

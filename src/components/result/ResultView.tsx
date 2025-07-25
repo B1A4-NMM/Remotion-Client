@@ -218,7 +218,7 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
       <ActivityAnalysisCard data={activityAnalysis} />
 
       {peopleWithChanges.length > 0 && (
-        <div className={activityAnalysis.length === 1 ? "mt-2" : "mt-6"}>
+        <div className={activityAnalysis.length === 1 ? "mt-2" : "mt-16"}>
           <h2 className="text-2xl font-semibold text-gray-800 mb-3 p-1">{titles.relationshipChanges}</h2>
           <RelationshipChangeCard people={peopleWithChanges} />
         </div>
@@ -226,16 +226,16 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
 
       {hasValidProblems && (
         <>
-          <h2 className="text-2xl font-semibold text-gray-800 mt-6 mb-3 p-1">{titles.eventReport}</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mt-8 mb-3 p-1">{titles.eventReport}</h2>
           <ConflictAnalysisCard conflicts={allProblems} />
         </>
       )}
 
-      <h2 className="text-2xl font-semibold text-gray-800 mt-6 mb-3 p-1">{titles.emotionTimeline}</h2>
+      <h2 className="text-2xl font-semibold text-gray-800 mt-8 mb-3 p-1">{titles.emotionTimeline}</h2>
       <IntensityChart scores={beforeDiaryScores} diaryId={diaryId} />
 
       {(reflectionTodos.length > 0 || warningType || (recommendRoutines && recommendRoutines.content) || negativeEmotionType) && (
-        <h2 className="text-2xl font-semibold text-gray-800 mt-6 mb-3 p-1">{titles.recoveryRoutine}</h2>
+        <h2 className="text-2xl font-semibold text-gray-800 mt-8 mb-3 p-1">{titles.recoveryRoutine}</h2>
       )}
 
       {recommendRoutines && recommendRoutines.content && (

@@ -92,13 +92,13 @@ const NegativeEmotionCard: React.FC<NegativeEmotionCardProps> = ({ emotionType }
   const emotion = emotionMessages[emotionType];
 
   return (
-    <div className="bg-[#ffffff] dark:bg-[#4A3551] p-1 mt-4 rounded-lg mb-5 text-black dark:text-white shadow-md border border-gray-200 dark:border-gray-600">
-      <div className=" dark:bg-gray-800 p-4 rounded-lg">
+    <div className="bg-[#ffffff] dark:bg-white p-1 mt-4 rounded-2xl mb-5 text-black dark:text-white shadow-md dark:border-gray-600">
+      <div className="p-4 rounded-2xl">
         <div className="flex items-center mb-2">
           <Play className="w-5 h-5 text-[#ef7c80] dark:text-purple-400 mr-2" />
           <h4 className="font-medium text-base">{emotion.videoTitle}</h4>
         </div>
-        <p className="text-base text-gray-600 dark:text-gray-300 mb-3">
+        <p className="text-base text-gray-600 dark:text-gray-200 mb-3">
           {emotion.videoDescription}
         </p>
         <Link to="/contents">

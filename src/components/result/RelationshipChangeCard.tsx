@@ -20,7 +20,7 @@ const RelationshipChangeCard: React.FC<RelationshipChangeCardProps> = ({ people 
   return (
     <div className="mb-6 mt-3">
       <Link to="/relation" className="block">
-        <div className="rounded-2xl shadow bg-white dark:bg-gray-800 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+        <div className="rounded-2xl shadow bg-white dark:bg-gray-800 p-5 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors">
           <div className="text-gray-700 dark:text-gray-300 leading-relaxed ">
             {increased.length > 0 && (
               <p>
@@ -31,7 +31,7 @@ const RelationshipChangeCard: React.FC<RelationshipChangeCardProps> = ({ people 
                       {person.name}
                     </span>
                     와의 친밀도가{" "}
-                    <span className="text-green-600 dark:text-green-300 font-medium">
+                    <span className="text-green-600 dark:text-green-200 font-medium">
                       {person.changeScore.toFixed(1)}점{" "}
                     </span>
                     올랐

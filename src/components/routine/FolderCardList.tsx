@@ -103,7 +103,7 @@ const FolderCardList = ( { onFolderClick } : FolderCardListProps) => {
         <div className="overflow-x-auto pb-[30px] relative">
           <div
             ref={scrollRef}
-            className="flex space-x-4 px-[18px] overflow-x-auto hide-scrollbar cursor-grab active:cursor-grabbing"
+            className="flex gap-4 px-4 overflow-x-auto hide-scrollbar cursor-grab active:cursor-grabbing"
             onMouseDown={handleMouseDown}
             onTouchStart={handleTouchStart}
             style={{ scrollBehavior: isDragging ? "auto" : "smooth" }}
@@ -116,6 +116,7 @@ const FolderCardList = ( { onFolderClick } : FolderCardListProps) => {
               />
             ))}
           </div>
+
     
           {/* 하단 인디케이터 */}
           <div className="absolute left-1/2 bottom-[12px] transform -translate-x-1/2 flex gap-2">

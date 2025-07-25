@@ -185,20 +185,27 @@ const Relation = () => {
       const baseDistance = 200;
       const affectionBonus = (relation.affection / 100) * 100;
       const distance = baseDistance + affectionBonus;
-
+    
       const baseRadius = 10;
-      const affectionRadius = (relation.affection / 100) * 15;
-      const radius = Math.max(25, Math.min(50, baseRadius + affectionRadius));
-      const scale = Math.max(8, Math.min(20, radius / 2.5));  // radius 25-50 → scale 8-20
-
+      console.log(relation.name+"'s COUNT!!!!: "+relation.count);
+      
+      // relationCount의 영향력을 높임: 15 → 30으로 증가
+      const countRadius = (relation.count / 10) * 20;
+      
+      // 최대 radius를 80으로 확장하여 더 큰 차이를 표현
+      const radius = Math.max(25, Math.min(80, baseRadius + countRadius));
+      
+      // scale도 새로운 radius 범위에 맞게 조정
+      const scale = Math.max(8, Math.min(28, radius / 2.5));  // radius 25-70 → scale 8-28
+    
       if(relation.name==="None"){
         relation.name="누군가";
       }
-
+    
       const node: ProcessedNode = {
         ...relation,
-        x: centerX + Math.cos(angle) * distance, // 정중앙 기준
-        y: centerY + Math.sin(angle) * distance, // 정중앙 기준
+        x: centerX + Math.cos(angle) * distance,
+        y: centerY + Math.sin(angle) * distance,
         radius: radius,
         isMe: false,
         processedEmotions: processRelationEmotions(relation),
@@ -206,7 +213,7 @@ const Relation = () => {
       };
       processedNodes.push(node);
     });
-
+    
     setNodes(processedNodes);
 
     // ✅ 초기 스크롤 위치 - 확장된 공간의 중심으로

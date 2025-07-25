@@ -432,9 +432,9 @@ const Relation = () => {
                 style={{
                   position: "absolute",
                   left:node.isMe? -2: -10,
-                  top: node.isMe? -2 :-11,
-                  width: node.isMe? node.radius * 2.1 :node.radius * 2.75,
-                  height: node.isMe? node.radius * 2.1 : node.radius * 2.75,
+                  top: node.isMe? -2 :-10,
+                  width: node.isMe? node.radius * 2.1 :node.radius * 2.7,
+                  height: node.isMe? node.radius * 2.1 : node.radius * 2.7,
                   zIndex: 1, // 가장 낮은 z-index
                 }}
               />

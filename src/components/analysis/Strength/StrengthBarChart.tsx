@@ -31,9 +31,9 @@ function normalizeValues(values: number[], maxAllowed: number) {
 
 const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthBarChartProps) => {
   const { theme } = useTheme();
-    const isDark =
-      theme === "dark" ||
-      (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
   const ref = useRef<SVGSVGElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
@@ -65,7 +65,9 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
 
     // 원본 값 추출
     const lastValues = detailKeys.map(key => Math.max(0, (lastData && lastData[key]) || 0));
-    const currentValues = detailKeys.map(key => Math.max(0, (currentData && currentData[key]) || 0));
+    const currentValues = detailKeys.map(key =>
+      Math.max(0, (currentData && currentData[key]) || 0)
+    );
     // 전체 값 중 최댓값
     const allValues = [...lastValues, ...currentValues];
     // 기준치
@@ -119,7 +121,6 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
         .attr("width", barWidth)
         .attr("height", 0)
         .attr("fill", LAST_COLOR)
-        .attr("rx", 4)
         .transition()
         .duration(800)
         .delay(i * 100)
@@ -137,7 +138,6 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
         .attr("width", barWidth)
         .attr("height", 0)
         .attr("fill", CURRENT_COLOR)
-        .attr("rx", 4)
         .transition()
         .duration(800)
         .delay(i * 100 + 150)
@@ -179,7 +179,7 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
         .style("opacity", 1);
 
       // 라벨
-        svg
+      svg
         .append("text")
         .attr("x", groupX + groupWidth / 2)
         .attr("y", height - 35)
@@ -188,7 +188,6 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
         .style("font-size", "13px")
         .style("font-weight", "500")
         .text(key);
-    
     });
 
     // 범례 추가
@@ -201,8 +200,7 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
       .attr("y", 10)
       .attr("width", 14)
       .attr("height", 14)
-      .attr("fill", LAST_COLOR)
-      .attr("rx", 2);
+      .attr("fill", LAST_COLOR);
 
     legendGroup
       .append("text")
@@ -219,8 +217,7 @@ const StrengthBarChart = ({ lastData, currentData, selectedCategory }: StrengthB
       .attr("y", 10)
       .attr("width", 14)
       .attr("height", 14)
-      .attr("fill", CURRENT_COLOR)
-      .attr("rx", 2);
+      .attr("fill", CURRENT_COLOR);
 
     legendGroup
       .append("text")

@@ -421,19 +421,6 @@ const Relation = () => {
               onClick={() => handleNodeClick(node)}
               className="cursor-pointer"
             >
-              {/* 1. bg-gradient - 가장 뒤 (최하위) */}
-              <div 
-                className="blob-container dark:bg-gradient-to-b dark:from-[#f5f6fa] dark:to-[#e0e3ef] rounded-full"
-                style={{
-                  position: "absolute",
-                  left:node.isMe? -2: -10,
-                  top: node.isMe? -2 :-10,
-                  width: node.isMe? node.radius * 2.1 :node.radius * 2.7,
-                  height: node.isMe? node.radius * 2.1 : node.radius * 2.7,
-                  zIndex: 1, // 가장 낮은 z-index
-                }}
-              />
-              
               {/* 2. Canvas는 별도 위치에서 z-index: 5 정도로 설정 */}
               
               {/* 3. 글자 오버레이 - 가장 앞 (최상위) */}

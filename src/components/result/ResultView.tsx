@@ -188,7 +188,7 @@ const ResultView: React.FC<ResultViewProps> = ({ diaryContent, isLoading }) => {
   }
 
   return (
-    <div className="px-4">
+    <div className="px-4 mb-10">
       {/* ✅ CSS Grid 컨테이너로 모든 섹션을 감싸기 */}
       <div className="grid grid-cols-1 gap-8 auto-rows-max">
         

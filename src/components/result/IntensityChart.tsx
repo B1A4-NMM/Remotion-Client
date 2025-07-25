@@ -187,10 +187,8 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
 
   return (
     <div className="mb-4 pt-4 overflow-visible">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-3 p-1">오늘까지 감정 타임라인</h2>
       <div
-        className="rounded-2xl shadow-lg p-4 overflow-visible"
-        style={{ backgroundColor: "#FFFFFF" }}
+        className="rounded-2xl shadow-lg p-4 overflow-visible bg-white dark:bg-gray-800"
       >
         <div className="overflow-visible">
           <svg width={chartWidth} height={topPadding + chartHeight + bottomPadding}>
@@ -295,6 +293,7 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
                 fill="white"
                 fontWeight="600"
                 fontFamily="system-ui, -apple-system, BlinkMacSystemFont, sans-serif"
+                className="dark:fill-gray-800"
               >
                 긍정
               </text>
@@ -319,6 +318,7 @@ const IntensityChart: React.FC<IntensityChartProps> = ({ scores, diaryId }) => {
                 fill="white"
                 fontWeight="600"
                 fontFamily="system-ui, -apple-system, BlinkMacSystemFont, sans-serif"
+                className="dark:fill-gray-800"
               >
                 부정
               </text>

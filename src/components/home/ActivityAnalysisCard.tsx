@@ -204,7 +204,7 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
                   />
                 </svg>
               </div>
-              <div className="text-gray-800 text-base leading-relaxed text-left">
+              <div className="text-gray-800 dark:text-gray-300 text-base leading-relaxed text-left">
                 오늘 {highlightActivity(activity)}에서
                 <br /> {allLines as React.ReactNode[]}
               </div>
@@ -295,7 +295,7 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
                   />
                 </svg>
               </div>
-              <div className="text-gray-800 text-base leading-relaxed text-left">
+              <div className="text-gray-800 dark:text-gray-300 text-base leading-relaxed text-left">
                 오늘 {highlightActivity(activity)}에서 <br /> {highlightEmotions(allEmotions)}을
                 느꼈어요.
               </div>
@@ -429,7 +429,7 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
                   />
                 </svg>
               </div>
-              <div className="text-gray-800 text-base leading-relaxed text-left">
+              <div className="text-gray-800 dark:text-gray-300 text-base leading-relaxed text-left">
                 오늘 {highlightActivity(activity)}에서
                 <br /> {allLines as React.ReactNode[]}
               </div>
@@ -470,7 +470,7 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
                   />
                 </svg>
               </div>
-              <div className="text-gray-800 text-base leading-relaxed text-left">
+              <div className="text-gray-800 dark:text-gray-300 text-base leading-relaxed text-left">
                 오늘 {highlightActivity(activity)}에서는 <br />
                 {highlightTargets([{ name: displayName, colorKey: "blue" }])}와{" "}
                 {emotions.length > 0 ? (
@@ -672,7 +672,7 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
                   />
                 </svg>
               </div>
-              <div className="text-gray-800 text-base leading-relaxed text-left">
+              <div className="text-gray-800 dark:text-gray-300 text-base leading-relaxed text-left">
                 오늘 {highlightActivity(activity)}에서 <br /> {highlightEmotions(emotions)}을
                 느꼈어요.
               </div>
@@ -689,7 +689,6 @@ const ActivityAnalysisCard: React.FC<{ data?: ActivityAnalysisItem[] }> = ({ dat
 
   return (
     <div className="mb-6">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-3 p-1">감정으로 보는 오늘 하루</h2>
       <Carousel items={cardList} />
     </div>
   );

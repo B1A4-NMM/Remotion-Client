@@ -14,7 +14,6 @@ interface ConflictAnalysisCardProps {
 
 const ConflictAnalysisCard: React.FC<ConflictAnalysisCardProps> = ({
   conflicts,
-  title = "마음 사건 리포트",
 }) => {
   // situation만 있어도 렌더링되도록 수정
   const validConflicts = conflicts.filter(
@@ -158,7 +157,7 @@ const ConflictAnalysisCard: React.FC<ConflictAnalysisCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-md px-4 py-5">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md px-4 py-5">
       <div className="space-y-4">
         {validConflicts.map((conflict, index) => {
           const templateText = getConflictTemplate(conflict);
@@ -166,8 +165,8 @@ const ConflictAnalysisCard: React.FC<ConflictAnalysisCardProps> = ({
           if (!templateText) return null; // templateText가 null이면 렌더링하지 않음
 
           return (
-            <div key={index} className="bg-gray-100 rounded-lg p-4">
-              <p className="text-base text-gray-700 leading-relaxed">
+            <div key={index} className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
+              <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed">
                 {renderHighlightedText(templateText, conflict)}
               </p>
             </div>

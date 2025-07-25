@@ -49,9 +49,9 @@ const Title = ({
   };
 
   const { theme, setTheme } = useTheme();
-    const isDark =
-      theme === "dark" ||
-      (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   return (
     <>
@@ -60,7 +60,9 @@ const Title = ({
 
         {isBackActive ? (
           <>
-            <div className={`flex justify-between items-center px-4 pt-8 pb-4 ${isDark ? "bg-[#181718]" : "bg-[#FAF6F4]"}`}>
+            <div
+              className={`flex justify-between items-center px-4 pt-8 pb-4 ${isDark ? "bg-[#181718]" : "bg-[#FAF6F4]"}`}
+            >
               <button onClick={onClickHandler} className="flex items-center gap-1">
                 <ChevronLeft className="size-8 text-gray-600" />
               </button>
@@ -78,7 +80,7 @@ const Title = ({
               <h1 className="font-bold text-gray-900 text-3xl">{name}</h1>
             </div>
             <div className="w-full">
-              <div className="buttonContainer2 shadow-md mt-3">
+              <div className="buttonContainer2 shadow-md ">
                 <button
                   className={`button ${isRelation ? "active" : ""}`}
                   onClick={() => handleTabClick("relation")}

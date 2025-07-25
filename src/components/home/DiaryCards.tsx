@@ -64,12 +64,9 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
   );
 
   const MapSkeleton = ({ className }: { className?: string }) => (
-    <div className={`relative bg-gray-200 animate-pulse rounded-lg ${className}`}>
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-        <div className="w-6 h-6 bg-gray-300 rounded-full animate-pulse" />
-      </div>
-    </div>
+    <div className={`bg-gray-200 animate-pulse rounded-lg ${className}`} />
   );
+  
 
   // LazyImage 컴포넌트 완성
   const LazyImage = ({ 

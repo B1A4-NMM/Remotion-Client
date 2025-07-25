@@ -109,18 +109,12 @@ const FolderCardList = ( { onFolderClick } : FolderCardListProps) => {
             style={{ scrollBehavior: isDragging ? "auto" : "smooth" }}
           >
             {folderData.map((folder, idx) => (
-            <div
-            key={idx}
-            className={`${
-            idx === 0 ? "ml-4" : idx === folderData.length - 1 ? "mr-4" : ""
-            }`}
-          >
-    <FolderCard
-      {...folder}
-      onClick={() => onFolderClick(folder.emotionKey)}
-    />
-  </div>
-))}
+              <FolderCard
+                key={idx}
+                {...folder}
+                onClick={() => onFolderClick(folder.emotionKey)}
+              />
+            ))}
           </div>
 
     

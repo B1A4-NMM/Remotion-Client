@@ -13,7 +13,6 @@ import { useGetAuthTest } from "@/api/queries/auth/useGetAuthTest";
 import { useNegativeData, usePositiveData } from "@/api/queries/aboutme/useMentalData";
 import { useGetStrengthPeriod } from "@/api/queries/aboutme/useGetStrength";
 import Index from "@/components/home/Index";
-import { useUserStore } from "@/store/userStore";
 
 type PeriodType = "daily" | "weekly" | "monthly";
 
@@ -29,12 +28,12 @@ const Analysis = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const helpRef = useRef<HTMLDivElement>(null);
-  
+
   const navigate = useNavigate();
 
-  const {data:authData} = useGetAuthTest();
+  const { data: authData } = useGetAuthTest();
   const apiUser = authData?.user;
-  const nickname = apiUser?.nickname ||"하루뒤";
+  const nickname = apiUser?.nickname || "하루뒤";
 
   const periodConfigs: Record<PeriodType, PeriodConfig> = {
     daily: { days: 7, barCount: 7, label: "일간 (7일)" },
@@ -168,7 +167,7 @@ const Analysis = () => {
               onValueChange={value => setSelectedPeriod(value as PeriodType)}
               options={periodOptions}
               placeholder="기간을 선택하세요"
-              className="font-bold !text-2xl"
+              className="text-base "
             />
           </div>
           {/* 도움말 버튼 */}
@@ -186,10 +185,7 @@ const Analysis = () => {
                 <div className="font-semibold mb-2 flex items-center gap-2">
                   <HelpCircle className="w-5 h-5 text-gray-500" /> 도움말
                 </div>
-                <div>
-                  여기서는 일기에서 나타난 감정들의 상세 분석을 확인할 수 있어요. 업데이트까지는
-                  시간이 조금 걸려요.
-                </div>
+                <div>여기서는 일기에서 나타난 감정들의 상세 분석을 확인할 수 있어요.</div>
               </div>
             )}
           </div>

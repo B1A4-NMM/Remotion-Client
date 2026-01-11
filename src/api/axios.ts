@@ -2,9 +2,7 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_SOCIAL_AUTH_URL,
-  // baseURL: import.meta.env.DEV
-  // ? '/api'
-  // : import.meta.env.VITE_SOCIAL_AUTH_URL,
+  withCredentials: true, // 쿠키 자동 포함 설정 (HttpOnly Cookie 사용 시 필수)
 });
 
 // 전역 로그아웃 모달 상태 관리
@@ -37,42 +35,35 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/auth/refresh')) {
       originalRequest._retry = true;
       
-      const refreshToken = localStorage.getItem("refreshToken");
-      
-      if (refreshToken) {
-        try {
-          console.log("🔄 토큰 만료, 재발급 시도...");
-          // 토큰 갱신 요청
-          const { data } = await axios.post(`${import.meta.env.VITE_SOCIAL_AUTH_URL}/auth/refresh`, {
-            refreshToken
-          });
+      try {
+        console.log("🔄 토큰 만료, 재발급 시도 (Cookie)...");
+        // 토큰 갱신 요청 (쿠키가 자동으로 전송됨)
+        const { data } = await api.post(`/auth/refresh`);
 
-          console.log("✅ 토큰 재발급 성공");
-          // 새 토큰 저장
-          localStorage.setItem("accessToken", data.access_token);
-          localStorage.setItem("refreshToken", data.refresh_token);
+        console.log("✅ 토큰 재발급 성공");
+        // 새 Access Token 저장
+        localStorage.setItem("accessToken", data.access_token);
+        
+        // Refresh Token은 백엔드가 Set-Cookie 헤더로 자동 갱신해줌
 
-          // 실패한 요청의 헤더 업데이트
-          originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
+        // 실패한 요청의 헤더 업데이트
+        originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
 
-          // 실패한 요청 재시도
-          return api(originalRequest);
-        } catch (refreshError) {
-          console.error("❌ 토큰 갱신 실패:", refreshError);
-          // 갱신 실패 시 로그아웃 처리 진행
-        }
-      } else {
-        console.warn("⚠️ Refresh Token 없음");
+        // 실패한 요청 재시도
+        return api(originalRequest);
+      } catch (refreshError) {
+        console.error("❌ 토큰 갱신 실패:", refreshError);
+        // 갱신 실패 시 로그아웃 처리 진행
       }
     }
 
-    // 401 에러이고 (재발급 실패했거나, 처음부터 재발급 불가한 경우)
+    // 위에서 리턴되지 않았다면 (갱신 실패, 등) 로그아웃 처리
     if (error.response?.status === 401) {
       // 토큰 만료 또는 무효
       localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
+      // refreshToken은 쿠키에 있으므로 클라이언트가 직접 지울 수 없음 (로그아웃 API 호출 필요하지만, 여기선 상태만 클리어)
 
-      console.log("🔍 API 에러 발생 (401):", {
+      console.log("🔍 API 에러 발생 (401) -> 로그아웃 처리:", {
         url: error.config?.url,
         data: error.response?.data,
       });

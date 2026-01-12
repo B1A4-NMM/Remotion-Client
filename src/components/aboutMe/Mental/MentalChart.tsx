@@ -237,7 +237,7 @@ const MentalChart = ({ type, data, limit }: MentalChartProps) => {
           <BarChart
             data={groupedData}
             height={100}
-            margin={{ top: 15, right: 10, left: 0, bottom: -10 }}
+            margin={{ top: 15, right: 10, left: 30, bottom: -10 }}
             barCategoryGap="20%"
             barGap={2}
           >

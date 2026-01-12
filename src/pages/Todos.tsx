@@ -25,17 +25,17 @@ export default function TodosPage() {
   }, [urlDate]);
 
   return (
-    <div className=" overflow-auto text-foreground bg-[#fdfaf8] dark:bg-transparent px-4 pb-8">
-      <Title currentTab="todos" onTabChange={() => {}} />
+    <div className="overflow-auto text-foreground bg-[#fdfaf8] dark:bg-transparent md:px-8 px-4 pb-8 md:pb-12">
+      <Title />
 
       {/* 📅 Calendar 영역: 높이 고정 없이 자연 배치 */}
-      <div className="mt-2">
+      <div className="mt-2 md:mt-4">
         <CalendarSection />
       </div>
 
       {/* ✅ Todo 영역: Calendar 아래로 자연 흐름 */}
-      <div className="mt-6">
-        <TodoSection selectedDate={selectedDate} />
+      <div className="mt-6 md:mt-8">
+        <TodoSection />
       </div>
     </div>
   );

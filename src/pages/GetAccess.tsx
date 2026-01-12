@@ -7,16 +7,19 @@ export default function GetAccess() {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const token = params.get("access");
+    const accessToken = params.get("access");
+    const refreshToken = params.get("refresh");
 
-    if (token) {
-      localStorage.setItem("accessToken", token);
+    if (accessToken && refreshToken) {
+      // Access Token과 Refresh Token 모두 localStorage에 저장
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
       navigate("/");
     } else {
       console.error("토큰 없음");
       navigate("/login");
     }
-  }, [navigate]);
+  }, [navigate, location.search]);
 
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center">

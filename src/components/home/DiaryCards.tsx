@@ -32,12 +32,12 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
   const [openId, setOpenId] = useState<number | null>(null);
   const navigate = useNavigate();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  
+
   // 윈도우 크기 변화 감지
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // 화면 크기에 따른 레이아웃 모드 결정
@@ -66,18 +66,9 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
   const MapSkeleton = ({ className }: { className?: string }) => (
     <div className={`bg-gray-200 animate-pulse rounded-lg ${className}`} />
   );
-  
 
   // LazyImage 컴포넌트 완성
-  const LazyImage = ({ 
-    src, 
-    alt, 
-    className 
-  }: { 
-    src: string; 
-    alt: string; 
-    className: string; 
-  }) => {
+  const LazyImage = ({ src, alt, className }: { src: string; alt: string; className: string }) => {
     const [isLoaded, setIsLoaded] = useState(false);
     const [hasError, setHasError] = useState(false);
 
@@ -88,7 +79,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
           src={src}
           alt={alt}
           className={`${className} transition-opacity duration-200 ${
-            isLoaded ? 'opacity-100' : 'opacity-0'
+            isLoaded ? "opacity-100" : "opacity-0"
           }`}
           onLoad={() => setIsLoaded(true)}
           onError={() => setHasError(true)}
@@ -121,7 +112,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
           src={mapUrl}
           alt="map-preview"
           className={`rounded-lg object-cover w-full h-full transition-opacity duration-200 ${
-            isLoaded ? 'opacity-100' : 'opacity-0'
+            isLoaded ? "opacity-100" : "opacity-0"
           }`}
           onLoad={() => setIsLoaded(true)}
           onError={() => setHasError(true)}
@@ -154,8 +145,12 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
 
   // 공통 컴포넌트들
   const renderBlobSection = (diary: Diary, index: number) => (
-    <div className={`h-full w-full rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center p-2 overflow-hidden ${isCompactMode ? 'min-w-0' : 'min-w-[120px] max-w-[170px]'}`}>
-      <div className={`${isCompactMode ? 'text-sm' : 'text-base'} text-[#85848F] font-medium text-center mb-2`}>
+    <div
+      className={`h-full w-full rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] flex flex-col items-center justify-center p-2 overflow-hidden ${isCompactMode ? "min-w-0" : "min-w-[120px] max-w-[170px]"}`}
+    >
+      <div
+        className={`${isCompactMode ? "text-sm" : "text-base"} text-[#85848F] font-medium text-center mb-2`}
+      >
         {diary.emotions && diary.emotions.length > 0
           ? `${diary.emotions
               .slice(0, isCompactMode ? 1 : 2)
@@ -170,7 +165,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
           index={index}
         />
       </div>
-      <div className={`${isCompactMode ? 'text-sm' : 'text-base'} text-[#85848F] text-center mt-2`}>
+      <div className={`${isCompactMode ? "text-sm" : "text-base"} text-[#85848F] text-center mt-2`}>
         {diary.targets && diary.targets.length > 0
           ? `${diary.targets.slice(0, isCompactMode ? 1 : 2).join(", ")}${diary.targets.length > (isCompactMode ? 1 : 2) ? " 등" : ""}`
           : "나 혼자"}
@@ -263,7 +258,10 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
   };
 
   return (
-    <div className="flex flex-col gap-2 w-full max-w-[420px] mx-auto" style={{ containerType: 'inline-size' }}>
+    <div
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full"
+      style={{ containerType: "inline-size" }}
+    >
       {diaries.map((mappedDiary, index) => {
         if (!mappedDiary.diaryId) {
           console.error(`❌ mappedDiary[${index}]의 diaryId가 undefined입니다!`);
@@ -312,7 +310,9 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
                       ? `${mappedDiary.emotions
                           .slice(0, 2)
                           .map(e => e.emotion)
-                          .join(", ")}${mappedDiary.emotions.length > 2 ? ` 외 ${mappedDiary.emotions.length - 2}가지 감정` : ""}`
+                          .join(
+                            ", "
+                          )}${mappedDiary.emotions.length > 2 ? ` 외 ${mappedDiary.emotions.length - 2}가지 감정` : ""}`
                       : "감정 없음"}
                   </div>
                   <div className="text-xs text-[#85848F] truncate">
@@ -341,13 +341,11 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
-              <div 
-                className="grid grid-cols-2 gap-2 rounded-lg mb-4" 
+              <div
+                className="grid grid-cols-2 gap-2 rounded-lg mb-4"
                 style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
               >
-                <div className="col-span-1 h-full">
-                  {renderBlobSection(mappedDiary, index)}
-                </div>
+                <div className="col-span-1 h-full">{renderBlobSection(mappedDiary, index)}</div>
                 <div className="col-span-1 h-full flex items-center">
                   <LazyMap diary={mappedDiary} />
                 </div>
@@ -366,8 +364,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
-              <div 
-                className="flex gap-2 rounded-lg mb-4" 
+              <div
+                className="flex gap-2 rounded-lg mb-4"
                 style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
               >
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
@@ -393,8 +391,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
-              <div 
-                className="flex gap-2 rounded-lg mb-4" 
+              <div
+                className="flex gap-2 rounded-lg mb-4"
                 style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
               >
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
@@ -425,8 +423,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
-              <div 
-                className="flex gap-2 rounded-lg mb-4" 
+              <div
+                className="flex gap-2 rounded-lg mb-4"
                 style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
               >
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
@@ -463,7 +461,7 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
             >
               {isCompactMode ? (
                 // 좁은 화면에서의 레이아웃 - 스택 형태로 변경
-                <div style={{ height: 'auto' }} className="flex flex-col gap-2 rounded-lg mb-4">
+                <div style={{ height: "auto" }} className="flex flex-col gap-2 rounded-lg mb-4">
                   <div className="flex gap-2 items-center rounded-lg bg-gradient-to-b from-[#f5f6fa] to-[#e0e3ef] p-4">
                     <div className="w-[70px] h-[70px] flex-shrink-0 flex items-center justify-center rounded-full overflow-hidden">
                       <VirtualizedBlobCard
@@ -478,7 +476,9 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
                           ? `${mappedDiary.emotions
                               .slice(0, 2)
                               .map(e => e.emotion)
-                              .join(", ")}${mappedDiary.emotions.length > 2 ? ` 외 ${mappedDiary.emotions.length - 2}가지 감정` : ""}`
+                              .join(
+                                ", "
+                              )}${mappedDiary.emotions.length > 2 ? ` 외 ${mappedDiary.emotions.length - 2}가지 감정` : ""}`
                           : "감정 없음"}
                       </div>
                       <div className="text-xs text-[#85848F] truncate">
@@ -515,11 +515,13 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
                 </div>
               ) : (
                 // 일반 화면에서의 레이아웃
-                <div 
-                  className="flex gap-2 rounded-lg mb-4" 
+                <div
+                  className="flex gap-2 rounded-lg mb-4"
                   style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
                 >
-                  <div className="w-1/2 h-full flex-shrink-0">{renderBlobSection(mappedDiary, index)}</div>
+                  <div className="w-1/2 h-full flex-shrink-0">
+                    {renderBlobSection(mappedDiary, index)}
+                  </div>
                   <div className="w-1/2 grid grid-rows-2 gap-2 h-full min-w-0">
                     <div className="h-full min-h-0">
                       <LazyMap diary={mappedDiary} />
@@ -548,7 +550,6 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
           );
         }
 
-
         // 케이스 7: Blob + 사진3 (사진 3개, 지도 없음)
         if (!hasMap && imageCount === 3) {
           return (
@@ -558,8 +559,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
-              <div 
-                className="flex gap-2 rounded-lg mb-4" 
+              <div
+                className="flex gap-2 rounded-lg mb-4"
                 style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
               >
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
@@ -599,8 +600,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
-              <div 
-                className="flex gap-2 rounded-lg mb-4" 
+              <div
+                className="flex gap-2 rounded-lg mb-4"
                 style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
               >
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
@@ -639,8 +640,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
-              <div 
-                className="flex gap-2 rounded-lg mb-4" 
+              <div
+                className="flex gap-2 rounded-lg mb-4"
                 style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
               >
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>
@@ -686,8 +687,8 @@ const DiaryCards: React.FC<DiaryCardsProps> = ({ diaries, onDeleteDiary, lastIte
               className="w-full bg-white rounded-[20px] shadow-md p-4 flex flex-col cursor-pointer"
               onClick={() => handleCardClick(mappedDiary.diaryId)}
             >
-              <div 
-                className="flex gap-2 rounded-lg mb-4" 
+              <div
+                className="flex gap-2 rounded-lg mb-4"
                 style={{ height: `${CARD_CONTENT_HEIGHT}px` }}
               >
                 <div className="w-1/2 h-full">{renderBlobSection(mappedDiary, index)}</div>

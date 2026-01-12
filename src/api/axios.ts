@@ -2,9 +2,7 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_SOCIAL_AUTH_URL,
-  // baseURL: import.meta.env.DEV
-  // ? '/api'
-  // : import.meta.env.VITE_SOCIAL_AUTH_URL,
+  withCredentials: false, // 쿠키 사용 안 함
 });
 
 // 전역 로그아웃 모달 상태 관리
@@ -15,47 +13,13 @@ export const setLogoutModalStore = (store: any) => {
   logoutModalStore = store;
 };
 
-// JWT 토큰에서 만료 시간 추출
-const getTokenExpiry = (token: string): number | null => {
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload?.exp ? payload.exp * 1000 : null; // 밀리초로 변환
-  } catch (error) {
-    console.error("토큰 파싱 실패:", error);
-    return null;
-  }
-};
-
-// 토큰이 곧 만료될 예정인지 확인 (5분 전)
-const isTokenExpiringSoon = (token: string): boolean => {
-  const expiry = getTokenExpiry(token);
-  if (!expiry) return true;
-
-  const now = Date.now();
-  const fiveMinutes = 5 * 60 * 1000; // 5분
-  return expiry - now <= fiveMinutes;
-};
-
 // 요청 인터셉터 - 토큰 자동 첨부
 api.interceptors.request.use(
   config => {
-    const token = localStorage.getItem("accessToken");
-
-    if (token) {
-      // 토큰이 곧 만료될 예정이면 로그아웃
-      if (isTokenExpiringSoon(token)) {
-        localStorage.removeItem("accessToken");
-        if (logoutModalStore && typeof logoutModalStore.openModal === "function") {
-          logoutModalStore.openModal();
-        } else {
-          window.location.href = "/login";
-        }
-        return Promise.reject(new Error("토큰 만료"));
-      }
-
-      config.headers.Authorization = `Bearer ${token}`;
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
-
     return config;
   },
   error => Promise.reject(error)
@@ -64,17 +28,65 @@ api.interceptors.request.use(
 // 응답 인터셉터 - 401 에러 처리
 api.interceptors.response.use(
   response => response,
-  error => {
-    console.log("🔍 API 에러 발생:", {
-      status: error.response?.status,
-      url: error.config?.url,
-      method: error.config?.method,
-      data: error.response?.data,
-    });
+  async error => {
+    const originalRequest = error.config;
 
+    // 401 에러이고, 아직 재시도하지 않은 요청이며, refresh 요청이 아닌 경우
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes("/auth/refresh")
+    ) {
+      originalRequest._retry = true;
+
+      try {
+        console.log("🔄 토큰 만료, 재발급 시도 (localStorage)...");
+        // 토큰 갱신 요청 (localStorage에서 refreshToken 읽어서 전송)
+        const refreshToken = localStorage.getItem("refreshToken");
+        if (!refreshToken) {
+          throw new Error("Refresh token not found");
+        }
+
+        const { data } = await api.post(
+          `/auth/refresh`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${refreshToken}`,
+            },
+          }
+        );
+
+        console.log("✅ 토큰 재발급 성공");
+        // 새 Access Token 저장
+        localStorage.setItem("accessToken", data.access_token);
+
+        // Refresh Token도 갱신
+        if (data.refresh_token) {
+          localStorage.setItem("refreshToken", data.refresh_token);
+        }
+
+        // 실패한 요청의 헤더 업데이트
+        originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
+
+        // 실패한 요청 재시도
+        return api(originalRequest);
+      } catch (refreshError) {
+        console.error("❌ 토큰 갱신 실패:", refreshError);
+        // 갱신 실패 시 로그아웃 처리 진행
+      }
+    }
+
+    // 위에서 리턴되지 않았다면 (갱신 실패, 등) 로그아웃 처리
     if (error.response?.status === 401) {
       // 토큰 만료 또는 무효
       localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+
+      console.log("🔍 API 에러 발생 (401) -> 로그아웃 처리:", {
+        url: error.config?.url,
+        data: error.response?.data,
+      });
 
       // 모달 store가 설정되어 있고 openModal 메서드가 있으면 모달을 띄움
       if (logoutModalStore && typeof logoutModalStore.openModal === "function") {
@@ -87,8 +99,8 @@ api.interceptors.response.use(
       }
     } else if (error.response?.status >= 500) {
       console.error("Server Error:", error.response.data);
-      // 500 오류에 대한 추가 처리 로직
     }
+
     return Promise.reject(error);
   }
 );

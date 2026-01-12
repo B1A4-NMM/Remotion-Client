@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import EmotionSummaryCard from "@/components/analysis/EmotionSummaryCard";
 import EmotionSummaryCardSkeleton from "@/components/skeleton/EmotionSummaryCardSkeleton";
 import StrengthGraph from "@/components/analysis/StrengthGraph";
@@ -121,7 +121,7 @@ const Analysis = () => {
   };
 
   const data = useGetCharacter();
-  const character = data.data?.character;
+  const character = data.data?.character || "unknown";
 
   // 모든 분석 데이터가 없으면 Index 컴포넌트 표시
   if (!isDataLoading && hasNoData) {
@@ -139,8 +139,8 @@ const Analysis = () => {
     <div className="px-4 py-5 text-foreground min-h-screen space-y-6">
       {/* 기간 선택 드롭다운 - 감정 데이터가 있을 때만 표시 */}
       {(hasNegativeData || hasPositiveData) && (
-        <div className="flex justify-between gap-10">
-          <div className="w-80 bg-white rounded-xl z-40 ">
+        <div className="flex flex-col md:flex-row md:justify-between md:gap-4">
+          <div className="w-full md:w-80 bg-white rounded-xl z-40">
             <Select
               value={selectedPeriod}
               onValueChange={value => setSelectedPeriod(value as PeriodType)}
@@ -150,7 +150,7 @@ const Analysis = () => {
             />
           </div>
           {/* 도움말 버튼 */}
-          <div ref={helpRef} className="relative">
+          <div ref={helpRef} className="relative md:self-end">
             <button
               aria-label="도움말"
               className="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center shadow text-gray-600 text-xl font-bold border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
@@ -171,81 +171,87 @@ const Analysis = () => {
         </div>
       )}
 
-      {/* 부정적 감정 - 데이터가 있을 때만 표시 */}
-      {hasNegativeData && (
-        <section className="bg-white rounded-xl shadow p-5">
-          <div className="flex justify-between mb-5">
-            <h3 className="text-[21px] font-semibold mb-2 text-gray-800">부정적 감정</h3>
-            <div onClick={() => onClickHandler("부정")} className="cursor-pointer">
-              <ChevronRight className="text-gray-400" />
-            </div>
-          </div>
-          <div className="overflow-x-auto ">
-            {isLoading ? (
-              <EmotionSummaryCardSkeleton />
-            ) : (
-              <EmotionSummaryCard
-                key={"부정"}
-                type={"부정"}
-                period={getPeriodConfig(selectedPeriod).days}
-                barCount={getPeriodConfig(selectedPeriod).barCount}
-              />
-            )}
-          </div>
-        </section>
-      )}
+      {/* Desktop: 2-Column Layout for Charts */}
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Left Column: Charts */}
+        <div className="flex-1 space-y-6">
+          {/* 부정적 감정 - 데이터가 있을 때만 표시 */}
+          {hasNegativeData && (
+            <section className="bg-white rounded-xl shadow p-5">
+              <div className="flex justify-between mb-5">
+                <h3 className="text-[21px] font-semibold mb-2 text-gray-800">부정적 감정</h3>
+                <div onClick={() => onClickHandler("부정")} className="cursor-pointer">
+                  <ChevronRight className="text-gray-400" />
+                </div>
+              </div>
+              <div className="overflow-x-auto ">
+                {isLoading ? (
+                  <EmotionSummaryCardSkeleton />
+                ) : (
+                  <EmotionSummaryCard
+                    key={"부정"}
+                    type={"부정"}
+                    period={getPeriodConfig(selectedPeriod).days}
+                    barCount={getPeriodConfig(selectedPeriod).barCount}
+                  />
+                )}
+              </div>
+            </section>
+          )}
 
-      {/* 긍정적 감정 - 데이터가 있을 때만 표시 */}
-      {hasPositiveData && (
-        <section className="bg-white rounded-xl shadow p-5">
-          <div className="flex justify-between mb-5">
-            <h3 className="text-[21px] font-semibold mb-2 text-gray-800">긍정적 감정</h3>
-            <div onClick={() => onClickHandler("긍정")} className="cursor-pointer">
-              <ChevronRight className="text-gray-400" />
-            </div>
-          </div>
-          <div className="overflow-x-auto pb-2">
-            {isLoading ? (
-              <EmotionSummaryCardSkeleton />
-            ) : (
-              <EmotionSummaryCard
-                key={"긍정"}
-                type={"긍정"}
-                period={getPeriodConfig(selectedPeriod).days}
-                barCount={getPeriodConfig(selectedPeriod).barCount}
-              />
-            )}
-          </div>
-        </section>
-      )}
+          {/* 긍정적 감정 - 데이터가 있을 때만 표시 */}
+          {hasPositiveData && (
+            <section className="bg-white rounded-xl shadow p-5">
+              <div className="flex justify-between mb-5">
+                <h3 className="text-[21px] font-semibold mb-2 text-gray-800">긍정적 감정</h3>
+                <div onClick={() => onClickHandler("긍정")} className="cursor-pointer">
+                  <ChevronRight className="text-gray-400" />
+                </div>
+              </div>
+              <div className="overflow-x-auto pb-2">
+                {isLoading ? (
+                  <EmotionSummaryCardSkeleton />
+                ) : (
+                  <EmotionSummaryCard
+                    key={"긍정"}
+                    type={"긍정"}
+                    period={getPeriodConfig(selectedPeriod).days}
+                    barCount={getPeriodConfig(selectedPeriod).barCount}
+                  />
+                )}
+              </div>
+            </section>
+          )}
 
-      {/* 강점 - 데이터가 있을 때만 표시 */}
-      {hasStrengthData && (
-        <section className="bg-white rounded-xl shadow p-5">
-          <div className="flex justify-between mb-5">
-            <h3 className="text-[21px] font-semibold mb-2 text-gray-800">강점 그래프</h3>
-            <div onClick={() => onClickHandler("Strength")} className="cursor-pointer">
-              <ChevronRight className="text-gray-400" />
-            </div>
-          </div>
-          {isLoading ? <StrengthGraphSkeleton /> : <StrengthGraph />}
-        </section>
-      )}
+          {/* 강점 - 데이터가 있을 때만 표시 */}
+          {hasStrengthData && (
+            <section className="bg-white rounded-xl shadow p-5">
+              <div className="flex justify-between mb-5">
+                <h3 className="text-[21px] font-semibold mb-2 text-gray-800">강점 그래프</h3>
+                <div onClick={() => onClickHandler("Strength")} className="cursor-pointer">
+                  <ChevronRight className="text-gray-400" />
+                </div>
+              </div>
+              {isLoading ? <StrengthGraphSkeleton /> : <StrengthGraph />}
+            </section>
+          )}
+        </div>
 
-      {/* 캐릭터 - 데이터가 있을 때만 표시 */}
-      {hasCharacterData && (
-        <section className="bg-white rounded-xl shadow pt-5 pl-5 pr-5">
-          <div className="flex justify-between mb-5">
-            <h3 className="text-[21px] font-semibold mb-2 text-gray-800">
-              {nickname}님의 마음 속 동물
-            </h3>
-            <div onClick={() => onClickHandler("character")} className="cursor-pointer">
-              <ChevronRight className="text-gray-400" />
+        {/* Right Column: Character */}
+        {hasCharacterData && (
+          <section className="bg-white rounded-xl shadow pt-5 pl-5 pr-5 lg:w-1/3">
+            <div className="flex justify-between mb-5">
+              <h3 className="text-[21px] font-semibold mb-2 text-gray-800">
+                {nickname}님의 마음 속 동물
+              </h3>
+              <div onClick={() => onClickHandler("character")} className="cursor-pointer">
+                <ChevronRight className="text-gray-400" />
+              </div>
             </div>
-          </div>
-          <AnimalCard animalType={character} script="" isMain={true} />
-        </section>
-      )}
+            <AnimalCard animalType={character} script="" isMain={true} />
+          </section>
+        )}
+      </div>
     </div>
   );
 };

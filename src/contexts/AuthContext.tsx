@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import api from "../api/axios"; // API 호출을 위해 import
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -31,10 +32,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsAuthenticated(true);
   };
 
-  const logout = () => {
-    localStorage.removeItem("accessToken");
-    setToken(null);
-    setIsAuthenticated(false);
+  const logout = async () => {
+    try {
+      // 서버에 로그아웃 요청 (쿠키 삭제 및 Redis 삭제)
+      await api.post("/auth/logout");
+    } catch (error) {
+      console.error("로그아웃 요청 실패:", error);
+    } finally {
+      // 클라이언트 상태 정리
+      localStorage.removeItem("accessToken");
+      // refreshToken은 HttpOnly 쿠키라 클라이언트가 못 지움 (서버가 지워줘야 함)
+      setToken(null);
+      setIsAuthenticated(false);
+    }
   };
 
   useEffect(() => {

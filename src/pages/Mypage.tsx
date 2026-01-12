@@ -1,4 +1,3 @@
-import React from "react";
 import { useUserStore } from "@/store/userStore";
 import { useTheme } from "@/components/theme-provider";
 import NotificationPreview from "@/components/notification/NotificationPreview";
@@ -53,7 +52,7 @@ export default function Mypage() {
   const { user, logout } = useUserStore();
   const { theme, setTheme } = useTheme();
   const { data: authData, isLoading, error } = useGetAuthTest();
-  const navigate= useNavigate();
+  const navigate = useNavigate();
 
   // API 데이터에서 사용자 정보 추출
   const apiUser = authData?.user;
@@ -85,8 +84,8 @@ export default function Mypage() {
   const socialInfo = getSocialInfo(socialType);
 
   return (
-    <div className="min-h-screen overflow-auto text-foreground bg-[#fdfaf8] dark:bg-transparent px-4 pb-8">
-      <div className="max-w-md mx-auto">
+    <div className="min-h-screen overflow-auto text-foreground bg-[#fdfaf8] dark:bg-transparent md:px-8 px-4 pb-8 md:pb-12">
+      <div className="md:max-w-2xl mx-auto w-full">
         {/* 헤더 */}
         <div className="pt-8">
           <h1 className="text-3xl font-bold text-gray-900 pb-8">마이페이지</h1>
@@ -171,12 +170,14 @@ export default function Mypage() {
 
         <Webpush />
 
-        <div className="bg-card rounded-2xl shadow-lg p-6 mb-6 border cursor-pointer flex justify-between "
-          onClick={()=>navigate("/faq")}>
+        <div
+          className="bg-card rounded-2xl shadow-lg p-6 mb-6 border cursor-pointer flex justify-between "
+          onClick={() => navigate("/faq")}
+        >
           <span className="text-xl font-semibold">FAQ</span>
           <div className="text-sm text-muted-foreground flex justify-left mt-1">
-            <span className="mt-[1px] ">자주 하는 질문</span> 
-            <ChevronRight/>
+            <span className="mt-[1px] ">자주 하는 질문</span>
+            <ChevronRight />
           </div>
         </div>
 
@@ -187,7 +188,6 @@ export default function Mypage() {
         >
           로그아웃
         </button>
-
       </div>
     </div>
   );

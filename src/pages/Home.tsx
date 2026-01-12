@@ -1,22 +1,18 @@
 // Home.tsx
-import React, { useState, useRef, useCallback } from "react";
-import { useGetDiaryDate } from "../api/queries/home/useGetDiaryDate";
+import { useState, useRef, useCallback } from "react";
 import { useGetHomeData } from "../api/queries/home/useGetHome";
 import DiaryCards from "../components/home/DiaryCards";
 import DiaryCardsSkeleton from "../components/home/DiaryCardsSkeleton";
 import Title from "../components/home/Title";
 import Index from "../components/home/Index";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Map from "./Map";
 import HomeBar from "@/components/home/HomeBar";
-import { useTheme } from "@/components/theme-provider";
 
 import "../styles/homeCard.css";
-import dayjs from "dayjs";
 import { useDeleteDiary } from "../api/queries/home/useDeleteDiary";
 import { useInfiniteDiaries } from "../api/queries/home/useInfiniteDiaries";
 import { useQueryClient } from "@tanstack/react-query";
-import { usePatchDiaryBookmark } from "../api/queries/home/usePatchDiaryBookmark";
 // import RecommendHome from "@/components/home/RecommendHome";
 
 // S3 → http 변환 (실제 CDN 도메인에 맞게 수정 필요)
@@ -49,15 +45,7 @@ function mapApiDiaryToDiaryCard(apiDiary: any) {
 
 const Home = () => {
   const token = localStorage.getItem("accessToken") || "";
-  const navigate = useNavigate();
   const location = useLocation();
-  const { theme } = useTheme();
-  const isDark =
-    theme === "dark" ||
-    (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-
-  const [selectedDate, setSelectedDate] = useState<Date>(dayjs().toDate());
-  const [errorMessage, setErrorMessage] = useState<string>("");
   const [selectedTab, setSelectedTab] = useState<"list" | "map" | "search">(
     location.state?.selectedTab || "list"
   );
@@ -66,23 +54,10 @@ const Home = () => {
 
   const queryClient = useQueryClient();
   const deleteDiaryMutation = useDeleteDiary();
-  const patchBookmark = usePatchDiaryBookmark();
 
   const handleDeleteDiary = (diaryId: number) => {
     deleteDiaryMutation.mutate(
       { diaryId: String(diaryId) },
-      {
-        onSuccess: () => {
-          // useInfiniteDiaries의 query key와 동일하게 맞춤
-          queryClient.invalidateQueries({ queryKey: ["infiniteDiaries"] });
-        },
-      }
-    );
-  };
-
-  const handleToggleBookmark = (diaryId: number) => {
-    patchBookmark.mutate(
-      { diaryId },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["infiniteDiaries"] });
@@ -112,26 +87,13 @@ const Home = () => {
   const infiniteDiaries =
     data?.pages.flatMap(page => page.item.diaries.map(mapApiDiaryToDiaryCard)) ?? [];
 
-  // API 호출 시 string 변환
-  const { data: todayData, isLoading } = useGetDiaryDate(dayjs(selectedDate).format("YYYY-MM-DD"));
-
   // 새로운 Home API 호출
-  const { data: homeData, isLoading: homeLoading, error: homeError } = useGetHomeData(token);
+  const { data: homeData, isLoading: homeLoading } = useGetHomeData(token);
 
   // DiaryCards용 데이터 변환
   const emotionCountByMonth = homeData?.item?.emotionCountByMonth ?? 0;
   const totalDiaryCount = homeData?.item?.totalDiaryCount ?? 0;
   const continuousWritingDate = homeData?.item?.continuousWritingDate ?? 0;
-  const diaries = homeData?.item?.diaries?.map(mapApiDiaryToDiaryCard) || [];
-
-  // useEffect(() => {
-  //   if (!homeLoading && diaries.length === 0) {
-  //     setSelectedTab("map");
-  //   }
-  // }, [homeLoading, diaries]);
-
-
-  const todayDiary = todayData ? todayData : null;
 
   return (
     <div className="flex flex-col text-foreground ">
@@ -169,12 +131,14 @@ const Home = () => {
           </>
         )}
         {selectedTab === "map" && (
-          <Map
-            continuousWritingDate={continuousWritingDate}
-            emotionCountByMonth={emotionCountByMonth}
-            totalDiaryCount={totalDiaryCount}
-            initialCenter={initialCenter}
-          />
+          <div className="md:rounded-2xl md:shadow md:overflow-hidden">
+            <Map
+              continuousWritingDate={continuousWritingDate}
+              emotionCountByMonth={emotionCountByMonth}
+              totalDiaryCount={totalDiaryCount}
+              initialCenter={initialCenter}
+            />
+          </div>
         )}
       </div>
     </div>

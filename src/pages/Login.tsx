@@ -26,12 +26,13 @@ export default function Login() {
   const handleGoogle = () =>
     (window.location.href = SOCIAL_AUTH_URL.google + `?state=${REDIRECT_URI}`);
 
-  const handleDemo = async (id: "traveler" | "lee" | "harry" | "demo") => {
+  const handleDemo = async (id: "traveler" | "lee" | "harry" | "namul" | "anne" | "demo") => {
     try {
       const res = await demoLogin(id);
-      const token = res.accessToken;
-      if (token) {
-        localStorage.setItem("accessToken", token);
+      const { accessToken, refreshToken } = res;
+      if (accessToken && refreshToken) {
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
         window.location.href = "/";
       } else {
         alert("토큰을 받아오지 못했습니다.");

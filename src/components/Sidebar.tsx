@@ -17,8 +17,6 @@ export default function Sidebar() {
 
   const navItems = [
     { to: "/", icon: Home, label: "홈", active: path === "/" },
-    { to: "/login", icon: User, label: "로그인", active: path === "/login" },
-    { to: "/signup", icon: User, label: "회원가입", active: path === "/signup" },
     {
       to: "/analysis",
       icon: PieChart,

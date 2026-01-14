@@ -8,10 +8,12 @@ export default function GetAccess() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const accessToken = params.get("access");
-    // refreshToken은 이제 쿠키(HttpOnly)로 전달되므로 URL에 노출되지 않음
+    const refreshToken = params.get("refresh");
 
-    if (accessToken) {
+    if (accessToken && refreshToken) {
+      // Access Token과 Refresh Token 모두 localStorage에 저장
       localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
       navigate("/");
     } else {
       console.error("토큰 없음");

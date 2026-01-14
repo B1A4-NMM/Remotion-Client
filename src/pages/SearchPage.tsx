@@ -44,7 +44,6 @@ const SearchPage = () => {
   // 사진 데이터를 평면화
   const allPhotos = photoData?.pages?.flatMap(page => page.photos) ?? [];
 
-
   // 현재 표시할 데이터 결정
   const currentDiaries =
     selectedCategory === "bookmark"
@@ -55,7 +54,6 @@ const SearchPage = () => {
 
   // API 응답을 DiaryCards에서 사용하는 형식으로 변환
   const transformedDiaries = currentDiaries.map((diary: any) => {
-
     const transformed = {
       diaryId: diary.diaryId || diary.id,
       emotions: diary.emotions || diary.emotion || [], // 배열 형태
@@ -217,7 +215,7 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto text-foreground h-screen flex flex-col">
+    <div className="text-foreground h-screen flex flex-col">
       <div className="flex-shrink-0">
         <SearchBar
           value={inputValue}

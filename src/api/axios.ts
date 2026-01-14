@@ -2,7 +2,7 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_SOCIAL_AUTH_URL,
-  withCredentials: true, // 쿠키 자동 포함 설정 (HttpOnly Cookie 사용 시 필수)
+  withCredentials: false, // 쿠키 사용 안 함
 });
 
 // 전역 로그아웃 모달 상태 관리
@@ -16,9 +16,9 @@ export const setLogoutModalStore = (store: any) => {
 // 요청 인터셉터 - 토큰 자동 첨부
 api.interceptors.request.use(
   config => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
   },
@@ -32,19 +32,39 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // 401 에러이고, 아직 재시도하지 않은 요청이며, refresh 요청이 아닌 경우
-    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/auth/refresh')) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes("/auth/refresh")
+    ) {
       originalRequest._retry = true;
-      
+
       try {
-        console.log("🔄 토큰 만료, 재발급 시도 (Cookie)...");
-        // 토큰 갱신 요청 (쿠키가 자동으로 전송됨)
-        const { data } = await api.post(`/auth/refresh`);
+        console.log("🔄 토큰 만료, 재발급 시도 (localStorage)...");
+        // 토큰 갱신 요청 (localStorage에서 refreshToken 읽어서 전송)
+        const refreshToken = localStorage.getItem("refreshToken");
+        if (!refreshToken) {
+          throw new Error("Refresh token not found");
+        }
+
+        const { data } = await api.post(
+          `/auth/refresh`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${refreshToken}`,
+            },
+          }
+        );
 
         console.log("✅ 토큰 재발급 성공");
         // 새 Access Token 저장
         localStorage.setItem("accessToken", data.access_token);
-        
-        // Refresh Token은 백엔드가 Set-Cookie 헤더로 자동 갱신해줌
+
+        // Refresh Token도 갱신
+        if (data.refresh_token) {
+          localStorage.setItem("refreshToken", data.refresh_token);
+        }
 
         // 실패한 요청의 헤더 업데이트
         originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
@@ -61,7 +81,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // 토큰 만료 또는 무효
       localStorage.removeItem("accessToken");
-      // refreshToken은 쿠키에 있으므로 클라이언트가 직접 지울 수 없음 (로그아웃 API 호출 필요하지만, 여기선 상태만 클리어)
+      localStorage.removeItem("refreshToken");
 
       console.log("🔍 API 에러 발생 (401) -> 로그아웃 처리:", {
         url: error.config?.url,
@@ -80,7 +100,7 @@ api.interceptors.response.use(
     } else if (error.response?.status >= 500) {
       console.error("Server Error:", error.response.data);
     }
-    
+
     return Promise.reject(error);
   }
 );

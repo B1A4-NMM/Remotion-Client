@@ -29,10 +29,10 @@ export default function Login() {
   const handleDemo = async (id: "traveler" | "lee" | "harry" | "namul" | "anne" | "demo") => {
     try {
       const res = await demoLogin(id);
-      const { accessToken, refreshToken } = res;
-      if (accessToken && refreshToken) {
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
+      const { access_token, refresh_token } = res;
+      if (access_token && refresh_token) {
+        localStorage.setItem("accessToken", access_token);
+        localStorage.setItem("refreshToken", refresh_token);
         window.location.href = "/";
       } else {
         alert("토큰을 받아오지 못했습니다.");

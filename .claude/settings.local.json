@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(flutter create:*)",
+      "Bash(flutter pub get:*)",
+      "Bash(dart run build_runner build:*)",
+      "Bash(flutter pub upgrade:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(find:*)",
+      "Bash(for file in lib/data/models/diary/diary_models.dart lib/data/models/emotion/emotion_models.dart lib/data/models/notification/notification_models.dart lib/data/models/relation/relation_models.dart lib/data/models/routine/routine_models.dart lib/data/models/strength/strength_models.dart lib/data/models/user/character_models.dart lib/data/models/user/todo_models.dart lib/data/models/video/video_models.dart)",
+      "Bash(do sed -i 's/sealed class/class/g' \"$file\")",
+      "Bash(done)",
+      "Bash(flutter build:*)",
+      "Bash(flutter clean:*)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\gooch\\Desktop\\remotion-client\\flutter\\lib\\presentation\\widgets\\todos"
+    ]
+  }
+}
